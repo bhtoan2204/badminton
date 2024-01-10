@@ -1,0 +1,47 @@
+version: '1.0'
+services:
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+      target: development
+    container_name: gateway_container
+    ports:
+      - "8080:8080"
+    command: npm run start:dev
+
+  postgres:
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - postgres:/data/postgres
+  
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    restart: unless-stopped
+    volumes:
+      - pgadmin:/root/.pgadmin
+
+  rabbitmq:
+    image: rabbitmq
+    container_name: rabbitmq_container
+    ports:
+      - '5672:5672'
+
+volumes:
+  postgres:
+  pgadmin:
