@@ -2,16 +2,36 @@ version: '1.0'
 services:
   gateway:
     build:
-      context: ./gateway
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./apps/gateway/Dockerfile
       target: development
-    container_name: gateway_container
+    command: npm run start:dev gateway
+    env_file:
+      - ./apps/gateway/.env
     ports:
       - "8080:8080"
-    command: npm run start:dev
+    depends_on:
+      - postgres
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+  
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: npm run start:dev auth
+    env_file:
+      - ./apps/auth/.env
+    depends_on:
+      - gateway
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
 
   postgres:
-    container_name: postgres_container
     image: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -24,7 +44,6 @@ services:
       - postgres:/data/postgres
   
   pgadmin:
-    container_name: pgadmin_container
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
@@ -38,7 +57,6 @@ services:
 
   rabbitmq:
     image: rabbitmq
-    container_name: rabbitmq_container
     ports:
       - '5672:5672'
 
