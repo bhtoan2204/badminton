@@ -9,7 +9,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly rmqService: RmqService) { }
 
-  @EventPattern('helloauth')
+  @EventPattern('local_login')
   async handleOrderCreated(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return { message: 'Hello Auth!', returnData: data };
