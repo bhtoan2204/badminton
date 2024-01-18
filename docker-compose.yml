@@ -11,7 +11,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
+      - postgres1
+      - postgres2
       - rabbitmq
     volumes:
       - .:/usr/src/app
@@ -31,14 +32,22 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
 
-  postgres:
+  postgres1:
     image: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
       PGDATA: /data/postgres
-    ports:
-      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - postgres:/data/postgres
+  
+  postgres2:
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
     restart: unless-stopped
     volumes:
       - postgres:/data/postgres
