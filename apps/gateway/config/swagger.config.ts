@@ -1,10 +1,9 @@
 import { DocumentBuilder } from "@nestjs/swagger";
 
 export const configSwagger = new DocumentBuilder()
-    .setTitle('Customer')
-    .setDescription('Customer API')
+    .setTitle('Family Backend API')
+    .setDescription('This is the API documentation for the Family Backend API')
     .setVersion('1.0')
-    .addTag('taxi')
     .addBearerAuth(
         {
             description: "access token",
