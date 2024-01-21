@@ -1,0 +1,14 @@
+{
+  "tasks": {
+    "prisma": {
+      "outputs": ["prisma/@generated"],
+      "dependsOn": ["^build"],
+      "command": "npm run prisma"
+    },
+    "seed": {
+      "outputs": [],
+      "dependsOn": ["^build", "prisma"],
+      "command": "npm run seed"
+    }
+  }
+}
