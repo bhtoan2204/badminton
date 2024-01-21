@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
 import { RmqModule } from '@app/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { JwtModule } from '@nestjs/jwt';
+import { AuthenticationModule } from './auth/authentication.module';
 
 @Module({
   imports: [
@@ -28,9 +27,7 @@ import { JwtModule } from '@nestjs/jwt';
       }),
       inject: [ConfigService]
     }),
-    RmqModule,
+    AuthenticationModule
   ],
-  controllers: [AuthController],
-  providers: [AuthService],
 })
 export class AuthModule { }
