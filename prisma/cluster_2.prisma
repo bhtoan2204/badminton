@@ -1,8 +1,0 @@
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL_CLUSTER_2")
-}
-
-generator client {
-  provider = "prisma-client-js"
-}
