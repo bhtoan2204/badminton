@@ -39,6 +39,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
       PGDATA: /data/postgres
     restart: unless-stopped
+    command: postgres -c listen_addresses='*'
     ports:
       - '5432:5432'
     volumes:
@@ -51,6 +52,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
       PGDATA: /data/postgres
     restart: unless-stopped
+    command: postgres -c listen_addresses='*'
     ports:
       - '5433:5432'
     volumes:
