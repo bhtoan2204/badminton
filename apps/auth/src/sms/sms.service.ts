@@ -4,6 +4,5 @@ import { TwilioClient } from 'nestjs-twilio';
 
 @Injectable()
 export default class SmsService {
-    client: TwilioClient;
     
 }

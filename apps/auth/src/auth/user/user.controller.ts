@@ -2,6 +2,7 @@ import { Controller } from "@nestjs/common";
 import { Ctx, EventPattern, Payload, RmqContext } from "@nestjs/microservices";
 import { RmqService } from "@app/common";
 import { UserService } from "./user.service";
+import { CreateAccountDto } from "./dto/createAccount.dto";
 
 @Controller()
 export class UserController {
@@ -10,15 +11,17 @@ export class UserController {
     private readonly userService: UserService
     ) {}
 
-  @EventPattern('user_created')
+  @EventPattern('authClient/create_account')
   async handleUserCreated(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return {message: 'User created successfully', data}
+    const payload : CreateAccountDto = data.createAccountDto;
+    return await this.userService.createAccount(payload);
   }
 
-  @EventPattern('send_otp')
-  async handleSendOtp(@Payload() data: any, @Ctx() context: RmqContext) {
+  @EventPattern('authClient/validate_user')
+  async handleValidateUser(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.userService.sendOtp();
+    const {email, password} = data;
+    return await this.userService.validateLocalUser(email, password);
   }
 }
