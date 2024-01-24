@@ -2,11 +2,10 @@ import { Module } from '@nestjs/common';
 import { RmqModule } from '@app/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
-import { JwtModule } from '@nestjs/jwt';
 import { AuthenticationModule } from './auth/authentication.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { parse } from 'pg-connection-string';
-import { TwilioModule } from 'nestjs-twilio';
+import { SmsModule } from './sms/sms.module';
 
 @Module({
   imports: [
@@ -19,16 +18,6 @@ import { TwilioModule } from 'nestjs-twilio';
         TWILIO_AUTH_TOKEN: Joi.string().required(),
       }),
       envFilePath: './apps/auth/.env'
-    }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET_KEY'),
-        signOptions: {
-          expiresIn: `${configService.get('JWT_EXPIRATION')}s`
-        }
-      }),
-      inject: [ConfigService]
     }),
     TypeOrmModule.forRootAsync({
       imports : [ConfigModule],
@@ -51,16 +40,9 @@ import { TwilioModule } from 'nestjs-twilio';
       },
       inject: [ConfigService]
     }),
-    TwilioModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        accountSid: configService.get('TWILIO_ACCOUNT_SID'),
-        authToken: configService.get('TWILIO_AUTH_TOKEN'),
-      }),
-      inject: [ConfigService]
-    }),
     AuthenticationModule,
-    RmqModule
+    RmqModule,
+    SmsModule
   ],
 })
 export class AuthModule { }

@@ -12,6 +12,12 @@ export class UserService {
   ) {}
 
   async sendOtp(){
-    
+
   }
+
+  async validateLocalUser(username: string, password: string){
+
+  }
+  
+  async getUserById(id: string) {}
 }
