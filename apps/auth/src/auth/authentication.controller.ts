@@ -14,7 +14,6 @@ export class AuthenticationController {
   @EventPattern('authClient/local/login')
   async handleLocalLogin(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    const payload : LoginDto = data.loginDto;
-    return await this.authenticationService.localLogin(payload);
+    return await this.authenticationService.localLogin(data);
   }
 }

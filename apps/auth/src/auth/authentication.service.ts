@@ -5,7 +5,8 @@ import { LoginDto } from "./user/dto/login.dto";
 export class AuthenticationService {
   constructor() {}
 
-  async localLogin(payload: LoginDto){
-
+  async localLogin(payload: any){
+    console.log('localLogin', payload)
+    return {message: 'localLogin successful', payload};
   }
 }

@@ -21,6 +21,7 @@ export class UserController {
   @EventPattern('authClient/validate_user')
   async handleValidateUser(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
+    console.log('handleValidateUser', data)
     const {email, password} = data;
     return await this.userService.validateLocalUser(email, password);
   }
