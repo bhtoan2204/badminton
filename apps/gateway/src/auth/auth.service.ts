@@ -11,8 +11,8 @@ export class AuthApiService {
         @Inject(AUTH_SERVICE) private authClient: ClientProxy
     ) { }
 
-    async localLogin(loginDto: LoginDto) {
-        const source = this.authClient.send('authClient/local/login', loginDto);
+    async localLogin(currentUser) {
+        const source = this.authClient.send('authClient/local/login', currentUser);
         const data = await lastValueFrom(source);
         return data;
     }
