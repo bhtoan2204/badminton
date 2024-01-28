@@ -25,4 +25,11 @@ export class UserController {
     const {email, password} = data;
     return await this.userService.validateLocalUser(email, password);
   }
+
+  @EventPattern('authClient/validate_user_id')
+  async handleValidateUserId(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    const {id} = data;
+    return await this.userService.validateUserId(id);
+  }
 }

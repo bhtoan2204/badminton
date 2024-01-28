@@ -16,4 +16,10 @@ export class AuthenticationController {
     this.rmqService.ack(context);
     return await this.authenticationService.localLogin(data);
   }
+
+  @EventPattern('authClient/get_jwt_secret')
+  async handleGetJwtSecret(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.authenticationService.getJwtSecret();
+  }
 }
