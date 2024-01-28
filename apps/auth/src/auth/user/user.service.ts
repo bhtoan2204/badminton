@@ -31,8 +31,12 @@ export class UserService {
     return user;
   }
   
-  async getUserById(id: string) {
-
+  async validateUserId(id: string){
+    const user = await this.userRepository.findOne({where: {id}});
+    if(!user) {
+      throw new UnauthorizedException('User not found');
+    };
+    return user;
   }
 
   async createAccount(createAccountDto: CreateAccountDto) {
