@@ -20,6 +20,7 @@ export class AuthenticationController {
   @EventPattern('authClient/get_jwt_secret')
   async handleGetJwtSecret(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.authenticationService.getJwtSecret();
+    const jwtSecret = await this.authenticationService.getJwtSecret();
+    return jwtSecret;
   }
 }

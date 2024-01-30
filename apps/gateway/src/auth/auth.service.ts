@@ -35,4 +35,10 @@ export class UserService {
         const data = await lastValueFrom(source);
         return data;
     }
+
+    async getProfile(id: string){
+        const source = this.authClient.send('authClient/get_profile', {id});
+        const data = await lastValueFrom(source);
+        return data;
+    }
 }

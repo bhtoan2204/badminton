@@ -12,7 +12,7 @@ services:
       - "8080:8080"
     depends_on:
       - postgres1
-      - postgres2
+      # - postgres2
       - rabbitmq
     volumes:
       - .:/usr/src/app
@@ -45,18 +45,18 @@ services:
     volumes:
       - postgres:/data/postgres
   
-  postgres2:
-    image: postgres
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
-      PGDATA: /data/postgres
-    restart: unless-stopped
-    command: postgres -c listen_addresses='*'
-    ports:
-      - '5433:5432'
-    volumes:
-      - postgres:/data/postgres
+  # postgres2:
+  #   image: postgres
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER:-postgres}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+  #     PGDATA: /data/postgres
+  #   restart: unless-stopped
+  #   command: postgres -c listen_addresses='*'
+  #   ports:
+  #     - '5433:5432'
+  #   volumes:
+  #     - postgres:/data/postgres
   
   pgadmin:
     image: dpage/pgadmin4
