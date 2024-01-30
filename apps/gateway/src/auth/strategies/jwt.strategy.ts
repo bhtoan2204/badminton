@@ -1,5 +1,4 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AUTH_SERVICE } from 'apps/gateway/constant/services.constant';
@@ -12,16 +11,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     @Inject(AUTH_SERVICE) private authClient: ClientProxy
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: any) => {
-          return request?.authentication
-        }
-      ]),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: async () =>{
-        const jwtSecretRequest = this.authClient.send('authClient/get_jwt_secret', {});
-        return await lastValueFrom(jwtSecretRequest);
-      },
+      secretOrKey: "RedcupsandsweatybodieseverywhereHandsintheairlikewedontcareCausewecametohavesomuchfunnow"
     });
   }
 

@@ -21,7 +21,6 @@ export class UserController {
   @EventPattern('authClient/validate_user')
   async handleValidateUser(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    console.log('handleValidateUser', data)
     const {email, password} = data;
     return await this.userService.validateLocalUser(email, password);
   }
@@ -31,5 +30,12 @@ export class UserController {
     this.rmqService.ack(context);
     const {id} = data;
     return await this.userService.validateUserId(id);
+  }
+
+  @EventPattern('authClient/get_profile')
+  async handleGetProfile(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    const {id} = data;
+    return await this.userService.getProfile(id);
   }
 }
