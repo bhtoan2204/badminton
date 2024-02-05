@@ -25,7 +25,7 @@ export function setupSwagger(app: INestApplication): void {
         .build();
 
     const options: SwaggerDocumentOptions = {
-        ignoreGlobalPrefix: true,
+        ignoreGlobalPrefix: false,
         operationIdFactory: (controllerKey: string, methodKey: string) =>
             methodKey,
     };

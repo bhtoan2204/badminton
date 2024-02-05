@@ -7,6 +7,7 @@ import {
   OneToMany
 } from 'typeorm';
 import { Otp } from './otp.model';
+import { LoginType } from '../enums/loginType.enum';
 
 @Entity()
 export class User {
@@ -42,4 +43,11 @@ export class User {
 
   @Column({ default: false })
   isPhoneVerified: boolean;
+
+  @Column({
+    type: "enum",
+    enum: LoginType,
+    default: LoginType.LOCAL,
+  })
+  loginType: LoginType;
 }

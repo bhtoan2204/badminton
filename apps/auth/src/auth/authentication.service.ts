@@ -59,7 +59,70 @@ export class AuthenticationService {
     };
   }
 
+  async googleValidate(google_accessToken: string, profile: any) {
+    const user = await this.userService.validateGoogleUser(google_accessToken, profile);
+    const { accessToken, refreshToken } = await this.getTokens(user);
+    try {
+      // TODO: save refresh token to db
+    }
+    catch(err) {
+      if (err instanceof NotFoundException) {
+        // TODO: delete refresh token from db
+        throw new UnauthorizedException();
+      } else {
+        throw err;
+      }
+    }
+    return {
+      accessToken,
+      refreshToken,
+      data: {
+        id: user.id,
+        email: user.email,
+        phone: user.phone,
+        role: 'user'
+      }
+    };
+  }
+
+  async refreshToken(payload: User) {
+    const {accessToken, refreshToken} = await this.getTokens(payload);
+    try {
+      // TODO: save refresh token to db
+    }
+    catch(err) {
+      if (err instanceof NotFoundException) {
+        // TODO: delete refresh token from db
+        throw new UnauthorizedException();
+      } else {
+        throw err;
+      }
+    }
+    return {
+      accessToken,
+      refreshToken,
+      data: {
+        id: payload.id,
+        email: payload.email,
+        phone: payload.phone,
+        role: 'user'
+      }
+    };
+  }
+
   async getJwtSecret() {
     return this.configService.get<string>('JWT_SECRET');
+  }
+
+  async getJwtSecretRefresh() {
+    return this.configService.get<string>('JWT_SECRET_REFRESH');
+  }
+
+  async getGoogleConfig() {
+    return {
+      clientID: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+      clientSecret: this.configService.get<string>('GOOGLE_CLIENT_SECRET'),
+      callbackURL: this.configService.get<string>('GOOGLE_CALLBACK_URL')
+    };
   }
 }
