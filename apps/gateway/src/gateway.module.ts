@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { AuthApiModule } from './auth/auth.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -12,7 +13,8 @@ import { AuthApiModule } from './auth/auth.module';
       }),
       envFilePath: './apps/gateway/.env'
     }),
-    AuthApiModule
+    AuthApiModule,
+    PaymentModule
   ],
   controllers: [],
   providers: [],
