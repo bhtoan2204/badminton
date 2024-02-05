@@ -6,6 +6,8 @@ import { CreateAccountDto } from "./dto/createAccount.dto";
 import { LocalAuthGuard } from "./guard/local-auth.guard";
 import { JwtAuthGuard } from "./guard/jwt-auth.guard";
 import { CurrentUser } from "apps/gateway/decorator/current-user.decorator";
+import { JwtRefreshGuard } from "./guard/refresh-auth.guard";
+import { GoogleAuthGuard } from "./guard/oauth.guard/google.guard";
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -21,12 +23,30 @@ export class AuthApiController {
         return this.authService.localLogin(request.user);
     }
 
-    // @HttpCode(HttpStatus.OK)
-    // @ApiOperation({ summary: 'Refresh Token' })
-    // @Post('refreshToken')
-    // async refreshToken(@Body() refreshTokenDto: any){
-    //     return this.authService.refreshToken(refreshTokenDto.refreshToken);
-    // }
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Google Login' })
+    @UseGuards(GoogleAuthGuard)
+    @Get('google/login')
+    async googleLogin() {
+        return { message: "google login successfully" }
+    }
+
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Google Callback' })
+    @UseGuards(GoogleAuthGuard)
+    @Get('google/callback')
+    async googleLoginCallback(@Req() request: any) {
+        console.log(request.user);
+        return this.authService.googleLogin(request.user);
+    }
+
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Refresh Token' })
+    @UseGuards(JwtRefreshGuard)
+    @Post('refresh')
+    async refreshToken(@Req() request: any){
+        return this.authService.refreshToken(request.user);
+    }
 }
 
 @ApiTags('User')

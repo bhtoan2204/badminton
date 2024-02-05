@@ -3,7 +3,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { PassportStrategy } from '@nestjs/passport';
 import { AUTH_SERVICE } from 'apps/gateway/constant/services.constant';
 import { Strategy } from 'passport-local';
-import { lastValueFrom } from 'rxjs';
+import { catchError, lastValueFrom, timeout } from 'rxjs';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
@@ -19,7 +19,12 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
 
   async validate(request: any, email: string, password: string) {
     try {
-      const source = this.authClient.send('authClient/validate_user', {email, password});
+      const source = this.authClient.send('authClient/validate_user', {email, password}).pipe(
+        timeout(5000),
+        catchError(err => {
+          throw new Error(`Failed to validate user: ${err.message}`);
+        })
+      );
       const user = await lastValueFrom(source);
       if (user) {
         request.user = user;

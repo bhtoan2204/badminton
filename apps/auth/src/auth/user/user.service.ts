@@ -6,6 +6,7 @@ import { Otp } from "../../utils/models/otp.model";
 import { CreateAccountDto } from "./dto/createAccount.dto";
 import { ConfigService } from "@nestjs/config";
 import * as bcrypt from 'bcrypt';
+import { LoginType } from "../../utils/enums/loginType.enum";
 
 @Injectable()
 export class UserService {
@@ -15,7 +16,7 @@ export class UserService {
     private readonly configService: ConfigService
   ) {}
 
-  async sendOtp(){
+  async sendOtp() {
 
   }
 
@@ -29,6 +30,28 @@ export class UserService {
       throw new UnauthorizedException('Credentials are not valid.');
     };
     return user;
+  }
+
+  async validateGoogleUser(accessToken: string, profile: any) {
+    const user = await this.userRepository.findOne({where: 
+      {
+        email: profile.emails[0].value,
+        loginType: LoginType.GOOGLE
+      }
+    });
+    if (!user) {
+      const newUser = await this.userRepository.save({
+        email: profile.emails[0].value,
+        firstName: profile.name.givenName,
+        lastName: profile.name.familyName,
+        loginType: LoginType.GOOGLE,
+        role: 'user'
+      });
+      return newUser;
+    }
+    else {
+      return user;
+    }
   }
   
   async validateUserId(id: string){
@@ -55,7 +78,8 @@ export class UserService {
       phone,
       password: hashedPassword,
       firstName,
-      lastName
+      lastName,
+      loginType: LoginType.LOCAL,
     });
 
     return data;

@@ -33,7 +33,7 @@ import { SmsModule } from './sms/sms.module';
           database: connectionOptions.database,
           synchronize: true,
           autoLoadEntities: true,
-          ssl: false
+          ssl: true
         }
       },
       inject: [ConfigService]
