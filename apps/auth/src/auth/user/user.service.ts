@@ -16,10 +16,6 @@ export class UserService {
     private readonly configService: ConfigService
   ) {}
 
-  async sendOtp() {
-
-  }
-
   async validateLocalUser(email: string, password: string){
     const user = await this.userRepository.findOne({where: {email}});
     if(!user) {

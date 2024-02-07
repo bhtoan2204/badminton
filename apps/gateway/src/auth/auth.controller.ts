@@ -44,7 +44,7 @@ export class AuthApiController {
     @ApiOperation({ summary: 'Refresh Token' })
     @UseGuards(JwtRefreshGuard)
     @Post('refresh')
-    async refreshToken(@Req() request: any){
+    async refresh(@Req() request: any){
         return this.authService.refreshToken(request.user);
     }
 }
