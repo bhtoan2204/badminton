@@ -1,11 +1,6 @@
 pipeline{
     agent any
 
-    environment {
-        SONARQUBE_SCANNER_HOME = tool 'SonarQube-Scanner'
-        SONAR_PROJECT_ID = 'sonar.projectKey=Family-Backend'
-    }
-
     tools {
       nodejs 'NodeJs Environment'
     }
@@ -28,9 +23,9 @@ pipeline{
         stage("SonarQube Analysis") {
             steps {
                 script {
-                  def scannerHome = tool 'sonarscan';
-                  withSonarQubeEnv('SonarQube-Server') {
-                    sh "${tool("sonarscan ")}/bin/sonar-scanner -Dsonar.projectKey=Family-Backend"
+                  def scannerHome = tool 'SonarQube-Scanner';
+                  withSonarQubeEnv('SonarQube-Scanner') {
+                    sh "${tool("SonarQube-Scanner")}/bin/sonar-scanner -Dsonar.projectKey=Family-Backend"
                   }
                 }
             }
