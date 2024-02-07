@@ -2,7 +2,7 @@ pipeline{
     agent any
 
     environment {
-        SONARQUBE_SCANNER_HOME = tool 'SonarQube-Server'
+        SONARQUBE_SCANNER_HOME = tool 'SonarQube-Scanner'
         SONAR_PROJECT_ID = 'sonar.projectKey=Family-Backend'
     }
 
