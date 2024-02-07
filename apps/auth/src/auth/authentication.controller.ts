@@ -22,27 +22,9 @@ export class AuthenticationController {
     return await this.authenticationService.googleValidate(data.accessToken, data.profile);
   }
 
-  @EventPattern('authClient/get_jwt_secret')
-  async handleGetJwtSecret(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return await this.authenticationService.getJwtSecret();
-  }
-
-  @EventPattern('authClient/get_jwt_secret_refresh')
-  async handleGetJwtSecretRefresh(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return await this.authenticationService.getJwtSecretRefresh();
-  }
-
   @EventPattern('authClient/refresh_token')
   async handleRefreshToken(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return await this.authenticationService.refreshToken(data);
-  }
-
-  @EventPattern('authClient/get_google_config')
-  async getGoogleConfig(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return await this.authenticationService.getGoogleConfig();
   }
 }

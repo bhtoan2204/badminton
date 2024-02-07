@@ -109,20 +109,5 @@ export class AuthenticationService {
       }
     };
   }
-
-  async getJwtSecret() {
-    return this.configService.get<string>('JWT_SECRET');
-  }
-
-  async getJwtSecretRefresh() {
-    return this.configService.get<string>('JWT_SECRET_REFRESH');
-  }
-
-  async getGoogleConfig() {
-    return {
-      clientID: this.configService.get<string>('GOOGLE_CLIENT_ID'),
-      clientSecret: this.configService.get<string>('GOOGLE_CLIENT_SECRET'),
-      callbackURL: this.configService.get<string>('GOOGLE_CALLBACK_URL')
-    };
-  }
+  
 }

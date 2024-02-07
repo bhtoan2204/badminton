@@ -4,32 +4,29 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AUTH_SERVICE } from 'apps/gateway/constant/services.constant';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, lastValueFrom, throwError, timeout } from 'rxjs';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
-    @Inject(AUTH_SERVICE) private authClient: ClientProxy
+    @Inject(AUTH_SERVICE) private authClient: ClientProxy,
+    private readonly configService: ConfigService
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKeyProvider: async (request, jwtToken, done) => {
-        const source = this.authClient.send('authClient/get_jwt_secret', {}).pipe(
-          timeout(5000),
-          catchError(err => {
-            done(new Error(`Failed to get JWT secret: ${err.message}`), null);
-            return throwError(() => new Error(`Failed to get JWT secret: ${err}`));
-          })
-        );
-        const data = await lastValueFrom(source);
-        done(null, data);
-      }
+      secretOrKey: configService.get<string>('JWT_SECRET')
     });
   }
 
   async validate(payload: any) {
     try {
-      const userRequest = await this.authClient.send('authClient/validate_user_id', {id: payload.id});
+      const userRequest = await this.authClient.send('authClient/validate_user_id', {id: payload.id}).pipe(
+        timeout(5000),
+        catchError(err => {
+          return throwError(() => new Error(`Failed to get JWT secret: ${err}`));
+        })
+      );
       return await lastValueFrom(userRequest);
     }
     catch (err) {
