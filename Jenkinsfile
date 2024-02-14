@@ -42,11 +42,12 @@ pipeline {
         }
 
         stage("Push Docker Images") {
-          steps {
-            script {
-                withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh "echo ${PASSWORD} | sudo docker login --username ${USERNAME} --password-stdin"
-                    sh "sudo docker-compose -f docker-compose.yml push"
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh "echo ${PASSWORD} | sudo docker login --username ${USERNAME} --password-stdin"
+                        sh "sudo docker-compose -f docker-compose.yml push"
+                    }
                 }
             }
         }
@@ -58,6 +59,5 @@ pipeline {
         stage("Deploy to Kubernetes") {
 
         }
-      }
-  }
+    }
 }
