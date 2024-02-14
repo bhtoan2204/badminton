@@ -1,4 +1,4 @@
-pipeline{
+pipeline {
     agent any
 
     tools {
@@ -30,5 +30,34 @@ pipeline{
                 }
             }
         }
-    }
+
+        stage("Build Docker Images") {
+            steps {
+                script {
+                  withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh "sudo docker-compose build --no-cache"
+                  }
+                }
+            }
+        }
+
+        stage("Push Docker Images") {
+          steps {
+            script {
+                withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh "echo ${PASSWORD} | sudo docker login --username ${USERNAME} --password-stdin"
+                    sh "sudo docker-compose -f docker-compose.yml push"
+                }
+            }
+        }
+
+        stage("Pull Images from Docker Hub") {
+
+        }
+
+        stage("Deploy to Kubernetes") {
+
+        }
+      }
+  }
 }
