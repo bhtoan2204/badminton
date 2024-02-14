@@ -25,11 +25,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
           throw new Error(`Failed to validate user: ${err.message}`);
         })
       );
-      const user = await lastValueFrom(source);
-      if (user) {
-        request.user = user;
-      }
-      return user;
+      return await lastValueFrom(source);
     }
     catch (err) {
       throw err
