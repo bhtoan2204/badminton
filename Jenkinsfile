@@ -53,11 +53,15 @@ pipeline {
         }
 
         stage("Pull Images from Docker Hub") {
-
+          steps {
+                sh "echo Pull"
+          }
         }
 
         stage("Deploy to Kubernetes") {
-
+          steps {
+                sh "echo Deploy"
+          }
         }
     }
 }
