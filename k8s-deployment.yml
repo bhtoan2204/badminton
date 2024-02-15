@@ -16,7 +16,7 @@ kind: Deployment
 metadata:
   name: gateway-deployment
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: gateway
@@ -25,11 +25,19 @@ spec:
       labels:
         app: gateway
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: gateway
         image: mjkundta/gateway:latest
         ports:
         - containerPort: 8080
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "250m"
+          limits:
+            memory: "4Gi"
+            cpu: "500m"
 ---
 apiVersion: v1
 kind: Service
@@ -58,11 +66,19 @@ spec:
       labels:
         app: auth
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: auth
         image: mjkundta/auth:latest
         ports:
         - containerPort: 8080
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "250m"
+          limits:
+            memory: "4Gi"
+            cpu: "500m"
 ---
 apiVersion: v1
 kind: Service
@@ -91,11 +107,19 @@ spec:
       labels:
         app: payment
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: payment
         image: mjkundta/payment:latest
         ports:
         - containerPort: 8080
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "250m"
+          limits:
+            memory: "4Gi"
+            cpu: "500m"
 ---
 apiVersion: v1
 kind: Service
@@ -124,8 +148,16 @@ spec:
       labels:
         app: rabbitmq
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: rabbitmq
         image: rabbitmq
         ports:
         - containerPort: 5672
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "250m"
+          limits:
+            memory: "4Gi"
+            cpu: "500m"
