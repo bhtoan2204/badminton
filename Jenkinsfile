@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                   withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh "sudo docker-compose build --no-cache"
+                    sh "docker-compose build --no-cache"
                   }
                 }
             }
@@ -45,8 +45,8 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh "echo ${PASSWORD} | sudo docker login --username ${USERNAME} --password-stdin"
-                        sh "sudo docker-compose -f docker-compose.yml push"
+                        sh "echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin"
+                        sh "docker-compose -f docker-compose.yml push"
                     }
                 }
             }
