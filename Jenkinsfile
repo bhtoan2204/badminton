@@ -60,7 +60,7 @@ pipeline {
 
         stage("Deploy to Kubernetes") {
           steps {
-            sh "kubectl apply -f k8s-deployment.yml"
+            sh "ssh banhhaotoan2002@35.194.225.250 'kubectl apply -f k8s-deployment.yml'"
           }
         }
     }
