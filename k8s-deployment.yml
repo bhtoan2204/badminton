@@ -1,20 +1,7 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: gateway-service
-spec:
-  selector:
-    app: gateway
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8080
-  type: LoadBalancer
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gateway-deployment
+  name: gateway
 spec:
   replicas: 2
   selector:
@@ -25,39 +12,45 @@ spec:
       labels:
         app: gateway
     spec:
-      automountServiceAccountToken: false
       containers:
       - name: gateway
         image: mjkundta/gateway:latest
         ports:
         - containerPort: 8080
         resources:
-          requests:
-            memory: "1Gi"
-            cpu: "250m"
           limits:
             memory: "4Gi"
+            cpu: "1000m"
+          requests:
+            memory: "2Gi"
             cpu: "500m"
+        volumeMounts:
+        - name: app-volume
+          mountPath: /usr/src/app
+      volumes:
+      - name: app-volume
+        emptyDir: {}
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-service
+  name: gateway
 spec:
-  selector:
-    app: auth
+  type: NodePort
   ports:
-  - protocol: TCP
-    port: 80
+  - port: 8080
     targetPort: 8080
-  type: LoadBalancer
+    protocol: TCP
+  selector:
+    app: gateway
+
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-deployment
+  name: auth
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: auth
@@ -66,39 +59,29 @@ spec:
       labels:
         app: auth
     spec:
-      automountServiceAccountToken: false
       containers:
       - name: auth
         image: mjkundta/auth:latest
-        ports:
-        - containerPort: 8080
         resources:
+          limits:
+            memory: "2Gi"
+            cpu: "500m"
           requests:
             memory: "1Gi"
             cpu: "250m"
-          limits:
-            memory: "4Gi"
-            cpu: "500m"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: payment-service
-spec:
-  selector:
-    app: payment
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8080
-  type: LoadBalancer
+        volumeMounts:
+        - name: app-volume
+          mountPath: /usr/src/app
+      volumes:
+      - name: app-volume
+        emptyDir: {}
+
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: payment-deployment
+  name: payment
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: payment
@@ -107,39 +90,29 @@ spec:
       labels:
         app: payment
     spec:
-      automountServiceAccountToken: false
       containers:
       - name: payment
         image: mjkundta/payment:latest
-        ports:
-        - containerPort: 8080
         resources:
+          limits:
+            memory: "2Gi"
+            cpu: "500m"
           requests:
             memory: "1Gi"
             cpu: "250m"
-          limits:
-            memory: "4Gi"
-            cpu: "500m"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: rabbitmq-service
-spec:
-  selector:
-    app: rabbitmq
-  ports:
-  - protocol: TCP
-    port: 5672
-    targetPort: 5672
-  type: LoadBalancer
+        volumeMounts:
+        - name: app-volume
+          mountPath: /usr/src/app
+      volumes:
+      - name: app-volume
+        emptyDir: {}
+
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rabbitmq-deployment
+  name: rabbitmq
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: rabbitmq
@@ -148,16 +121,29 @@ spec:
       labels:
         app: rabbitmq
     spec:
-      automountServiceAccountToken: false
       containers:
       - name: rabbitmq
         image: rabbitmq
         ports:
         - containerPort: 5672
         resources:
-          requests:
-            memory: "1Gi"
-            cpu: "250m"
           limits:
             memory: "4Gi"
+            cpu: "1000m"
+          requests:
+            memory: "2Gi"
             cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5672
+    targetPort: 5672
+    protocol: TCP
+  selector:
+    app: rabbitmq
