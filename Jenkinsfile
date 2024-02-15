@@ -53,7 +53,7 @@ pipeline {
 
         stage("Pull Images from Docker Hub") {
           steps {
-            sh "ssh banhhaotoan2002@35.194.225.250 'docker-compose pull'"
+            sh "ssh banhhaotoan2002@35.194.225.250 'docker compose pull'"
           }
         }
 
