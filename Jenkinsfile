@@ -52,7 +52,9 @@ pipeline {
 
         stage("Pull Images from Docker Hub") {
           steps {
-                sh "echo Pull"
+            sshagent(['Server']) {
+              sh "ssh -o StrictHostKeyChecking=no banhhaotoan2002@35.194.225.250 'sudo touch test.txt'"
+            }
           }
         }
 
