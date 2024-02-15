@@ -34,14 +34,12 @@ pipeline {
         stage("Build Docker Images") {
             steps {
                 script {
-                  withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh "docker-compose build --no-cache"
-                  }
+                  sh "docker-compose build --no-cache"
                 }
             }
         }
 
-        stage("Push Docker Images") {
+        stage("Push Docker Images to Docker Hub") {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
