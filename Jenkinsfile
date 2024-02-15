@@ -34,7 +34,7 @@ pipeline {
         stage("Build Docker Images") {
             steps {
                 script {
-                  sh "docker-compose build --no-cache"
+                  sh "docker compose build --no-cache"
                 }
             }
         }
@@ -44,7 +44,7 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh "echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin"
-                        sh "docker-compose -f docker-compose.yml push"
+                        sh "docker compose -f docker-compose.yml push"
                     }
                 }
             }
