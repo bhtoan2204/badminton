@@ -46,7 +46,6 @@ pipeline {
                         sh "echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin"
                         sh "docker compose -f docker-compose.yml push"
                         sh "scp -r docker-compose.yml banhhaotoan2002@35.194.225.250:~/"
-                        sh "scp -r k8s-deployment.yml banhhaotoan2002@35.194.225.250:~/"
                     }
                 }
             }
@@ -60,7 +59,8 @@ pipeline {
 
         stage("Deploy to Kubernetes") {
           steps {
-            sh "ssh banhhaotoan2002@35.194.225.250 'kubectl apply -f k8s-deployment.yml'"
+            sh "ssh banhhaotoan2002@35.194.225.250 'kompose convert -o ./k8s_output/'"
+            sh "ssh banhhaotoan2002@35.194.225.250 'kubectl apply -f ./k8s_output/'"
           }
         }
     }
