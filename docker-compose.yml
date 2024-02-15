@@ -10,8 +10,6 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      # - postgres1
-      # - postgres2
       - rabbitmq
     volumes:
       - .:/usr/src/app
@@ -43,44 +41,6 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
 
-  # postgres1:
-  #   image: postgres
-  #   environment:
-  #     POSTGRES_USER: ${POSTGRES_USER:-postgres}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
-  #     PGDATA: /data/postgres
-  #   restart: unless-stopped
-  #   command: postgres -c listen_addresses='*'
-  #   ports:
-  #     - '5432:5432'
-  #   volumes:
-  #     - postgres:/data/postgres
-  
-  # postgres2:
-  #   image: postgres
-  #   environment:
-  #     POSTGRES_USER: ${POSTGRES_USER:-postgres}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
-  #     PGDATA: /data/postgres
-  #   restart: unless-stopped
-  #   command: postgres -c listen_addresses='*'
-  #   ports:
-  #     - '5433:5432'
-  #   volumes:
-  #     - postgres:/data/postgres
-  
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
-  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
-  #     PGADMIN_CONFIG_SERVER_MODE: 'False'
-  #   ports:
-  #     - "${PGADMIN_PORT:-5050}:80"
-  #   restart: unless-stopped
-  #   volumes:
-  #     - pgadmin:/root/.pgadmin
-
   rabbitmq:
     image: rabbitmq
     ports:
@@ -90,7 +50,3 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-
-# volumes:
-#   postgres:
-#   pgadmin:
