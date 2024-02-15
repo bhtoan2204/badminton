@@ -45,6 +45,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh "echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin"
                         sh "docker compose -f docker-compose.yml push"
+                        sh "scp -r docker-compose.yml banhhaotoan2002@35.194.225.250:~/"
                     }
                 }
             }
@@ -52,7 +53,7 @@ pipeline {
 
         stage("Pull Images from Docker Hub") {
           steps {
-            sh "sudo ssh banhhaotoan2002@35.194.225.250 'touch test.txt'"
+            sh "ssh banhhaotoan2002@35.194.225.250 'docker-compose pull'"
           }
         }
 
