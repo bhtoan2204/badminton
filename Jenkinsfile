@@ -31,11 +31,10 @@ pipeline {
             }
         }
 
-        stage("Build and Tag Docker Images") {
+        stage("Build Docker Images") {
             steps {
                 script {
-                  sh "docker compose build --no-cache"
-                  sh "docker compose images | tail -n +3 | awk '{print \$1,\$2,\$3}' | while read service image tag; do docker tag \$image:\$tag \$image:${COMMIT_ID}; done"
+                  sh "docker compose build"
                 }
             }
         }
@@ -45,7 +44,7 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh "echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin"
-                        sh "docker compose images | tail -n +3 | awk '{print \$1,\$2,\$3}' | while read service image tag; do docker push \$image:${COMMIT_ID}; done"
+                        sh "docker compose -f docker-compose.yml push"
                     }
                 }
             }
