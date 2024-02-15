@@ -10,6 +10,15 @@ import { PaymentModule } from './payment/payment.module';
       isGlobal: true,
       validationSchema: Joi.object({
         PORT: Joi.number().default(8080),
+        SESSION_SECRET: Joi.string().required(),
+        RABBIT_MQ_URI: Joi.string().required(),
+        RABBIT_MQ_AUTH_QUEUE: Joi.string().required(),
+        RABBIT_MQ_PAYMENT_QUEUE: Joi.string().required(),
+        GOOGLE_CLIENT_ID: Joi.string().required(),
+        GOOGLE_CLIENT_SECRET: Joi.string().required(),
+        GOOGLE_REDIRECT_URI: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_SECRET_REFRESH: Joi.string().required(),
       }),
       envFilePath: './apps/gateway/.env'
     }),

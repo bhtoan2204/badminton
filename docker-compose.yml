@@ -7,8 +7,6 @@ services:
       dockerfile: ./apps/gateway/Dockerfile
       target: development
     command: npm run start:dev gateway
-    env_file:
-      - ./apps/gateway/.env
     ports:
       - "8080:8080"
     depends_on:
@@ -26,8 +24,6 @@ services:
       dockerfile: ./apps/auth/Dockerfile
       target: development
     command: npm run start:dev auth
-    env_file:
-      - ./apps/auth/.env
     depends_on:
       - gateway
     volumes:
@@ -41,8 +37,6 @@ services:
       dockerfile: ./apps/payment/Dockerfile
       target: development
     command: npm run start:dev payment
-    env_file:
-      - ./apps/payment/.env
     depends_on:
       - gateway
     volumes:

@@ -4,8 +4,6 @@
 .dockerignore
 node_modules
 
-*.env
-
 .eslintrc.js
 .prettierrc.js
 README.md
