@@ -11,9 +11,7 @@ services:
       - "8080:8080"
     depends_on:
       - rabbitmq
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+    restart: on-failure
   
   auth:
     image: mjkundta/auth:latest
@@ -24,9 +22,7 @@ services:
     command: npm run start:dev auth
     depends_on:
       - gateway
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+    restart: on-failure
   
   payment:
     image: mjkundta/payment:latest
@@ -37,9 +33,7 @@ services:
     command: npm run start:dev payment
     depends_on:
       - gateway
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+    restart: on-failure
 
   rabbitmq:
     image: rabbitmq
@@ -50,3 +44,4 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    restart: on-failure
