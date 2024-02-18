@@ -56,7 +56,6 @@ pipeline {
         stage("Pull Images from Docker Hub") {
           steps {
             sh "ssh banhhaotoan2002@35.194.225.250 'docker compose pull'"
-            sh "ssh banhhaotoan2002@35.194.225.250 'docker rmi \$(docker images -f \"dangling=true\" -q)'"
             sh "ssh banhhaotoan2002@35.194.225.250 'tar -xzvf k8s.tar.gz'"
           }
         }
