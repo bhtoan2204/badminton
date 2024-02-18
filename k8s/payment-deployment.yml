@@ -12,6 +12,7 @@ spec:
       labels:
         app: payment
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: payment
         image: mjkundta/payment:latest

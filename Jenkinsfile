@@ -48,6 +48,7 @@ pipeline {
                         sh "tar -czvf k8s.tar.gz k8s/"
                         sh "scp -r docker-compose.yml banhhaotoan2002@35.194.225.250:~/"
                         sh "scp -r k8s.tar.gz banhhaotoan2002@35.194.225.250:~/"
+                        sh "rm -rf k8s.tar.gz"
                     }
                 }
             }
