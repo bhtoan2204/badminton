@@ -45,7 +45,9 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh "echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin"
                         sh "docker compose -f docker-compose.yml push"
+                        sh "tar -czvf k8s.tar.gz k8s/"
                         sh "scp -r docker-compose.yml banhhaotoan2002@35.194.225.250:~/"
+                        sh "scp -r k8s.tar.gz banhhaotoan2002@35.194.225.250:~/"
                     }
                 }
             }
@@ -54,15 +56,14 @@ pipeline {
         stage("Pull Images from Docker Hub") {
           steps {
             sh "ssh banhhaotoan2002@35.194.225.250 'docker compose pull'"
-            // sh "ssh banhhaotoan2002@35.194.225.250 'docker rmi \$(docker images -f \"dangling=true\" -q)'"
+            sh "ssh banhhaotoan2002@35.194.225.250 'docker rmi \$(docker images -f \"dangling=true\" -q)'"
+            sh "ssh banhhaotoan2002@35.194.225.250 'tar -xzvf k8s.tar.gz'"
           }
         }
 
         stage("Deploy to Kubernetes") {
           steps {
-            echo "Deploying to Kubernetes"
-            // sh "ssh banhhaotoan2002@35.194.225.250 'kompose convert -o ./k8s_output/'"
-            // sh "ssh banhhaotoan2002@35.194.225.250 'kubectl apply -f ./k8s_output/'"
+            sh "ssh banhhaotoan2002@35.194.225.250 'kubectl apply -f ./k8s'"
           }
         }
     }
