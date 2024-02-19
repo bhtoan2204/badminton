@@ -46,8 +46,8 @@ pipeline {
                         sh "echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin"
                         sh "docker compose -f docker-compose.yml push"
                         sh "tar -czvf k8s.tar.gz k8s/"
-                        sh "scp -r docker-compose.yml banhhaotoan2002@35.194.225.250:~/"
-                        sh "scp -r k8s.tar.gz banhhaotoan2002@35.194.225.250:~/"
+                        sh "scp -r docker-compose.yml banhhaotoan2002@104.199.191.41:~/"
+                        sh "scp -r k8s.tar.gz banhhaotoan2002@104.199.191.41:~/"
                         sh "rm -rf k8s.tar.gz"
                     }
                 }
@@ -56,14 +56,14 @@ pipeline {
 
         stage("Pull Images from Docker Hub") {
           steps {
-            sh "ssh banhhaotoan2002@35.194.225.250 'docker compose pull'"
-            sh "ssh banhhaotoan2002@35.194.225.250 'tar -xzvf k8s.tar.gz'"
+            sh "ssh banhhaotoan2002@104.199.191.41 'docker compose pull'"
+            sh "ssh banhhaotoan2002@104.199.191.41 'tar -xzvf k8s.tar.gz'"
           }
         }
 
         stage("Deploy to Kubernetes") {
           steps {
-            sh "ssh banhhaotoan2002@35.194.225.250 'kubectl apply -f ./k8s'"
+            sh "ssh banhhaotoan2002@104.199.191.41 'kubectl apply -f ./k8s'"
           }
         }
     }
