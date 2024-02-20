@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { LoginDto } from "./user/dto/login.dto";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "./user/user.service";

@@ -50,7 +50,7 @@ export class UserService {
         @Inject(AUTH_SERVICE) private authClient: ClientProxy
     ) { }
 
-    async sendRegisterSms(){
+    async sendRegisterSms() {
         const source = this.authClient.send('authClient/send_register_sms', {}).pipe(
             timeout(5000),
             catchError(err => {
@@ -61,8 +61,8 @@ export class UserService {
         return data;
     }
 
-    async createAccount(createAccountDto: CreateAccountDto){
-        const source = this.authClient.send('authClient/create_account', {createAccountDto}).pipe(
+    async createAccount(createAccountDto: CreateAccountDto) {
+        const source = this.authClient.send('authClient/create_account', { createAccountDto }).pipe(
             timeout(5000),
             catchError(err => {
                 throw new Error(`Failed to create Account: ${err.message}`);
@@ -72,8 +72,8 @@ export class UserService {
         return data;
     }
 
-    async getProfile(id: string){
-        const source = this.authClient.send('authClient/get_profile', {id}).pipe(
+    async getProfile(id: string) {
+        const source = this.authClient.send('authClient/get_profile', { id }).pipe(
             timeout(5000),
             catchError(err => {
                 throw new Error(`Failed to get profile: ${err.message}`);
