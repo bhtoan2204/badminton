@@ -34,6 +34,17 @@ services:
     depends_on:
       - gateway
     restart: on-failure
+  
+  sms:
+    image: mjkundta/sms:latest
+    build:
+      context: .
+      dockerfile: ./apps/sms/Dockerfile
+      target: development
+    command: npm run start:dev sms
+    depends_on:
+      - gateway
+    restart: on-failure
 
   rabbitmq:
     image: rabbitmq
