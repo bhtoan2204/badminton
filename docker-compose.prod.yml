@@ -1,7 +1,7 @@
 version: '1.0'
 services:
   gateway:
-    image: mjkundta/gateway:latest
+    image: mjkundta/gateway:${TAG}
     build:
       context: .
       dockerfile: ./apps/gateway/Dockerfile
@@ -16,7 +16,7 @@ services:
       - NODE_ENV=production
   
   auth:
-    image: mjkundta/auth:latest
+    image: mjkundta/auth:${TAG}
     build:
       context: .
       dockerfile: ./apps/auth/Dockerfile
@@ -29,7 +29,7 @@ services:
       - NODE_ENV=production
   
   payment:
-    image: mjkundta/payment:latest
+    image: mjkundta/payment:${TAG}
     build:
       context: .
       dockerfile: ./apps/payment/Dockerfile
@@ -42,7 +42,7 @@ services:
       - NODE_ENV=production
   
   sms:
-    image: mjkundta/sms:latest
+    image: mjkundta/sms:${TAG}
     build:
       context: .
       dockerfile: ./apps/sms/Dockerfile
