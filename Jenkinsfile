@@ -34,7 +34,7 @@ pipeline {
         stage("Build Docker Images") {
             steps {
                 script {
-                  sh "docker compose -f docker-compose.prod.yml build"
+                  sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml build"
                 }
             }
         }
@@ -44,7 +44,9 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh "echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin"
-                        sh "docker compose -f docker-compose.prod.yml push"
+                        sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml push"
+                    }
+                    sshagent(['Backend-K8S']) {
                         sh "tar -czvf k8s.tar.gz k8s/"
                         sh "scp -r docker-compose.prod.yml banhhaotoan2002@104.199.191.41:~/"
                         sh "scp -r k8s.tar.gz banhhaotoan2002@104.199.191.41:~/"
@@ -56,14 +58,22 @@ pipeline {
 
         stage("Pull Images from Docker Hub") {
           steps {
-            sh "ssh banhhaotoan2002@104.199.191.41 'docker compose -f docker-compose.prod.yml pull'"
-            sh "ssh banhhaotoan2002@104.199.191.41 'tar -xzvf k8s.tar.gz'"
+            sshagent(['Backend-K8S']) {
+                sh "ssh banhhaotoan2002@104.199.191.41 'TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml pull'"
+                sh "ssh banhhaotoan2002@104.199.191.41 'tar -xzvf k8s.tar.gz'"
+                sh "ssh banhhaotoan2002@104.199.191.41 'rm -rf k8s.tar.gz'"
+            }
           }
         }
 
         stage("Deploy to Kubernetes") {
           steps {
-            sh "ssh banhhaotoan2002@104.199.191.41 'kubectl apply -f ./k8s'"
+            sshagent(['Backend-K8S']) {
+              sh "ssh banhhaotoan2002@104.199.191.41 'TAG=${COMMIT_ID} tar -xzvf k8s.tar.gz'"
+              sh "ssh banhhaotoan2002@104.199.191.41 'find ./k8s -type f -name \"*.yml\" -print0 | xargs -0 sed -i \"s/<TAG>/${COMMIT_ID}/g\"'"
+              sh "ssh banhhaotoan2002@104.199.191.41 'kubectl apply -f ./k8s'"
+              sh "ssh banhhaotoan2002@104.199.191.41 'rm -rf ./k8s'"
+            }
           }
         }
     }

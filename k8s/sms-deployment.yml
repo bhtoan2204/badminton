@@ -15,8 +15,8 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: sms
-        image: mjkundta/sms:latest
-        command: ["npm", "run", "start:dev", "sms"]
+        image: mjkundta/sms:<TAG>
+        command: ["node", "dist/apps/sms/main"]
         resources:
           limits:
             cpu: "0.5"
@@ -24,3 +24,6 @@ spec:
           requests:
             cpu: "0.1"
             memory: "128Mi"
+        env:
+          - name: NODE_ENV
+            value: "production"
