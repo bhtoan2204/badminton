@@ -44,9 +44,9 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh "echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin"
-                        sh "docker compose -f docker-compose.yml push"
+                        sh "docker compose -f docker-compose.prod.yml push"
                         sh "tar -czvf k8s.tar.gz k8s/"
-                        sh "scp -r docker-compose.yml banhhaotoan2002@104.199.191.41:~/"
+                        sh "scp -r docker-compose.prod.yml banhhaotoan2002@104.199.191.41:~/"
                         sh "scp -r k8s.tar.gz banhhaotoan2002@104.199.191.41:~/"
                         sh "rm -rf k8s.tar.gz"
                     }
@@ -56,7 +56,7 @@ pipeline {
 
         stage("Pull Images from Docker Hub") {
           steps {
-            sh "ssh banhhaotoan2002@104.199.191.41 'docker compose pull'"
+            sh "ssh banhhaotoan2002@104.199.191.41 'docker compose -f docker-compose.prod.yml pull'"
             sh "ssh banhhaotoan2002@104.199.191.41 'tar -xzvf k8s.tar.gz'"
           }
         }
