@@ -49,7 +49,7 @@ services:
   rabbitmq:
     image: rabbitmq
     ports:
-      - "5672:5672"
+      - '5672:5672'
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 30s
