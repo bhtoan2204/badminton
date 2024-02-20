@@ -6,12 +6,14 @@ services:
       context: .
       dockerfile: ./apps/gateway/Dockerfile
       target: development
-    command: npm run start:dev gateway
+    command: node dist/apps/gateway/main
     ports:
       - "8080:8080"
     depends_on:
       - rabbitmq
     restart: on-failure
+    environment:
+      - NODE_ENV=production
   
   auth:
     image: mjkundta/auth:latest
@@ -19,10 +21,12 @@ services:
       context: .
       dockerfile: ./apps/auth/Dockerfile
       target: development
-    command: npm run start:dev auth
+    command: node dist/apps/auth/main
     depends_on:
       - gateway
     restart: on-failure
+    environment:
+      - NODE_ENV=production
   
   payment:
     image: mjkundta/payment:latest
@@ -30,10 +34,12 @@ services:
       context: .
       dockerfile: ./apps/payment/Dockerfile
       target: development
-    command: npm run start:dev payment
+    command: node dist/apps/payment/main
     depends_on:
       - gateway
     restart: on-failure
+    environment:
+      - NODE_ENV=production
   
   sms:
     image: mjkundta/sms:latest
@@ -41,10 +47,12 @@ services:
       context: .
       dockerfile: ./apps/sms/Dockerfile
       target: development
-    command: npm run start:dev sms
+    command: node dist/apps/sms/main
     depends_on:
       - gateway
     restart: on-failure
+    environment:
+      - NODE_ENV=production
 
   rabbitmq:
     image: rabbitmq
