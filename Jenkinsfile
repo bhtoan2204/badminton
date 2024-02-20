@@ -67,7 +67,7 @@ pipeline {
             sh "ssh banhhaotoan2002@104.199.191.41 'TAG=${COMMIT_ID} tar -xzvf k8s.tar.gz'"
             sh "ssh banhhaotoan2002@104.199.191.41 'find ./k8s -type f -name \"*.yml\" -print0 | xargs -0 sed -i \"s/<TAG>/${COMMIT_ID}/g\"'"
             sh "ssh banhhaotoan2002@104.199.191.41 'kubectl apply -f ./k8s'"
-            sh "ssh banhhaotoan2002@104.199.191.41 'rm -rf ./k8s'"
+            sh "ssh banhhaotoan2002@104.199.191.41 'rm -rf k8s.tar.gz'"
           }
         }
     }
