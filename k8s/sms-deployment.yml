@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sms-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sms
+  template:
+    metadata:
+      labels:
+        app: sms
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: sms
+        image: mjkundta/sms:latest
+        command: ["npm", "run", "start:dev", "sms"]
+        resources:
+          limits:
+            cpu: "0.5"
+            memory: "512Mi"
+          requests:
+            cpu: "0.1"
+            memory: "128Mi"

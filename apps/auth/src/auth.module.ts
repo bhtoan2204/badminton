@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { RmqModule } from '@app/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import * as Joi from 'joi';
 import { AuthenticationModule } from './auth/authentication.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { parse } from 'pg-connection-string';
-import { SmsModule } from './sms/sms.module';
+import * as Joi from 'joi';
 
 @Module({
   imports: [
@@ -14,8 +13,6 @@ import { SmsModule } from './sms/sms.module';
       validationSchema: Joi.object({
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_AUTH_QUEUE: Joi.string().required(),
-        TWILIO_ACCOUNT_SID: Joi.string().required(),
-        TWILIO_AUTH_TOKEN: Joi.string().required(),
       }),
       envFilePath: './apps/auth/.env'
     }),
@@ -39,8 +36,7 @@ import { SmsModule } from './sms/sms.module';
       inject: [ConfigService]
     }),
     AuthenticationModule,
-    RmqModule,
-    SmsModule
+    RmqModule
   ],
 })
 export class AuthModule { }

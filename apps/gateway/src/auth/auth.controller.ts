@@ -56,13 +56,6 @@ export class UserController {
     constructor(private readonly userService: UserService) { }
 
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Send Register Sms' })
-    @Post('register/sendRegisterSms')
-    async sendRegisterSms() {
-        return this.userService.sendRegisterSms();
-    }
-
-    @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Demo Create account' })
     @Post('register/createAccountForTest')
     async createAccountForTest(@Body() createAccountDto: CreateAccountDto) {
