@@ -72,8 +72,8 @@ export class UserService {
         return data;
     }
 
-    async getProfile(id: string) {
-        const source = this.authClient.send('authClient/get_profile', { id }).pipe(
+    async getProfile(id_user: string) {
+        const source = this.authClient.send('authClient/get_profile', { id_user }).pipe(
             timeout(5000),
             catchError(err => {
                 throw new Error(`Failed to get profile: ${err.message}`);

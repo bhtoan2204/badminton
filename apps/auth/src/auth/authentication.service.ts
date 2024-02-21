@@ -2,8 +2,8 @@ import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/co
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "./user/user.service";
-import { User } from "../utils/models/user.model";
 import { TokenPayload } from "./interface/tokenPayload.interface";
+import { User } from "@app/common";
 
 @Injectable()
 export class AuthenticationService {
@@ -16,9 +16,9 @@ export class AuthenticationService {
   async getTokens(payload: User) {
     const jwtPayload: TokenPayload = { 
       email: payload.email, 
-      id: payload.id,
+      id_user: payload.id_user,
       phone: payload.phone,
-      role: 'user'
+      isadmin: payload.isadmin
     };
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
@@ -50,10 +50,10 @@ export class AuthenticationService {
       accessToken,
       refreshToken,
       data: {
-        id: payload.id,
+        id_user: payload.id_user,
         email: payload.email,
         phone: payload.phone,
-        role: 'user'
+        isadmin: payload.isadmin
       }
     };
   }
@@ -76,10 +76,10 @@ export class AuthenticationService {
       accessToken,
       refreshToken,
       data: {
-        id: user.id,
+        id_user: user.id_user,
         email: user.email,
         phone: user.phone,
-        role: 'user'
+        isadmin: user.isadmin
       }
     };
   }
@@ -101,10 +101,10 @@ export class AuthenticationService {
       accessToken,
       refreshToken,
       data: {
-        id: payload.id,
+        id_user: payload.id_user,
         email: payload.email,
         phone: payload.phone,
-        role: 'user'
+        isadmin: payload.isadmin
       }
     };
   }

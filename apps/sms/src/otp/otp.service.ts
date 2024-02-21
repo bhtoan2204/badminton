@@ -1,15 +1,15 @@
+import { OTP } from '@app/common';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TwilioService } from 'nestjs-twilio';
-import { Otp } from '../models/otp.model';
 
 @Injectable()
 export class OTPService {
   constructor(
     private readonly twilioService: TwilioService,
     private readonly configService: ConfigService,
-    @InjectRepository(Otp) private otpRepository: Otp
+    @InjectRepository(OTP) private otpRepository: OTP
   ) { }
 
   async sendRegisterOTP() {
