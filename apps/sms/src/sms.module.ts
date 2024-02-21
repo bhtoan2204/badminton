@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { RmqModule } from '@app/common';
 import * as Joi from 'joi';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { parse } from 'pg-connection-string';
 import { OTPModule } from './otp/otp.module';
 import { DatabaseModule } from '@app/common/database/database.module';
 
