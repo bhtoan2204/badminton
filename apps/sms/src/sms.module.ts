@@ -4,7 +4,8 @@ import { RmqModule } from '@app/common';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { parse } from 'pg-connection-string';
-import { OTPModule } from './utils/otp/otp.module';
+import { OTPModule } from './otp/otp.module';
+import { DatabaseModule } from '@app/common/database/database.module';
 
 @Module({
   imports: [
@@ -19,25 +20,7 @@ import { OTPModule } from './utils/otp/otp.module';
       }),
       envFilePath: './apps/sms/.env'
     }),
-    TypeOrmModule.forRootAsync({
-      imports : [ConfigModule],
-      useFactory: (configService: ConfigService) => {
-        const dbUrl = configService.get('DATABASE_URL_CLUSTER_1');
-        const connectionOptions = parse(dbUrl);
-        return {
-          type: 'postgres',
-          host: connectionOptions.host,
-          port: parseInt(connectionOptions.port),
-          username: connectionOptions.user,
-          password: connectionOptions.password,
-          database: connectionOptions.database,
-          synchronize: true,
-          autoLoadEntities: true,
-          ssl: true
-        }
-      },
-      inject: [ConfigService]
-    }),
+    DatabaseModule,
     RmqModule,
     OTPModule
   ],

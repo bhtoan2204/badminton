@@ -1,6 +1,6 @@
 export interface TokenPayload {
-  id: string;
+  id_user: string;
   email: string;
   phone: string;
-  role: string;
+  isadmin: boolean;
 }

@@ -1,14 +1,14 @@
 import { Module } from "@nestjs/common";
-import { Otp } from "../models/otp.model";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { TwilioModule } from "nestjs-twilio";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { OTPController } from "./otp.controller";
 import { OTPService } from "./otp.service";
+import { OTP } from "@app/common";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Otp]),
+    TypeOrmModule.forFeature([OTP]),
     TwilioModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({

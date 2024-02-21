@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { RmqModule } from '@app/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { AuthenticationModule } from './auth/authentication.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { parse } from 'pg-connection-string';
 import * as Joi from 'joi';
+import { DatabaseModule } from '@app/common/database/database.module';
 
 @Module({
   imports: [
@@ -16,25 +15,7 @@ import * as Joi from 'joi';
       }),
       envFilePath: './apps/auth/.env'
     }),
-    TypeOrmModule.forRootAsync({
-      imports : [ConfigModule],
-      useFactory: (configService: ConfigService) => {
-        const dbUrl = configService.get('DATABASE_URL_CLUSTER_1');
-        const connectionOptions = parse(dbUrl);
-        return {
-          type: 'postgres',
-          host: connectionOptions.host,
-          port: parseInt(connectionOptions.port),
-          username: connectionOptions.user,
-          password: connectionOptions.password,
-          database: connectionOptions.database,
-          synchronize: true,
-          autoLoadEntities: true,
-          ssl: true
-        }
-      },
-      inject: [ConfigService]
-    }),
+    DatabaseModule,
     AuthenticationModule,
     RmqModule
   ],
