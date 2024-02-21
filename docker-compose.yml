@@ -12,6 +12,9 @@ services:
     depends_on:
       - rabbitmq
     restart: on-failure
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
   
   auth:
     image: mjkundta/auth:latest
@@ -23,6 +26,9 @@ services:
     depends_on:
       - gateway
     restart: on-failure
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
   
   payment:
     image: mjkundta/payment:latest
@@ -34,6 +40,9 @@ services:
     depends_on:
       - gateway
     restart: on-failure
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
   
   sms:
     image: mjkundta/sms:latest
@@ -45,6 +54,9 @@ services:
     depends_on:
       - gateway
     restart: on-failure
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
 
   rabbitmq:
     image: rabbitmq
