@@ -31,11 +31,4 @@ export class UserController {
     const { id_user } = data;
     return await this.userService.validateUserId(id_user);
   }
-
-  @EventPattern('authClient/get_profile')
-  async handleGetProfile(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    const { id_user } = data;
-    return await this.userService.getProfile(id_user);
-  }
 }
