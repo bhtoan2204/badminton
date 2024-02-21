@@ -20,11 +20,11 @@ export class CreateAccountDto {
     @IsNotEmpty()
     @IsString()
     @ApiProperty({ example: 'Bành' })
-    firstName: string;
+    firstname: string;
 
     @IsNotEmpty()
     @IsString()
     @ApiProperty({ example: 'Toàn' })
-    lastName: string;
-
+    lastname: string;
+    
 }

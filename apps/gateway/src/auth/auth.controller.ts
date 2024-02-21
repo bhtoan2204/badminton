@@ -67,6 +67,6 @@ export class UserController {
     @UseGuards(JwtAuthGuard)
     @Get('profile')
     async getProfile(@CurrentUser() user) {
-        return {message: 'ok', data: user};
+        return { message: 'ok', data: user };
     }
 }

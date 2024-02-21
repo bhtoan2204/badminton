@@ -17,7 +17,7 @@ export class SessionSerializer extends PassportSerializer {
   }
 
   async deserializeUser(payload: any, done: Function) {
-    const source = this.clientProxy.send('authClient/validate_user_id', { id: payload.id }).pipe(
+    const source = this.clientProxy.send('authClient/validate_user_id', { id_user: payload.id_user }).pipe(
       timeout(5000),
       catchError(err => {
         throw new Error(`Failed to refresh token: ${err.message}`);
