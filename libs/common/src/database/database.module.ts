@@ -9,15 +9,14 @@ import * as Joi from 'joi';
       ConfigModule.forRoot({
         isGlobal: false,
         validationSchema: Joi.object({
-          // DATABASE_URL: Joi.string().required()
+          DATABASE_URL: Joi.string().required()
         }),
-        envFilePath: './libs/common/.env'
+        envFilePath: process.cwd() + '/libs/.env'
       }),
       TypeOrmModule.forRootAsync({
         imports : [ConfigModule],
         useFactory: (configService: ConfigService) => {
-          // const dbUrl = configService.get('DATABASE_URL');
-          const dbUrl = "postgresql://root:B5wNWVyNvrnUioFkFGCKVFbmvTAUwEn3@dpg-cn255l0cmk4c73dds8f0-a.singapore-postgres.render.com:5432/famfund_i2wq";
+          const dbUrl = configService.get('DATABASE_URL');
           const connectionOptions = parse(dbUrl);
           return {
             type: 'postgres',
