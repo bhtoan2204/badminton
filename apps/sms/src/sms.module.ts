@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { TwilioModule } from 'nestjs-twilio';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RmqModule } from '@app/common';
-import { SmsController } from './sms.controller';
-import { SmsService } from './sms.service';
 import * as Joi from 'joi';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { parse } from 'pg-connection-string';
+import { OTPModule } from './utils/otp/otp.module';
 
 @Module({
   imports: [
@@ -19,17 +19,27 @@ import * as Joi from 'joi';
       }),
       envFilePath: './apps/sms/.env'
     }),
-    TwilioModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (config: ConfigService) => ({
-          accountSid: config.get('TWILIO_ACCOUNT_SID'),
-          authToken: config.get('TWILIO_AUTH_TOKEN'),
-      }),
-      inject: [ConfigService],
+    TypeOrmModule.forRootAsync({
+      imports : [ConfigModule],
+      useFactory: (configService: ConfigService) => {
+        const dbUrl = configService.get('DATABASE_URL_CLUSTER_1');
+        const connectionOptions = parse(dbUrl);
+        return {
+          type: 'postgres',
+          host: connectionOptions.host,
+          port: parseInt(connectionOptions.port),
+          username: connectionOptions.user,
+          password: connectionOptions.password,
+          database: connectionOptions.database,
+          synchronize: true,
+          autoLoadEntities: true,
+          ssl: true
+        }
+      },
+      inject: [ConfigService]
     }),
     RmqModule,
+    OTPModule
   ],
-  controllers: [SmsController],
-  providers: [SmsService],
 })
 export class SmsModule { }

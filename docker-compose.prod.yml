@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: ./apps/gateway/Dockerfile
-      target: development
+      target: production
     command: node dist/apps/gateway/main
     ports:
       - "8080:8080"
@@ -20,7 +20,7 @@ services:
     build:
       context: .
       dockerfile: ./apps/auth/Dockerfile
-      target: development
+      target: production
     command: node dist/apps/auth/main
     depends_on:
       - gateway
@@ -33,7 +33,7 @@ services:
     build:
       context: .
       dockerfile: ./apps/payment/Dockerfile
-      target: development
+      target: production
     command: node dist/apps/payment/main
     depends_on:
       - gateway
@@ -46,7 +46,7 @@ services:
     build:
       context: .
       dockerfile: ./apps/sms/Dockerfile
-      target: development
+      target: production
     command: node dist/apps/sms/main
     depends_on:
       - gateway
