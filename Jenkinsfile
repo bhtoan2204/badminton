@@ -56,16 +56,16 @@ pipeline {
 
         stage("Pull Images from Docker Hub") {
           steps {
-            sh "ssh banhhaotoan2002@104.199.191.41 'TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml pull'"
-            sh "ssh banhhaotoan2002@104.199.191.41 'tar -xzvf k8s.tar.gz'"
+            sh "sshpass -p $ssh_pass ssh banhhaotoan2002@104.199.191.41 'TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml pull'"
+            sh "sshpass -p $ssh_pass ssh banhhaotoan2002@104.199.191.41 'tar -xzvf k8s.tar.gz'"
           }
         }
 
         stage("Deploy to Kubernetes") {
           steps {
-            sh "ssh banhhaotoan2002@104.199.191.41 'TAG=${COMMIT_ID} tar -xzvf k8s.tar.gz'"
-            sh "ssh banhhaotoan2002@104.199.191.41 'find ./k8s -type f -name \"*.yml\" -print0 | xargs -0 sed -i \"s/<TAG>/${COMMIT_ID}/g\"'"
-            sh "ssh banhhaotoan2002@104.199.191.41 'kubectl apply -f ./k8s'"
+            sh "sshpass -p $ssh_pass ssh banhhaotoan2002@104.199.191.41 'TAG=${COMMIT_ID} tar -xzvf k8s.tar.gz'"
+            sh "sshpass -p $ssh_pass ssh banhhaotoan2002@104.199.191.41 'find ./k8s -type f -name \"*.yml\" -print0 | xargs -0 sed -i \"s/<TAG>/${COMMIT_ID}/g\"'"
+            sh "sshpass -p $ssh_pass ssh banhhaotoan2002@104.199.191.41 'kubectl apply -f ./k8s'"
           }
         }
     }
