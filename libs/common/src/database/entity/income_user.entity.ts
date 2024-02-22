@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { User } from './user.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Users } from './users.entity';
 import { CategoryIncome } from './category_income.entity'; // Giả sử bạn đã sửa tên đúng
 import { WalletUser } from './wallet_user.entity'; // Giả sử bạn đã định nghĩa entity này
 
@@ -8,7 +8,7 @@ export class IncomeUser {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => Users)
   @Column('uuid')
   id_user: string;
 
@@ -25,4 +25,11 @@ export class IncomeUser {
   @ManyToOne(() => WalletUser)
   @Column({ type: 'integer' })
   id_wallet: number;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 }
+

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('wallet_user')
 export class WalletUser {
@@ -9,5 +9,12 @@ export class WalletUser {
   name: string;
 
   @Column('money', { nullable: true })
-  money: string;
+  money: number;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
 }
