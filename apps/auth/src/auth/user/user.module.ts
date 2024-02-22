@@ -1,12 +1,12 @@
 import { Module } from "@nestjs/common";
 import { UserController } from "./user.controller";
-import { OTP, RmqModule, User } from "@app/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserService } from "./user.service";
+import { OTP, RmqModule, Users } from "@app/common";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, OTP]),
+    TypeOrmModule.forFeature([Users, OTP]),
     RmqModule
   ],
   controllers: [UserController],

@@ -4,12 +4,12 @@ import { Repository } from "typeorm";
 import { CreateAccountDto } from "./dto/createAccount.dto";
 import { ConfigService } from "@nestjs/config";
 import * as bcrypt from 'bcrypt';
-import { LoginType, OTP, User } from "@app/common";
+import { LoginType, OTP, Users } from "@app/common";
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Users) private userRepository: Repository<Users>,
     @InjectRepository(OTP) private otpRepository: Repository<OTP>,
     private readonly configService: ConfigService
   ) {}
