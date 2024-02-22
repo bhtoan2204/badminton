@@ -1,12 +1,15 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from 'typeorm';
-import { User } from './user.entity'; // Giả sử bạn đã định nghĩa entity User
+import { Users } from './users.entity'; 
 
 @Entity('refresh_token')
 export class RefreshToken {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column('varchar')
   refresh_token: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => Users)
   @Column('uuid')
   id_user: string;
 
@@ -15,4 +18,5 @@ export class RefreshToken {
 
   @Column('timestamp')
   expired_at: Date;
+
 }

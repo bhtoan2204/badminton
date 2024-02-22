@@ -3,7 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "./user/user.service";
 import { TokenPayload } from "./interface/tokenPayload.interface";
-import { User } from "@app/common";
+import { Users } from "@app/common";
 
 @Injectable()
 export class AuthenticationService {
@@ -13,7 +13,7 @@ export class AuthenticationService {
     private readonly userService: UserService
   ) {}
 
-  async getTokens(payload: User) {
+  async getTokens(payload: Users) {
     const jwtPayload: TokenPayload = { 
       email: payload.email, 
       id_user: payload.id_user,
@@ -33,7 +33,7 @@ export class AuthenticationService {
     return { accessToken, refreshToken };
   }
 
-  async localLogin(payload: User){
+  async localLogin(payload: Users){
     const {accessToken, refreshToken} = await this.getTokens(payload);
     try {
       // TODO: save refresh token to db
@@ -84,7 +84,7 @@ export class AuthenticationService {
     };
   }
 
-  async refreshToken(payload: User) {
+  async refreshToken(payload: Users) {
     const {accessToken, refreshToken} = await this.getTokens(payload);
     try {
       // TODO: save refresh token to db

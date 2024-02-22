@@ -1,7 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
 import { Family } from './family.entity';
 import { CategoryExpense } from './category_expense.entity';
-import { WalletFamily } from './wallet_family.entity'; // Giả sử bạn đã định nghĩa entity này
+import { WalletFamily } from './wallet_family.entity';
 
 @Entity('expense_family')
 export class ExpenseFamily {
@@ -9,17 +9,23 @@ export class ExpenseFamily {
   id_expense: number;
 
   @ManyToOne(() => Family)
-  @Column({ type: 'integer', nullable: true })
-  id_family: number;
+  @JoinColumn({ name: 'id_family' }) 
+  id_family: Family;
 
   @Column('varchar', { nullable: true })
   description: string;
 
   @ManyToOne(() => CategoryExpense)
-  @Column({ type: 'integer', nullable: true })
-  id_category: number;
+  @JoinColumn({ name: 'id_category' }) 
+  id_category: CategoryExpense;
 
   @ManyToOne(() => WalletFamily)
-  @Column({ type: 'integer' })
-  wallet: number;
+  @JoinColumn({ name: 'id_wallet' }) 
+  wallet: WalletFamily;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 }

@@ -1,12 +1,11 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { User } from './user.entity'; // Giả sử bạn đã định nghĩa entity này
+import { Users } from './users.entity';
 
 @Entity('otp')
 export class OTP {
   @PrimaryGeneratedColumn()
   otp_id: number;
 
-  @ManyToOne(() => User)
   @Column('uuid', { nullable: true })
   owner_id: string;
 
@@ -21,7 +20,4 @@ export class OTP {
 
   @Column('timestamp', { nullable: true })
   expired_at: Date;
-
-  @Column('bit', { nullable: true })
-  active: boolean;
 }
