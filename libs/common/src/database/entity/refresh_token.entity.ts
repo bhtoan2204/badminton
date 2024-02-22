@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from 'typeorm';
-import { Users } from './users.entity'; // Giả sử bạn đã định nghĩa entity User
+import { Users } from './users.entity'; 
 
 @Entity('refresh_token')
 export class RefreshToken {

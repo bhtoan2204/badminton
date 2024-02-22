@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
-import { Users } from './users.entity'; // Giả sử bạn đã định nghĩa entity này
+import { Users } from './users.entity';
 import { Family } from './family.entity';
 import { Role } from './role.entity';
 

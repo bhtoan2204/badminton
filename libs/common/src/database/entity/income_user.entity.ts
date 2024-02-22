@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Users } from './users.entity';
-import { CategoryIncome } from './category_income.entity'; // Giả sử bạn đã sửa tên đúng
-import { WalletUser } from './wallet_user.entity'; // Giả sử bạn đã định nghĩa entity này
+import { CategoryIncome } from './category_income.entity'; 
+import { WalletUser } from './wallet_user.entity'; 
 
 @Entity('income_user')
 export class IncomeUser {

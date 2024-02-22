@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn , UpdateDateColumn} from 'typeorm';
 import { Family } from './family.entity';
-import { CategoryExpense } from './category_expense.entity'; // Giả sử bạn đã định nghĩa entity này
+import { CategoryExpense } from './category_expense.entity'; 
 
 @Entity('total_category_family')
 export class TotalCategoryFamily {

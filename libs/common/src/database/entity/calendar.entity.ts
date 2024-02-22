@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
-import { Family } from './family.entity'; // Giả sử bạn đã định nghĩa entity Family
+import { Family } from './family.entity'; 
 
 @Entity('calendar')
 export class Calendar {
@@ -13,7 +13,7 @@ export class Calendar {
   description: string;
 
   @ManyToOne(() => Family)
-  @JoinColumn({ name: 'id_family' }) // Đặt tên cột khóa ngoại là id_wallet
+  @JoinColumn({ name: 'id_family' }) 
   id_family: Family;
 
   @CreateDateColumn()

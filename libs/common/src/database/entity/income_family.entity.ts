@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne ,CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
 import { Family } from './family.entity';
-import { CategoryIncome } from './category_income.entity'; // Giả sử bạn đã sửa tên đúng
-import { WalletFamily } from './wallet_family.entity'; // Giả sử bạn đã định nghĩa entity này
+import { CategoryIncome } from './category_income.entity'; 
+import { WalletFamily } from './wallet_family.entity'; 
 
 @Entity('income_family')
 export class IncomeFamily {
@@ -23,7 +23,7 @@ export class IncomeFamily {
   total: number;
 
   @ManyToOne(() => WalletFamily)
-  @JoinColumn({ name: 'id_wallet' }) // Đặt tên cột khóa ngoại là id_wallet
+  @JoinColumn({ name: 'id_wallet' }) 
   wallet: WalletFamily;
 
   @CreateDateColumn()
