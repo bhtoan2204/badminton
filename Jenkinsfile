@@ -46,8 +46,8 @@ pipeline {
                         sh "echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin"
                         sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml push"
                         sh "tar -czvf k8s.tar.gz k8s/"
-                        sh "scp -r docker-compose.prod.yml banhhaotoan2002@104.199.191.41:~/"
-                        sh "scp -r k8s.tar.gz banhhaotoan2002@104.199.191.41:~/"
+                        sh "sshpass -p $ssh_pass 'scp -r docker-compose.prod.yml banhhaotoan2002@104.199.191.41:~/'"
+                        sh "sshpass -p $ssh_pass 'scp -r k8s.tar.gz banhhaotoan2002@104.199.191.41:~/'"
                         sh "rm -rf k8s.tar.gz"
                     }
                 }
@@ -56,16 +56,16 @@ pipeline {
 
         stage("Pull Images from Docker Hub") {
           steps {
-            sh "sshpass -p $ssh_pass ssh banhhaotoan2002@104.199.191.41 'TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml pull'"
-            sh "sshpass -p $ssh_pass ssh banhhaotoan2002@104.199.191.41 'tar -xzvf k8s.tar.gz'"
+            sh "sshpass -p $ssh_pass 'ssh banhhaotoan2002@104.199.191.41 'TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml pull''"
+            sh "sshpass -p $ssh_pass 'ssh banhhaotoan2002@104.199.191.41 'tar -xzvf k8s.tar.gz''"
           }
         }
 
         stage("Deploy to Kubernetes") {
           steps {
-            sh "sshpass -p $ssh_pass ssh banhhaotoan2002@104.199.191.41 'TAG=${COMMIT_ID} tar -xzvf k8s.tar.gz'"
-            sh "sshpass -p $ssh_pass ssh banhhaotoan2002@104.199.191.41 'find ./k8s -type f -name \"*.yml\" -print0 | xargs -0 sed -i \"s/<TAG>/${COMMIT_ID}/g\"'"
-            sh "sshpass -p $ssh_pass ssh banhhaotoan2002@104.199.191.41 'kubectl apply -f ./k8s'"
+            sh "sshpass -p $ssh_pass 'ssh banhhaotoan2002@104.199.191.41 'TAG=${COMMIT_ID} tar -xzvf k8s.tar.gz''"
+            sh "sshpass -p $ssh_pass 'ssh banhhaotoan2002@104.199.191.41 'find ./k8s -type f -name \"*.yml\" -print0 | xargs -0 sed -i \"s/<TAG>/${COMMIT_ID}/g\"''"
+            sh "sshpass -p $ssh_pass 'ssh banhhaotoan2002@104.199.191.41 'kubectl apply -f ./k8s''"
           }
         }
     }
