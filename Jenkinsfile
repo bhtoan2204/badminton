@@ -7,6 +7,7 @@ pipeline {
 
     options {
       skipDefaultCheckout(true)
+      disableConcurrentBuilds()
     }
 
     stages{
