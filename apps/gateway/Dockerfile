@@ -21,9 +21,8 @@ COPY package*.json ./
 
 RUN npm install --only=production --ignore-scripts
 
-COPY --from=development /usr/src/app/dist ./dist
+COPY . .
 
-RUN addgroup -S nodegroup && adduser -S nodeuser -G nodegroup
-USER nodeuser
+COPY --from=development /usr/src/app/dist ./dist
 
 CMD [ "node", "dist/apps/gateway/main" ]
