@@ -9,7 +9,7 @@ import { LoginType, OTP, User } from "@app/common";
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Users) private userRepository: Repository<Users>,
     @InjectRepository(OTP) private otpRepository: Repository<OTP>,
     private readonly configService: ConfigService
   ) {}

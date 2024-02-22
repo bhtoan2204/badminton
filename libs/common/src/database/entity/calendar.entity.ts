@@ -1,18 +1,24 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Family } from './family.entity'; // Giả sử bạn đã định nghĩa entity Family
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
+import { Family } from './family.entity'; 
 
 @Entity('calendar')
 export class Calendar {
   @PrimaryGeneratedColumn()
   id_calendar: number;
 
-  @Column('timestamp')
+  @Column({ type: 'timestamp' })
   datetime: Date;
 
-  @Column('varchar', { nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   description: string;
 
-  @ManyToOne(() => Family, (family) => family.id_family)
-  @Column({ type: 'integer' })
-  id_family: number;
+  @ManyToOne(() => Family)
+  @JoinColumn({ name: 'id_family' }) 
+  id_family: Family;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 }

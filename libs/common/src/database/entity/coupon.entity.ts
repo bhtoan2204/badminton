@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn  , CreateDateColumn, UpdateDateColumn} from 'typeorm';
 
 @Entity('coupon')
 export class Coupon {
@@ -13,4 +13,10 @@ export class Coupon {
 
   @Column('int')
   quantity: number;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 }

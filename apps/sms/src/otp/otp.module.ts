@@ -4,7 +4,7 @@ import { TwilioModule } from "nestjs-twilio";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { OTPController } from "./otp.controller";
 import { OTPService } from "./otp.service";
-import { OTP } from "@app/common";
+import { OTP, RmqModule } from "@app/common";
 
 @Module({
   imports: [
@@ -17,6 +17,7 @@ import { OTP } from "@app/common";
       }),
       inject: [ConfigService],
     }),
+    RmqModule,
   ],
   controllers: [OTPController],
   providers: [OTPService],

@@ -17,7 +17,7 @@ export * from './database/entity/otp.entity';
 export * from './database/entity/package.entity';
 export * from './database/entity/refresh_token.entity';
 export * from './database/entity/role.entity';
-export * from './database/entity/user.entity';
+export * from './database/entity/users.entity';
 export * from './database/entity/wallet_family.entity';
 export * from './database/entity/wallet_user.entity';
 export * from './database/entity/total_category_user.entity';

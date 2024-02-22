@@ -1,8 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { LoginType } from '../enum/login_type.enum';
 
-@Entity('user')
-export class User {
+@Entity('users')
+export class Users {
   @PrimaryGeneratedColumn('uuid')
   id_user: string;
 
@@ -16,10 +16,10 @@ export class User {
   password: string;
 
   @Column('varchar', { nullable: true })
-  firstname: string;
+  fullname: string;
 
   @Column('varchar', { nullable: true })
-  lastname: string;
+  language: string;
 
   @Column('boolean', { default: false })
   twofa: boolean;
