@@ -1,12 +1,14 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
+import { Users } from './users.entity';
 
 @Entity('otp')
 export class OTP {
   @PrimaryGeneratedColumn()
   otp_id: number;
 
-  @Column('uuid', { nullable: true })
-  owner_id: string;
+  @ManyToOne(() => Users)
+  @JoinColumn({ name: 'id_user' }) 
+  owner_id: Users;
 
   @Column('varchar')
   code: string;

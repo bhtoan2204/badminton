@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
 import { Users } from './users.entity';
 import { CategoryIncome } from './category_income.entity'; 
 import { WalletUser } from './wallet_user.entity'; 
@@ -9,22 +9,23 @@ export class IncomeUser {
   id: number;
 
   @ManyToOne(() => Users)
-  @Column('uuid')
-  id_user: string;
+  @JoinColumn({ name: 'id_user' }) 
+  id_user: Users;
 
   @Column('varchar', { nullable: true })
   description: string;
 
   @ManyToOne(() => CategoryIncome)
-  @Column({ type: 'integer' })
-  id_category: number;
+  @JoinColumn({ name: 'id_category' }) 
+  id_category: CategoryIncome;
 
   @Column('money')
   total: string;
 
   @ManyToOne(() => WalletUser)
-  @Column({ type: 'integer' })
-  id_wallet: number;
+  @JoinColumn({ name: 'id_wallet' }) 
+  id_wallet: WalletUser;
+
 
   @CreateDateColumn()
   created_at: Date;

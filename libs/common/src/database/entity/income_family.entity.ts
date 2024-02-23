@@ -9,22 +9,23 @@ export class IncomeFamily {
   id: number;
 
   @ManyToOne(() => Family)
-  @Column({ type: 'integer' })
-  id_family: number;
+  @JoinColumn({ name: 'id_family' }) 
+  id_family: Family;
 
   @Column('varchar', { nullable: true })
   description: string;
 
   @ManyToOne(() => CategoryIncome)
-  @Column({ type: 'integer' })
-  id_category: number;
+  @JoinColumn({ name: 'id_category' }) 
+  id_category: CategoryIncome;
+
 
   @Column('money')
   total: number;
 
   @ManyToOne(() => WalletFamily)
   @JoinColumn({ name: 'id_wallet' }) 
-  wallet: WalletFamily;
+  id_wallet: WalletFamily;
 
   @CreateDateColumn()
   created_at: Date;
