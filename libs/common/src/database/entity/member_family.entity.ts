@@ -10,15 +10,15 @@ export class MemberFamily {
 
   @ManyToOne(() => Users)
   @JoinColumn({ name: 'id_user' }) 
-  id_user: string;
+  id_user: Users;
 
   @ManyToOne(() => Family)
   @JoinColumn({ name: 'id_family' }) 
-  id_family: number;
+  id_family: Family;
 
   @ManyToOne(() => Role)
   @JoinColumn({ name: 'id_role' }) 
-  role: number;
+  role: Role;
 
 
 
