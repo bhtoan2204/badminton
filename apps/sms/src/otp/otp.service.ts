@@ -22,7 +22,7 @@ export class OTPService {
       return message;
     }
     catch (error) {
-      return new UnauthorizedException(error.message);
+      throw error;
     }
   }
 
@@ -36,7 +36,7 @@ export class OTPService {
       return message;
     }
     catch (error) {
-      return new UnauthorizedException(error.message);
+      throw error;
     }
   }
 }
