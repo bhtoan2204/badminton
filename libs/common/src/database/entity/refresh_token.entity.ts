@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, JoinColumn } from 'typeorm';
 import { Users } from './users.entity'; // Giả sử bạn đã định nghĩa entity User
 
 @Entity('refresh_token')
@@ -10,8 +10,9 @@ export class RefreshToken {
   refresh_token: string;
 
   @ManyToOne(() => Users)
-  @Column('uuid')
-  id_user: string;
+  @JoinColumn({ name: 'id_user' }) 
+  id_user: Users;
+
 
   @CreateDateColumn()
   created_at: Date;

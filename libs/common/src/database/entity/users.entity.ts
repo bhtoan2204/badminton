@@ -16,7 +16,10 @@ export class Users {
   password: string;
 
   @Column('varchar', { nullable: true })
-  fullname: string;
+  firstname: string;
+
+  @Column('varchar', { nullable: true })
+  lastname: string;
 
   @Column('varchar', { nullable: true })
   language: string;
