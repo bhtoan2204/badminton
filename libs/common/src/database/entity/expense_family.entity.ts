@@ -9,18 +9,18 @@ export class ExpenseFamily {
   id_expense: number;
 
   @ManyToOne(() => Family)
-  @JoinColumn({ name: 'id_family' }) // Đặt tên cột khóa ngoại là id_family
+  @JoinColumn({ name: 'id_family' })
   id_family: Family;
 
   @Column('varchar', { nullable: true })
   description: string;
 
   @ManyToOne(() => CategoryExpense)
-  @JoinColumn({ name: 'id_category' }) // Đặt tên cột khóa ngoại là id_category
+  @JoinColumn({ name: 'id_category' }) 
   id_category: CategoryExpense;
 
   @ManyToOne(() => WalletFamily)
-  @JoinColumn({ name: 'id_wallet' }) // Đặt tên cột khóa ngoại là id_wallet
+  @JoinColumn({ name: 'id_wallet' })
   wallet: WalletFamily;
 
   @CreateDateColumn()

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn , UpdateDateColumn} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn , UpdateDateColumn, JoinColumn} from 'typeorm';
 import { Family } from './family.entity';
 import { CategoryExpense } from './category_expense.entity'; // Giả sử bạn đã định nghĩa entity này
 
@@ -8,12 +8,12 @@ export class TotalCategoryFamily {
   id: number;
 
   @ManyToOne(() => Family)
-  @Column({ type: 'integer' })
-  id_family: number;
+  @JoinColumn({ name: 'id_family' }) 
+  id_family: Family;
 
   @ManyToOne(() => CategoryExpense)
-  @Column({ type: 'integer' })
-  id_category: number;
+  @JoinColumn({ name: 'id_category' }) 
+  id_category: CategoryExpense;
 
   @Column('money', { nullable: true })
   total: number;

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
 import { Users } from './users.entity'; // Giả sử bạn đã định nghĩa entity này
 
 @Entity('otp')
@@ -7,8 +7,8 @@ export class OTP {
   otp_id: number;
 
   @ManyToOne(() => Users)
-  @Column('uuid', { nullable: true })
-  owner_id: string;
+  @JoinColumn({ name: 'id_user' }) 
+  owner_id: Users;
 
   @Column('varchar')
   code: string;
