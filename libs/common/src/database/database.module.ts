@@ -11,7 +11,7 @@ import * as Joi from 'joi';
         validationSchema: Joi.object({
           DATABASE_URL: Joi.string().required()
         }),
-        envFilePath: process.cwd() + '/libs/.env'
+        envFilePath: './libs/.env'
       }),
       TypeOrmModule.forRootAsync({
         imports : [ConfigModule],
