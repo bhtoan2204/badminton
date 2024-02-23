@@ -1,5 +1,5 @@
 import { OTP } from '@app/common';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TwilioService } from 'nestjs-twilio';

@@ -15,9 +15,9 @@ export class CreateAccountDto {
 
     @IsNotEmpty()
     @IsString()
-    firstName: string;
+    firstname: string;
 
     @IsNotEmpty()
     @IsString()
-    lastName: string;
+    lastname: string;
 }

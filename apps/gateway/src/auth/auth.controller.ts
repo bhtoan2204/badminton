@@ -36,7 +36,6 @@ export class AuthApiController {
     @UseGuards(GoogleAuthGuard)
     @Get('google/callback')
     async googleLoginCallback(@Req() request: any) {
-        console.log(request.user);
         return this.authService.googleLogin(request.user);
     }
 
