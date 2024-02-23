@@ -1,11 +1,10 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import {Injectable, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { QueryFailedError, Repository, EntityManager } from "typeorm";
 import { CreateAccountDto } from "./dto/createAccount.dto";
 import { ConfigService } from "@nestjs/config";
 import * as bcrypt from 'bcryptjs';
 import { LoginType, OTP, Users } from "@app/common";
-import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class UserService {
@@ -70,21 +69,18 @@ export class UserService {
 
   async createAccount(createAccountDto: CreateAccountDto) {
     try {
-      const { email, phone, password, firstName, lastName } = createAccountDto;
+      const { email, phone, password, firstname, lastname } = createAccountDto;
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6)';
-      const parameters = [email, phone, hashedPassword, firstName, lastName, 'null'];
+      const parameters = [email, phone, hashedPassword, firstname, lastname, null];
 
-      const data = await this.entityManager.query(query, parameters)
-        .catch(err => {
-          console.log(err);
-          throw err.driverError;
-        });
+      const data = await this.entityManager.query(query, parameters);
+
       return data;
     }
     catch (error) {
-      throw error;
+      throw new QueryFailedError(error.query, error.parameters, error.driverError);
     }
   }
 }
