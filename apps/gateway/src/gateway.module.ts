@@ -4,6 +4,7 @@ import { AuthApiModule } from './auth/auth.module';
 import { PaymentModule } from './payment/payment.module';
 import { SmsModule } from './sms/sms.module';
 import * as Joi from 'joi';
+import { FamilyModule } from './family/family.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import * as Joi from 'joi';
     AuthApiModule,
     PaymentModule,
     SmsModule,
+    FamilyModule
   ],
   controllers: [],
   providers: [],
