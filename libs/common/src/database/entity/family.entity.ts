@@ -16,5 +16,8 @@ export class Family {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @Column('varchar', { nullable: true })
+  name: string;
 }
 

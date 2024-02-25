@@ -6,7 +6,7 @@ import { OTP, RmqModule, Users } from "@app/common";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Users, OTP]),
+    TypeOrmModule.forFeature([Users, OTP]), // muốn sử dụng entity nào thì khai báo ở module ở đây
     RmqModule
   ],
   controllers: [UserController],
