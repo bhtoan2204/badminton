@@ -2,7 +2,7 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ClientProxy } from '@nestjs/microservices';
-import { catchError, lastValueFrom, throwError, timeout } from 'rxjs';
+import { lastValueFrom, timeout } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 import { AUTH_SERVICE } from 'apps/gateway/constant/services.constant';
 

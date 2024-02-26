@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { SmsModule } from './sms.module';
 import { RmqService } from '@app/common';
-import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(SmsModule);

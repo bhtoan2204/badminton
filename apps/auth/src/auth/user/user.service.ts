@@ -1,10 +1,10 @@
-import {HttpStatus, Injectable, UnauthorizedException } from "@nestjs/common";
+import {HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { QueryFailedError, Repository, EntityManager } from "typeorm";
+import { Repository, EntityManager } from "typeorm";
 import { CreateAccountDto } from "./dto/createAccount.dto";
 import { ConfigService } from "@nestjs/config";
 import * as bcrypt from 'bcryptjs';
-import { LoginType, OTP, Users } from "@app/common";
+import { LoginType, Users } from "@app/common";
 import { RpcException } from "@nestjs/microservices";
 
 @Injectable()
@@ -53,14 +53,6 @@ export class UserService {
         }
       });
       if (!user) {
-        // const newUser = await this.userRepository.save({
-        //   email: profile.emails[0].value,
-        //   firstname: profile.name.givenName,
-        //   lastname: profile.name.familyName,
-        //   login_type: LoginType.GOOGLE,
-        //   role: 'user'
-        // });
-        // return newUser;
         const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7)';
         const parameters = [profile.emails[0].value, null, null, profile.name.givenName, profile.name.familyName, null, LoginType.GOOGLE];
         const data = await this.entityManager.query(query, parameters);

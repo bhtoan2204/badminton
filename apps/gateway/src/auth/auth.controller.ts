@@ -8,8 +8,6 @@ import { JwtAuthGuard } from "./guard/jwt-auth.guard";
 import { CurrentUser } from "apps/gateway/decorator/current-user.decorator";
 import { JwtRefreshGuard } from "./guard/refresh-auth.guard";
 import { GoogleAuthGuard } from "./guard/oauth.guard/google.guard";
-import { AdminGuard } from "./guard/authorize/role.guard";
-import { Admin } from "apps/gateway/decorator/role.decorator";
 
 @ApiTags('Authentication')
 @Controller('auth')

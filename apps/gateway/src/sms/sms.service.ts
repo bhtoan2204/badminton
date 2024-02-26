@@ -1,4 +1,4 @@
-import { HttpException, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { SMS_SERVICE } from "apps/gateway/constant/services.constant";
 import { lastValueFrom, timeout } from "rxjs";
