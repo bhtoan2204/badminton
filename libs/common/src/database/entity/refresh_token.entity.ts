@@ -13,11 +13,9 @@ export class RefreshToken {
   @JoinColumn({ name: 'id_user' }) 
   id_user: Users;
 
-
   @CreateDateColumn()
   created_at: Date;
 
   @Column('timestamp')
   expired_at: Date;
-
 }

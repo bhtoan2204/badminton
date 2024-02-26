@@ -6,7 +6,6 @@ export class OTP {
   @PrimaryGeneratedColumn()
   otp_id: number;
 
-  @ManyToOne(() => Users)
   @JoinColumn({ name: 'id_user' }) 
   owner_id: Users;
 

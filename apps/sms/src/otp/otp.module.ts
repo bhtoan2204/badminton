@@ -8,7 +8,6 @@ import { OTP, RmqModule } from "@app/common";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([OTP]),
     TwilioModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({

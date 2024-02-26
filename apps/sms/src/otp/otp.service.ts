@@ -3,37 +3,31 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TwilioService } from 'nestjs-twilio';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class OTPService {
   constructor(
     private readonly twilioService: TwilioService,
     private readonly configService: ConfigService,
-    @InjectRepository(OTP) private otpRepository: OTP
+    private readonly entityManager: EntityManager
   ) { }
 
-  async sendRegisterOTP() {
+  async sendValidatePhoneSms(validateData) {
     try {
-      const message = await this.twilioService.client.messages.create({
-        body: 'OTP Body, sent to the phone! for register',
-        from: this.configService.get<string>('TWILIO_PHONE_NUMBER'),
-        to: '+84971308623',
-      });
-      return message;
-    }
-    catch (error) {
-      throw error;
-    }
-  }
+      const query = 'SELECT * FROM f_generate_otp($1)';
+      const parameters = [validateData.id_user];
 
-  async sendForgotOTP() {
-    try {
-      const message = await this.twilioService.client.messages.create({
-        body: 'OTP Body, sent to the phone! for forgot password',
-        from: this.configService.get<string>('TWILIO_PHONE_NUMBER'),
-        to: '+84971308623',
-      });
-      return message;
+      const data = await this.entityManager.query(query, parameters);
+
+      return data;
+      // const message = await this.twilioService.client.messages.create({
+      //   body: 'Your Verification Code of Famfund is: ' + data,
+      //   from: this.configService.get<string>('TWILIO_PHONE_NUMBER'),
+      //   to: validateData.phone,
+      // });
+
+      // return message;
     }
     catch (error) {
       throw error;

@@ -10,15 +10,9 @@ export class OTPController {
     private readonly OTPService: OTPService
   ) {}
 
-  @EventPattern('smsClient/send_register_OTP')
-  async handleSendRegisterOTP(@Payload() data: any, @Ctx() context: RmqContext) {
+  @EventPattern('smsClient/sendValidatePhoneSms')
+  async sendValidatePhoneSms(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.OTPService.sendRegisterOTP();
-  }
-
-  @EventPattern('smsClient/send_forgot_OTP')
-  async handleSendForgotOTP(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return this.OTPService.sendForgotOTP();
+    return this.OTPService.sendValidatePhoneSms(data);
   }
 }
