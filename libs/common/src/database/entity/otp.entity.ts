@@ -6,8 +6,8 @@ export class OTP {
   @PrimaryGeneratedColumn()
   otp_id: number;
 
-  @JoinColumn({ name: 'id_user' }) 
-  owner_id: Users;
+  @Column('id_user') 
+  id_user: string;
 
   @Column('varchar')
   code: string;

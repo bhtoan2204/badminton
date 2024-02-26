@@ -1,6 +1,7 @@
 import { OTP } from '@app/common';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TwilioService } from 'nestjs-twilio';
 import { EntityManager } from 'typeorm';
@@ -30,7 +31,10 @@ export class OTPService {
       // return message;
     }
     catch (error) {
-      throw error;
+      throw new RpcException({
+        message: error.message,
+        statusCode: 404
+      });
     }
   }
 }
