@@ -4,13 +4,16 @@ import { JwtService } from "@nestjs/jwt";
 import { UserService } from "./user/user.service";
 import { TokenPayload } from "./interface/tokenPayload.interface";
 import { Users } from "@app/common";
+import { RpcException } from "@nestjs/microservices";
+import { EntityManager } from "typeorm";
 
 @Injectable()
 export class AuthenticationService {
   constructor(
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly entityManager: EntityManager
   ) {}
 
   async getTokens(payload: Users) {
@@ -34,27 +37,21 @@ export class AuthenticationService {
   }
 
   async localLogin(payload: Users){
-    const {accessToken, refreshToken} = await this.getTokens(payload);
+    const { accessToken, refreshToken } = await this.getTokens(payload);
     try {
-      // TODO: save refresh token to db
+      const query = "SELECT * FROM f_generate_refresh_token ($1, $2)";
+      const parameters = [payload.id_user, refreshToken];
+      await this.entityManager.query(query, parameters);
     }
     catch(err) {
-      if (err instanceof NotFoundException) {
-        // TODO: delete refresh token from db
-        throw new UnauthorizedException();
-      } else {
-        throw err;
-      }
+      throw new RpcException({
+        message: err.message,
+        statusCode: 404
+      });
     }
     return {
       accessToken,
-      refreshToken,
-      data: {
-        id_user: payload.id_user,
-        email: payload.email,
-        phone: payload.phone,
-        isadmin: payload.isadmin
-      }
+      refreshToken
     };
   }
 
@@ -65,37 +62,29 @@ export class AuthenticationService {
       // TODO: save refresh token to db
     }
     catch(err) {
-      if (err instanceof NotFoundException) {
-        // TODO: delete refresh token from db
-        throw new UnauthorizedException();
-      } else {
-        throw err;
-      }
+      throw new RpcException({
+        message: err.message,
+        statusCode: 404
+      });
     }
     return {
       accessToken,
-      refreshToken,
-      data: {
-        id_user: user.id_user,
-        email: user.email,
-        phone: user.phone,
-        isadmin: user.isadmin
-      }
+      refreshToken
     };
   }
 
   async refreshToken(payload: Users) {
     const {accessToken, refreshToken} = await this.getTokens(payload);
     try {
-      // TODO: save refresh token to db
+      const query = "SELECT * FROM f_generate_refresh_token ($1, $2)";
+      const parameters = [payload.id_user, refreshToken];
+      await this.entityManager.query(query, parameters);
     }
     catch(err) {
-      if (err instanceof NotFoundException) {
-        // TODO: delete refresh token from db
-        throw new UnauthorizedException();
-      } else {
-        throw err;
-      }
+      throw new RpcException({
+        message: err.message,
+        statusCode: 404
+      });
     }
     return {
       accessToken,

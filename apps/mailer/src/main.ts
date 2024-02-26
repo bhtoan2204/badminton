@@ -1,12 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { SmsModule } from './sms.module';
+import { MailerModule } from './mailer.module';
 import { RmqService } from '@app/common';
-import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(SmsModule);
+  const app = await NestFactory.create(MailerModule);
   const rmqService = app.get<RmqService>(RmqService);
-  app.connectMicroservice(rmqService.getOptions('SMS'));
+  app.connectMicroservice(rmqService.getOptions('MAILER'));
   await app.startAllMicroservices();
 }
 bootstrap();

@@ -20,8 +20,6 @@ export class MemberFamily {
   @JoinColumn({ name: 'id_role' }) 
   role: Role;
 
-
-
   @CreateDateColumn()
   created_at: Date;
 
