@@ -3,7 +3,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { PassportStrategy } from '@nestjs/passport';
 import { AUTH_SERVICE } from 'apps/gateway/constant/services.constant';
 import { Strategy } from 'passport-local';
-import { catchError, lastValueFrom, throwError, timeout } from 'rxjs';
+import { lastValueFrom, timeout } from 'rxjs';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {

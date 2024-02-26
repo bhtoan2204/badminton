@@ -1,8 +1,6 @@
-import { OTP } from '@app/common';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
-import { InjectRepository } from '@nestjs/typeorm';
 import { TwilioService } from 'nestjs-twilio';
 import { EntityManager } from 'typeorm';
 
@@ -21,14 +19,13 @@ export class OTPService {
 
       const data = await this.entityManager.query(query, parameters);
 
-      return data;
-      // const message = await this.twilioService.client.messages.create({
-      //   body: 'Your Verification Code of Famfund is: ' + data,
-      //   from: this.configService.get<string>('TWILIO_PHONE_NUMBER'),
-      //   to: validateData.phone,
-      // });
+      const message = await this.twilioService.client.messages.create({
+        body: 'Your Verification Code of Famfund is: ' + data,
+        from: this.configService.get<string>('TWILIO_PHONE_NUMBER'),
+        to: validateData.phone,
+      });
 
-      // return message;
+      return message;
     }
     catch (error) {
       throw new RpcException({
