@@ -76,10 +76,11 @@ export class UserService {
       const parameters = [email, phone, hashedPassword, firstname, lastname, null];
 
       const data = await this.entityManager.query(query, parameters);
-
+      
       return data;
     }
     catch (error) {
+      console.log(error);
       throw new QueryFailedError(error.query, error.parameters, error.driverError);
     }
   }

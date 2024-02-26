@@ -16,5 +16,4 @@ export class WalletFamily {
 
   @UpdateDateColumn()
   updated_at: Date;
-
 }

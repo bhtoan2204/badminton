@@ -26,7 +26,6 @@ export class IncomeUser {
   @JoinColumn({ name: 'id_wallet' }) 
   id_wallet: WalletUser;
 
-
   @CreateDateColumn()
   created_at: Date;
 
