@@ -25,15 +25,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   private async validateUser(payload: any) {
     const userRequest$ = this.authClient.send('authClient/validate_user_id', {id: payload.id}).pipe(
-      timeout(5000),
-      catchError(err => throwError(() => new Error(`Failed to get JWT secret: ${err}`)))
+      timeout(5000)
     );
 
     try {
       return await lastValueFrom(userRequest$);
     }
     catch (err) {
-      throw new UnauthorizedException("Validate strategy: " + err.message);
+      throw new UnauthorizedException(err.message);
     }
   }
 }

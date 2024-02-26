@@ -19,7 +19,6 @@ export class IncomeFamily {
   @JoinColumn({ name: 'id_category' }) 
   id_category: CategoryIncome;
 
-
   @Column('money')
   total: number;
 
