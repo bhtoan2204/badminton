@@ -21,7 +21,7 @@ export class AuthApiController {
     @UseGuards(LocalAuthGuard)
     @Post('local/login')
     async localLogin(@Req() request: any, @Body() loginDto: LoginDto){
-        
+
         return this.authService.localLogin(request.user);
     }
 
@@ -84,5 +84,12 @@ export class UserController {
     @Post('forgotPassword')
     async forgotPassword(@Body() data: any) {
         return { message: 'forgot password', data: data };
+    }
+
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Update Profile' })
+    @Post('updateProfile')
+    async updateProfile(@Body() data: any) {
+        return { message: 'update profile', data: data };
     }
 }
