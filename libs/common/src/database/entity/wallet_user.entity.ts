@@ -16,5 +16,4 @@ export class WalletUser {
 
   @UpdateDateColumn()
   updated_at: Date;
-
 }

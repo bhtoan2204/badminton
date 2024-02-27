@@ -1,73 +1,152 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import {HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Repository, EntityManager } from "typeorm";
 import { CreateAccountDto } from "./dto/createAccount.dto";
 import { ConfigService } from "@nestjs/config";
 import * as bcrypt from 'bcryptjs';
-import { LoginType, OTP, Users } from "@app/common";
+import { LoginType, Users } from "@app/common";
+import { RpcException } from "@nestjs/microservices";
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(Users) private userRepository: Repository<Users>,
-    @InjectRepository(OTP) private otpRepository: Repository<OTP>,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly entityManager: EntityManager
   ) {}
 
-  async validateLocalUser(email: string, password: string){
-    const user = await this.userRepository.findOne({where: {email}});
-    if(!user) {
-      throw new UnauthorizedException('User not found');
-    };
-    const isMatch = await bcrypt.compare(password, user.password);
-    if(!isMatch) {
-      throw new UnauthorizedException('Credentials are not valid.');
-    };
-    return user;
+  async validateLocalUser(email: string, inputPassword: string) {
+    let user;
+    try {
+      user = await this.userRepository.findOne({ where: { email, login_type: LoginType.LOCAL } });
+    } catch (error) {
+      throw new RpcException({
+        message: 'An error occurred while retrieving user information',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  
+    if (!user) {
+      throw new RpcException({
+        message: 'User not found',
+        statusCode: HttpStatus.UNAUTHORIZED,
+      });
+    }
+  
+    const isMatch = await bcrypt.compare(inputPassword, user.password);
+
+    if (!isMatch) {
+      throw new RpcException({
+        message: 'Credentials are not valid',
+        statusCode: HttpStatus.UNAUTHORIZED,
+      });
+    }
+  
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 
   async validateGoogleUser(accessToken: string, profile: any) {
-    const user = await this.userRepository.findOne({where: 
-      {
-        email: profile.emails[0].value,
-        login_type: LoginType.GOOGLE
-      }
-    });
-    if (!user) {
-      const newUser = await this.userRepository.save({
-        email: profile.emails[0].value,
-        firstname: profile.name.givenName,
-        lastname: profile.name.familyName,
-        login_type: LoginType.GOOGLE,
-        role: 'user'
+    try {
+      const user = await this.userRepository.findOne({where: 
+        {
+          email: profile.emails[0].value,
+          login_type: LoginType.GOOGLE
+        }
       });
-      return newUser;
+      if (!user) {
+        const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7)';
+        const parameters = [profile.emails[0].value, null, null, profile.name.givenName, profile.name.familyName, null, LoginType.GOOGLE];
+        const data = await this.entityManager.query(query, parameters);
+
+        return await this.userRepository.findOne({where: 
+          {
+            id_user: data[0].id_user,
+            login_type: LoginType.GOOGLE
+          }
+        });
+      }
+      else {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      }
     }
-    else {
-      return user;
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: 404
+      });
     }
   }
   
   async validateUserId(id_user: string){
     const user = await this.userRepository.findOne({where: { id_user }});
-    if(!user) {
-      throw new UnauthorizedException('User not found');
+    if (!user) {
+      throw new RpcException({
+        message: 'User not found',
+        statusCode: 404
+      });
     };
-    return user;
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 
   async createAccount(createAccountDto: CreateAccountDto) {
-    const { email, phone, password, firstName, lastName } = createAccountDto;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const data = await this.userRepository.save({
-      email,
-      phone,
-      password: hashedPassword,
-      firstname: firstName,
-      lastname: lastName,
-      loginType: LoginType.LOCAL,
-    });
+    try {
+      const { email, phone, password, firstname, lastname } = createAccountDto;
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-    return data;
+      const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6)';
+      const parameters = [email, phone, hashedPassword, firstname, lastname, null];
+
+      const data = await this.entityManager.query(query, parameters);
+      
+      return data;
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.CONFLICT
+      });
+    }
+  }
+
+  async changePassword(user: any, passwordDto: any) {
+    try {
+      const { oldPassword, newPassword } = passwordDto;
+      if (oldPassword === newPassword) {
+        throw new RpcException({
+          message: 'New password must be different from old password',
+          statusCode: HttpStatus.BAD_REQUEST
+        });
+      }
+
+      const { password } = await this.userRepository.findOne({where: { id_user: user.id_user }});
+      const isMatch = await bcrypt.compare(oldPassword, password);
+
+      if (!isMatch) {
+        throw new RpcException({
+          message: 'Old password is not correct',
+          statusCode: HttpStatus.UNAUTHORIZED
+        });
+      }
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      const query = 'SELECT * FROM f_change_password($1, $2)';
+      const parameters = [user.id_user, hashedPassword];
+      const data = await this.entityManager.query(query, parameters);
+      return data;
+    }
+    catch (error) {
+      console.log(error);
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      else {
+        throw new RpcException({
+          message: error.message,
+          statusCode: HttpStatus.UNAUTHORIZED
+        });
+      }
+    }
   }
 }

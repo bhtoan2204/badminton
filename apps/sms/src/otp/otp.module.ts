@@ -1,14 +1,12 @@
 import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
 import { TwilioModule } from "nestjs-twilio";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { OTPController } from "./otp.controller";
 import { OTPService } from "./otp.service";
-import { OTP, RmqModule } from "@app/common";
+import { RmqModule } from "@app/common";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([OTP]),
     TwilioModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({

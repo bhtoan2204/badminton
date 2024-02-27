@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gateway
+  name: gateway-deployment
 spec:
   strategy:
       rollingUpdate:
@@ -27,6 +27,9 @@ spec:
           limits:
             cpu: "0.5"
             memory: "512Mi"
+          requests:
+            cpu: "0.1"
+            memory: "128Mi"
         env:
         - name: NODE_ENV
           value: "production"

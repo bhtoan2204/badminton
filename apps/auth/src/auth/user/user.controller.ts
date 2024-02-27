@@ -26,9 +26,14 @@ export class UserController {
   }
 
   @EventPattern('authClient/validate_user_id')
-  async handleValidateUserId(@Payload() data: any, @Ctx() context: RmqContext) {
+  async handleValidateUserId(@Payload() id_user: string, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    const { id_user } = data;
     return await this.userService.validateUserId(id_user);
+  }
+
+  @EventPattern('authClient/change_password')
+  async handleChangePassword(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.userService.changePassword(data.currentUser, data.data);
   }
 }

@@ -2,7 +2,7 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ClientProxy } from '@nestjs/microservices';
-import { catchError, lastValueFrom, throwError, timeout } from 'rxjs';
+import { lastValueFrom, timeout } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 import { AUTH_SERVICE } from 'apps/gateway/constant/services.constant';
 
@@ -24,16 +24,15 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   private async validateUser(payload: any) {
-    const userRequest$ = this.authClient.send('authClient/validate_user_id', {id: payload.id}).pipe(
-      timeout(5000),
-      catchError(err => throwError(() => new Error(`Failed to get JWT secret: ${err}`)))
+    const userRequest$ = this.authClient.send('authClient/validate_user_id', payload.id_user).pipe(
+      timeout(5000)
     );
 
     try {
       return await lastValueFrom(userRequest$);
     }
     catch (err) {
-      throw new UnauthorizedException("Validate strategy: " + err.message);
+      throw new UnauthorizedException(err.message);
     }
   }
 }
