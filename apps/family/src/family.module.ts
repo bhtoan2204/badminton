@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { familyController } from './family.controller';
+import { FamilyController } from './family.controller';
 import { DatabaseModule, Family, RmqModule } from '@app/common';
-import { familyService } from './family.service';
+import { FamilyService } from './family.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -20,7 +20,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     TypeOrmModule.forFeature([Family]),
     RmqModule
   ],
-  controllers: [familyController],
-  providers: [familyService],
+  controllers: [FamilyController],
+  providers: [FamilyService],
 })
 export class FamilyModule {}
