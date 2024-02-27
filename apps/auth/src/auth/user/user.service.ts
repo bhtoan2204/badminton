@@ -15,10 +15,10 @@ export class UserService {
     private readonly entityManager: EntityManager
   ) {}
 
-  async validateLocalUser(email: string, password: string) {
+  async validateLocalUser(email: string, inputPassword: string) {
     let user;
     try {
-      user = await this.userRepository.findOne({ where: { email } });
+      user = await this.userRepository.findOne({ where: { email, login_type: LoginType.LOCAL } });
     } catch (error) {
       throw new RpcException({
         message: 'An error occurred while retrieving user information',
@@ -33,7 +33,8 @@ export class UserService {
       });
     }
   
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(inputPassword, user.password);
+
     if (!isMatch) {
       throw new RpcException({
         message: 'Credentials are not valid',
@@ -41,7 +42,8 @@ export class UserService {
       });
     }
   
-    return user;
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 
   async validateGoogleUser(accessToken: string, profile: any) {
@@ -65,7 +67,8 @@ export class UserService {
         });
       }
       else {
-        return user;
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
       }
     }
     catch (error) {
@@ -84,7 +87,8 @@ export class UserService {
         statusCode: 404
       });
     };
-    return user;
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 
   async createAccount(createAccountDto: CreateAccountDto) {
@@ -104,6 +108,45 @@ export class UserService {
         message: error.message,
         statusCode: HttpStatus.CONFLICT
       });
+    }
+  }
+
+  async changePassword(user: any, passwordDto: any) {
+    try {
+      const { oldPassword, newPassword } = passwordDto;
+      if (oldPassword === newPassword) {
+        throw new RpcException({
+          message: 'New password must be different from old password',
+          statusCode: HttpStatus.BAD_REQUEST
+        });
+      }
+
+      const { password } = await this.userRepository.findOne({where: { id_user: user.id_user }});
+      const isMatch = await bcrypt.compare(oldPassword, password);
+
+      if (!isMatch) {
+        throw new RpcException({
+          message: 'Old password is not correct',
+          statusCode: HttpStatus.UNAUTHORIZED
+        });
+      }
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      const query = 'SELECT * FROM f_change_password($1, $2)';
+      const parameters = [user.id_user, hashedPassword];
+      const data = await this.entityManager.query(query, parameters);
+      return data;
+    }
+    catch (error) {
+      console.log(error);
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      else {
+        throw new RpcException({
+          message: error.message,
+          statusCode: HttpStatus.UNAUTHORIZED
+        });
+      }
     }
   }
 }

@@ -8,6 +8,7 @@ import { JwtAuthGuard } from "./guard/jwt-auth.guard";
 import { CurrentUser } from "apps/gateway/decorator/current-user.decorator";
 import { JwtRefreshGuard } from "./guard/refresh-auth.guard";
 import { GoogleAuthGuard } from "./guard/oauth.guard/google.guard";
+import { ChangePasswordDto } from "./dto/changePassword.dto";
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -20,6 +21,7 @@ export class AuthApiController {
     @UseGuards(LocalAuthGuard)
     @Post('local/login')
     async localLogin(@Req() request: any, @Body() loginDto: LoginDto){
+        
         return this.authService.localLogin(request.user);
     }
 
@@ -67,5 +69,20 @@ export class UserController {
     @Get('profile')
     async getProfile(@CurrentUser() user) {
         return { message: 'ok', data: user };
+    }
+
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Change Password' })
+    @UseGuards(JwtAuthGuard)
+    @Post('changePassword')
+    async changePassword(@CurrentUser() user, @Body() data: ChangePasswordDto) {
+        return this.userService.changePassword(user, data);
+    }
+
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Forgot Password' })
+    @Post('forgotPassword')
+    async forgotPassword(@Body() data: any) {
+        return { message: 'forgot password', data: data };
     }
 }
