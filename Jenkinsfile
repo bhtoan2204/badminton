@@ -12,6 +12,8 @@ pipeline {
 
     environment {
         SSH_password = credentials('SSH-password')
+        SSH_user = credentials('SSH_user')
+        SSH_ip = credentials('SSH_ip')
     }
 
     stages{
@@ -51,8 +53,8 @@ pipeline {
                         sh "echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin"
                         sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml push"
                         sh "tar -czvf k8s.tar.gz k8s/"
-                        sh "sshpass -p ${SSH_password} scp -r docker-compose.prod.yml banhhaotoan2002@104.199.191.41:~/"
-                        sh "sshpass -p ${SSH_password} scp -r k8s.tar.gz banhhaotoan2002@104.199.191.41:~/"
+                        sh "sshpass -p ${SSH_password} scp -r docker-compose.prod.yml ${SSH_user}@${SSH_ip}:~/"
+                        sh "sshpass -p ${SSH_password} scp -r k8s.tar.gz ${SSH_user}@${SSH_ip}:~/"
                         sh "rm -rf k8s.tar.gz"
                     }
                 }
@@ -61,16 +63,18 @@ pipeline {
 
         stage("Pull Images from Docker Hub") {
           steps {
-            sh "sshpass -p ${SSH_password} ssh banhhaotoan2002@104.199.191.41 'TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml pull'"
-            sh "sshpass -p ${SSH_password} ssh banhhaotoan2002@104.199.191.41 'tar -xzvf k8s.tar.gz'"
+            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml pull'"
+            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'tar -xzvf k8s.tar.gz'"
           }
         }
 
         stage("Deploy to Kubernetes") {
           steps {
-            sh "sshpass -p ${SSH_password} ssh banhhaotoan2002@104.199.191.41 'TAG=${COMMIT_ID} tar -xzvf k8s.tar.gz'"
-            sh "sshpass -p ${SSH_password} ssh banhhaotoan2002@104.199.191.41 'find ./k8s -type f -name \"*.yml\" -print0 | xargs -0 sed -i \"s/<TAG>/${COMMIT_ID}/g\"'"
-            sh "sshpass -p ${SSH_password} ssh banhhaotoan2002@104.199.191.41 'kubectl apply -f ./k8s'"
+            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'TAG=${COMMIT_ID} tar -xzvf k8s.tar.gz'"
+            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'find ./k8s -type f -name \"*.yml\" -print0 | xargs -0 sed -i \"s/<TAG>/${COMMIT_ID}/g\"'"
+            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'kubectl delete -f ./k8s --ignore-not-found=true'"
+            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'kubectl apply -f ./k8s'"
+            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'kubectl rollout restart deployment'"
           }
         }
     }
