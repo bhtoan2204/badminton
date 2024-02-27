@@ -4,6 +4,7 @@ import { AuthApiModule } from './auth/auth.module';
 import { PaymentModule } from './payment/payment.module';
 import { SmsModule } from './sms/sms.module';
 import * as Joi from 'joi';
+import { FamilyModule } from './family/family.module';
 import { AdminModule } from './admin/admin.module';
 
 @Module({
@@ -31,6 +32,7 @@ import { AdminModule } from './admin/admin.module';
     AuthApiModule,
     PaymentModule,
     SmsModule,
+    FamilyModule,
     AdminModule
   ],
   controllers: [],

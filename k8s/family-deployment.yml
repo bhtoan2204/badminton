@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: family-deployment
+spec:
+  strategy:
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: family
+  template:
+    metadata:
+      labels:
+        app: family
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: family
+        image: mjkundta/family:<TAG>
+        command: ["node", "dist/apps/family/main"]
+        resources:
+          limits:
+            cpu: "0.5"
+            memory: "512Mi"
+          requests:
+            cpu: "0.1"
+            memory: "128Mi"
+        env:
+          - name: NODE_ENV
+            value: "production"

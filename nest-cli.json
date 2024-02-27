@@ -55,6 +55,15 @@
         "tsConfigPath": "apps/sms/tsconfig.app.json"
       }
     },
+    "family": {
+      "type": "application",
+      "root": "apps/family",
+      "entryFile": "main",
+      "sourceRoot": "apps/family/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/family/tsconfig.app.json"
+      }
+    },
     "mailer": {
       "type": "application",
       "root": "apps/mailer",
