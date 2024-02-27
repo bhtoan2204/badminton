@@ -1,19 +1,19 @@
 import { Controller, Get } from '@nestjs/common';
-import { familyService } from './family.service';
+import { FamilyService } from './family.service';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { RmqService } from '@app/common';
 import { createFamilyDto } from './dto/createFamilyDto.dto';
 
 @Controller()
-export class familyController {
+export class FamilyController {
   constructor(
-    private readonly familyService: familyService,
+    private readonly familyService: FamilyService,
     private readonly rmqService: RmqService) {}
 
   @EventPattern('family/get_Family')
-  async getFamily(@Payload() id: number, @Ctx() context: RmqContext) {
+  async getFamily(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.familyService.getFamily(id);
+    return this.familyService.getFamily(data.id);
   }
 
   @EventPattern('family/create_Family')

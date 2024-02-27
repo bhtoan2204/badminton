@@ -6,17 +6,16 @@ import { createFamilyDto } from './dto/createFamilyDto.dto';
 import { ConfigService } from "@nestjs/config";
 
 @Injectable()
-export class familyService {
+export class FamilyService {
   constructor(
     @InjectRepository(Family) private familyRepository: Repository<Family>,
     private readonly configService: ConfigService,
-
     private readonly entityManager: EntityManager
 
   ) {}
 
   async getFamily(id: number){
-    try{
+    try {
       const Query = 'select * from family where id_family = $1;';
       const param = [id];
       const data= await this.entityManager.query(Query, param);

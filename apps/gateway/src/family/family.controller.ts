@@ -15,7 +15,6 @@ export class FamilyController {
     return this.familyService.getFamily(id);
   }
 
-
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Create a family' })
   @Post('createFamily')
