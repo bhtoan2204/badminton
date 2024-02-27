@@ -53,6 +53,19 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+  
+  family:
+    image: mjkundta/family:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/family/Dockerfile
+      target: production
+    command: node dist/apps/family/main
+    depends_on:
+      - gateway
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
 
   rabbitmq:
     image: rabbitmq
