@@ -4,7 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager } from "typeorm";
 import { createFamilyDto } from './dto/createFamilyDto.dto';
 import { ConfigService } from "@nestjs/config";
-
+import { Users } from '@app/common';
+import { CurrentUser } from 'apps/gateway/decorator/current-user.decorator';
 @Injectable()
 export class FamilyService {
   constructor(
@@ -14,11 +15,11 @@ export class FamilyService {
 
   ) {}
 
-  async getFamily(id: number){
+  async getFamily(user: any){
     try {
-      const Query = 'select * from family where id_family = $1;';
-      const param = [id];
-      const data= await this.entityManager.query(Query, param);
+      const q2 = 'select * from family where id_family = (select id_family from users where id_user=$1) ';
+      const param = [user.id_user];
+      const data= await this.entityManager.query(q2, param);
       return data;
     }
     catch(error) {
@@ -31,11 +32,27 @@ export class FamilyService {
     //   }
   }
 
-  async createFamily(createFamilyDto: createFamilyDto) {
+  async createFamily(user: any,createFamilyDto: createFamilyDto) {
+    try {
+      const usersEntity: Users = Object.assign(new Users(), user);
+
+      const { description, name } = createFamilyDto;
+      const Query = 'SELECT * FROM f_create_family($1, $2, $3)';
+      const params = [user.id_user, description, name]; 
+      const data = await this.entityManager.query(Query, params);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+
+  async updateFamily(user: any,createFamilyDto: createFamilyDto) {
     try{
+
       const {description, name} = createFamilyDto;
-      const Query = 'select * from f_create_family($1, $2)';
-      const param = [description, name];
+      const Query = 'call p_update_family($1,$2,$3)';
+      const param = [user.id_user,description, name];
       const data= await this.entityManager.query(Query, param);
       return data;
     }
@@ -44,23 +61,11 @@ export class FamilyService {
     }
   }
 
-  async updateFamily(id: number, createFamilyDto: createFamilyDto) {
+  async deleteFamily(user: any) {
     try{
-      const {description, name} = createFamilyDto;
-      const Query = 'call p_update_family($1,$2.$3)';
-      const param = [id,description, name];
-      const data= await this.entityManager.query(Query, param);
-      return data;
-    }
-    catch(error) {
-        throw error;
-    }
-  }
 
-  async deleteFamily(id: number) {
-    try{
-      const Query = 'CALL p_delete_family($1)';
-      const param = [id];
+      const Query = 'call p_delete_family($1)';
+      const param = [user.id_user];
       const data= await this.entityManager.query(Query, param);
       return data;
     }

@@ -13,3 +13,10 @@ export const CurrentUser = createParamDecorator(
   (_data: unknown, context: ExecutionContext) =>
     getCurrentUserByContext(context),
 );
+
+export const CurrentID = createParamDecorator(
+  (data: unknown, context: ExecutionContext) => {
+    const request = context.switchToHttp().getRequest();
+    return request.Users; 
+  },
+);
