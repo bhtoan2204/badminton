@@ -3,7 +3,7 @@ import { Strategy, Profile } from 'passport-google-oauth20';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { AUTH_SERVICE } from 'apps/gateway/constant/services.constant';
-import { catchError, lastValueFrom, timeout } from 'rxjs';
+import { lastValueFrom, timeout } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -23,10 +23,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   async validate(accessToken: string, refreshToken: string, profile: Profile): Promise<any> {
     try {
       const source = this.authClient.send('authClient/google_login', { accessToken, profile }).pipe(
-        timeout(5000),
-        catchError(err => {
-          throw new Error(`Failed to login: ${err.message}`);
-        })
+        timeout(5000)
       );
       return await lastValueFrom(source);
     }

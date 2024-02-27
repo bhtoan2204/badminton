@@ -21,6 +21,10 @@ COPY package*.json ./
 
 RUN npm install --only=production --ignore-scripts
 
+RUN adduser -D nonroot && chown -R nonroot:nonroot /usr/src/app
+
+USER nonroot
+
 COPY . .
 
 COPY --from=development /usr/src/app/dist ./dist

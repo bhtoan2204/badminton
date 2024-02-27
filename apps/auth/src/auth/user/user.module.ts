@@ -2,11 +2,11 @@ import { Module } from "@nestjs/common";
 import { UserController } from "./user.controller";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserService } from "./user.service";
-import { OTP, RmqModule, Users } from "@app/common";
+import { RmqModule, Users } from "@app/common";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Users, OTP]), // muốn sử dụng entity nào thì khai báo ở module ở đây
+    TypeOrmModule.forFeature([Users]),
     RmqModule
   ],
   controllers: [UserController],
