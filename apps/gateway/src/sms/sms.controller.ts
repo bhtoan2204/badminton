@@ -9,7 +9,7 @@ export class SmsController {
   constructor(private readonly smsService: SmsService) {}
   
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Send register OTP' })
+  @ApiOperation({ summary: 'Send validation OTP' })
   @Post('validate/sendValidateSms')
   async handleSendValidatePhoneSms(@Body() data: ValidatePhoneDto) {
     return this.smsService.sendValidatePhoneSms(data);
