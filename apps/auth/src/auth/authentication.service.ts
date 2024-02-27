@@ -16,7 +16,7 @@ export class AuthenticationService {
     private readonly entityManager: EntityManager
   ) {}
 
-  async getTokens(payload: Users) {
+  async getTokens(payload) {
     const jwtPayload: TokenPayload = { 
       email: payload.email, 
       id_user: payload.id_user,
@@ -59,7 +59,9 @@ export class AuthenticationService {
     const user = await this.userService.validateGoogleUser(google_accessToken, profile);
     const { accessToken, refreshToken } = await this.getTokens(user);
     try {
-      // TODO: save refresh token to db
+      const query = "SELECT * FROM f_generate_refresh_token ($1, $2)";
+      const parameters = [user.id_user, refreshToken];
+      await this.entityManager.query(query, parameters);
     }
     catch(err) {
       throw new RpcException({
