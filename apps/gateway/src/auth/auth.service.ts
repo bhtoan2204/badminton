@@ -1,9 +1,10 @@
-import { HttpException, Inject, Injectable } from "@nestjs/common";
-import { AUTH_SERVICE } from "apps/gateway/constant/services.constant";
+import { ConflictException, HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AUTH_SERVICE } from "apps/gateway/src/utils/constant/services.constant";
 import { ClientProxy } from "@nestjs/microservices";
 import { lastValueFrom, timeout } from "rxjs";
 import { CreateAccountDto } from "./dto/createAccount.dto";
 import { ChangePasswordDto } from "./dto/changePassword.dto";
+import { UpdateProfileDto } from "./dto/updateProfile.dto";
 
 @Injectable()
 export class AuthApiService {
@@ -79,6 +80,31 @@ export class UserService {
             return result;
         }
         catch (error) {
+            throw new HttpException(error, error.statusCode);
+        }
+    }
+
+    async updateProfile(user, data) {
+        try {
+            const { firstname, lastname } = data;
+            if ((firstname && user.firstname === firstname) 
+            || (lastname && user.lastname === lastname)
+            || (!firstname && !lastname)) {
+                throw new ConflictException({
+                    message: 'No changes detected',
+                    statusCode: HttpStatus.BAD_REQUEST
+                });
+            }
+            const source = this.authClient.send('authClient/update_profile', { user , data }).pipe(
+                timeout(5000),
+            );
+            const result = await lastValueFrom(source);
+            return result;
+        }
+        catch (error) {
+            if (error instanceof ConflictException) {
+                throw error;
+            }
             throw new HttpException(error, error.statusCode);
         }
     }

@@ -1,6 +1,6 @@
 import { RmqModule } from "@app/common";
 import { Module } from "@nestjs/common";
-import { PAYMENT_SERVICE } from "apps/gateway/constant/services.constant";
+import { PAYMENT_SERVICE } from "apps/gateway/src/utils/constant/services.constant";
 
 @Module({
   imports: [

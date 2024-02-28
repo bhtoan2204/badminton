@@ -1,6 +1,9 @@
 export * from './rmq/rmq.module';
 export * from './rmq/rmq.service';
 
+export * from './grpc/grpc.module';
+export * from './grpc/grpc.service';
+
 export * from './database/database.module';
 
 export * from './database/entity/calendar.entity';
@@ -24,3 +27,5 @@ export * from './database/entity/total_category_user.entity';
 export * from './database/entity/total_category_family.entity';
 
 export * from './database/enum/login_type.enum';
+
+export * from './types/storage'

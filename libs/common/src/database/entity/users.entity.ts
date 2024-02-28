@@ -45,4 +45,7 @@ export class Users {
     default: LoginType.LOCAL
   })
   login_type: LoginType;
+
+  @Column('varchar', { nullable: true })
+  avatar: string;
 }

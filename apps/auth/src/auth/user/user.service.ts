@@ -149,4 +149,38 @@ export class UserService {
       }
     }
   }
+
+  async updateProfile(user: any, data: any) {
+    try {
+      const { firstname, lastname } = data;
+      if (user.firstname === firstname && user.lastname === lastname) {
+        throw new RpcException({
+          message: 'No changes detected',
+          statusCode: HttpStatus.BAD_REQUEST
+        });
+      }
+      let query, parameters;
+      if (firstname && !lastname) {
+        query = 'SELECT * FROM f_change_firstname($1, $2)';
+        parameters = [user.id_user, firstname];
+      }
+      else if (!firstname && lastname) {
+        query = 'SELECT * FROM f_change_lastname($1, $2)';
+        parameters = [user.id_user, lastname];
+      }
+      else {
+        query = 'SELECT * FROM f_change_firstname_lastname($1, $2, $3)';
+        parameters = [user.id_user, firstname, lastname];
+      }
+      const result = await this.entityManager.query(query, parameters);
+
+      return result;
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
 }
