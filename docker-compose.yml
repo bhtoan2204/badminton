@@ -16,47 +16,47 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
   
-  auth:
-    image: mjkundta/auth:latest
-    build:
-      context: .
-      dockerfile: ./apps/auth/Dockerfile
-      target: development
-    command: npm run start:dev auth
-    depends_on:
-      - gateway
-    restart: on-failure
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+  # auth:
+  #   image: mjkundta/auth:latest
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/auth/Dockerfile
+  #     target: development
+  #   command: npm run start:dev auth
+  #   depends_on:
+  #     - gateway
+  #   restart: on-failure
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
   
-  payment:
-    image: mjkundta/payment:latest
-    build:
-      context: .
-      dockerfile: ./apps/payment/Dockerfile
-      target: development
-    command: npm run start:dev payment
-    depends_on:
-      - gateway
-    restart: on-failure
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+  # payment:
+  #   image: mjkundta/payment:latest
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/payment/Dockerfile
+  #     target: development
+  #   command: npm run start:dev payment
+  #   depends_on:
+  #     - gateway
+  #   restart: on-failure
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
   
-  sms:
-    image: mjkundta/sms:latest
-    build:
-      context: .
-      dockerfile: ./apps/sms/Dockerfile
-      target: development
-    command: npm run start:dev sms
-    depends_on:
-      - gateway
-    restart: on-failure
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+  # sms:
+  #   image: mjkundta/sms:latest
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/sms/Dockerfile
+  #     target: development
+  #   command: npm run start:dev sms
+  #   depends_on:
+  #     - gateway
+  #   restart: on-failure
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
 
   family:
     image: mjkundta/family:latest
