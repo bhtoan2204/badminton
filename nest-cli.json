@@ -16,7 +16,9 @@
       "entryFile": "main",
       "sourceRoot": "apps/gateway/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/gateway/tsconfig.app.json"
+        "tsConfigPath": "apps/gateway/tsconfig.app.json",
+        "assets": ["proto/*.proto"],
+        "watchAssets": true
       }
     },
     "auth": {
@@ -25,7 +27,9 @@
       "entryFile": "main",
       "sourceRoot": "apps/auth/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/auth/tsconfig.app.json"
+        "tsConfigPath": "apps/auth/tsconfig.app.json",
+        "assets": ["proto/*.proto"],
+        "watchAssets": true
       }
     },
     "common": {
@@ -62,6 +66,17 @@
       "sourceRoot": "apps/mailer/src",
       "compilerOptions": {
         "tsConfigPath": "apps/mailer/tsconfig.app.json"
+      }
+    },
+    "storage": {
+      "type": "application",
+      "root": "apps/storage",
+      "entryFile": "main",
+      "sourceRoot": "apps/storage/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/storage/tsconfig.app.json",
+        "assets": ["proto/*.proto"],
+        "watchAssets": true
       }
     }
   }

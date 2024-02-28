@@ -1,6 +1,6 @@
 import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
-import { SMS_SERVICE } from "apps/gateway/constant/services.constant";
+import { SMS_SERVICE } from "apps/gateway/src/utils/constant/services.constant";
 import { lastValueFrom, timeout } from "rxjs";
 import { ValidatePhoneDto } from "./dto/validatePhone";
 

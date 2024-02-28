@@ -1,14 +1,16 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Req, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AuthApiService, UserService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { CreateAccountDto } from "./dto/createAccount.dto";
 import { LocalAuthGuard } from "./guard/local-auth.guard";
 import { JwtAuthGuard } from "./guard/jwt-auth.guard";
-import { CurrentUser } from "apps/gateway/decorator/current-user.decorator";
+import { CurrentUser } from "apps/gateway/src/utils/decorator/current-user.decorator";
 import { JwtRefreshGuard } from "./guard/refresh-auth.guard";
 import { GoogleAuthGuard } from "./guard/oauth.guard/google.guard";
 import { ChangePasswordDto } from "./dto/changePassword.dto";
+import { UpdateProfileDto } from "./dto/updateProfile.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -88,8 +90,17 @@ export class UserController {
 
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Update Profile' })
-    @Post('updateProfile')
-    async updateProfile(@Body() data: any) {
-        return { message: 'update profile', data: data };
+    @UseGuards(JwtAuthGuard)
+    @Put('updateProfile')
+    async updateProfile(@CurrentUser() user, @Body() data: UpdateProfileDto) {
+        return this.userService.updateProfile(user, data);
+    }
+
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Change Avatar' })
+    @UseGuards(JwtAuthGuard)
+    @Put('changeAvatar')
+    async changeAvatar(@CurrentUser() user) {
+        // return this.userService.changeAvatar(user, data);
     }
 }

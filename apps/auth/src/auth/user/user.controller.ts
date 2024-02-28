@@ -36,4 +36,10 @@ export class UserController {
     this.rmqService.ack(context);
     return await this.userService.changePassword(data.currentUser, data.data);
   }
+
+  @EventPattern('authClient/update_profile')
+  async handleUpdateProfile(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.userService.updateProfile(data.user, data.data);
+  }
 }
