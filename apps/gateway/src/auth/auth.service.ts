@@ -4,7 +4,6 @@ import { ClientProxy } from "@nestjs/microservices";
 import { lastValueFrom, timeout } from "rxjs";
 import { CreateAccountDto } from "./dto/createAccount.dto";
 import { ChangePasswordDto } from "./dto/changePassword.dto";
-import { UpdateProfileDto } from "./dto/updateProfile.dto";
 
 @Injectable()
 export class AuthApiService {
@@ -109,9 +108,9 @@ export class UserService {
         }
     }
 
-    async changeAvatar(currentUser) {
+    async changeAvatar(currentUser, file: Express.Multer.File) {
         try {
-            const source = this.authClient.send('authClient/change_avatar', currentUser).pipe(
+            const source = this.authClient.send('authClient/change_avatar', { currentUser, file } ).pipe(
                 timeout(5000),
             );
             const result = await lastValueFrom(source);

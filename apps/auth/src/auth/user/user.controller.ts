@@ -44,8 +44,8 @@ export class UserController {
   }
 
   @EventPattern('authClient/change_avatar')
-  async handleChangeAvatar(@Payload() currentUser: any, @Ctx() context: RmqContext) {
+  async handleChangeAvatar(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.userService.changeAvatar(currentUser);
+    return await this.userService.changeAvatar(data);
   }
 }

@@ -17,5 +17,4 @@ export class FilesController implements StorageServiceController {
   deleteFile(request: DeleteFileRequest): DeleteFileResponse | Observable<DeleteFileResponse> | Promise<DeleteFileResponse> {
     throw new Error('Method not implemented.');
   }
-
 }

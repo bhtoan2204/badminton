@@ -4,7 +4,7 @@ import { Repository, EntityManager } from "typeorm";
 import { CreateAccountDto } from "./dto/createAccount.dto";
 import { ConfigService } from "@nestjs/config";
 import * as bcrypt from 'bcryptjs';
-import { LoginType, ReadFileRequest, Users } from "@app/common";
+import { LoginType, ReadFileRequest, UploadFileRequest, Users } from "@app/common";
 import { RpcException } from "@nestjs/microservices";
 import { StorageService } from "../../storage/storage.service";
 
@@ -187,15 +187,27 @@ export class UserService {
     }
   }
 
-  async changeAvatar(user: any) {
-    const params: ReadFileRequest = {
-      fileName: 'test.txt'
-    }
-    const test = await this.storageService.readFile(params);
+  async changeAvatar(data: any) {
+    try {
+      const { currentUser, file } = data;
+      const filename = 'avatar_' + currentUser.id_user + '_' + file.originalname;
 
-    return {
-      message: 'ok',
-      data: test
-    };
+      const params: UploadFileRequest = {
+        fileName: 'test.txt',
+        file
+      }
+      const test = await this.storageService.uploadFile(params);
+
+      return {
+        message: 'ok',
+        data: test
+      };
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
   }
 }
