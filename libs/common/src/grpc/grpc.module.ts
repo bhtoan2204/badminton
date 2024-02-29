@@ -26,6 +26,7 @@ export class GrpcModule {
                             options: {
                                 package: configService.get<string>(`GRPC_${name}_PACKAGE`),
                                 protoPath: join(currentDir, '..', '..', '..', 'proto', configService.get<string>(`GRPC_${name}_PROTO_PATH`)),
+                                url: configService.get<string>(`GRPC_${name}_URL`),
                             },
                         }),
                         inject: [ConfigService],

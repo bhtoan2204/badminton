@@ -6,7 +6,7 @@ export const protobufPackage = "storage";
 
 export interface UploadFileRequest {
   fileName: string;
-  fileContent: Uint8Array;
+  file: Express.Multer.File;
 }
 
 export interface UploadFileResponse {
