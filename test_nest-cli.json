@@ -1,0 +1,4 @@
+"assets": ["**/*.proto"],
+"test": {
+  "assets": ["**/*.proto"]
+}

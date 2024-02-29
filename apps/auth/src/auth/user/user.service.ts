@@ -1,19 +1,21 @@
-import {HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, EntityManager } from "typeorm";
 import { CreateAccountDto } from "./dto/createAccount.dto";
 import { ConfigService } from "@nestjs/config";
 import * as bcrypt from 'bcryptjs';
-import { LoginType, Users } from "@app/common";
+import { LoginType, ReadFileRequest, Users } from "@app/common";
 import { RpcException } from "@nestjs/microservices";
+import { StorageService } from "../../storage/storage.service";
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(Users) private userRepository: Repository<Users>,
     private readonly configService: ConfigService,
-    private readonly entityManager: EntityManager
-  ) {}
+    private readonly entityManager: EntityManager,
+    private readonly storageService: StorageService
+  ) { }
 
   async validateLocalUser(email: string, inputPassword: string) {
     let user;
@@ -25,14 +27,14 @@ export class UserService {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
-  
+
     if (!user) {
       throw new RpcException({
         message: 'User not found',
         statusCode: HttpStatus.UNAUTHORIZED,
       });
     }
-  
+
     const isMatch = await bcrypt.compare(inputPassword, user.password);
 
     if (!isMatch) {
@@ -41,14 +43,15 @@ export class UserService {
         statusCode: HttpStatus.UNAUTHORIZED,
       });
     }
-  
+
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
   async validateGoogleUser(accessToken: string, profile: any) {
     try {
-      const user = await this.userRepository.findOne({where: 
+      const user = await this.userRepository.findOne({
+        where:
         {
           email: profile.emails[0].value,
           login_type: LoginType.GOOGLE
@@ -59,7 +62,8 @@ export class UserService {
         const parameters = [profile.emails[0].value, null, null, profile.name.givenName, profile.name.familyName, null, LoginType.GOOGLE];
         const data = await this.entityManager.query(query, parameters);
 
-        return await this.userRepository.findOne({where: 
+        return await this.userRepository.findOne({
+          where:
           {
             id_user: data[0].id_user,
             login_type: LoginType.GOOGLE
@@ -78,9 +82,9 @@ export class UserService {
       });
     }
   }
-  
-  async validateUserId(id_user: string){
-    const user = await this.userRepository.findOne({where: { id_user }});
+
+  async validateUserId(id_user: string) {
+    const user = await this.userRepository.findOne({ where: { id_user } });
     if (!user) {
       throw new RpcException({
         message: 'User not found',
@@ -100,7 +104,7 @@ export class UserService {
       const parameters = [email, phone, hashedPassword, firstname, lastname, null];
 
       const data = await this.entityManager.query(query, parameters);
-      
+
       return data;
     }
     catch (error) {
@@ -121,7 +125,7 @@ export class UserService {
         });
       }
 
-      const { password } = await this.userRepository.findOne({where: { id_user: user.id_user }});
+      const { password } = await this.userRepository.findOne({ where: { id_user: user.id_user } });
       const isMatch = await bcrypt.compare(oldPassword, password);
 
       if (!isMatch) {
@@ -137,7 +141,6 @@ export class UserService {
       return data;
     }
     catch (error) {
-      console.log(error);
       if (error instanceof RpcException) {
         throw error;
       }
@@ -182,5 +185,17 @@ export class UserService {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR
       });
     }
+  }
+
+  async changeAvatar(user: any) {
+    const params: ReadFileRequest = {
+      fileName: 'test.txt'
+    }
+    const test = await this.storageService.readFile(params);
+
+    return {
+      message: 'ok',
+      data: test
+    };
   }
 }

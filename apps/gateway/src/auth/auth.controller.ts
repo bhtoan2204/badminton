@@ -101,6 +101,6 @@ export class UserController {
     @UseGuards(JwtAuthGuard)
     @Put('changeAvatar')
     async changeAvatar(@CurrentUser() user) {
-        // return this.userService.changeAvatar(user, data);
+        return this.userService.changeAvatar(user);
     }
 }
