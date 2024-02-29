@@ -108,4 +108,17 @@ export class UserService {
             throw new HttpException(error, error.statusCode);
         }
     }
+
+    async changeAvatar(currentUser) {
+        try {
+            const source = this.authClient.send('authClient/change_avatar', currentUser).pipe(
+                timeout(5000),
+            );
+            const result = await lastValueFrom(source);
+            return result;
+        }
+        catch (error) {
+            throw new HttpException(error, error.statusCode);
+        }
+    }
 }

@@ -2,6 +2,7 @@ import { Module, DynamicModule } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { GrpcService } from './grpc.service';
+import { dirname, join } from 'path';
 
 interface GrpcModuleOptions {
     name: string;
@@ -13,6 +14,7 @@ interface GrpcModuleOptions {
 })
 export class GrpcModule {
     static register({ name }: GrpcModuleOptions): DynamicModule {
+        const currentDir = dirname(__filename);
         return {
             module: GrpcModule,
             imports: [
@@ -23,7 +25,7 @@ export class GrpcModule {
                             transport: Transport.GRPC,
                             options: {
                                 package: configService.get<string>(`GRPC_${name}_PACKAGE`),
-                                protoPath: configService.get<string>(`GRPC_${name}_PROTO_PATH`)
+                                protoPath: join(currentDir, '..', '..', '..', 'proto', configService.get<string>(`GRPC_${name}_PROTO_PATH`)),
                             },
                         }),
                         inject: [ConfigService],

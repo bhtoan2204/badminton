@@ -11,6 +11,8 @@ export class StorageService implements OnModuleInit{
   
   onModuleInit() {
     this.storageService = this.storageClient.getService<StorageServiceClient>(STORAGE_SERVICE_NAME);
+    console.log("StorageService initialized")
+    console.log(this.storageService)
   }
 
   async uploadFile(request: UploadFileRequest): Promise<UploadFileResponse> {

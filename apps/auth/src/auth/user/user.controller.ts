@@ -42,4 +42,10 @@ export class UserController {
     this.rmqService.ack(context);
     return await this.userService.updateProfile(data.user, data.data);
   }
+
+  @EventPattern('authClient/change_avatar')
+  async handleChangeAvatar(@Payload() currentUser: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.userService.changeAvatar(currentUser);
+  }
 }
