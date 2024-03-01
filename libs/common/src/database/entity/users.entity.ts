@@ -50,4 +50,7 @@ export class Users {
   // @ManyToOne(() => Family)
   // @JoinColumn({ name: 'id_family' }) 
   // id_family: Family;
+  
+  @Column('varchar', { nullable: true })
+  avatar: string;
 }

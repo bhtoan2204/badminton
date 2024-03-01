@@ -8,7 +8,7 @@ RUN npm install --ignore-scripts
 
 COPY . .
 
-RUN npm run build gateway
+RUN npm run build storage
 
 FROM node:20.10.0-alpine AS production
 
@@ -29,4 +29,4 @@ COPY . .
 
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD [ "node", "dist/apps/gateway/main" ]
+CMD [ "node", "dist/apps/storage/main" ]
