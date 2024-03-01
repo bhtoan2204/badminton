@@ -85,6 +85,8 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    ports:
+      - "50000:50000"
 
   rabbitmq:
     image: rabbitmq
