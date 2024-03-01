@@ -79,6 +79,8 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+    ports:
+      - "50000:50000"
 
   rabbitmq:
     image: rabbitmq
