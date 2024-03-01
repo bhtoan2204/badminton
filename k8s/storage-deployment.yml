@@ -21,6 +21,7 @@ spec:
       - name: storage
         image: mjkundta/storage:<TAG>
         command: ["node", "dist/apps/storage/main"]
+        port: 50000
         resources:
           limits:
             cpu: "0.5"
