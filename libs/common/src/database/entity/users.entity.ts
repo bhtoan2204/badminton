@@ -1,6 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { LoginType } from '../enum/login_type.enum';
-import { Family } from './family.entity';
 
 @Entity('users')
 export class Users {
@@ -50,7 +49,7 @@ export class Users {
   // @ManyToOne(() => Family)
   // @JoinColumn({ name: 'id_family' }) 
   // id_family: Family;
-  
+
   @Column('varchar', { nullable: true })
   avatar: string;
 }

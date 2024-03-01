@@ -3,11 +3,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, EntityManager } from "typeorm";
 import { CreateAccountDto } from "./dto/createAccount.dto";
 import { ConfigService } from "@nestjs/config";
-import { DeleteFileRequest, LoginType, ReadFileRequest, UploadFileRequest, Users } from "@app/common";
+import { DeleteFileRequest, LoginType, UploadFileRequest, Users } from "@app/common";
 import { RpcException } from "@nestjs/microservices";
 import { StorageService } from "../../storage/storage.service";
 import * as bcrypt from 'bcryptjs';
-import * as fs from 'fs';
 
 @Injectable()
 export class UserService {
