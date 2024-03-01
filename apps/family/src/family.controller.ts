@@ -2,8 +2,6 @@ import { Controller, Get } from '@nestjs/common';
 import { FamilyService } from './family.service';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { RmqService } from '@app/common';
-import { createFamilyDto } from './dto/createFamilyDto.dto';
-import { memberFamilyDto } from 'apps/gateway/src/family/dto/memberFamilyDto.dto';
 
 @Controller()
 export class FamilyController {

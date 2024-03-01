@@ -2,8 +2,8 @@ import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { FAMILY_SERVICE } from "apps/gateway/constant/services.constant";
 import { catchError, lastValueFrom, timeout } from "rxjs";
-import { createFamilyDto } from "./dto/createFamilyDto.dto";
-import { memberFamilyDto } from "./dto/memberFamilyDto.dto";
+import { CreateFamilyDto } from "./dto/createFamilyDto.dto";
+import { MemberFamilyDto } from "./dto/memberFamilyDto.dto";
 
 
 
@@ -31,7 +31,7 @@ export class FamilyService {
 
 
 
-async addMember(CurrentUser, memberFamilyDto: memberFamilyDto) {
+async addMember(CurrentUser, memberFamilyDto: MemberFamilyDto) {
     try {
         const response = this.familyClient.send('family/add_Member', {CurrentUser, memberFamilyDto} )
             .pipe(
@@ -45,7 +45,7 @@ async addMember(CurrentUser, memberFamilyDto: memberFamilyDto) {
 
 
 
-    async createFamily(CurrentUser,createFamilyDto: createFamilyDto) {
+    async createFamily(CurrentUser,createFamilyDto: CreateFamilyDto) {
       const source = this.familyClient.send('family/create_Family', { CurrentUser,createFamilyDto  }).pipe(
           timeout(5000),
           catchError(err => {
@@ -58,7 +58,7 @@ async addMember(CurrentUser, memberFamilyDto: memberFamilyDto) {
 
 
 
-  async updateFamily(CurrentUser,createFamilyDto: createFamilyDto) {
+  async updateFamily(CurrentUser,createFamilyDto: CreateFamilyDto) {
     const source = this.familyClient.send('family/update_Family', { CurrentUser,createFamilyDto }).pipe(
         timeout(5000),
         catchError(err => {

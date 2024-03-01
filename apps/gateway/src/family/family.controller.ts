@@ -1,10 +1,10 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { FamilyService } from "./family.service";
-import { createFamilyDto } from "./dto/createFamilyDto.dto";
+import { CreateFamilyDto } from "./dto/createFamilyDto.dto";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { CurrentUser } from "apps/gateway/decorator/current-user.decorator";
-import { memberFamilyDto } from "./dto/memberFamilyDto.dto";
+import { MemberFamilyDto } from "./dto/memberFamilyDto.dto";
 @ApiTags('Family')
 @Controller('family')
 @ApiBearerAuth()
@@ -25,14 +25,14 @@ export class FamilyController {
   @ApiOperation({ summary: 'Create a family' })
   @Post('createFamily')
   @UseGuards(JwtAuthGuard)
-  async createFamily(@CurrentUser() user, @Body() createFamilyDto: createFamilyDto) {
+  async createFamily(@CurrentUser() user, @Body() createFamilyDto: CreateFamilyDto) {
     return this.familyService.createFamily(user,createFamilyDto);
   }
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update a family' })
   @Put('updateFamily')
   @UseGuards(JwtAuthGuard)
-  async updateFamily(@CurrentUser() user, @Body() createFamilyDto: createFamilyDto) {
+  async updateFamily(@CurrentUser() user, @Body() createFamilyDto: CreateFamilyDto) {
     return this.familyService.updateFamily(user,createFamilyDto);
   }
 
@@ -48,7 +48,7 @@ export class FamilyController {
   @ApiOperation({ summary: 'add member' })
   @Post('addMember')
   @UseGuards(JwtAuthGuard)
-  async addMember(@CurrentUser() user, @Body() data: memberFamilyDto) {
+  async addMember(@CurrentUser() user, @Body() data: MemberFamilyDto) {
     return this.familyService.addMember(user, data);
   }
 }

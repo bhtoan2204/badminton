@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PaymentController } from './payment.controller';
+import { DatabaseModule, RmqModule } from '@app/common';
 import { PaymentService } from './payment.service';
-import { RmqModule } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -15,9 +16,10 @@ import * as Joi from 'joi';
       }),
       envFilePath: './apps/payment/.env'
     }),
-    RmqModule,
+    DatabaseModule,
+    RmqModule
   ],
   controllers: [PaymentController],
   providers: [PaymentService],
 })
-export class PaymentModule { }
+export class PaymentModule {}
