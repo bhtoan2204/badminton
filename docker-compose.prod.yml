@@ -53,6 +53,19 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+  
+  storage:
+    image: mjkundta/storage:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/storage/Dockerfile
+      target: production
+    command: node dist/apps/storage/main
+    depends_on:
+      - gateway
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
 
   rabbitmq:
     image: rabbitmq

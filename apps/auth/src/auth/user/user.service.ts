@@ -192,7 +192,7 @@ export class UserService {
   async changeAvatar(data: any) {
     try {
       const { currentUser, file } = data;
-      const filename = 'avatar_' + currentUser.id_user + '_' + file.originalname;
+      const filename = 'avatar_' + currentUser.id_user + '_' + Date.now() + '_' + file.originalname;
       const params: UploadFileRequest = {
         fileName: filename,
         file: new Uint8Array(file.buffer.data)
@@ -203,7 +203,7 @@ export class UserService {
       
       if (currentUser.avatar) {
         const deleteParams: DeleteFileRequest = {
-          fileName: currentUser.avatar
+          fileName: (currentUser.avatar).split('/').pop()
         }
         await this.storageService.deleteFile(deleteParams);
       }
