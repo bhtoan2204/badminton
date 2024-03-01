@@ -1,8 +1,8 @@
 import { RmqModule } from "@app/common";
 import { Module } from "@nestjs/common";
-import { FAMILY_SERVICE } from "apps/gateway/constant/services.constant";
 import { FamilyService } from "./family.service";
 import { FamilyController } from "./family.controller";
+import { FAMILY_SERVICE } from "../utils/constant/services.constant";
 
 @Module({
   imports: [

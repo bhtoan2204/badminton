@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { FamilyController } from './family.controller';
-import { DatabaseModule, Family, RmqModule } from '@app/common';
+import { DatabaseModule, RmqModule } from '@app/common';
 import { FamilyService } from './family.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -17,7 +16,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       envFilePath: './apps/family/.env'
     }),
     DatabaseModule,
-    TypeOrmModule.forFeature([Family]),
     RmqModule
   ],
   controllers: [FamilyController],

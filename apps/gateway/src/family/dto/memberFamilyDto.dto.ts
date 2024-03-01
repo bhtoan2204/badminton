@@ -1,10 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsString } from "class-validator";
 
-
-
-export class memberFamilyDto {
+export class MemberFamilyDto {
 
     @IsString()
 
