@@ -6,6 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(MailerModule);
   const rmqService = app.get<RmqService>(RmqService);
   app.connectMicroservice(rmqService.getOptions('MAILER'));
-  await app.startAllMicroservices();
+  app.startAllMicroservices();
+  await app.init()
 }
 bootstrap();
