@@ -8,13 +8,13 @@ import { Observable } from 'rxjs';
 export class FilesController implements StorageServiceController {
   constructor(private readonly filesService: FilesService) {}
   
-  uploadFile(request: UploadFileRequest): UploadFileResponse | Observable<UploadFileResponse> | Promise<UploadFileResponse> {
-    throw new Error('Method not implemented.');
+  async uploadFile(request: UploadFileRequest): Promise<UploadFileResponse> {
+    return await this.filesService.uploadFile(request);
   }
   readFile(request: ReadFileRequest): ReadFileResponse | Observable<ReadFileResponse> | Promise<ReadFileResponse> {
     throw new Error('Method not implemented.');
   }
-  deleteFile(request: DeleteFileRequest): DeleteFileResponse | Observable<DeleteFileResponse> | Promise<DeleteFileResponse> {
-    throw new Error('Method not implemented.');
+  async deleteFile(request: DeleteFileRequest): Promise<DeleteFileResponse> {
+    return await this.filesService.deleteFile(request);
   }
 }

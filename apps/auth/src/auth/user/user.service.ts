@@ -3,10 +3,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, EntityManager } from "typeorm";
 import { CreateAccountDto } from "./dto/createAccount.dto";
 import { ConfigService } from "@nestjs/config";
-import * as bcrypt from 'bcryptjs';
-import { LoginType, ReadFileRequest, UploadFileRequest, Users } from "@app/common";
+import { DeleteFileRequest, LoginType, ReadFileRequest, UploadFileRequest, Users } from "@app/common";
 import { RpcException } from "@nestjs/microservices";
 import { StorageService } from "../../storage/storage.service";
+import * as bcrypt from 'bcryptjs';
+import * as fs from 'fs';
 
 @Injectable()
 export class UserService {
@@ -14,7 +15,8 @@ export class UserService {
     @InjectRepository(Users) private userRepository: Repository<Users>,
     private readonly configService: ConfigService,
     private readonly entityManager: EntityManager,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
+
   ) { }
 
   async validateLocalUser(email: string, inputPassword: string) {
@@ -191,19 +193,33 @@ export class UserService {
     try {
       const { currentUser, file } = data;
       const filename = 'avatar_' + currentUser.id_user + '_' + file.originalname;
-
       const params: UploadFileRequest = {
-        fileName: 'test.txt',
-        file
+        fileName: filename,
+        file: new Uint8Array(file.buffer.data)
       }
-      const test = await this.storageService.uploadFile(params);
+      const uploadImageData = await this.storageService.uploadFile(params);
 
+      const fileUrl = uploadImageData.fileUrl;
+      
+      if (currentUser.avatar) {
+        const deleteParams: DeleteFileRequest = {
+          fileName: currentUser.avatar
+        }
+        await this.storageService.deleteFile(deleteParams);
+      }
+
+      const query = 'SELECT * FROM f_update_user_avatar($1, $2)';
+      const parameters = [currentUser.id_user, fileUrl];
+      const result = await this.entityManager.query(query, parameters);
+      
       return {
-        message: 'ok',
-        data: test
+        message: file.size + ' bytes uploaded successfully',
+        data: uploadImageData,
+        result: result
       };
     }
     catch (error) {
+      console.log(error.message);
       throw new RpcException({
         message: error.message,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR
