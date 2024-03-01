@@ -2,7 +2,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-google-oauth20';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { AUTH_SERVICE } from 'apps/gateway/constant/services.constant';
+import { AUTH_SERVICE } from 'apps/gateway/src/utils/constant/services.constant';
 import { lastValueFrom, timeout } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 

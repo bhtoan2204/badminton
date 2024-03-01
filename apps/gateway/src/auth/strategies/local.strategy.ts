@@ -1,7 +1,7 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PassportStrategy } from '@nestjs/passport';
-import { AUTH_SERVICE } from 'apps/gateway/constant/services.constant';
+import { AUTH_SERVICE } from 'apps/gateway/src/utils/constant/services.constant';
 import { Strategy } from 'passport-local';
 import { lastValueFrom, timeout } from 'rxjs';
 
