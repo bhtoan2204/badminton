@@ -7,6 +7,6 @@ spec:
     app: storage
   ports:
     - protocol: TCP
-      port: 8084
-      targetPort: 8084
+      port: 50000
+      targetPort: 50000
   type: ClusterIP
