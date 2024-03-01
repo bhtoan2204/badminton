@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MulterModuleOptions, MulterOptionsFactory } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import * as path from 'path';
+import { memoryStorage } from 'multer';
 
 @Injectable()
 export class ImageFileInterceptor implements MulterOptionsFactory {
@@ -19,13 +18,7 @@ export class ImageFileInterceptor implements MulterOptionsFactory {
         }
         callback(null, true);
       },
-      storage: diskStorage({
-        destination: './uploads', // Your destination path
-        filename: (req, file, callback) => {
-          const filename = path.parse(file.originalname).name.replace(/\s/g, '') + '-' + Date.now() + path.extname(file.originalname);
-          callback(null, filename);
-        },
-      }),
+      storage: memoryStorage()
     };
   }
 }

@@ -6,7 +6,7 @@ export const protobufPackage = "storage";
 
 export interface UploadFileRequest {
   fileName: string;
-  file: Express.Multer.File;
+  file: Uint8Array;
 }
 
 export interface UploadFileResponse {
@@ -21,7 +21,7 @@ export interface ReadFileRequest {
 
 export interface ReadFileResponse {
   fileName: string;
-  fileUrl: Uint8Array;
+  fileUrl: string;
   message: string;
 }
 

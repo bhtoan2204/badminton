@@ -22,6 +22,6 @@ export class StorageService implements OnModuleInit{
   }
 
   async deleteFile(request: DeleteFileRequest): Promise<DeleteFileResponse> {
-    return this.storageService.readFile(request).toPromise();
+    return this.storageService.deleteFile(request).toPromise();
   }
 }
