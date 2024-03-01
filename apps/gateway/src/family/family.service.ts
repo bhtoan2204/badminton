@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { catchError, lastValueFrom, timeout } from "rxjs";
-import { CreateFamilyDto } from "./dto/createFamilyDto";
+import { CreateFamilyDto } from "./dto/createFamilyDto.dto";
 import { MemberFamilyDto } from "./dto/memberFamilyDto.dto";
 import { FAMILY_SERVICE } from "../utils/constant/services.constant";
 
