@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { MailerController } from './mailer.controller';
 import { MailerService } from './mailer.service';
-import { RmqModule } from '@app/common';
+import { GrpcModule } from '@app/common';
 
 @Module({
-  imports: [RmqModule],
+  imports: [
+    GrpcModule
+  ],
   controllers: [MailerController],
   providers: [MailerService],
 })
