@@ -6,6 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(FamilyModule);
   const rmqService = app.get<RmqService>(RmqService);
   app.connectMicroservice(rmqService.getOptions('FAMILY'));
-  await app.startAllMicroservices();
+  app.startAllMicroservices();
+  await app.init()
 }
 bootstrap();
