@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { FamilyService } from "./family.service";
-import { CreateFamilyDto } from "./dto/CreateFamilyDto.dto";
+import { CreateFamilyDto } from "./dto/createFamilyDto";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
-import { MemberFamilyDto } from "./dto/MemberFamilyDto.dto";
+import { MemberFamilyDto } from "./dto/memberFamilyDto.dto";
 import { CurrentUser } from "../utils/decorator/current-user.decorator";
 @ApiTags('Family')
 @Controller('family')

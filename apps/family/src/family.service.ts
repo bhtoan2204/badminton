@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { EntityManager } from "typeorm";
 import { ConfigService } from "@nestjs/config";
-import { MemberFamilyDto } from 'apps/gateway/src/family/dto/MemberFamilyDto.dto';
+import { MemberFamilyDto } from 'apps/gateway/src/family/dto/memberFamilyDto.dto';
 
 @Injectable()
 export class FamilyService {
