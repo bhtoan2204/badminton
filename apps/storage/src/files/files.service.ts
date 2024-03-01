@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Storage } from "@google-cloud/storage";
 import { ConfigService } from '@nestjs/config';
-import { DeleteFileRequest, UploadFileRequest, UploadFileResponse } from '@app/common';
+import { DeleteFileRequest, DeleteFileResponse, UploadFileRequest, UploadFileResponse } from '@app/common';
 import { Buffer } from 'buffer';
 
 @Injectable()
@@ -61,7 +61,26 @@ export class FilesService {
     throw new Error('Method not implemented.');
   }
   
-  async deleteFile(request: DeleteFileRequest): Promise<any> {
-    
-  }
+  async deleteFile({ fileName }: DeleteFileRequest): Promise<DeleteFileResponse> {
+    try {
+        const path = `avatar/${fileName}`;
+        const fileRef = this.storage.bucket(this.bucket).file(path);
+        const [exists] = await fileRef.exists();
+        if (!exists) {
+            return {
+                fileName: fileName,
+                message: "File does not exist, nothing to delete",
+            };
+        }
+        await fileRef.delete();
+        return {
+            fileName: fileName,
+            message: "File deleted successfully",
+        };
+    } catch (e) {
+        console.log(e.message);
+        throw e;
+    }
+}
+
 }
