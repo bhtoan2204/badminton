@@ -29,5 +29,5 @@ spec:
             cpu: "0.1"
             memory: "128Mi"
         env:
-          - name: NODE_ENV
-            value: "production"
+        - name: NODE_ENV
+          value: "production"
