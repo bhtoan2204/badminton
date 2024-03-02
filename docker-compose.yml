@@ -85,8 +85,6 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    ports:
-      - "50000:50000"
 
   rabbitmq:
     image: rabbitmq
@@ -96,5 +94,3 @@ services:
       timeout: 10s
       retries: 5
     restart: on-failure
-    ports:
-      - '5672:5672'
