@@ -48,4 +48,10 @@ export class UserController {
     this.rmqService.ack(context);
     return await this.userService.changeAvatar(data);
   }
+
+  @EventPattern('authClient/validate_email')
+  async handleValidateEmail(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.userService.validateEmail(data);
+  }
 }

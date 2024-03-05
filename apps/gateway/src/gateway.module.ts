@@ -6,6 +6,7 @@ import { SmsModule } from './sms/sms.module';
 import * as Joi from 'joi';
 import { FamilyModule } from './family/family.module';
 import { AdminModule } from './admin/admin.module';
+import { MailModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -31,9 +32,10 @@ import { AdminModule } from './admin/admin.module';
     }),
     AuthApiModule,
     PaymentModule,
+    MailModule,
     SmsModule,
     FamilyModule,
-    AdminModule
+    AdminModule,
   ],
   controllers: [],
   providers: [],

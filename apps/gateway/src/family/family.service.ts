@@ -1,14 +1,11 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
-import { catchError, lastValueFrom, timeout } from "rxjs";
+import { lastValueFrom, timeout } from "rxjs";
 import { CreateFamilyDto } from "./dto/createFamilyDto.dto";
 import { MemberFamilyDto } from "./dto/memberFamilyDto.dto";
 import { FAMILY_SERVICE } from "../utils/constant/services.constant";
 
-
-
 @Injectable()
-
 export class FamilyService {
     constructor(
         @Inject(FAMILY_SERVICE) private familyClient: ClientProxy
@@ -22,55 +19,61 @@ export class FamilyService {
                 );
             const data = await lastValueFrom(response);
             return data;
-        } catch (err) {
-            throw err;
+        }
+        catch (error) {
+            throw new HttpException(error, error.statusCode);
         }
     }
 
     async addMember(CurrentUser, MemberFamilyDto: MemberFamilyDto) {
         try {
-            const response = this.familyClient.send('family/add_Member', { CurrentUser, MemberFamilyDto })
-                .pipe(
-                    timeout(5000),
-                );
+            const response = this.familyClient.send('family/add_Member', { CurrentUser, MemberFamilyDto }).pipe(
+                timeout(5000),
+            );
             const data = await lastValueFrom(response);
             return data;
-        } catch (err) {
-            throw err;
+        }
+        catch (error) {
+            throw new HttpException(error, error.statusCode);
         }
     }
 
     async createFamily(CurrentUser, CreateFamilyDto: CreateFamilyDto) {
-        const source = this.familyClient.send('family/create_Family', { CurrentUser, CreateFamilyDto }).pipe(
-            timeout(5000),
-            catchError(err => {
-                throw new Error(`Failed to create family: ${err.message}`);
-            })
-        );;
-        const data = await lastValueFrom(source);
-        return data;
+        try {
+            const source = this.familyClient.send('family/create_Family', { CurrentUser, CreateFamilyDto }).pipe(
+                timeout(5000)
+            );
+            const data = await lastValueFrom(source);
+            return data;
+        } 
+        catch (error) {
+            throw new HttpException(error, error.statusCode);
+        }
     }
 
     async updateFamily(CurrentUser, CreateFamilyDto: CreateFamilyDto) {
-        const source = this.familyClient.send('family/update_Family', { CurrentUser, CreateFamilyDto }).pipe(
-            timeout(5000),
-            catchError(err => {
-                throw new Error(`Failed to update family: ${err.message}`);
-            })
-        );;
-        const data = await lastValueFrom(source);
-        return data;
+        try {
+            const source = this.familyClient.send('family/update_Family', { CurrentUser, CreateFamilyDto }).pipe(
+                timeout(5000)
+            );;
+            const data = await lastValueFrom(source);
+            return data;
+        }
+        catch (error) {
+            throw new HttpException(error, error.statusCode);
+        }
     }
 
     async deleteFamily(CurrentUser) {
-        const source = this.familyClient.send('family/delete_Family', { CurrentUser }).pipe(
-            timeout(5000),
-            catchError(err => {
-                throw new Error(`Failed to delete family: ${err.message}`);
-            })
-        );;
-        const data = await lastValueFrom(source);
-        return data;
+        try {
+            const source = this.familyClient.send('family/delete_Family', { CurrentUser }).pipe(
+                timeout(5000)
+            );;
+            const data = await lastValueFrom(source);
+            return data;
+        }
+        catch (error) {
+            throw new HttpException(error, error.statusCode);
+        }
     }
-
 }

@@ -12,6 +12,7 @@ import { ChangePasswordDto } from "./dto/changePassword.dto";
 import { UpdateProfileDto } from "./dto/updateProfile.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ImageFileInterceptor } from "./interceptor/imageFile.interceptor";
+import { ValidateEmailDto } from "./dto/validateEmail.dto";
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -105,5 +106,13 @@ export class UserController {
     @Put('changeAvatar')
     async changeAvatar(@CurrentUser() user, @UploadedFile() file: Express.Multer.File) {
         return this.userService.changeAvatar(user, file);
+    }
+
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Validate Email' })
+    @UseGuards(JwtAuthGuard)
+    @Post('validateEmail')
+    async validateEmail(@CurrentUser() user, @Body() data: ValidateEmailDto) {
+        return this.userService.validateEmail(user, data);
     }
 }

@@ -34,6 +34,9 @@ export class Users {
   updated_at: Date;
 
   @Column('boolean', { default: false })
+  isemailverified: boolean;
+
+  @Column('boolean', { default: false })
   isphoneverified: boolean;
 
   @Column('boolean', { default: false })

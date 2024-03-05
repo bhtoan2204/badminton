@@ -120,4 +120,17 @@ export class UserService {
             throw new HttpException(error, error.statusCode);
         }
     }
+
+    async validateEmail(currentUser, data) {
+        try {
+            const source = this.authClient.send('authClient/validate_email', { currentUser, data }).pipe(
+                timeout(5000),
+            );
+            const result = await lastValueFrom(source);
+            return result;
+        }
+        catch (error) {
+            throw new HttpException(error, error.statusCode);
+        }
+    }
 }
