@@ -1,8 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsString, isNumber } from "class-validator";
 
-export class CreateFamilyDto {
-
+export class UpdateFamilyDTO {
+    @IsNotEmpty()
+    @ApiProperty({ example: 60 })
+    id_family: number;
 
     @IsString()
     @ApiProperty({ example: 'abc' })
