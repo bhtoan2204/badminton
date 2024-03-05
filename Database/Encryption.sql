@@ -73,17 +73,39 @@ $$ LANGUAGE plpgsql;
 
 --insert into "key"("key", created_at, updated_at) values( generate_key(16), now(), now())
 
-
 CREATE OR REPLACE FUNCTION encrypt_user_password()
 RETURNS TRIGGER AS $$
+DECLARE
+    encryption_key VARCHAR;
 BEGIN
-        NEW.password := encryption(NEW.password);
-        RETURN NEW;
+    -- Lấy key mới nhất từ bảng key
+    SELECT key_value INTO encryption_key 
+    FROM key 
+    ORDER BY created_at DESC 
+    LIMIT 1;
+
+    -- Mã hóa mật khẩu mới nếu nó được cung cấp
+    IF TG_OP = 'INSERT' then
+                EXECUTE 'CREATE USER "' || user_record.id_user || '" WITH PASSWORD ' || quote_literal(NEW.password) || ';';
+        NEW.password := encryption(NEW.password, encryption_key);
+    ELSIF TG_OP = 'UPDATE' then
+    	EXECUTE 'ALTER USER "' || NEW.id_user || '" WITH PASSWORD ' || quote_literal(NEW.password) || ';';
+        NEW.password := encryption(NEW.password, encryption_key);
+
+    END IF;
+
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER encrypt_user_password_trigger
-BEFORE INSERT OR UPDATE OF password ON "users"
+BEFORE INSERT OR UPDATE OF password ON users
+FOR EACH ROW
+EXECUTE FUNCTION encrypt_user_password();
+
+
+CREATE TRIGGER encrypt_user_password_trigger
+BEFORE INSERT OR UPDATE OF password ON users
 FOR EACH ROW
 EXECUTE FUNCTION encrypt_user_password();
 
@@ -106,5 +128,37 @@ BEGIN
     RETURN decrypted_password = input_password;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE create_users_from_table()
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    user_record RECORD;
+    user_exists BOOLEAN;
+BEGIN
+    FOR user_record IN SELECT * FROM users LOOP
+        BEGIN
+            -- Kiểm tra xem người dùng đã tồn tại chưa
+            EXECUTE 'SELECT EXISTS (SELECT FROM pg_catalog.pg_user WHERE usename = ''' || user_record.id_user || ''')' INTO user_exists;
+            
+            -- Nếu người dùng chưa tồn tại, tạo người dùng mới
+            IF NOT user_exists THEN
+                EXECUTE 'CREATE USER "' || user_record.id_user || '" WITH PASSWORD ' || quote_literal(user_record.password) || ';';
+                RAISE NOTICE 'User % created successfully', user_record.id_user;
+            END IF;
+        EXCEPTION
+            WHEN others THEN
+                RAISE EXCEPTION 'Failed to create user %: %', user_record.id_user, SQLERRM;
+        END;
+    END LOOP;
+END;
+$$;
+
+
+CREATE ROLE common_user;
+GRANT CONNECT ON DATABASE famfund_i2wq TO common_user; -- Cho phép kết nối vào cơ sở dữ liệu
+GRANT EXECUTE ON FUNCTION get_all_family TO "53b87106-d15a-4aa2-b6be-3223433614b7";
+
+GRANT common_user TO "53b87106-d15a-4aa2-b6be-3223433614b7";
 
 
