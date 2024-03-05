@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "./user/user.service";
@@ -46,7 +46,7 @@ export class AuthenticationService {
     catch(err) {
       throw new RpcException({
         message: err.message,
-        statusCode: 404
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
       });
     }
     return {
@@ -66,7 +66,7 @@ export class AuthenticationService {
     catch(err) {
       throw new RpcException({
         message: err.message,
-        statusCode: 404
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
       });
     }
     return {
@@ -85,7 +85,7 @@ export class AuthenticationService {
     catch(err) {
       throw new RpcException({
         message: err.message,
-        statusCode: 404
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
       });
     }
     return {

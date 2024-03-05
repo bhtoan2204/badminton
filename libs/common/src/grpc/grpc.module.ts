@@ -14,7 +14,6 @@ interface GrpcModuleOptions {
 })
 export class GrpcModule {
     static register({ name }: GrpcModuleOptions): DynamicModule {
-        const currentDir = dirname(__filename);
         return {
             module: GrpcModule,
             imports: [
@@ -25,7 +24,7 @@ export class GrpcModule {
                             transport: Transport.GRPC,
                             options: {
                                 package: configService.get<string>(`GRPC_${name}_PACKAGE`),
-                                protoPath: join(currentDir, '..', '..', '..', 'proto', configService.get<string>(`GRPC_${name}_PROTO_PATH`)),
+                                protoPath: join(dirname(__filename), '..', configService.get<string>(`GRPC_${name}_PROTO_PATH`)),
                                 url: configService.get<string>(`GRPC_${name}_URL`),
                             },
                         }),

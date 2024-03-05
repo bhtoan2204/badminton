@@ -79,7 +79,7 @@ export class UserService {
     catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: 404
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
       });
     }
   }
@@ -89,7 +89,7 @@ export class UserService {
     if (!user) {
       throw new RpcException({
         message: 'User not found',
-        statusCode: 404
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
       });
     };
     const { password, ...userWithoutPassword } = user;
@@ -199,7 +199,7 @@ export class UserService {
       const uploadImageData = await this.storageService.uploadFile(params);
 
       const fileUrl = uploadImageData.fileUrl;
-      
+
       if (currentUser.avatar) {
         const deleteParams: DeleteFileRequest = {
           fileName: (currentUser.avatar).split('/').pop()
@@ -210,7 +210,7 @@ export class UserService {
       const query = 'SELECT * FROM f_update_user_avatar($1, $2)';
       const parameters = [currentUser.id_user, fileUrl];
       const result = await this.entityManager.query(query, parameters);
-      
+
       return {
         message: file.size + ' bytes uploaded successfully',
         data: uploadImageData,
@@ -219,6 +219,34 @@ export class UserService {
     }
     catch (error) {
       console.log(error.message);
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async validateEmail(dto: any) {
+    try {
+      const { currentUser, data } = dto;
+      const { email, otp } = data;
+
+      const query = 'SELECT * FROM f_validate_otp($1, $2, $3)';
+      const parameters = [currentUser.id_user, otp, email];
+
+      const result = await this.entityManager.query(query, parameters);
+      if (!result[0].f_validate_otp) {
+        throw new RpcException({
+          message: 'OTP is not valid',
+          statusCode: HttpStatus.BAD_REQUEST
+        });
+      }
+      return {
+        message: 'Email has been verified',
+        data: result
+      };
+    }
+    catch (error) {
       throw new RpcException({
         message: error.message,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR

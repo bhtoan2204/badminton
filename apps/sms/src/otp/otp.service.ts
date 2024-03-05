@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
 import { TwilioService } from 'nestjs-twilio';
@@ -30,7 +30,7 @@ export class OTPService {
     catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: 404
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
       });
     }
   }

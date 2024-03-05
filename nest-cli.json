@@ -13,8 +13,8 @@
     "gateway": {
       "type": "application",
       "root": "apps/gateway",
-      "entryFile": "main",
-      "sourceRoot": "apps/gateway/src",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/gateway/tsconfig.app.json"
       }
@@ -22,10 +22,12 @@
     "auth": {
       "type": "application",
       "root": "apps/auth",
-      "entryFile": "main",
-      "sourceRoot": "apps/auth/src",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
       "compilerOptions": {
-        "tsConfigPath": "apps/auth/tsconfig.app.json"
+        "tsConfigPath": "apps/auth/tsconfig.app.json",
+        "assets": ["proto/*.proto"],
+        "watchAssets": true
       }
     },
     "common": {
@@ -40,8 +42,8 @@
     "payment": {
       "type": "application",
       "root": "apps/payment",
-      "entryFile": "main",
-      "sourceRoot": "apps/payment/src",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/payment/tsconfig.app.json"
       }
@@ -49,8 +51,8 @@
     "sms": {
       "type": "application",
       "root": "apps/sms",
-      "entryFile": "main",
-      "sourceRoot": "apps/sms/src",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/sms/tsconfig.app.json"
       }
@@ -58,8 +60,8 @@
     "family": {
       "type": "application",
       "root": "apps/family",
-      "entryFile": "main",
-      "sourceRoot": "apps/family/src",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/family/tsconfig.app.json"
       }
@@ -67,20 +69,27 @@
     "mailer": {
       "type": "application",
       "root": "apps/mailer",
-      "entryFile": "main",
-      "sourceRoot": "apps/mailer/src",
+      "entryFile": "src/main",
+      "sourceRoot": "apps/mailer",
       "compilerOptions": {
-        "tsConfigPath": "apps/mailer/tsconfig.app.json"
+        "tsConfigPath": "apps/mailer/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "templates/*.hbs",
+            "output": "templates"
+          }
+        ],
+        "watchAssets": true
       }
     },
     "storage": {
       "type": "application",
       "root": "apps/storage",
-      "entryFile": "main",
-      "sourceRoot": "apps/storage/src",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/storage/tsconfig.app.json",
-        "assets": ["**/*.proto"],
+        "assets": ["proto/*.proto"],
         "watchAssets": true
       }
     }

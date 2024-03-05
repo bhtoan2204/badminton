@@ -5,11 +5,14 @@ export class OTP {
   @PrimaryGeneratedColumn()
   otp_id: number;
 
-  @Column('id_user') 
+  @Column('uuid') 
   id_user: string;
 
   @Column('varchar')
   code: string;
+
+  @Column('varchar')
+  email: string;
 
   @CreateDateColumn()
   created_at: Date;

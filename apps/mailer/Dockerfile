@@ -8,7 +8,7 @@ RUN npm install --ignore-scripts
 
 COPY . .
 
-RUN npm run build payment
+RUN npm run build mailer
 
 FROM node:20.10.0-alpine AS production
 
@@ -29,4 +29,4 @@ COPY . .
 
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD [ "node", "dist/apps/payment/src/main" ]
+CMD [ "node", "dist/apps/mailer/src/main" ]
