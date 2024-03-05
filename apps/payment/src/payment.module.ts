@@ -4,7 +4,6 @@ import { DatabaseModule, RmqModule } from '@app/common';
 import { PaymentService } from './payment.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [

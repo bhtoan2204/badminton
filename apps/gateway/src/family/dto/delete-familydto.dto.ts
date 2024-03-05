@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString } from "class-validator";
 
 export class DeleteMemberDTO {
     @IsNotEmpty()
-    @ApiProperty({ example: 38 })
+    @ApiProperty({ example: 60 })
     id_family: number;
 
     @IsNotEmpty()
