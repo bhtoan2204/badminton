@@ -1,5 +1,5 @@
 
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
 import { MailService } from "./mailer.service";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { SendEmailRegisterDto } from "./dto/sendEmailRegister.dto";
