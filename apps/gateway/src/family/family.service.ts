@@ -42,7 +42,17 @@ async addMember(CurrentUser, memberFamilyDto: MemberFamilyDto) {
     } catch (err) {
         throw err;
     }}
-
+    async deleteMember(member) {
+        try {
+            const response = this.familyClient.send('family/delete_Member', {member} )
+                .pipe(
+                    timeout(5000),
+                );
+            const data = await lastValueFrom(response);
+            return data;
+        } catch (err) {
+            throw err;
+        }}
 
 
     async createFamily(CurrentUser,createFamilyDto: CreateFamilyDto) {

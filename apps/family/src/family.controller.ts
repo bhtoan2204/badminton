@@ -29,6 +29,14 @@ export class FamilyController {
     this.rmqService.ack(context);
     return this.familyService.addMember(data.CurrentUser,data.memberFamilyDto);
   }
+
+  @EventPattern('family/delete_Member')
+  async deleteMember(@Payload() data: any, @Ctx() context: RmqContext) {
+
+    this.rmqService.ack(context);
+    return this.familyService.deleteMember(data.member);
+  }
+
   @EventPattern('family/update_Family')
   async updateFamily(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
