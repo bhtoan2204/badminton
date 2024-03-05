@@ -33,7 +33,11 @@ export class UserService {
       });
     }
   
-    const isMatch = await bcrypt.compare(inputPassword, user.password);
+    //const isMatch = await bcrypt.compare(inputPassword, user.password);
+    const Query = 'SELECT * FROM compare_passwords($1,$2)';
+    const param = [inputPassword,  user.password];
+    const isMatch= await this.entityManager.query(Query, param);
+
 
     if (!isMatch) {
       throw new RpcException({
@@ -94,10 +98,9 @@ export class UserService {
   async createAccount(createAccountDto: CreateAccountDto) {
     try {
       const { email, phone, password, firstname, lastname } = createAccountDto;
-      const hashedPassword = await bcrypt.hash(password, 10);
 
       const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6)';
-      const parameters = [email, phone, hashedPassword, firstname, lastname, null];
+      const parameters = [email, phone, password, firstname, lastname, null];
 
       const data = await this.entityManager.query(query, parameters);
       
@@ -122,7 +125,9 @@ export class UserService {
       }
 
       const { password } = await this.userRepository.findOne({where: { id_user: user.id_user }});
-      const isMatch = await bcrypt.compare(oldPassword, password);
+      const Query = 'SELECT * FROM compare_passwords($1,$2)';
+      const param = [oldPassword,  password];
+      const isMatch= await this.entityManager.query(Query, param);
 
       if (!isMatch) {
         throw new RpcException({
@@ -130,9 +135,9 @@ export class UserService {
           statusCode: HttpStatus.UNAUTHORIZED
         });
       }
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      //const hashedPassword = await bcrypt.hash(newPassword, 10);
       const query = 'SELECT * FROM f_change_password($1, $2)';
-      const parameters = [user.id_user, hashedPassword];
+      const parameters = [user.id_user, newPassword];
       const data = await this.entityManager.query(query, parameters);
       return data;
     }
