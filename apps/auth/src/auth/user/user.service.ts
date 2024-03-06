@@ -14,7 +14,6 @@ export class UserService {
     @InjectRepository(Users) private userRepository: Repository<Users>,
     private readonly entityManager: EntityManager,
     private readonly storageService: StorageService,
-
   ) { }
 
   async validateLocalUser(email: string, inputPassword: string) {

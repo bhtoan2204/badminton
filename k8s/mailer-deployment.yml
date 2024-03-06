@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gateway-deployment
+  name: mailer-deployment
 spec:
   strategy:
       rollingUpdate:
@@ -10,19 +10,17 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: gateway
+      app: mailer
   template:
     metadata:
       labels:
-        app: gateway
+        app: mailer
     spec:
       automountServiceAccountToken: false
       containers:
-      - name: gateway
-        image: mjkundta/gateway:<TAG>
-        command: ["node", "dist/apps/gateway/src/main"]
-        ports:
-        - containerPort: 8080
+      - name: mailer
+        image: mjkundta/mailer:<TAG>
+        command: ["node", "dist/apps/mailer/src/main"]
         resources:
           limits:
             cpu: "0.5"
