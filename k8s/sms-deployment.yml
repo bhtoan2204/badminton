@@ -20,7 +20,7 @@ spec:
       containers:
       - name: sms
         image: mjkundta/sms:<TAG>
-        command: ["node", "dist/apps/sms/main"]
+        command: ["node", "dist/apps/sms/src/main"]
         resources:
           limits:
             cpu: "0.5"
