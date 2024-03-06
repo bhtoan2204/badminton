@@ -7,6 +7,7 @@ import { DeleteFileRequest, LoginType, UploadFileRequest, Users } from "@app/com
 import { RpcException } from "@nestjs/microservices";
 import { StorageService } from "../../storage/storage.service";
 import * as bcrypt from 'bcryptjs';
+import { parse } from "pg-connection-string";
 
 @Injectable()
 export class UserService {
@@ -35,8 +36,12 @@ export class UserService {
         statusCode: HttpStatus.UNAUTHORIZED,
       });
     }
+  
+    //const isMatch = await bcrypt.compare(inputPassword, user.password);
+    const Query = 'SELECT * FROM compare_passwords($1,$2)';
+    const param = [inputPassword,  user.password];
+    const isMatch= await this.entityManager.query(Query, param);
 
-    const isMatch = await bcrypt.compare(inputPassword, user.password);
 
     if (!isMatch) {
       throw new RpcException({
@@ -44,6 +49,22 @@ export class UserService {
         statusCode: HttpStatus.UNAUTHORIZED,
       });
     }
+    
+
+    const configService = new ConfigService();
+    const dbUrl = configService.get('DATABASE_URL');
+    const connectionOptions = parse(dbUrl);
+
+
+    //const newUsername = user.id_user;
+    //const newPassword = inputPassword;
+    const username = user.id_user;
+    const p_password = inputPassword;
+
+
+    
+    const newDbUrl = "postgresql://${username}:${p_password}@dpg-cn255l0cmk4c73dds8f0-a.singapore-postgres.render.com:5432/famfund_i2wq";
+    process.env.DATABASE_URL = newDbUrl;
 
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
@@ -99,10 +120,9 @@ export class UserService {
   async createAccount(createAccountDto: CreateAccountDto) {
     try {
       const { email, phone, password, firstname, lastname } = createAccountDto;
-      const hashedPassword = await bcrypt.hash(password, 10);
 
       const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6)';
-      const parameters = [email, phone, hashedPassword, firstname, lastname, null];
+      const parameters = [email, phone, password, firstname, lastname, null];
 
       const data = await this.entityManager.query(query, parameters);
 
@@ -126,8 +146,10 @@ export class UserService {
         });
       }
 
-      const { password } = await this.userRepository.findOne({ where: { id_user: user.id_user } });
-      const isMatch = await bcrypt.compare(oldPassword, password);
+      const { password } = await this.userRepository.findOne({where: { id_user: user.id_user }});
+      const Query = 'SELECT * FROM compare_passwords($1,$2)';
+      const param = [oldPassword,  password];
+      const isMatch= await this.entityManager.query(Query, param);
 
       if (!isMatch) {
         throw new RpcException({
@@ -135,9 +157,9 @@ export class UserService {
           statusCode: HttpStatus.UNAUTHORIZED
         });
       }
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      //const hashedPassword = await bcrypt.hash(newPassword, 10);
       const query = 'SELECT * FROM f_change_password($1, $2)';
-      const parameters = [user.id_user, hashedPassword];
+      const parameters = [user.id_user, newPassword];
       const data = await this.entityManager.query(query, parameters);
       return data;
     }
