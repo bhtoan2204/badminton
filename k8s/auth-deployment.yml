@@ -20,7 +20,7 @@ spec:
       containers:
       - name: auth
         image: mjkundta/auth:<TAG>
-        command: ["node", "dist/apps/auth/main"]
+        command: ["node", "dist/apps/auth/src/main"]
         resources:
           limits:
             cpu: "0.5"
