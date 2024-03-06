@@ -1,7 +1,7 @@
 version: '1.0'
 services:
   gateway:
-    image: mjkundta/gateway:latest
+    image: mjkundta/gateway:${TAG}
     build:
       context: .
       dockerfile: ./apps/gateway/Dockerfile
@@ -16,7 +16,7 @@ services:
       - NODE_ENV=production
   
   auth:
-    image: mjkundta/auth:latest
+    image: mjkundta/auth:${TAG}
     build:
       context: .
       dockerfile: ./apps/auth/Dockerfile
@@ -29,7 +29,7 @@ services:
       - NODE_ENV=production
   
   payment:
-    image: mjkundta/payment:latest
+    image: mjkundta/payment:${TAG}
     build:
       context: .
       dockerfile: ./apps/payment/Dockerfile
@@ -42,7 +42,7 @@ services:
       - NODE_ENV=production
   
   sms:
-    image: mjkundta/sms:latest
+    image: mjkundta/sms:${TAG}
     build:
       context: .
       dockerfile: ./apps/sms/Dockerfile
@@ -55,7 +55,7 @@ services:
       - NODE_ENV=production
   
   family:
-    image: mjkundta/family:latest
+    image: mjkundta/family:${TAG}
     build:
       context: .
       dockerfile: ./apps/family/Dockerfile
@@ -68,7 +68,7 @@ services:
       - NODE_ENV=production
     
   storage:
-    image: mjkundta/storage:latest
+    image: mjkundta/storage:${TAG}
     build:
       context: .
       dockerfile: ./apps/storage/Dockerfile
@@ -81,7 +81,7 @@ services:
       - NODE_ENV=production
   
   mailer:
-    image: mjkundta/mailer:latest
+    image: mjkundta/mailer:${TAG}
     build:
       context: .
       dockerfile: ./apps/mailer/Dockerfile
