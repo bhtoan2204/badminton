@@ -28,4 +28,8 @@ export * from './database/entity/total_category_family.entity';
 
 export * from './database/enum/login_type.enum';
 
-export * from './types/storage'
+export * from './types/storage';
+
+export * from './jwt/jwt.module';
+
+export * from './mongoose/mgdatabase.module';
