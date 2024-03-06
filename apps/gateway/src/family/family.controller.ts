@@ -67,7 +67,7 @@ export class FamilyController {
   @ApiOperation({ summary: 'Lay thong tin cua 1 member, sau khi current-user chon member bat ki' })
   @Get('get-member')
   @UseGuards(JwtAuthGuard)
-  async getMember(@Query('id_user') id_user: number, @CurrentUser() CurrentUser) {
+  async getMember(@Query('id_user') id_user: string, @CurrentUser() CurrentUser) {
     return this.familyService.getMember(CurrentUser, id_user);
   }
 
