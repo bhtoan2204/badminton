@@ -3,10 +3,11 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthApiModule } from './auth/auth.module';
 import { PaymentModule } from './payment/payment.module';
 import { SmsModule } from './sms/sms.module';
-import * as Joi from 'joi';
 import { FamilyModule } from './family/family.module';
 import { AdminModule } from './admin/admin.module';
 import { MailModule } from './mailer/mailer.module';
+import { ChatModule } from './chat/chat.module';
+import * as Joi from 'joi';
 
 @Module({
   imports: [
@@ -20,6 +21,9 @@ import { MailModule } from './mailer/mailer.module';
         RABBIT_MQ_AUTH_QUEUE: Joi.string().required(),
         RABBIT_MQ_PAYMENT_QUEUE: Joi.string().required(),
         RABBIT_MQ_SMS_QUEUE: Joi.string().required(),
+        RABBIT_MQ_FAMILY_QUEUE: Joi.string().required(),
+        RABBIT_MQ_MAILER_QUEUE: Joi.string().required(),
+        RABBIT_MQ_CHAT_QUEUE: Joi.string().required(),
 
         GOOGLE_CLIENT_ID: Joi.string().required(),
         GOOGLE_CLIENT_SECRET: Joi.string().required(),
@@ -36,6 +40,7 @@ import { MailModule } from './mailer/mailer.module';
     SmsModule,
     FamilyModule,
     AdminModule,
+    ChatModule
   ],
   controllers: [],
   providers: [],
