@@ -44,8 +44,8 @@
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
     "express-session": "^1.18.0",
-    "handlebars": "^4.7.8",
     "graphql": "^16.8.1",
+    "handlebars": "^4.7.8",
     "joi": "^17.12.1",
     "mongoose": "^8.2.1",
     "nestjs-twilio": "^4.3.0",
@@ -57,11 +57,11 @@
     "pug-strip-comments": "^2.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
+    "socket.io": "^4.7.4",
+    "ts-proto": "^1.166.4",
     "ts-protoc-gen": "^0.15.0",
     "typeorm": "^0.3.19",
-    "ts-proto": "^1.166.4",
-    "vn-qr-pay": "^0.0.5",
-    "socket.io": "^4.7.4"
+    "vn-qr-pay": "^0.0.5"
   },
   "devDependencies": {
     "@grpc/grpc-js": "^1.10.1",
