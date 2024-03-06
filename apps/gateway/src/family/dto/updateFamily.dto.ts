@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, isNumber } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
 export class UpdateFamilyDTO {
     @IsNotEmpty()
