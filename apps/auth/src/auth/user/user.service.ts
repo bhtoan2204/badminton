@@ -12,10 +12,8 @@ import * as bcrypt from 'bcryptjs';
 export class UserService {
   constructor(
     @InjectRepository(Users) private userRepository: Repository<Users>,
-    private readonly configService: ConfigService,
     private readonly entityManager: EntityManager,
     private readonly storageService: StorageService,
-
   ) { }
 
   async validateLocalUser(email: string, inputPassword: string) {
