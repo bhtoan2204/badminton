@@ -1,8 +1,8 @@
 import {HttpStatus, Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import { InjectRepository, TypeOrmModule } from "@nestjs/typeorm";
 import { Repository, EntityManager } from "typeorm";
 import { CreateAccountDto } from "./dto/createAccount.dto";
-import { ConfigService } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import * as bcrypt from 'bcryptjs';
 import { LoginType, Users } from "@app/common";
 import { RpcException } from "@nestjs/microservices";
@@ -47,20 +47,12 @@ export class UserService {
       });
     }
     
-
+    // Thay đổi username và password trong DATABASE_URL
     const configService = new ConfigService();
     const dbUrl = configService.get('DATABASE_URL');
-    const connectionOptions = parse(dbUrl);
-
-
-    //const newUsername = user.id_user;
-    //const newPassword = inputPassword;
-    const username = user.id_user;
-    const p_password = inputPassword;
-
-
-    
-    const newDbUrl = "postgresql://${username}:${p_password}@dpg-cn255l0cmk4c73dds8f0-a.singapore-postgres.render.com:5432/famfund_i2wq";
+    const newUsername = user.id_user;
+    const newPassword = inputPassword;
+    const newDbUrl = dbUrl.replace(/\/\/([^:]+):([^@]+)@/, `//${newUsername}:${newPassword}@`);
     process.env.DATABASE_URL = newDbUrl;
 
     const { password, ...userWithoutPassword } = user;
