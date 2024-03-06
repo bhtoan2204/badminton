@@ -44,61 +44,61 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
   
-  sms:
-    image: mjkundta/sms:latest
-    build:
-      context: .
-      dockerfile: ./apps/sms/Dockerfile
-      target: development
-    command: npm run start:dev sms
-    depends_on:
-      - gateway
-    restart: on-failure
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+  # sms:
+  #   image: mjkundta/sms:latest
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/sms/Dockerfile
+  #     target: development
+  #   command: npm run start:dev sms
+  #   depends_on:
+  #     - gateway
+  #   restart: on-failure
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
 
-  family:
-    image: mjkundta/family:latest
-    build:
-      context: .
-      dockerfile: ./apps/family/Dockerfile
-      target: development
-    command: npm run start:dev family
-    depends_on:
-      - gateway
-    restart: on-failure
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+  # family:
+  #   image: mjkundta/family:latest
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/family/Dockerfile
+  #     target: development
+  #   command: npm run start:dev family
+  #   depends_on:
+  #     - gateway
+  #   restart: on-failure
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
     
-  storage:
-    image: mjkundta/storage:latest
-    build:
-      context: .
-      dockerfile: ./apps/storage/Dockerfile
-      target: development
-    command: npm run start:dev storage
-    depends_on:
-      - gateway
-    restart: on-failure
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+  # storage:
+  #   image: mjkundta/storage:latest
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/storage/Dockerfile
+  #     target: development
+  #   command: npm run start:dev storage
+  #   depends_on:
+  #     - gateway
+  #   restart: on-failure
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
 
-  mailer:
-    image: mjkundta/mailer:latest
-    build:
-      context: .
-      dockerfile: ./apps/mailer/Dockerfile
-      target: development
-    command: npm run start:dev mailer
-    depends_on:
-      - gateway
-    restart: on-failure
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+  # mailer:
+  #   image: mjkundta/mailer:latest
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/mailer/Dockerfile
+  #     target: development
+  #   command: npm run start:dev mailer
+  #   depends_on:
+  #     - gateway
+  #   restart: on-failure
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
 
   rabbitmq:
     image: rabbitmq
