@@ -158,6 +158,9 @@ $$;
 CREATE ROLE common_user;
 GRANT CONNECT ON DATABASE famfund_i2wq TO common_user; -- Cho phép kết nối vào cơ sở dữ liệu
 GRANT EXECUTE ON FUNCTION get_all_family TO "53b87106-d15a-4aa2-b6be-3223433614b7";
+GRANT EXECUTE ON FUNCTION f_create_family TO "53b87106-d15a-4aa2-b6be-3223433614b7";
+
+
 
 GRANT common_user TO "53b87106-d15a-4aa2-b6be-3223433614b7";
 
