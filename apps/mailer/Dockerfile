@@ -10,6 +10,7 @@ COPY libs ./libs
 COPY proto ./proto
 COPY apps/mailer ./apps/mailer
 COPY tsconfig.json .
+COPY nest-cli.json .
 
 RUN npm run build mailer
 
@@ -28,8 +29,9 @@ RUN adduser -D nonroot && chown -R nonroot:nonroot /usr/src/app
 
 USER nonroot
 
-COPY . .
-
+COPY --from=development /usr/src/app/apps/mailer ./apps/mailer
 COPY --from=development /usr/src/app/dist ./dist
+COPY --from=development /usr/src/app/libs ./libs
+COPY --from=development /usr/src/app/proto ./proto
 
 CMD [ "node", "dist/apps/mailer/src/main" ]

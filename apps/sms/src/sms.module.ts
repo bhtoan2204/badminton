@@ -16,7 +16,7 @@ import { DatabaseModule } from '@app/common/database/database.module';
         TWILIO_AUTH_TOKEN: Joi.string().required(),
         TWILIO_PHONE_NUMBER: Joi.string().required(),
       }),
-      envFilePath: './apps/sms/.env'
+      envFilePath: process.env.NODE_ENV === 'production' ? './apps/sms/.env.production' : './apps/sms/.env',
     }),
     DatabaseModule,
     RmqModule,

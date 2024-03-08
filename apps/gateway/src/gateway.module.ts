@@ -32,7 +32,7 @@ import * as Joi from 'joi';
         JWT_SECRET: Joi.string().required(),
         JWT_SECRET_REFRESH: Joi.string().required(),
       }),
-      envFilePath: './apps/gateway/.env'
+      envFilePath: process.env.NODE_ENV === 'production' ? './apps/gateway/.env.production' : './apps/gateway/.env',
     }),
     AuthApiModule,
     PaymentModule,

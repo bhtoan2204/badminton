@@ -13,7 +13,7 @@ import * as Joi from 'joi';
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_PAYMENT_QUEUE: Joi.string().required(),
       }),
-      envFilePath: './apps/payment/.env'
+      envFilePath: process.env.NODE_ENV === 'production' ? './apps/payment/.env.production' : './apps/payment/.env',
     }),
     RmqModule,
   ],

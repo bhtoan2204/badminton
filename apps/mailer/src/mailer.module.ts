@@ -19,7 +19,7 @@ import { join } from 'path';
         MAIL_PASSWORD: Joi.string().required(),
         MAIL_SENDER: Joi.string().required(),
       }),
-      envFilePath: './apps/mailer/.env'
+      envFilePath: process.env.NODE_ENV === 'production' ? './apps/mailer/.env.production' : './apps/mailer/.env',
     }),
     MailerModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
