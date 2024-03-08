@@ -1,4 +1,4 @@
-FROM node:alpine AS development
+FROM node:20.10.0-alpine AS development
 
 WORKDIR /usr/src/app
 
@@ -14,7 +14,7 @@ COPY nest-cli.json .
 
 RUN npm run build family
 
-FROM node:alpine AS production
+FROM node:20.10.0-alpine AS production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
