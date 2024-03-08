@@ -5,7 +5,6 @@ import { LoginDto } from "./dto/login.dto";
 import { CreateAccountDto } from "./dto/createAccount.dto";
 import { LocalAuthGuard } from "./guard/local-auth.guard";
 import { JwtAuthGuard } from "./guard/jwt-auth.guard";
-import { CurrentUser } from "apps/gateway/src/utils/decorator/current-user.decorator";
 import { JwtRefreshGuard } from "./guard/refresh-auth.guard";
 import { GoogleAuthGuard } from "./guard/oauth.guard/google.guard";
 import { ChangePasswordDto } from "./dto/changePassword.dto";
@@ -13,6 +12,7 @@ import { UpdateProfileDto } from "./dto/updateProfile.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ImageFileInterceptor } from "./interceptor/imageFile.interceptor";
 import { ValidateEmailDto } from "./dto/validateEmail.dto";
+import { CurrentUser } from "../utils/decorator/current-user.decorator";
 
 @ApiTags('Authentication')
 @Controller('auth')

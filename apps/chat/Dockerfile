@@ -8,10 +8,10 @@ RUN npm install --ignore-scripts
 
 COPY libs ./libs
 COPY proto ./proto
-COPY apps/payment ./apps/auth
+COPY apps/chat ./apps/chat
 COPY tsconfig.json .
 
-RUN npm run build payment
+RUN npm run build chat
 
 FROM node:20.10.0-alpine AS production
 
@@ -32,4 +32,4 @@ COPY . .
 
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD [ "node", "dist/apps/payment/src/main" ]
+CMD [ "node", "dist/apps/chat/src/main" ]

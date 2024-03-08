@@ -93,6 +93,19 @@ services:
     environment:
       - NODE_ENV=production
 
+  chat:
+    image: mjkundta/chat:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/chat/Dockerfile
+      target: production
+    command: node dist/apps/chat/src/main
+    depends_on:
+      - gateway
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
+
   rabbitmq:
     image: rabbitmq
     healthcheck:

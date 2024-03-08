@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Storage } from "@google-cloud/storage";
 import { ConfigService } from '@nestjs/config';
 import { DeleteFileRequest, DeleteFileResponse, UploadFileRequest, UploadFileResponse } from '@app/common';
@@ -6,18 +6,12 @@ import { Buffer } from 'buffer';
 
 @Injectable()
 export class FilesService {
-  private storage: Storage;
   private bucket: string;
 
-  constructor(private readonly configService: ConfigService) {
-    this.storage = new Storage({
-      projectId: this.configService.get<string>('GOOGLE_PROJECT_ID'),
-      credentials: {
-        client_email: this.configService.get<string>('GOOGLE_CLIENT_EMAIL'),
-        private_key: this.configService.get<string>('GOOGLE_PRIVATE_KEY').replace(/\\n/g, '\n'),
-      },
-    });
-
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject('STORAGE') private readonly storage: Storage
+    ) {
     this.bucket = this.configService.get<string>('GOOGLE_MEDIA_BUCKET');
   }
 

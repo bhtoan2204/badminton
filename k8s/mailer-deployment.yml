@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mailer-deployment
+  labels:
+    app: mailer
 spec:
   strategy:
       rollingUpdate:

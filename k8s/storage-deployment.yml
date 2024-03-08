@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: storage-deployment
+  labels:
+    app: storage
 spec:
   strategy:
       rollingUpdate:

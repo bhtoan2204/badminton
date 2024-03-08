@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gateway-deployment
+  name: chat-deployment
   labels:
-    app: gateway
+    app: chat
 spec:
   strategy:
       rollingUpdate:
@@ -12,19 +12,17 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: gateway
+      app: chat
   template:
     metadata:
       labels:
-        app: gateway
+        app: chat
     spec:
       automountServiceAccountToken: false
       containers:
-      - name: gateway
-        image: mjkundta/gateway:<TAG>
-        command: ["node", "dist/apps/gateway/src/main"]
-        ports:
-        - containerPort: 8080
+      - name: chat
+        image: mjkundta/chat:<TAG>
+        command: ["node", "dist/apps/chat/src/main"]
         resources:
           limits:
             cpu: "0.5"

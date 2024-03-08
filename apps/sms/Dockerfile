@@ -6,7 +6,10 @@ COPY package*.json ./
 
 RUN npm install --ignore-scripts
 
-COPY . .
+COPY libs ./libs
+COPY proto ./proto
+COPY apps/sms ./apps/sms
+COPY tsconfig.json .
 
 RUN npm run build sms
 

@@ -2,8 +2,8 @@ import { Controller, Get, HttpCode, HttpStatus, UseGuards } from "@nestjs/common
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { AdminGuard } from "../auth/guard/authorize/role.guard";
-import { Admin } from "apps/gateway/src/utils/decorator/role.decorator";
 import { AdminService } from "./admin.service";
+import { Admin } from "../utils/decorator/role.decorator";
 
 @ApiTags('Admin')
 @Controller('admin')

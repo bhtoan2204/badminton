@@ -2,9 +2,9 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-google-oauth20';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { AUTH_SERVICE } from 'apps/gateway/src/utils/constant/services.constant';
 import { lastValueFrom, timeout } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
+import { AUTH_SERVICE } from '../../../utils/constant/services.constant';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {

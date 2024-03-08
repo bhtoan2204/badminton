@@ -6,7 +6,10 @@ COPY package*.json ./
 
 RUN npm install --ignore-scripts
 
-COPY . .
+COPY libs ./libs
+COPY proto ./proto
+COPY apps/family ./apps/auth
+COPY tsconfig.json .
 
 RUN npm run build family
 
