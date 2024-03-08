@@ -13,7 +13,7 @@ import * as Joi from 'joi';
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_AUTH_QUEUE: Joi.string().required(),
       }),
-      envFilePath: './apps/auth/.env'
+      envFilePath: process.env.NODE_ENV === 'production' ? './apps/auth/.env.production' : './apps/auth/.env',
     }),
     DatabaseModule,
     AuthenticationModule,

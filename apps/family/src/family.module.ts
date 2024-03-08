@@ -13,7 +13,7 @@ import * as Joi from 'joi';
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_FAMILY_QUEUE: Joi.string().required(),
       }),
-      envFilePath: './apps/family/.env'
+      envFilePath: process.env.NODE_ENV === 'production' ? './apps/family/.env.production' : './apps/family/.env',
     }),
     DatabaseModule,
     RmqModule

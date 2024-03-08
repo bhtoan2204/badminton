@@ -14,7 +14,7 @@ import * as Joi from 'joi';
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_CHAT_QUEUE: Joi.string().required(),
       }),
-      envFilePath: './apps/chat/.env'
+      envFilePath: process.env.NODE_ENV === 'production' ? './apps/chat/.env.production' : './apps/chat/.env',
     }),
     MgDatabaseModule,
     RmqModule,
