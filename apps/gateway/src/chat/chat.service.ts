@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { CHAT_SERVICE } from '../utils/constant/services.constant';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, timeout } from 'rxjs';
@@ -11,11 +11,11 @@ export class ChatService {
 
   async getMessages(sender_id, receiver_id, index) {
     try {
-      const response = this.chatClient.send('chatClient/getMessages', { sender_id, receiver_id, index }).pipe(timeout(5000));;
+      const response = this.chatClient.send('chatClient/getMessages', { sender_id, receiver_id, index }).pipe(timeout(5000));
       return await lastValueFrom(response);
     }
     catch (error) {
-      throw error;
+      throw new HttpException(error, error.statusCode);
     }
   }
 
@@ -25,7 +25,7 @@ export class ChatService {
       return await lastValueFrom(response);
     }
     catch (error) {
-      throw error;
+      throw new HttpException(error, error.statusCode);
     }
   }
 }

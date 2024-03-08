@@ -33,12 +33,10 @@ export class UserService {
         statusCode: HttpStatus.UNAUTHORIZED,
       });
     }
-  
-    //const isMatch = await bcrypt.compare(inputPassword, user.password);
+
     const Query = 'SELECT * FROM compare_passwords($1,$2)';
     const param = [inputPassword,  user.password];
     const isMatch= await this.entityManager.query(Query, param);
-
 
     if (!isMatch) {
       throw new RpcException({
@@ -144,7 +142,6 @@ export class UserService {
           statusCode: HttpStatus.UNAUTHORIZED
         });
       }
-      //const hashedPassword = await bcrypt.hash(newPassword, 10);
       const query = 'SELECT * FROM f_change_password($1, $2)';
       const parameters = [user.id_user, newPassword];
       const data = await this.entityManager.query(query, parameters);

@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { EntityManager } from "typeorm";
 import { ConfigService } from "@nestjs/config";
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class FamilyService {
@@ -17,7 +18,10 @@ export class FamilyService {
       return data;
     }
     catch(error) {
-        throw error;
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
     }}
 
     async getMember(user, id_user: any){
@@ -28,7 +32,10 @@ export class FamilyService {
         return data;
       }
       catch(error) {
-          throw error;
+        throw new RpcException({
+          message: error.message,
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        });
       }}
 
       async getallMember(user, id_family: any){
@@ -39,7 +46,10 @@ export class FamilyService {
           return data;
         }
         catch(error) {
-            throw error;
+          throw new RpcException({
+            message: error.message,
+            statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+          });
         }}
   
     async GetAllFamily(user: any){
@@ -50,7 +60,10 @@ export class FamilyService {
         return data;
       }
       catch(error) {
-          throw error;
+        throw new RpcException({
+          message: error.message,
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        });
       }}
 
 
@@ -64,7 +77,10 @@ export class FamilyService {
       return data;
     }
     catch(error) {
-        throw error;
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
     }}
 
 
@@ -76,7 +92,10 @@ export class FamilyService {
       const data = await this.entityManager.query(Query, params);
       return data[0]['f_create_family'];
     } catch (error) {
-      throw error;
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
     }
   }
 
@@ -89,7 +108,10 @@ export class FamilyService {
       return data;
     }
     catch(error) {
-        throw error;
+        throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
     }
   }
 
@@ -104,7 +126,10 @@ export class FamilyService {
     }
 
     catch(error) {
-        throw error;
+        throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
     }
   }
 
@@ -119,7 +144,10 @@ export class FamilyService {
     }
 
     catch(error) {
-        throw error;
+        throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
     }
   }
 }

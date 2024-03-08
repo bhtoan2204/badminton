@@ -5,9 +5,6 @@ import { Observable } from "rxjs";
 
 @Injectable()
 export class WsJwtAuthGuard extends AuthGuard('ws-jwt') {
-    constructor() {
-        super();
-    }
     canActivate(
         context: ExecutionContext,
     ): boolean | Promise<boolean> | Observable<boolean> {
