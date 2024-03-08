@@ -26,7 +26,7 @@ export class FamilyService {
 
     async getMember(user, id_user: any){
       try {
-        const q2 = 'SELECT email, phone, language, firstname, lastname FROM users WHERE id_user = $1';
+        const q2 = 'SELECT * FROM view_users where id_user = $1';
         const param = [id_user];
         const data= await this.entityManager.query(q2, param);
         return data;
