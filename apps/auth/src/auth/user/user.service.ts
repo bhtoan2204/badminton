@@ -6,15 +6,14 @@ import { ConfigService } from "@nestjs/config";
 import { DeleteFileRequest, LoginType, UploadFileRequest, Users } from "@app/common";
 import { RpcException } from "@nestjs/microservices";
 import { StorageService } from "../../storage/storage.service";
-import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UserService {
-  storageService: any;
   constructor(
     @InjectRepository(Users) private userRepository: Repository<Users>,
     private readonly configService: ConfigService,
-    private readonly entityManager: EntityManager
+    private readonly entityManager: EntityManager,
+    private readonly storageService: StorageService
   ) {}
 
   async validateLocalUser(email: string, inputPassword: string) {

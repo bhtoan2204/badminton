@@ -1,13 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { EntityManager } from "typeorm";
-import { CreateFamilyDto } from 'apps/gateway/src/family/dto/createFamily.dto';
 import { ConfigService } from "@nestjs/config";
-import { MemberFamilyDto } from 'apps/gateway/src/family/dto/memberFamily.dto';
-import { DeleteMemberDTO } from 'apps/gateway/src/family/dto/deleteFamily.dto';
-import { UpdateFamilyDTO } from 'apps/gateway/src/family/dto/updateFamily.dto';
 
 @Injectable()
-
 export class FamilyService {
   constructor(
     private readonly configService: ConfigService,
@@ -60,7 +55,7 @@ export class FamilyService {
 
 
 
-  async addMember(user, memberFamilyDto: MemberFamilyDto){
+  async addMember(user, memberFamilyDto: any){
     try {
       const {id_family, phone, gmail, role} = memberFamilyDto;
       const q2 = 'call p_add_member($1,$2,$3,$4,$5)';
@@ -73,7 +68,7 @@ export class FamilyService {
     }}
 
 
-  async createFamily(user: any,createFamilyDto: CreateFamilyDto) {
+  async createFamily(user: any,createFamilyDto: any) {
     try {
       const { description, name } = createFamilyDto;
       const Query = 'SELECT * FROM f_create_family($1, $2, $3)';
@@ -85,7 +80,7 @@ export class FamilyService {
     }
   }
 
-  async updateFamily(user,UpdateFamilyDTO: UpdateFamilyDTO) {
+  async updateFamily(user,UpdateFamilyDTO: any) {
     try{
       const {id_family, description, name} = UpdateFamilyDTO;
       const Query = 'call p_update_family($1,$2,$3,$4)';
@@ -113,7 +108,7 @@ export class FamilyService {
     }
   }
 
-  async deleteMember(user, member : DeleteMemberDTO) {
+  async deleteMember(user, member : any) {
     try{
       const {id_family, id_user} = member;
 

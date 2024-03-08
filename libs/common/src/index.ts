@@ -33,3 +33,5 @@ export * from './types/storage';
 export * from './jwt/jwt.module';
 
 export * from './mongoose/mgdatabase.module';
+
+export * from './mongoose/entity/message.schema';
