@@ -8,7 +8,7 @@ RUN npm install --ignore-scripts
 
 COPY libs ./libs
 COPY proto ./proto
-COPY apps/payment ./apps/auth
+COPY apps/payment ./apps/payment
 COPY tsconfig.json .
 
 RUN npm run build payment

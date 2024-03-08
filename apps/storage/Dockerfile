@@ -8,7 +8,7 @@ RUN npm install --ignore-scripts
 
 COPY libs ./libs
 COPY proto ./proto
-COPY apps/storage ./apps/auth
+COPY apps/storage ./apps/storage
 COPY tsconfig.json .
 
 RUN npm run build storage
