@@ -96,7 +96,7 @@ $$ LANGUAGE plpgsql;
 
 
 
---select f_create_user('thuhien21052004@gmail.com', '0886725035', 'abc', 'Hien', 'Tran' , 'Vietnam', 'null' ) as a;
+--select f_create_user('thuhien21052004@gmail.com', '0886725035', 'abc', 'Hien', 'Tran' , 'Vietnam', 'null' ,'local' ) as a;
 -- tạo mã OTP 
 
 CREATE OR REPLACE FUNCTION f_generate_otp(owner_id UUID)

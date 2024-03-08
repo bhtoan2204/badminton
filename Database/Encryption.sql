@@ -67,8 +67,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+insert into "key"(key, created_at, updated_at) values('$1$9I7H2xzp8cfc2f93aecb1a6',now(), now())
 
---call update_key_value()
+--select * from generate_key(16)
 
 
 --insert into "key"("key", created_at, updated_at) values( generate_key(16), now(), now())
@@ -79,7 +80,7 @@ DECLARE
     encryption_key VARCHAR;
 BEGIN
     -- Lấy key mới nhất từ bảng key
-    SELECT key_value INTO encryption_key 
+    SELECT key INTO encryption_key 
     FROM key 
     ORDER BY created_at DESC 
     LIMIT 1;
