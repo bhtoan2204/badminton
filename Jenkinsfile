@@ -79,7 +79,7 @@ pipeline {
 
         stage("Clean Up") {
           steps {
-            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'docker system prune -f"
+            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'docker system prune -f'"
           }
         }
     }
