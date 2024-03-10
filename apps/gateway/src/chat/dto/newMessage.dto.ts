@@ -6,6 +6,6 @@ export class NewMessageDto {
   message: string;
 
   @IsString()
-  @IsUUID()
+  @IsNotEmpty()
   receiverId: string;
 }
