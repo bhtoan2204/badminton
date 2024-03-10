@@ -34,13 +34,11 @@ export class FamilyController {
 
   @EventPattern('family/create_Family')
   async createFamily(@Payload() data: any, @Ctx() context: RmqContext) {
-
     this.rmqService.ack(context);
     return this.familyService.createFamily(data.CurrentUser,data.createFamilyDto);
   }
   @EventPattern('family/add_Member')
   async addMember(@Payload() data: any, @Ctx() context: RmqContext) {
-
     this.rmqService.ack(context);
     return this.familyService.addMember(data.CurrentUser,data.memberFamilyDto);
   }
