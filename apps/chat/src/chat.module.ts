@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
-import { MessageSchema, MgDatabaseModule, RmqModule, Message } from '@app/common';
+import { MessageContentSchema, MgDatabaseModule, RmqModule, MessageContent } from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
@@ -18,7 +18,7 @@ import * as Joi from 'joi';
     }),
     MgDatabaseModule,
     RmqModule,
-    MongooseModule.forFeature([{ name: Message.name, schema: MessageSchema }]),
+    MongooseModule.forFeature([{ name: MessageContent.name, schema: MessageContentSchema }]),
   ],
   controllers: [ChatController],
   providers: [ChatService],

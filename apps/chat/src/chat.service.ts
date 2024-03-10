@@ -1,18 +1,18 @@
-import { Message, MessageDocument } from '@app/common';
+import { MessageContent } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+
+const limit = 20;
 
 @Injectable()
 export class ChatService {
   constructor(
-    @InjectModel(Message.name) private messageRepository: Model<MessageDocument>,
+    @InjectModel(MessageContent.name) private messageRepository,
   ) { }
 
-  async getMessages(senderId: string, receiverId: string, index: number): Promise<Message[]> {
+  async getMessages(senderId: string, receiverId: string, index: number): Promise<MessageContent[]> {
     try {
-      const limit = 50;
       const skip = index * limit;
       return this.messageRepository.find({
         $or: [
@@ -31,21 +31,23 @@ export class ChatService {
     }
   }
 
-  async saveMessage(idUser: string, messageData: { message: string; receiverId: string; }): Promise<Message> {
+  async saveMessage(id_user: string, messageData: { message: string; receiverId: string; }): Promise<MessageContent> {
     try {
-      const newMessage = new this.messageRepository({
-        senderId: idUser,
+      if (!id_user || !messageData.receiverId || id_user === messageData.receiverId) {
+        throw new Error('Invalid sender or receiver ID.');
+      }
+      const newMessageContent = new this.messageRepository({
+        _id: null,
+        senderId: id_user,
         receiverId: messageData.receiverId,
         content: messageData.message,
-        timestamp: new Date(),
       });
-      return newMessage.save();
-    }
-    catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
-      });
+
+      return await newMessageContent.save();
+    } catch (error) {
+      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
+      const message = error.message || 'An error occurred while saving the message.';
+      throw new RpcException({ message, statusCode });
     }
   }
 }
