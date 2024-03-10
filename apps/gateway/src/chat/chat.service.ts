@@ -11,7 +11,6 @@ export class ChatService {
 
   async getMessages(sender_id: string, receiver_id: string, index: number) {
     try {
-      console.log({ sender_id, receiver_id, index });
       const response = this.chatClient.send('chatClient/getMessages', { sender_id, receiver_id, index }).pipe(timeout(5000));
       return await lastValueFrom(response);
     }
