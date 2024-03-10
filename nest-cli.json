@@ -77,8 +77,7 @@
         "tsConfigPath": "apps/mailer/tsconfig.app.json",
         "assets": [
           {
-            "include": "templates/*.hbs",
-            "output": "templates"
+            "include": "templates/*.hbs"
           }
         ],
         "watchAssets": true
