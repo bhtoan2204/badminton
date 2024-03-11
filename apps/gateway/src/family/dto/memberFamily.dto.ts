@@ -14,7 +14,7 @@ export class MemberFamilyDto {
     @ApiProperty({ example: '' })
     phone: string;
 
-    @ApiProperty({ example: 'user_common' })
+    @ApiProperty({ example: 'member' })
     role: string;
 
 }

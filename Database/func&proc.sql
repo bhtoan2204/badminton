@@ -144,7 +144,25 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE PROCEDURE p_validate_otp(
+    IN code VARCHAR,
+    IN id_user UUID
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM otp WHERE code = code and id_user=id_user) THEN
+        UPDATE users
+        SET twofa = TRUE
+        WHERE id_user = id_user;
 
+        DELETE FROM otp
+        WHERE code = code and id_user=id_user ;
+    ELSE
+        RAISE EXCEPTION 'Invalid OTP code';
+    END IF;
+END;
+$$;
 
 --select f_generate_otp('da7354cf-f526-4df8-9d91-0fbd4a43d196') as otp;
 -- tạo token
@@ -165,7 +183,7 @@ $$ LANGUAGE plpgsql;
 --select f_generate_refresh_token('da7354cf-f526-4df8-9d91-0fbd4a43d196') as token;
 
 
---tạo family
+----------------------FAMILY-----------------------------------------
 
 CREATE OR REPLACE FUNCTION f_create_family(
 	p_id_user uuid,
@@ -194,25 +212,6 @@ $$ LANGUAGE plpgsql;
 
 --select f_create_family('da7354cf-f526-4df8-9d91-0fbd4a43d196','abc', 'family1') as family;
 
-CREATE OR REPLACE PROCEDURE p_validate_otp(
-    IN code VARCHAR,
-    IN id_user UUID
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM otp WHERE code = code and id_user=id_user) THEN
-        UPDATE users
-        SET twofa = TRUE
-        WHERE id_user = id_user;
-
-        DELETE FROM otp
-        WHERE code = code and id_user=id_user ;
-    ELSE
-        RAISE EXCEPTION 'Invalid OTP code';
-    END IF;
-END;
-$$;
 
 
 CREATE OR REPLACE PROCEDURE p_update_family(
@@ -254,8 +253,9 @@ CREATE OR REPLACE PROCEDURE p_add_member(
 DECLARE
     v_family_id INT;
     v_user_id UUID;
+    v_name_family varchar;
 BEGIN 
-    SELECT id_family INTO v_family_id FROM Users WHERE id_user = p_id;
+    SELECT id_family, "name" INTO v_family_id, v_name_family FROM Users WHERE id_user = p_id;
 
     SELECT id_user INTO v_user_id FROM Users WHERE phone = p_phone OR email = p_email;
 
@@ -265,6 +265,8 @@ BEGIN
             VALUES (v_user_id, v_family_id, NOW(), NOW(), p_role);
         
             UPDATE Users SET id_family = v_family_id WHERE id_user = v_user_id;
+            RAISE EXCEPTION 'Successfully added a member to the % family', v_name_family;
+
         EXCEPTION
             WHEN others THEN
                 RAISE EXCEPTION 'Failed to add member: %', SQLERRM;
@@ -276,7 +278,67 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+
 --call p_add_member('53b87106-d15a-4aa2-b6be-3223433614b7',null, 'Test2@gmail.com', null);
 --select id_family from users where id_user='da7354cf-f526-4df8-9d91-0fbd4a43d196'
 --select id_user from users where email='Teest3@gmail.com' or phone = ''
-insert into role values(1, 'Member', null, now(), now());
+--insert into role values(1, 'Member', null, now(), now());
+
+
+-------------ROLE-------------------------
+
+CREATE OR REPLACE VIEW v_get_role AS
+SELECT role, name, description FROM "role";
+
+
+--select * from v_get_role 
+
+CREATE OR REPLACE FUNCTION f_get_role_member( 
+    p_id_user uuid,
+    p_id_family int
+) RETURNS varchar AS $$
+DECLARE 	
+    v_role varchar;
+    v_name varchar;
+BEGIN 	
+    SELECT "role" INTO v_role FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family;
+    
+    SELECT "name" INTO v_name FROM "role" WHERE "role" = v_role;
+    
+    RETURN v_name;
+END
+$$ LANGUAGE plpgsql;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
