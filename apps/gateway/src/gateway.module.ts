@@ -7,6 +7,7 @@ import { FamilyModule } from './family/family.module';
 import { AdminModule } from './admin/admin.module';
 import { MailModule } from './mailer/mailer.module';
 import { ChatModule } from './chat/chat.module';
+import { RoleModule } from './role/role.module'; 
 import * as Joi from 'joi';
 
 @Module({
@@ -24,6 +25,7 @@ import * as Joi from 'joi';
         RABBIT_MQ_FAMILY_QUEUE: Joi.string().required(),
         RABBIT_MQ_MAILER_QUEUE: Joi.string().required(),
         RABBIT_MQ_CHAT_QUEUE: Joi.string().required(),
+        RABBIT_MQ_ROLE_QUEUE: Joi.string().required(),
 
         GOOGLE_CLIENT_ID: Joi.string().required(),
         GOOGLE_CLIENT_SECRET: Joi.string().required(),
@@ -40,7 +42,8 @@ import * as Joi from 'joi';
     SmsModule,
     FamilyModule,
     AdminModule,
-    ChatModule
+    ChatModule,
+    RoleModule
   ],
   controllers: [],
   providers: [],

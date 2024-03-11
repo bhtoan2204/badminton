@@ -42,6 +42,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/family/tsconfig.app.json"
       }
+    }, 
+    "role": {
+      "type": "application",
+      "root": "apps/role",
+      "entryFile": "main",
+      "sourceRoot": "apps/role/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/role/tsconfig.app.json"
+      }
     }
   }
 }

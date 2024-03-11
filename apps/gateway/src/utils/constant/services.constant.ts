@@ -4,3 +4,5 @@ export const SMS_SERVICE = 'SMS';
 export const FAMILY_SERVICE = 'FAMILY';
 export const MAILER_SERVICE = 'MAILER';
 export const CHAT_SERVICE = 'CHAT';
+export const ROLE_SERVICE = 'ROLE';
+
