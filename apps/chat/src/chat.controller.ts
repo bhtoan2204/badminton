@@ -15,9 +15,21 @@ export class ChatController {
     return this.chatService.getMessages(data.sender_id, data.receiver_id, data.index);
   }
 
+  @EventPattern('chatClient/getFamilyMessages')
+  async getFamilyMessages(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.chatService.getFamilyMessages(data.id_user, data.id_family, data.index);
+  }
+
   @EventPattern('chatClient/sendMessage')
   async saveMessage(@Payload() data: { id_user: string, message: {message: string; receiverId: string;} }, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.chatService.saveMessage(data.id_user, data.message);
+  }
+
+  @EventPattern('chatClient/sendFamilyMessage')
+  async saveFamilyMessage(@Payload() data: { id_user: string, message: {message: string; familyId: number;} }, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.chatService.saveFamilyMessage(data.id_user, data.message);
   }
 }
