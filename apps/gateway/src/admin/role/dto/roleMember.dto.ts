@@ -11,6 +11,4 @@ export class RoleMemberDTO {
     @IsNumber()
     @ApiProperty({ example: '8' })
     id_family: number;
-
-
 }

@@ -1,7 +1,7 @@
 import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
-import { ROLE_SERVICE } from "../utils/constant/services.constant";
 import { lastValueFrom, timeout } from "rxjs";
+import { ROLE_SERVICE } from "../../utils/constant/services.constant";
 
 @Injectable()
 
@@ -10,8 +10,7 @@ export class RoleService {
         @Inject(ROLE_SERVICE) private roleClient: ClientProxy
     ) { }
 
-
-    async getallRole() {
+    async getAllRole() {
         try {
             const response = this.roleClient.send('role/getallrole', {})
                 .pipe(
@@ -26,7 +25,7 @@ export class RoleService {
 
     async getRole(family, user) {
         try {
-            const response = this.roleClient.send('role/getrole', {family, user})
+            const response = this.roleClient.send('role/getrole', { family, user })
                 .pipe(
                     timeout(5000),
                 );
