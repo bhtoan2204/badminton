@@ -21,4 +21,13 @@ export class ChatController {
   async getMessages(@CurrentUser() user, @Param('id_user') id_user: string, @Param('index') index: number) {
     return this.chatService.getMessages(user.id_user, id_user, index);
   }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get messages of family' })
+  @Get('getFamilyMessages/:id_family/:index')
+  @ApiParam({ name: 'id_family', required: true, description: 'The ID of the family' })
+  @ApiParam({ name: 'index', required: true, description: 'Pagination index', type: Number })
+  async getFamilyMessages(@CurrentUser() user, @Param('id_family') id_family: number, @Param('index') index: number) {
+    return this.chatService.getFamilyMessages(user.id_user, id_family, index);
+  }
 }
