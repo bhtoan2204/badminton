@@ -7,7 +7,6 @@ import { FamilyModule } from './family/family.module';
 import { AdminModule } from './admin/admin.module';
 import { MailModule } from './mailer/mailer.module';
 import { ChatModule } from './chat/chat.module';
-import { RoleModule } from './role/role.module'; 
 import * as Joi from 'joi';
 
 @Module({
@@ -41,9 +40,8 @@ import * as Joi from 'joi';
     MailModule,
     SmsModule,
     FamilyModule,
-    AdminModule,
     ChatModule,
-    RoleModule
+    AdminModule,
   ],
   controllers: [],
   providers: [],
