@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, Post, Query, UseGuards } from "@nestjs/common";
+import { Controller, Get, HttpCode, HttpStatus, Query, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { RoleService } from "./role.service";
 import { JwtAuthGuard } from "../../auth/guard/jwt-auth.guard";
