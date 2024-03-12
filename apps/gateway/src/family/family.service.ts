@@ -14,9 +14,9 @@ export class FamilyService {
         @Inject(FAMILY_SERVICE) private familyClient: ClientProxy
     ) { }
     
-    async getFamily(CurrentUser, id_family) {
+    async getFamily(currentUser, id_family) {
         try {
-            const response = this.familyClient.send('family/get_Family', { CurrentUser, id_family })
+            const response = this.familyClient.send('family/get_Family', { currentUser, id_family })
                 .pipe(
                     timeout(5000),
                 );
@@ -27,9 +27,9 @@ export class FamilyService {
         }
     }
 
-    async getMember(CurrentUser, id_user) {
+    async getMember(currentUser, id_user) {
         try {
-            const response = this.familyClient.send('family/get_Member', { CurrentUser, id_user })
+            const response = this.familyClient.send('family/get_Member', { currentUser, id_user })
                 .pipe(
                     timeout(5000),
                 );
@@ -40,9 +40,9 @@ export class FamilyService {
         }
     }
 
-    async getallMember(CurrentUser, id_family) {
+    async getAllMember(id_user: any , id_family: any) {
         try {
-            const response = this.familyClient.send('family/get_all_Member', { CurrentUser, id_family })
+            const response = this.familyClient.send('family/get_all_Member', { id_user, id_family })
                 .pipe(
                     timeout(5000),
                 );
@@ -53,9 +53,9 @@ export class FamilyService {
         }
     }
 
-    async GetAllFamily(CurrentUser) {
+    async getAllFamily(id_user: string) {
         try {
-            const response = this.familyClient.send('family/get_all_Family', { CurrentUser })
+            const response = this.familyClient.send('family/get_all_Family', id_user)
                 .pipe(
                     timeout(5000),
                 );
@@ -67,9 +67,9 @@ export class FamilyService {
 
     }
 
-    async addMember(CurrentUser, memberFamilyDto: MemberFamilyDto) {
+    async addMember(id_user: string, memberFamilyDto: MemberFamilyDto) {
         try {
-            const response = this.familyClient.send('family/add_Member', { CurrentUser, memberFamilyDto })
+            const response = this.familyClient.send('family/add_Member', { id_user, memberFamilyDto })
                 .pipe(
                     timeout(5000),
                 );
@@ -80,9 +80,9 @@ export class FamilyService {
         }
     }
 
-    async deleteMember(CurrentUser, DeleteMemberDTO: DeleteMemberDTO) {
+    async deleteMember(currentUser, DeleteMemberDTO: DeleteMemberDTO) {
         try {
-            const response = this.familyClient.send('family/delete_Member', { CurrentUser, DeleteMemberDTO })
+            const response = this.familyClient.send('family/delete_Member', { currentUser, DeleteMemberDTO })
                 .pipe(
                     timeout(5000),
                 );
@@ -93,9 +93,9 @@ export class FamilyService {
         }
     }
 
-    async createFamily(CurrentUser, createFamilyDto: CreateFamilyDto) {
+    async createFamily(currentUser, createFamilyDto: CreateFamilyDto) {
         try {
-            const source = this.familyClient.send('family/create_Family', { CurrentUser, createFamilyDto }).pipe(
+            const source = this.familyClient.send('family/create_Family', { currentUser, createFamilyDto }).pipe(
                 timeout(5000),
                 catchError(err => {
                     throw new Error(`Failed to create family: ${err.message}`);
@@ -108,9 +108,9 @@ export class FamilyService {
         }
     }
 
-    async updateFamily(CurrentUser, UpdateFamilyDTO: UpdateFamilyDTO) {
+    async updateFamily(currentUser, UpdateFamilyDTO: UpdateFamilyDTO) {
         try {
-            const source = this.familyClient.send('family/update_Family', { CurrentUser, UpdateFamilyDTO }).pipe(
+            const source = this.familyClient.send('family/update_Family', { currentUser, UpdateFamilyDTO }).pipe(
                 timeout(5000),
                 catchError(err => {
                     throw new Error(`Failed to update family: ${err.message}`);
@@ -123,9 +123,9 @@ export class FamilyService {
         }
     }
 
-    async deleteFamily(CurrentUser, id_family) {
+    async deleteFamily(currentUser, id_family) {
         try {
-            const source = this.familyClient.send('family/delete_Family', { CurrentUser, id_family }).pipe(
+            const source = this.familyClient.send('family/delete_Family', { currentUser, id_family }).pipe(
                 timeout(5000),
                 catchError(err => {
                     throw new Error(`Failed to delete family: ${err.message}`);

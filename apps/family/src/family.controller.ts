@@ -21,15 +21,15 @@ export class FamilyController {
     return this.familyService.getMember(data.CurrentUser, data.id_user);
   }
   @EventPattern('family/get_all_Family')
-  async getallFamily(@Payload() data: any, @Ctx() context: RmqContext) {
+  async getAllFamily(@Payload() id_user: string, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.familyService.GetAllFamily(data.CurrentUser);
+    return this.familyService.getAllFamily(id_user);
   }
 
   @EventPattern('family/get_all_Member')
-  async getallMember(@Payload() data: any, @Ctx() context: RmqContext) {
+  async getAllMember(@Payload() data: { id_user, id_family }, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.familyService.getallMember(data.CurrentUser, data.id_family);
+    return this.familyService.getAllMember(data.id_user, data.id_family);
   }
 
   @EventPattern('family/create_Family')
@@ -40,7 +40,7 @@ export class FamilyController {
   @EventPattern('family/add_Member')
   async addMember(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.familyService.addMember(data.CurrentUser,data.memberFamilyDto);
+    return this.familyService.addMember(data.id_user, data.memberFamilyDto);
   }
 
   @EventPattern('family/delete_Member')
@@ -62,4 +62,9 @@ export class FamilyController {
     return this.familyService.deleteFamily(data.CurrentUser, data.id_family);
   }
 
+  @EventPattern('family/getIdsMember')
+  async getIdsMember(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.familyService.getIdsMember(data.id_user, data.id_family);
+  }
 }
