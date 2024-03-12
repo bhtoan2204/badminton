@@ -2,7 +2,6 @@ import { FamilyMessageContent, MessageContent } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
-import { Types } from 'mongoose';
 
 const limit = 20;
 
