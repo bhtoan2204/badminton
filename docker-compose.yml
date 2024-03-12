@@ -128,8 +128,6 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
 
-
-
   rabbitmq:
     image: rabbitmq
     healthcheck:

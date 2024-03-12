@@ -119,7 +119,6 @@ services:
     environment:
       - NODE_ENV=production
 
-
   rabbitmq:
     image: rabbitmq
     healthcheck:
