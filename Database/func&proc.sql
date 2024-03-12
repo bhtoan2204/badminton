@@ -189,102 +189,186 @@ CREATE OR REPLACE FUNCTION f_create_family(
 	p_id_user uuid,
     p_description VARCHAR,
     p_name VARCHAR
-) RETURNS INT AS $$
+) RETURNS varchar AS $$
 DECLARE
     new_id INT;
-BEGIN
-    BEGIN
-        INSERT INTO family (quantity, description, created_at, updated_at, "name")
-        VALUES (1, p_description, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, p_name)
-        RETURNING id_family INTO new_id;
-       
-        update Users set id_family=new_id where id_user=p_id_user;
-
-        insert into member_family(id_user,id_family, created_at, updated_at, role) values (p_id_user, new_id, now(), now(), null );
-    EXCEPTION
-        WHEN others THEN
-            RAISE EXCEPTION 'Failed to create family: %', SQLERRM;
-    END;
-    RETURN new_id;
+    result_message varchar;
+	recordCount int;
+begin
+	SELECT COUNT(*) INTO recordCount FROM users WHERE id_user = p_id_user;
+	if recordCount >0 then
+	    BEGIN
+	        INSERT INTO family (quantity,description, created_at, updated_at, "name", owner_id)
+	        VALUES (0, p_description, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, p_name, p_id_user)
+	        RETURNING id_family INTO new_id; 
+	
+	        INSERT INTO member_family (id_user, id_family, created_at, updated_at, "role")
+	        VALUES (p_id_user, new_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'owner'); 
+	       
+	        result_message := 'Successfully created family: ' || p_name;
+	    EXCEPTION
+	        WHEN others THEN
+	            result_message:= 'Failed to create family';
+	    END;
+	 else
+        	result_message:= 'Invalid user provided';
+	 end if;
+    RETURN result_message;
 END;
 $$ LANGUAGE plpgsql;
 
 
---select f_create_family('da7354cf-f526-4df8-9d91-0fbd4a43d196','abc', 'family1') as family;
+--select f_create_family('bd94ba3a-b046-4a05-a260-890913e09df9','abc', 'family1') as family;
 
 
 
-CREATE OR REPLACE PROCEDURE p_update_family(
+CREATE OR REPLACE function f_update_family(
     p_id uuid,
+    p_id_family int,
     p_name VARCHAR,
     p_description VARCHAR
-) AS $$
-BEGIN
-    BEGIN
-        UPDATE family SET description = p_description, "name" = p_name, updated_at=now() WHERE id_family = (select id_family from users where id_user=p_id);
-    EXCEPTION
-        WHEN others THEN
-            RAISE EXCEPTION 'Failed to update family: %', SQLERRM;
-    END;
-END;
+) RETURNS varchar AS $$
+DECLARE
+    recordCount int;
+   	result_message varchar;
+begin
+	SELECT COUNT(*) INTO recordCount FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family;
+	if recordCount> 0 then 
+	    BEGIN
+	        UPDATE family SET description = p_description, "name" = p_name, updated_at=now() WHERE id_family = p_id_family;
+	       	result_message:='Successfully updated family';
+	    EXCEPTION
+	        WHEN others THEN
+	           result_message:= 'Failed to update family';
+	    END;
+	 else 
+       	 result_message:= 'Not in the same family';
+
+	 end if;
+end;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE PROCEDURE p_delete_family(
-    p_id uuid
-) AS $$
-BEGIN
-    BEGIN
-        DELETE FROM family WHERE id_family = (select id_family from users where id_user=p_id);
-    EXCEPTION
-        WHEN others THEN
-            RAISE EXCEPTION 'Fail to delete family: %', SQLERRM;
-    END;
+
+
+
+CREATE OR REPLACE function f_delete_family(
+    p_id_user uuid, 
+    p_id_family int
+) RETURNS varchar AS $$
+declare 
+	result_message varchar;
+	recordCount int;
+begin
+	SELECT COUNT(*) INTO recordCount FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family and role='owner';
+	if recordCount> 0 then 
+	    BEGIN
+	        DELETE FROM family WHERE id_family = p_id_family;
+	       	result_message := 'Successfully deleted family';
+	    EXCEPTION
+	        WHEN others THEN
+	            result_message:= 'Fail to delete family';
+ 		end;
+	else 
+       	result_message:= 'Not in the same family or not the owner of the family';
+
+    end if;
+   return result_message;
 END;
 $$ LANGUAGE plpgsql;
 --CALL p_update_family('da7354cf-f526-4df8-9d91-0fbd4a43d196', 'New Family Name', 'New Family Description');
---call p_delete_family('da7354cf-f526-4df8-9d91-0fbd4a43d196') 
+select * from  f_delete_family('bd94ba3a-b046-4a05-a260-890913e09df9', 18) 
 --select id_family from users where id_user='da7354cf-f526-4df8-9d91-0fbd4a43d196';
-CREATE OR REPLACE PROCEDURE p_add_member(
-    p_id UUID,
+CREATE OR REPLACE FUNCTION f_add_member(
+    p_id_user UUID,
+    p_id_family int,
     p_phone VARCHAR,
     p_email VARCHAR, 
-    p_role INT
-) AS $$
+    p_role varchar
+) RETURNS VARCHAR AS $$
 DECLARE
-    v_family_id INT;
     v_user_id UUID;
-    v_name_family varchar;
+    recordCount int;
+   result_message varchar;
 BEGIN 
-    SELECT id_family, "name" INTO v_family_id, v_name_family FROM Users WHERE id_user = p_id;
+	sELECT COUNT(*) INTO recordCount FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family;
 
     SELECT id_user INTO v_user_id FROM Users WHERE phone = p_phone OR email = p_email;
 
-    IF v_family_id IS NOT NULL AND v_user_id IS NOT NULL THEN
+    IF v_user_id IS NOT null and recordCount>0 THEN
         BEGIN
             INSERT INTO member_family (id_user, id_family, created_at, updated_at, role)
-            VALUES (v_user_id, v_family_id, NOW(), NOW(), p_role);
-        
-            UPDATE Users SET id_family = v_family_id WHERE id_user = v_user_id;
-            RAISE EXCEPTION 'Successfully added a member to the % family', v_name_family;
-
+            VALUES (v_user_id, p_id_family, NOW(), NOW(), p_role);
+           
+            result_message := 'Successfully added a member to the family';
         EXCEPTION
             WHEN others THEN
-                RAISE EXCEPTION 'Failed to add member: %', SQLERRM;
+                result_message := 'Failed to add member';
         END;
     ELSE
-        RAISE EXCEPTION 'Invalid family ID or user ID provided';
+        result_message :=  'Invalid family or user provided';
     END IF;
+
+    RETURN result_message;
 END;
 $$ LANGUAGE plpgsql;
 
 
 
---call p_add_member('53b87106-d15a-4aa2-b6be-3223433614b7',null, 'Test2@gmail.com', null);
+INSERT INTO member_family (id_user, id_family, created_at, updated_at, role) values('bd94ba3a-b046-4a05-a260-890913e09df9', 21, now(), now(), 'member')
+ 
+select * from  f_add_member('bd94ba3a-b046-4a05-a260-890913e09df9',24 ,null, 'duongthanhgiang.0108@gmail.com', 'member');
 --select id_family from users where id_user='da7354cf-f526-4df8-9d91-0fbd4a43d196'
 --select id_user from users where email='Teest3@gmail.com' or phone = ''
 --insert into role values(1, 'Member', null, now(), now());
 
 
+CREATE OR REPLACE function public.f_delete_member(IN p_id_current_user uuid, IN p_id_user uuid, IN p_id_family integer)
+RETURNS VARCHAR AS $$
+DECLARE
+    recordCount int;
+   	result_message varchar;
+BEGIN 
+    SELECT COUNT(*) INTO recordCount FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family;
+	if recordCount> 0 then
+        BEGIN
+            delete from member_family where id_family=p_id_family and p_id_user=id_user;
+           	   	result_message:= 'Successfully deleted member';
+
+        EXCEPTION
+		    WHEN others THEN
+		        result_message:= 'Failed to delete member';
+        END;
+    ELSE
+        result_message:= 'Invalid family or user provided';
+    END IF;
+   return result_message;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+CREATE OR REPLACE FUNCTION public.get_all_family(p_id_user uuid, p_id_family)
+ RETURNS SETOF family
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    familyRecord RECORD;
+begin
+	SELECT COUNT(*) INTO recordCount FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family;
+	if recordCount> 0 then
+		begin
+		    FOR familyRecord IN 
+		        SELECT id_family FROM member_family WHERE id_user = p_id_user
+		    LOOP
+		        RETURN QUERY SELECT * FROM family WHERE id_family = familyRecord.id_family;
+		    END LOOP;
+		 end if;
+		
+END;
+$function$
+;
+
+select * from get_all_family('bd94ba3a-b046-4a05-a260-890913e09df9')
 -------------ROLE-------------------------
 
 CREATE OR REPLACE VIEW v_get_role AS
@@ -311,6 +395,30 @@ $$ LANGUAGE plpgsql;
 
 
 
+CREATE OR REPLACE FUNCTION p_update_role(
+    p_id_user uuid,
+    p_id_family int,
+    p_role varchar
+) RETURNS varchar AS $$
+DECLARE
+    error_message varchar;
+BEGIN
+    BEGIN
+        UPDATE member_family
+        SET "role" = p_role
+        WHERE id_family = p_id_family AND id_user = p_id_user;
+
+        IF NOT FOUND THEN
+            error_message := 'Failed to update role for the user.';
+        END IF;
+    EXCEPTION
+        WHEN others THEN
+            error_message := 'Failed to update role for the user.';
+    END;
+
+    RETURN error_message;
+END;
+$$ LANGUAGE plpgsql;
 
 
 

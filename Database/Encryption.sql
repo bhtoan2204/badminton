@@ -145,46 +145,7 @@ $$ LANGUAGE plpgsql;
 --END;
 --$$;
 
-CREATE OR REPLACE FUNCTION public.p_delete_role()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-BEGIN 
 
-	EXECUTE 'DROP ROLE IF EXISTS ' || OLD.role;
-
-    RETURN OLD;
-END;
-$function$
-
-CREATE OR REPLACE FUNCTION public.p_create_role()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-BEGIN 
-    EXECUTE 'CREATE ROLE ' || NEW.role;
-    EXECUTE 'GRANT CONNECT ON DATABASE famfund_i2wq_a3fq TO ' || NEW.role;
-    RETURN NEW;
-END;
-$function$
-
-create trigger tr_insert_role after
-insert
-    on
-    public.role for each row execute function p_create_role();
-   
-   
-create trigger tr_delete_role before
-delete
-    on
-    public.role for each row execute function p_delete_role();
-   
-----------------------------------------INSERT---------------------------------------------------
-
-insert into "role" values('Family member', null, now(), now(), 'member');
-insert into "role" values('Mommy', null, now(), now(), 'mom');
-insert into "role" values('Daddy', null, now(), now(), 'dad');
-insert into "role" values('Owner package', null, now(), now(), 'owner');
 
 
 
