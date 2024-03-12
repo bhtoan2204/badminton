@@ -9,6 +9,6 @@ import { FAMILY_SERVICE } from "../utils/constant/services.constant";
     RmqModule.register({ name: FAMILY_SERVICE }),
   ],
   controllers: [FamilyController],
-  providers: [FamilyService],
+  providers: [FamilyService]
 })
 export class FamilyModule { }

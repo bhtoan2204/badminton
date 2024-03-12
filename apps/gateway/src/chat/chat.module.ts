@@ -1,6 +1,6 @@
 import { GlobalJwtModule, RmqModule } from "@app/common";
 import { Module } from "@nestjs/common";
-import { AUTH_SERVICE, CHAT_SERVICE } from "../utils/constant/services.constant";
+import { AUTH_SERVICE, CHAT_SERVICE, FAMILY_SERVICE } from "../utils/constant/services.constant";
 import { ChatGateway } from "./chat.gateway";
 import { ChatController } from "./chat.controller";
 import { WsJwtStrategy } from "./strategies/ws-jwt-auth.strategy";
@@ -10,7 +10,8 @@ import { ChatService } from "./chat.service";
   imports: [
     RmqModule.register({name: CHAT_SERVICE}),
     RmqModule.register({name: AUTH_SERVICE}),
-    GlobalJwtModule
+    RmqModule.register({ name: FAMILY_SERVICE }),
+    GlobalJwtModule,
   ],
   controllers: [ChatController],
   providers: [ChatGateway, WsJwtStrategy, ChatService],
