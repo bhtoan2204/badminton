@@ -15,4 +15,10 @@ export class MailController {
     this.rmqService.ack(context);
     return await this.mailerService.sendUserConfirmation(dto);
   }
+
+  @EventPattern('mailClient/sendInvite')
+  async sendInvite(@Payload() dto: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    //return await this.mailerService.sendInvite(dto);
+  }
 }

@@ -223,7 +223,7 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE function f_update_family(
-    p_id uuid,
+    p_id_user uuid,
     p_id_family int,
     p_name VARCHAR,
     p_description VARCHAR
@@ -231,24 +231,40 @@ CREATE OR REPLACE function f_update_family(
 DECLARE
     recordCount int;
    	result_message varchar;
-begin
-	SELECT COUNT(*) INTO recordCount FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family;
-	if recordCount> 0 then 
-	    BEGIN
-	        UPDATE family SET description = p_description, "name" = p_name, updated_at=now() WHERE id_family = p_id_family;
-	       	result_message:='Successfully updated family';
-	    EXCEPTION
-	        WHEN others THEN
-	           result_message:= 'Failed to update family';
-	    END;
-	 else 
-       	 result_message:= 'Not in the same family';
+    recordCount_user int;
+   	recordCount_family int;
 
-	 end if;
+begin
+	select count(*) into recordCount_user from users where id_user=p_id_user; 
+	select count(*) into recordCount_family from family where id_family = p_id_family; 
+	SELECT COUNT(*) INTO recordCount FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family;
+	if recordCount_user then 
+		if recordCount_family >0 then
+			if recordCount> 0 then 
+			    BEGIN
+			        UPDATE family SET description = p_description, "name" = p_name, updated_at=now() WHERE id_family = p_id_family;
+			       	result_message:='Successfully updated family';
+			    EXCEPTION
+			        WHEN others THEN
+			           result_message:= 'Failed to update family';
+			    END;
+			 else 
+		       	 result_message:= 'Not in the same family';
+		
+			 end if;
+		else 
+	       	 result_message:= 'Invalid family provided';
+	    end if;
+
+	else 
+       	 result_message:= 'Invalid user provided';
+    end if; 
+
+	return result_message;
 end;
 $$ LANGUAGE plpgsql;
 
-
+select * from f_update_family('bd94ba3a-b046-4a05-a260-890913e09df9', 45 , 'vdbfvj', 'fnjdf')
 
 
 CREATE OR REPLACE function f_delete_family(
@@ -259,6 +275,7 @@ declare
 	result_message varchar;
 	recordCount int;
 begin
+	
 	SELECT COUNT(*) INTO recordCount FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family and role='owner';
 	if recordCount> 0 then 
 	    BEGIN
@@ -269,14 +286,14 @@ begin
 	            result_message:= 'Fail to delete family';
  		end;
 	else 
-       	result_message:= 'Not in the same family or not the owner of the family';
+       	result_message:= 'Not the owner of the family';
 
     end if;
    return result_message;
 END;
 $$ LANGUAGE plpgsql;
 --CALL p_update_family('da7354cf-f526-4df8-9d91-0fbd4a43d196', 'New Family Name', 'New Family Description');
-select * from  f_delete_family('bd94ba3a-b046-4a05-a260-890913e09df9', 18) 
+select * from  f_delete_family('bd94ba3a-b046-4a05-a260-890913e09df9', 45) 
 --select id_family from users where id_user='da7354cf-f526-4df8-9d91-0fbd4a43d196';
 CREATE OR REPLACE FUNCTION f_add_member(
     p_id_user UUID,
@@ -314,9 +331,9 @@ $$ LANGUAGE plpgsql;
 
 
 
-INSERT INTO member_family (id_user, id_family, created_at, updated_at, role) values('bd94ba3a-b046-4a05-a260-890913e09df9', 21, now(), now(), 'member')
+--INSERT INTO member_family (id_user, id_family, created_at, updated_at, role) values('bd94ba3a-b046-4a05-a260-890913e09df9', 21, now(), now(), 'member')
  
-select * from  f_add_member('bd94ba3a-b046-4a05-a260-890913e09df9',24 ,null, 'duongthanhgiang.0108@gmail.com', 'member');
+--select * from  f_add_member('bd94ba3a-b046-4a05-a260-890913e09df9',24 ,null, 'duongthanhgiang.0108@gmail.com', 'member');
 --select id_family from users where id_user='da7354cf-f526-4df8-9d91-0fbd4a43d196'
 --select id_user from users where email='Teest3@gmail.com' or phone = ''
 --insert into role values(1, 'Member', null, now(), now());
@@ -325,50 +342,85 @@ select * from  f_add_member('bd94ba3a-b046-4a05-a260-890913e09df9',24 ,null, 'du
 CREATE OR REPLACE function public.f_delete_member(IN p_id_current_user uuid, IN p_id_user uuid, IN p_id_family integer)
 RETURNS VARCHAR AS $$
 DECLARE
-    recordCount int;
+    recordCount_member int;
    	result_message varchar;
+   	recordCount_owner int;
 BEGIN 
-    SELECT COUNT(*) INTO recordCount FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family;
-	if recordCount> 0 then
-        BEGIN
-            delete from member_family where id_family=p_id_family and p_id_user=id_user;
-           	   	result_message:= 'Successfully deleted member';
+	select count(*) into recordCount_owner from member_family where id_user=p_id_current_user and id_family = p_id_family and role='owner';
 
-        EXCEPTION
-		    WHEN others THEN
-		        result_message:= 'Failed to delete member';
-        END;
-    ELSE
-        result_message:= 'Invalid family or user provided';
-    END IF;
+    SELECT COUNT(*) INTO recordCount_member FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family;
+    if recordCount_owner>0 then
+   	begin
+		if recordCount_member> 0 then
+	        BEGIN
+	            delete from member_family where id_family=p_id_family and p_id_user=id_user;
+	           	   	result_message:= 'Successfully deleted member';
+	
+	        EXCEPTION
+			    WHEN others THEN
+			        result_message:= 'Failed to delete member';
+	        END;
+	    ELSE
+	        result_message:= 'Invalid family or user provided';
+	    END IF;
+	 end;
+	else 
+		result_message := 'The current user is not the owner of this family';
+	end if;
    return result_message;
 END;
 $$ LANGUAGE plpgsql;
 
+--select * from f_delete_member('75531187-fa7c-4bff-8b2c-db9b515b8f63', '75531187-fa7c-4bff-8b2c-db9b515b8f63', 43)
+
+CREATE OR REPLACE FUNCTION public.f_get_all_member(p_id_user uuid, p_id_family integer)
+ RETURNS SETOF view_users
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    recordCount int;
+    userRecord view_users%ROWTYPE;
+BEGIN
+    SELECT COUNT(*) INTO recordCount FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family;
+
+    IF recordCount > 0 THEN
+        FOR userRecord IN 
+            SELECT * FROM view_users WHERE id_user IN (SELECT id_user FROM member_family WHERE id_family = p_id_family)
+        LOOP
+            RETURN NEXT userRecord;
+        END LOOP;
+    END IF;
+
+    
+END;
+$function$
 
 
-CREATE OR REPLACE FUNCTION public.get_all_family(p_id_user uuid, p_id_family)
+
+
+CREATE OR REPLACE FUNCTION public.f_getfamily(p_id_user uuid, p_id_family integer)
  RETURNS SETOF family
  LANGUAGE plpgsql
 AS $function$
 DECLARE
-    familyRecord RECORD;
-begin
-	SELECT COUNT(*) INTO recordCount FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family;
-	if recordCount> 0 then
-		begin
-		    FOR familyRecord IN 
-		        SELECT id_family FROM member_family WHERE id_user = p_id_user
-		    LOOP
-		        RETURN QUERY SELECT * FROM family WHERE id_family = familyRecord.id_family;
-		    END LOOP;
-		 end if;
-		
+    recordCount int;
+    familyRecord family%ROWTYPE;
+BEGIN
+    SELECT COUNT(*) INTO recordCount FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family;
+
+    IF recordCount > 0 THEN
+        SELECT * INTO familyRecord FROM family WHERE id_family = p_id_family;
+        RETURN NEXT familyRecord;
+    ELSE
+        RETURN;
+    END IF;
 END;
 $function$
-;
 
-select * from get_all_family('bd94ba3a-b046-4a05-a260-890913e09df9')
+--select * from f_getfamily('bd94ba3a-b046-4a05-a260-890913e09df9', 45)
+
+
+--select * from f_get_all_member('bd94ba3a-b046-4a05-a260-890913e09df9', 44)
 -------------ROLE-------------------------
 
 CREATE OR REPLACE VIEW v_get_role AS
@@ -423,10 +475,43 @@ $$ LANGUAGE plpgsql;
 
 
 
+---------------PAYMENT------------------------
+CREATE OR REPLACE FUNCTION public.f_create_order(p_id_user uuid, p_id_package integer)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    user_exists BOOLEAN;
+   	new_id int;
+    p_price int;
+    p_expried int;
+BEGIN
+    SELECT EXISTS(SELECT 1 FROM users WHERE id_user = p_id_user) INTO user_exists;
+    
+	select price, expried into p_price, p_expried from package where id_package = p_id_package;
 
+    IF NOT user_exists THEN
+        RAISE EXCEPTION 'User does not exist';
+    ELSIF p_price is null THEN
+        RAISE EXCEPTION 'Package does not match';
+    else
+    	begin
+        insert into "order"(id_user, id_package, status, created_at, expried_at) 
+        values (p_id_user, p_id_package, '1', now(), now() + INTERVAL '1 month' * p_expried)
+        RETURNING id_order INTO new_id;
+        return new_id;
 
+       EXCEPTION
+            WHEN others THEN
+                RAISE EXCEPTION 'Failed to create order: %', SQLERRM;
+        END;
+    end if;
 
+END;
+$function$
 
+insert into package values (1, 'Basic' , 100000 , null, now() , now() , 1)
+--select * from f_create_order('e8462da1-159a-4082-8f95-5dd4cf0e777e', 1)
 
 
 

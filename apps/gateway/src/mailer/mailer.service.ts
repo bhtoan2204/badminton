@@ -20,4 +20,16 @@ export class MailService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async sendInvitation(userInfo: any, email: string) {
+    try {
+      const response = this.mailerClient.send('mailClient/sendInvitation', { userInfo, email }).pipe(
+        timeout(8000)
+      );
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }
