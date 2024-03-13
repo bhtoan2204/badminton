@@ -5,7 +5,6 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { SendEmailRegisterDto } from "./dto/sendEmailRegister.dto";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { CurrentUser } from "../utils/decorator/current-user.decorator";
-
 @ApiTags('Mailer')
 @Controller('mailer')
 @ApiBearerAuth()
@@ -21,4 +20,14 @@ export class MailController {
   async sendUserConfirmation(@CurrentUser() userInfo, @Body() dto: SendEmailRegisterDto) {
     return await this.mailerService.sendUserConfirmation(userInfo, dto.email);
   }
+
+  @ApiOperation({ summary: 'Send invitation' })
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(JwtAuthGuard)
+  @Post('sendEmailConfirmation')
+  async sendInvitation(@CurrentUser() userInfo, @Body() dto: SendEmailRegisterDto) {
+    return await this.mailerService.sendUserConfirmation(userInfo, dto.email);
+  }
+
+
 }

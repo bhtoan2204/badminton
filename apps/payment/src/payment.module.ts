@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
-import { RmqModule } from '@app/common';
+import { DatabaseModule, RmqModule } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 
@@ -16,6 +16,7 @@ import * as Joi from 'joi';
       envFilePath: process.env.NODE_ENV === 'production' ? './apps/payment/.env.production' : './apps/payment/.env',
     }),
     RmqModule,
+    DatabaseModule
   ],
   controllers: [PaymentController],
   providers: [PaymentService],
