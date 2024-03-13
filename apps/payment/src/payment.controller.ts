@@ -9,16 +9,21 @@ export class PaymentController {
   private readonly paymentService: PaymentService,
   private readonly rmqService: RmqService) {}
 
+  @EventPattern('payment/get_package')
+  async get_package(@Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.get_package();
+  }
 
   @EventPattern('payment/create_order')
   async CreateOrder(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.paymentService.CreateOrder(data.id_user, data.id_package );
+    return this.paymentService.create_order(data.id_user, data.id_package );
   }
 
-  @EventPattern('payment/update_status')
+  @EventPattern('payment/check_order_return')
   async UpdateStatus(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.paymentService.UpdateStatus(data.orderId);
+    return this.paymentService.check_order(data.id_user, data.OrderReturn);
   }
 }
