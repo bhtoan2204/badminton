@@ -104,7 +104,7 @@
       "compilerOptions": {
         "tsConfigPath": "apps/chat/tsconfig.app.json"
       }
-    }, 
+    },
     "role": {
       "type": "application",
       "root": "apps/role",
@@ -112,6 +112,15 @@
       "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/role/tsconfig.app.json"
+      }
+    },
+    "crawler": {
+      "type": "application",
+      "root": "apps/crawler",
+      "entryFile": "main",
+      "sourceRoot": "apps/crawler/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/crawler/tsconfig.app.json"
       }
     }
   }
