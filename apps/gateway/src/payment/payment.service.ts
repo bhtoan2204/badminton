@@ -1,5 +1,5 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { ClientProxy } from "@nestjs/microservices";
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { PAYMENT_SERVICE } from "../utils/constant/services.constant";
 import { OrderDTO } from "./dto/order.dto";
 import * as moment from 'moment';
@@ -12,7 +12,23 @@ export class PaymentService {
     @Inject(PAYMENT_SERVICE) private paymentClient: ClientProxy
   ) { }
 
-  async CreateOrder (id_user, id_package){
+  async get_package()
+  {
+    const response = this.paymentClient.send('payment/get_package', {} )
+        .pipe(
+            timeout(5000),
+        );
+    const data = await lastValueFrom(response);
+    return data;
+        }
+        catch (error) {
+          throw new RpcException({
+            message: error.message,
+            statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+          });
+        }
+  
+  async create_order (id_user, id_package){
   try{
     const response = this.paymentClient.send('payment/create_order', {id_user,id_package} )
         .pipe(
@@ -21,12 +37,30 @@ export class PaymentService {
     const data = await lastValueFrom(response);
     return data;
         }
-    catch(error){
-      throw error;
-    }
-  }
+        catch (error) {
+          throw new RpcException({
+            message: error.message,
+            statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+          });
+        }
+      }
 
-
+  async check_order_return(id_user, OrderReturn){
+    try{
+      const response = this.paymentClient.send('payment/check_order_return', {id_user,OrderReturn} )
+          .pipe(
+              timeout(5000),
+          );
+      const data = await lastValueFrom(response);
+      return data;
+          }
+          catch (error) {
+            throw new RpcException({
+              message: error.message,
+              statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+            });
+          }
+        }
 
   async generateVnpay(id_user, order: OrderDTO, req, res) {
     try{
@@ -42,7 +76,7 @@ export class PaymentService {
     //     req.socket.remoteAddress ||
     //     req.connection.socket.remoteAddress;
     let id_package = order.id_package;
-    let orderId = await this.CreateOrder(id_user, id_package);
+    let orderId = await this.create_order(id_user, id_package);
 
     let tmnCode = vnpayConfig.vnp_TmnCode;
     let secretKey = vnpayConfig.vnp_HashSecret;
@@ -82,16 +116,20 @@ export class PaymentService {
     let signed = hmac.update(Buffer.from(signData, 'utf-8')).digest("hex"); 
     vnp_Params['vnp_SecureHash'] = signed;
     vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
-    console.log(vnpUrl);
 
     //res.redirect(vnpUrl)
     return vnpUrl;
   }
     catch (error) {
-      throw error;
+        throw new RpcException({
+          message: error.message,
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        });
+      }
     }
-  }
 }
+
+
 
 
 function sortObject(obj) {

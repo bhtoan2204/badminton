@@ -497,7 +497,7 @@ BEGIN
     else
     	begin
         insert into "order"(id_user, id_package, status, created_at, expried_at) 
-        values (p_id_user, p_id_package, '1', now(), now() + INTERVAL '1 month' * p_expried)
+        values (p_id_user, p_id_package, 'Pending', now(), now() + INTERVAL '1 month' * p_expried)
         RETURNING id_order INTO new_id;
         return new_id;
 
@@ -510,15 +510,63 @@ BEGIN
 END;
 $function$
 
-insert into package values (1, 'Basic' , 100000 , null, now() , now() , 1)
+insert into package values (1, 'Basic' , 100000 , null, now() , now() , 3)
+insert into package values (2, 'Premium' , 500000 , null, now() , now() , 10)
+
 --select * from f_create_order('e8462da1-159a-4082-8f95-5dd4cf0e777e', 1)
 
+CREATE OR REPLACE VIEW v_package AS
+SELECT
+    id_package AS "Mã gói",
+    name AS "Tên gói",
+    price AS "Giá",
+    description AS "Mô tả",
+    expried AS "Thời hạn sử dụng: tháng"
+FROM
+    package;
 
 
 
+create or replace function f_check_order(
+	p_id_user uuid,
+	p_id_order int,
+	p_amount int, 
+	p_ResponseCode varchar,
+	p_TransactionStatus varchar
+) RETURNS JSON AS $$
+declare 
+	returnData JSON;
+	valid_user int;
+	valid_package int;
+	valid_order int;
+begin 
+	select count(*) into valid_user from users where id_user=p_id_user;
+	select id_package into valid_package from "order" where id_order=p_id_order; 
+	select count(*) into valid_order from package where id_package=valid_package and price=p_amount/100;
+	if valid_user >0 then 
+		begin
+			if valid_order > 0 then 
+				begin 
+					update "order" set status = 'Successed' where id_order= p_id_order;
 
+                	returnData := json_build_object('RspCode', '00', 'Message', 'Confirm Success');
 
+				end;
+			else
+				update "order" set status = 'Failed' where id_order= p_id_order;
+                returnData := json_build_object('RspCode', '97', 'Message', 'Fail checksum');
+            end if;
+		end;
+	else 
+		 update "order" set status = 'Failed' where id_order= p_id_order;
+         returnData := json_build_object('RspCode', '97', 'Message', 'Fail checksum');
+	end if;
+ 	return returnData;
+end;
+$$ LANGUAGE plpgsql;
 
+select * from f_check_order('e8462da1-159a-4082-8f95-5dd4cf0e777e', 1, 10000000, '00','00')
+CREATE TYPE status_enum AS ENUM ('Failed', 'Successed', 'Pending', 'Refunded');
 
 
 
