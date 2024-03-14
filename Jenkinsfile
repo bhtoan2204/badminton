@@ -53,7 +53,6 @@ pipeline {
                         sh "echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin"
                         sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml push"
                         sh "tar -czvf k8s.tar.gz k8s/"
-                        sh "sshpass -p ${SSH_password} scp -r docker-compose.prod.yml ${SSH_user}@${SSH_ip}:~/"
                         sh "sshpass -p ${SSH_password} scp -r k8s.tar.gz ${SSH_user}@${SSH_ip}:~/"
                         sh "rm -rf k8s.tar.gz"
                     }
