@@ -38,7 +38,7 @@ export class MailService {
       throw new RpcException({
         code: HttpStatus.INTERNAL_SERVER_ERROR,
         message: err.message
-      })
+      });
     }
   }
 }
