@@ -61,13 +61,6 @@ pipeline {
             }
         }
 
-        stage("Pull Images from Docker Hub") {
-          steps {
-            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml pull'"
-            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'tar -xzvf k8s.tar.gz'"
-          }
-        }
-
         stage("Deploy to Kubernetes") {
           steps {
             sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'TAG=${COMMIT_ID} tar -xzvf k8s.tar.gz'"
@@ -79,7 +72,7 @@ pipeline {
 
         stage("Clean Up") {
           steps {
-            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'docker system prune -f'"
+            sh "docker system prune -f"
           }
         }
     }
