@@ -24,6 +24,12 @@ export class PaymentController {
   @EventPattern('payment/check_order_return')
   async UpdateStatus(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.paymentService.check_order(data.id_user, data.OrderReturn);
+    return this.paymentService.check_order(data.id_user, data.orderReturn);
+  }
+
+  @EventPattern('payment/generateVnpay')
+  async generateVnpay(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.generateVnpay(data.id_user, data.order, data.ip);
   }
 }
