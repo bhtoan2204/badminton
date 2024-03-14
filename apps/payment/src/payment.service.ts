@@ -1,42 +1,104 @@
-import { Injectable , HttpException} from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
+import { RpcException } from '@nestjs/microservices';
+import { ConfigService } from '@nestjs/config';
+import { sortObject } from '../utils';
+import * as moment from 'moment';
+import * as crypto from "crypto";
+import * as qs from "qs";
 
 @Injectable()
 export class PaymentService {
-  constructor(
-    private readonly entityManager: EntityManager
-) {}
+  private readonly vnpTmnCode: string;
+  private readonly vnpHashSecret: string;
+  private readonly vnpUrl: string;
+  private readonly vnpReturnUrl: string;
 
-  async get_package(){
+  constructor(
+    private readonly entityManager: EntityManager,
+    private readonly configService: ConfigService
+  ) {
+    this.vnpTmnCode = this.configService.get<string>("VNPAY_TMN_CODE");
+    this.vnpHashSecret = this.configService.get<string>("VNPAY_HASH_SECRET");
+    this.vnpUrl = this.configService.get<string>("VNPAY_URL");
+    this.vnpReturnUrl = this.configService.get<string>("VNPAY_RETURN_URL");
+  }
+
+  async get_package() {
     try {
       const Query = 'SELECT * from v_package';
       const data = await this.entityManager.query(Query);
       return data;
     } catch (error) {
-      throw new HttpException(error, error.statusCode);
+      throw new RpcException({
+        code: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error.message
+      });
     }
   }
   async create_order(id_user, id_package) {
     try {
       const Query = 'SELECT * FROM f_create_order($1,$2)';
-      const params = [id_user, id_package]; 
+      const params = [id_user, id_package];
       const data = await this.entityManager.query(Query, params);
       return data[0]['f_create_order'];
     } catch (error) {
-      throw new HttpException(error, error.statusCode);
+      throw new RpcException({
+        code: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error.message
+      });
     }
   }
 
-  async check_order(id_user, OrderReturn){
-    const {id_order , amount, vnp_ResponseCode, vnp_TransactionStatus} = OrderReturn;
+  async check_order(id_user, orderReturn) {
+    const { id_order, amount, vnp_ResponseCode, vnp_TransactionStatus } = orderReturn;
     try {
-    
       const Query = 'select * from f_check_order($1, $2, $3, $4, $5)';
-      const params = [id_user, id_order, amount, vnp_ResponseCode, vnp_TransactionStatus]; 
+      const params = [id_user, id_order, amount, vnp_ResponseCode, vnp_TransactionStatus];
       const data = await this.entityManager.query(Query, params);
       return data[0]['f_check_order'];
     } catch (error) {
-      throw new HttpException(error, error.statusCode);
+      throw new RpcException({
+        code: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error.message
+      });
+    }
+  }
+
+  async generateVnpay(id_user, order, fullIp) {
+    try {
+      const orderId = await this.create_order(id_user, order.id_package);
+      const vnp_Params = {
+        vnp_Version: '2.1.0',
+        vnp_Command: 'pay',
+        vnp_TmnCode: this.vnpTmnCode,
+        vnp_Locale: order.language || 'vn',
+        vnp_CurrCode: 'VND',
+        vnp_TxnRef: orderId,
+        vnp_OrderInfo: `Thanh toan cho ma giao dich: ${orderId}`,
+        vnp_OrderType: 'other',
+        vnp_Amount: order.amount * 10000,
+        vnp_ReturnUrl: `${this.vnpReturnUrl}${orderId}`,
+        vnp_IpAddr: fullIp.split(":").pop(),
+        vnp_CreateDate: moment().format('YYYYMMDDHHmmss'),
+        ...(order.bankCode && { vnp_BankCode: order.bankCode })
+      };
+      
+      const sortedVnpParams = sortObject(vnp_Params);
+      const signData = qs.stringify(sortedVnpParams, { encode: false });
+      const hmac = crypto.createHmac("sha512", this.vnpHashSecret);
+      const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest("hex");
+      sortedVnpParams['vnp_SecureHash'] = signed;
+  
+      return {
+        isSuccess: true,
+        paymentUrl: `${this.vnpUrl}?${qs.stringify(sortedVnpParams, { encode: false })}`
+      };
+    } catch (error) {
+      throw new RpcException({
+        code: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error.message
+      });
     }
   }
 }

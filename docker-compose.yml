@@ -38,7 +38,7 @@ services:
       target: development
     command: npm run start:dev payment
     depends_on:
-      - gateway
+      - auth
     restart: on-failure
     volumes:
       - .:/usr/src/app
@@ -52,7 +52,7 @@ services:
       target: development
     command: npm run start:dev sms
     depends_on:
-      - gateway
+      - auth
     restart: on-failure
     volumes:
       - .:/usr/src/app
@@ -66,7 +66,7 @@ services:
       target: development
     command: npm run start:dev family
     depends_on:
-      - gateway
+      - auth
     restart: on-failure
     volumes:
       - .:/usr/src/app
@@ -80,7 +80,7 @@ services:
       target: development
     command: npm run start:dev storage
     depends_on:
-      - gateway
+      - auth
     restart: on-failure
     volumes:
       - .:/usr/src/app
@@ -94,7 +94,7 @@ services:
       target: development
     command: npm run start:dev mailer
     depends_on:
-      - gateway
+      - auth
     restart: on-failure
     volumes:
       - .:/usr/src/app
@@ -108,7 +108,7 @@ services:
       target: development
     command: npm run start:dev chat
     depends_on:
-      - gateway
+      - auth
     restart: on-failure
     volumes:
       - .:/usr/src/app
@@ -122,7 +122,7 @@ services:
       target: development
     command: npm run start:dev role
     depends_on:
-      - gateway
+      - auth
     restart: on-failure
     volumes:
       - .:/usr/src/app
