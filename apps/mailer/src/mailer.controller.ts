@@ -19,6 +19,5 @@ export class MailController {
   @EventPattern('mailClient/sendInvite')
   async sendInvite(@Payload() dto: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    //return await this.mailerService.sendInvite(dto);
   }
 }
