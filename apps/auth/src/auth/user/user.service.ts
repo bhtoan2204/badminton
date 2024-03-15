@@ -45,7 +45,6 @@ export class UserService {
       });
     }
     
-    // Thay đổi username và password trong DATABASE_URL
     const configService = new ConfigService();
     const dbUrl = configService.get('DATABASE_URL');
     const newUsername = user.id_user;
