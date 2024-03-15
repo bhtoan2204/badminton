@@ -19,5 +19,12 @@ export class MailController {
   @EventPattern('mailClient/sendInvite')
   async sendInvite(@Payload() dto: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
+    return await this.mailerService.sendInvite(dto);
+  }
+
+  @EventPattern('mailClient/sendResetPassword')
+  async sendResetPassword(@Payload() dto: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.mailerService.sendResetPassword(dto);
   }
 }
