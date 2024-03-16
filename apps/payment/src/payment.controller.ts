@@ -14,6 +14,11 @@ export class PaymentController {
     this.rmqService.ack(context);
     return this.paymentService.get_package();
   }
+  @EventPattern('payment/get_order')
+  async get_order(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.get_order(data.id_user);
+  }
 
   @EventPattern('payment/create_order')
   async CreateOrder(@Payload() data: any, @Ctx() context: RmqContext) {

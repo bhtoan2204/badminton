@@ -36,6 +36,19 @@ export class PaymentService {
       });
     }
   }
+  async get_order(id_user) {
+    try {
+      const Query = 'SELECT * FROM f_get_order_info($1)';
+      const params = [id_user];
+      const data = await this.entityManager.query(Query, params);
+      return data;
+    } catch (error) {
+      throw new RpcException({
+        code: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error.message
+      });
+    }
+  }
   async create_order(id_user, id_package) {
     try {
       const Query = 'SELECT * FROM f_create_order($1,$2)';
@@ -77,7 +90,7 @@ export class PaymentService {
         vnp_TxnRef: orderId,
         vnp_OrderInfo: `Thanh toan cho ma giao dich: ${orderId}`,
         vnp_OrderType: 'other',
-        vnp_Amount: order.amount * 10000,
+        vnp_Amount: order.amount * 100,
         vnp_ReturnUrl: `${this.vnpReturnUrl}${orderId}`,
         vnp_IpAddr: fullIp.split(":").pop(),
         vnp_CreateDate: moment().format('YYYYMMDDHHmmss'),
