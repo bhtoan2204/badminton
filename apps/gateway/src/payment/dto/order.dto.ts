@@ -11,7 +11,7 @@ export class OrderDTO {
   bankCode: string;
 
   @IsNumber()
-  @ApiProperty({ example: 1000 })
+  @ApiProperty({ example: 100000 })
   amount: number;
 
   @IsString()

@@ -20,11 +20,7 @@ export class PaymentController {
     return this.paymentService.get_order(data.id_user);
   }
 
-  @EventPattern('payment/create_order')
-  async CreateOrder(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return this.paymentService.create_order(data.id_user, data.id_package );
-  }
+
 
   @EventPattern('payment/check_order_return')
   async UpdateStatus(@Payload() data: any, @Ctx() context: RmqContext) {

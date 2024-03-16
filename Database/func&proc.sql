@@ -186,7 +186,7 @@ $$ LANGUAGE plpgsql;
 ----------------------FAMILY-----------------------------------------
 
 CREATE OR REPLACE FUNCTION f_create_family(
-	p_id_user uuid,
+    p_id_user uuid,
     p_description VARCHAR,
     p_name VARCHAR, 
     p_id_order int
@@ -194,43 +194,46 @@ CREATE OR REPLACE FUNCTION f_create_family(
 DECLARE
     new_id INT;
     result_message varchar;
-	recordCount int;
-	recordCountOrder int;
-	p_expired_at timestamp;
-begin
-	select count(*), expired_at into recordCountOrder, p_expired_at from "order" where id_user = p_id_user and p_id_order=id_order and status ='Successed' and id_family is null; 
-	if recordCountOrder > 0 then
-		begin
-			SELECT COUNT(*) INTO recordCount FROM users WHERE id_user = p_id_user;
-			if recordCount >0 then
-			    BEGIN
-			        INSERT INTO family (quantity,description, created_at, updated_at, "name", owner_id, expired_at)
-			        VALUES (0, p_description, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, p_name, p_id_user, p_expired_at)
-			        RETURNING id_family INTO new_id; 
-			
-			        INSERT INTO member_family (id_user, id_family, created_at, updated_at, "role")
-			        VALUES (p_id_user, new_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'owner'); 
-			       
-			        result_message := 'Successfully created family: ' || p_name;
-			        update "order" set id_family=new_id where id_order= p_id_order;
-			       
-			    EXCEPTION
-			        WHEN others THEN
-			            result_message:= 'Failed to create family';
-			    END;
-			 else
-		        	result_message:= 'Invalid user provided';
-			 end if;
-		end;
-	else 
-		result_message:= 'Invalid order';
-	end if;
+    recordCount int;
+    p_expired_at timestamp;
+BEGIN
+    SELECT expired_at INTO p_expired_at 
+    FROM "order" 
+    WHERE id_user = p_id_user AND id_order = p_id_order AND status ='Succeeded' AND id_family IS NULL; 
+    
+    IF p_expired_at > NOW() THEN
+        SELECT COUNT(*) INTO recordCount FROM users WHERE id_user = p_id_user;
+        
+        IF recordCount > 0 THEN
+            BEGIN
+                INSERT INTO family (quantity, description, created_at, updated_at, "name", owner_id, expired_at)
+                VALUES (0, p_description, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, p_name, p_id_user, p_expired_at)
+                RETURNING id_family INTO new_id; 
+            
+                INSERT INTO member_family (id_user, id_family, created_at, updated_at, "role")
+                VALUES (p_id_user, new_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'owner'); 
+                
+                UPDATE "order" SET id_family = new_id, updated_at = NOW() WHERE id_order = p_id_order;
+                
+                result_message := 'Successfully created family: ' || p_name;
+            EXCEPTION
+                WHEN others THEN
+                    result_message := 'Failed to create family';
+            END;
+        ELSE
+            result_message := 'Invalid user provided';
+        END IF;
+    ELSE 
+        result_message := 'Invalid order';
+    END IF;
+    
     RETURN result_message;
 END;
 $$ LANGUAGE plpgsql;
 
 
---select f_create_family('bd94ba3a-b046-4a05-a260-890913e09df9','abc', 'family1') as family;
+
+--select f_create_family('bd94ba3a-b046-4a05-a260-890913e09df9','abc', 'family1', 28) as family;
 
 
 
@@ -488,44 +491,47 @@ $$ LANGUAGE plpgsql;
 
 
 ---------------PAYMENT------------------------
-CREATE OR REPLACE FUNCTION public.f_create_order(p_id_user uuid, p_id_package integer)
- RETURNS integer
- LANGUAGE plpgsql
+CREATE OR REPLACE FUNCTION public.f_create_order(p_id_user uuid, p_id_package integer, p_amount int)
+RETURNS integer
+LANGUAGE plpgsql
 AS $function$
 DECLARE
     user_exists BOOLEAN;
-   	new_id int;
+    new_id int;
     p_price int;
     p_expired int;
 BEGIN
     SELECT EXISTS(SELECT 1 FROM users WHERE id_user = p_id_user) INTO user_exists;
     
-	select price, expired into p_price, p_expired from package where id_package = p_id_package;
+    SELECT price, expired INTO p_price, p_expired 
+    FROM package 
+    WHERE id_package = p_id_package AND price = p_amount;
 
     IF NOT user_exists THEN
         RAISE EXCEPTION 'User does not exist';
-    ELSIF p_price is null THEN
+    ELSIF p_price IS NULL THEN
         RAISE EXCEPTION 'Package does not match';
-    else
-    	begin
-        insert into "order"(id_user, id_package, status, created_at, expired_at) 
-        values (p_id_user, p_id_package, 'Pending', now(), now() + INTERVAL '1 month' * p_expired)
-        RETURNING id_order INTO new_id;
-        return new_id;
-
-       EXCEPTION
+    ELSE
+        BEGIN
+            INSERT INTO "order"(id_user, id_package, status, created_at, expired_at) 
+            VALUES (p_id_user, p_id_package, 'Pending', NOW(), NOW() + INTERVAL '1 month' * p_expired)
+            RETURNING id_order INTO new_id;
+            RETURN new_id;
+        EXCEPTION
             WHEN others THEN
                 RAISE EXCEPTION 'Failed to create order: %', SQLERRM;
         END;
-    end if;
+    END IF;
 
 END;
-$function$
+$function$;
+
+
 
 insert into package values (1, 'Basic' , 100000 , null, now() , now() , 3)
 insert into package values (2, 'Premium' , 500000 , null, now() , now() , 10)
 
---select * from f_create_order('e8462da1-159a-4082-8f95-5dd4cf0e777e', 1)
+--select * from f_create_order('bd94ba3a-b046-4a05-a260-890913e09df9', 1, 100000)
 
 CREATE OR REPLACE VIEW v_package AS
 SELECT
