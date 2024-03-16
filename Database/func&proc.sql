@@ -544,43 +544,50 @@ FROM
     package;
 
 
-create or replace function f_check_order(
-	p_id_user uuid,
-	p_id_order int,
-	p_amount int, 
-	p_ResponseCode varchar,
-	p_TransactionStatus varchar
+CREATE OR REPLACE FUNCTION f_check_order(
+    p_id_user uuid,
+    p_id_order int,
+    p_amount int, 
+    p_ResponseCode varchar,
+    p_TransactionStatus varchar
 ) RETURNS JSON AS $$
-declare 
-	returnData JSON;
-	valid_user int;
-	valid_package int;
-	valid_order int;
-begin 
-	select count(*) into valid_user from users where id_user=p_id_user;
-	select id_package into valid_package from "order" where id_order=p_id_order; 
-	select count(*) into valid_order from package where id_package=valid_package and price=p_amount/100;
-	if valid_user >0 then 
-		begin
-			if valid_order > 0 then 
-				begin 
-					update "order" set status = 'Succeeded' where id_order= p_id_order;
+DECLARE 
+    returnData JSON;
+    valid_user int;
+    valid_package int;
+    valid_order int;
+    status_payment varchar;
+BEGIN 
+    SELECT id_package, status INTO valid_order, status_payment FROM "order" WHERE id_order = p_id_order and id_user=p_id_user; 
+    SELECT COUNT(*) INTO valid_package FROM package WHERE id_package = valid_order AND price = p_amount / 100;
 
-                	returnData := json_build_object('RspCode', '00', 'Message', 'Confirm Success');
+    IF status_payment = 'Pending' THEN
+        IF valid_package > 0 THEN
+                IF valid_order > 0 THEN 
+                    IF p_ResponseCode = '00' THEN
+                        UPDATE "order" SET status = 'Succeeded' WHERE id_order = p_id_order;
+                        returnData := json_build_object('RspCode', '00', 'Message', 'Success');
+                    ELSE 
+                        UPDATE "order" SET status = 'Failed' WHERE id_order = p_id_order;
+                        returnData := json_build_object('RspCode', '00', 'Message', 'Success');
+                    END IF;
+                ELSE
+                    UPDATE "order" SET status = 'Failed' WHERE id_order = p_id_order;
+                    returnData := json_build_object('RspCode', '01', 'Message', 'Order not found');
+                END IF;
+            ELSE 
+                UPDATE "order" SET status = 'Failed' WHERE id_order = p_id_order;
+                returnData := json_build_object('RspCode', '97', 'Message', 'Checksum failed');
+            END IF;
+        ELSE
+            returnData := json_build_object('RspCode', '02', 'Message', 'This order has been updated to the payment status');
+        END IF;
+    
 
-				end;
-			else
-				update "order" set status = 'Failed' where id_order= p_id_order;
-                returnData := json_build_object('RspCode', '97', 'Message', 'Fail checksum');
-            end if;
-		end;
-	else 
-		 update "order" set status = 'Failed' where id_order= p_id_order;
-         returnData := json_build_object('RspCode', '97', 'Message', 'Fail checksum');
-	end if;
- 	return returnData;
-end;
+    RETURN returnData;
+END;
 $$ LANGUAGE plpgsql;
+
 
 --select * from f_check_order('e8462da1-159a-4082-8f95-5dd4cf0e777e', 1, 10000000, '00','00')
 --CREATE TYPE status_e AS ENUM ('Failed', 'Succeeded', 'Pending', 'Refunded');
