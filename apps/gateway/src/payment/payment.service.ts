@@ -42,20 +42,9 @@ export class PaymentService {
           });
         }
       }
-  async create_order (id_user, id_package){
-  try{
-    const response = this.paymentClient.send('payment/create_order', {id_user,id_package} )
-        .pipe(
-          timeout(5000),
-        );
-      const data = await lastValueFrom(response);
-      return data;
-    }
-    catch (error) {
-      throw new HttpException(error, error.statusCode);
-    }
-  }
+  
 
+  async 
   async generateVnpay(id_user, order, ip) {
     try {
       const response = this.paymentClient.send('payment/generateVnpay', { id_user, ip, order } )

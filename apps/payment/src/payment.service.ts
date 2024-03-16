@@ -49,10 +49,10 @@ export class PaymentService {
       });
     }
   }
-  async create_order(id_user, id_package) {
+  async create_order(id_user, id_package, amount) {
     try {
-      const Query = 'SELECT * FROM f_create_order($1,$2)';
-      const params = [id_user, id_package];
+      const Query = 'SELECT * FROM f_create_order($1,$2,$3)';
+      const params = [id_user, id_package, amount];
       const data = await this.entityManager.query(Query, params);
       return data[0]['f_create_order'];
     } catch (error) {
@@ -80,7 +80,7 @@ export class PaymentService {
 
   async generateVnpay(id_user, order, fullIp) {
     try {
-      const orderId = await this.create_order(id_user, order.id_package);
+      const orderId = await this.create_order(id_user, order.id_package, order.amount);
       const vnp_Params = {
         vnp_Version: '2.1.0',
         vnp_Command: 'pay',
