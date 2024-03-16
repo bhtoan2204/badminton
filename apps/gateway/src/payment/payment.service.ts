@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { PAYMENT_SERVICE } from "../utils/constant/services.constant";
-import { OrderDTO } from "./dto/order.dto";
 import { lastValueFrom, timeout } from "rxjs";
 
 @Injectable()
