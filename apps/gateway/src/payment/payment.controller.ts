@@ -15,7 +15,6 @@ export class PaymentController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get package' })
-  @UseGuards(JwtAuthGuard)
   @Get('getPackage')
   async get_package() {
     return this.paymentService.get_package();
@@ -38,4 +37,14 @@ export class PaymentController {
     const id_user = user.id_user;
     return this.paymentService.check_order_return(id_user, orderReturn);
   }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get successful orders for current user' })
+  @UseGuards(JwtAuthGuard)
+  @Get('getOrder')
+  async get_order(@CurrentUser() user) {
+    const id_user = user.id_user;
+    return this.paymentService.get_order(id_user);
+  }
+
 }

@@ -188,31 +188,43 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION f_create_family(
 	p_id_user uuid,
     p_description VARCHAR,
-    p_name VARCHAR
+    p_name VARCHAR, 
+    p_id_order int
 ) RETURNS varchar AS $$
 DECLARE
     new_id INT;
     result_message varchar;
 	recordCount int;
+	recordCountOrder int;
+	p_expired_at timestamp;
 begin
-	SELECT COUNT(*) INTO recordCount FROM users WHERE id_user = p_id_user;
-	if recordCount >0 then
-	    BEGIN
-	        INSERT INTO family (quantity,description, created_at, updated_at, "name", owner_id)
-	        VALUES (0, p_description, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, p_name, p_id_user)
-	        RETURNING id_family INTO new_id; 
-	
-	        INSERT INTO member_family (id_user, id_family, created_at, updated_at, "role")
-	        VALUES (p_id_user, new_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'owner'); 
-	       
-	        result_message := 'Successfully created family: ' || p_name;
-	    EXCEPTION
-	        WHEN others THEN
-	            result_message:= 'Failed to create family';
-	    END;
-	 else
-        	result_message:= 'Invalid user provided';
-	 end if;
+	select count(*), expired_at into recordCountOrder, p_expired_at from "order" where id_user = p_id_user and p_id_order=id_order and status ='Successed' and id_family is null; 
+	if recordCountOrder > 0 then
+		begin
+			SELECT COUNT(*) INTO recordCount FROM users WHERE id_user = p_id_user;
+			if recordCount >0 then
+			    BEGIN
+			        INSERT INTO family (quantity,description, created_at, updated_at, "name", owner_id, expired_at)
+			        VALUES (0, p_description, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, p_name, p_id_user, p_expired_at)
+			        RETURNING id_family INTO new_id; 
+			
+			        INSERT INTO member_family (id_user, id_family, created_at, updated_at, "role")
+			        VALUES (p_id_user, new_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'owner'); 
+			       
+			        result_message := 'Successfully created family: ' || p_name;
+			        update "order" set id_family=new_id where id_order= p_id_order;
+			       
+			    EXCEPTION
+			        WHEN others THEN
+			            result_message:= 'Failed to create family';
+			    END;
+			 else
+		        	result_message:= 'Invalid user provided';
+			 end if;
+		end;
+	else 
+		result_message:= 'Invalid order';
+	end if;
     RETURN result_message;
 END;
 $$ LANGUAGE plpgsql;
@@ -264,7 +276,7 @@ begin
 end;
 $$ LANGUAGE plpgsql;
 
-select * from f_update_family('bd94ba3a-b046-4a05-a260-890913e09df9', 45 , 'vdbfvj', 'fnjdf')
+--select * from f_update_family('bd94ba3a-b046-4a05-a260-890913e09df9', 45 , 'vdbfvj', 'fnjdf')
 
 
 CREATE OR REPLACE function f_delete_family(
@@ -293,7 +305,7 @@ begin
 END;
 $$ LANGUAGE plpgsql;
 --CALL p_update_family('da7354cf-f526-4df8-9d91-0fbd4a43d196', 'New Family Name', 'New Family Description');
-select * from  f_delete_family('bd94ba3a-b046-4a05-a260-890913e09df9', 45) 
+--select * from  f_delete_family('bd94ba3a-b046-4a05-a260-890913e09df9', 45) 
 --select id_family from users where id_user='da7354cf-f526-4df8-9d91-0fbd4a43d196';
 CREATE OR REPLACE FUNCTION f_add_member(
     p_id_user UUID,
@@ -484,11 +496,11 @@ DECLARE
     user_exists BOOLEAN;
    	new_id int;
     p_price int;
-    p_expried int;
+    p_expired int;
 BEGIN
     SELECT EXISTS(SELECT 1 FROM users WHERE id_user = p_id_user) INTO user_exists;
     
-	select price, expried into p_price, p_expried from package where id_package = p_id_package;
+	select price, expired into p_price, p_expired from package where id_package = p_id_package;
 
     IF NOT user_exists THEN
         RAISE EXCEPTION 'User does not exist';
@@ -496,8 +508,8 @@ BEGIN
         RAISE EXCEPTION 'Package does not match';
     else
     	begin
-        insert into "order"(id_user, id_package, status, created_at, expried_at) 
-        values (p_id_user, p_id_package, 'Pending', now(), now() + INTERVAL '1 month' * p_expried)
+        insert into "order"(id_user, id_package, status, created_at, expired_at) 
+        values (p_id_user, p_id_package, 'Pending', now(), now() + INTERVAL '1 month' * p_expired)
         RETURNING id_order INTO new_id;
         return new_id;
 
@@ -517,14 +529,13 @@ insert into package values (2, 'Premium' , 500000 , null, now() , now() , 10)
 
 CREATE OR REPLACE VIEW v_package AS
 SELECT
-    id_package AS "Mã gói",
-    name AS "Tên gói",
-    price AS "Giá",
-    description AS "Mô tả",
-    expried AS "Thời hạn sử dụng: tháng"
+    id_package AS "Package code",
+    name AS "Name",
+    price AS "Price: ",
+    description AS "Description",
+    expired AS "Validity period"
 FROM
     package;
-
 
 
 create or replace function f_check_order(
@@ -547,7 +558,7 @@ begin
 		begin
 			if valid_order > 0 then 
 				begin 
-					update "order" set status = 'Successed' where id_order= p_id_order;
+					update "order" set status = 'Succeeded' where id_order= p_id_order;
 
                 	returnData := json_build_object('RspCode', '00', 'Message', 'Confirm Success');
 
@@ -565,18 +576,27 @@ begin
 end;
 $$ LANGUAGE plpgsql;
 
-select * from f_check_order('e8462da1-159a-4082-8f95-5dd4cf0e777e', 1, 10000000, '00','00')
-CREATE TYPE status_enum AS ENUM ('Failed', 'Successed', 'Pending', 'Refunded');
+--select * from f_check_order('e8462da1-159a-4082-8f95-5dd4cf0e777e', 1, 10000000, '00','00')
+--CREATE TYPE status_e AS ENUM ('Failed', 'Succeeded', 'Pending', 'Refunded');
+
+--CREATE TYPE type_otp AS ENUM ('verify', 'register', 'forgot_password');
 
 
+CREATE OR REPLACE FUNCTION f_get_order_info(p_id_user uuid) 
+RETURNS TABLE (id_order INT, id_package INT, name varchar, price INT, description VARCHAR, id_family int, expired_at TIMESTAMP) AS
+$$
+BEGIN
+    RETURN QUERY 
+    SELECT o.id_order, o.id_package,p.name, p.price, p.description, o.id_family, o.expired_at
+    FROM "order" o
+    JOIN package p ON o.id_package = p.id_package
+    WHERE o.status = 'Succeeded' AND o.id_user = p_id_user;
+END;
+$$
+LANGUAGE plpgsql;
 
 
-
-
-
-
-
-
+--select * from f_get_order_info('bd94ba3a-b046-4a05-a260-890913e09df9')
 
 
 
