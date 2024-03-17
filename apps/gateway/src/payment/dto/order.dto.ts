@@ -25,4 +25,8 @@ export class OrderDTO {
   @IsNotEmpty()
   @ApiProperty({ example: 'vnpay' })
   method: string;
+
+  @IsNumber()
+  @ApiProperty({ example: 50 })
+  id_family: number;
 }
