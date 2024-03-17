@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Get, UseGuards, Ip } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, Get, UseGuards, Ip, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import { OrderDTO } from './dto/order.dto';
@@ -14,10 +14,17 @@ export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all package' })
+  @Get('getAllPackage')
+  async get_all_package() {
+    return this.paymentService.get_all_package();
+  }
+
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get package' })
   @Get('getPackage')
-  async get_package() {
-    return this.paymentService.get_package();
+  async get_package(@Query('id_package') id_package: number){
+    return this.paymentService.get_package(id_package);
   }
 
   @HttpCode(HttpStatus.OK)

@@ -24,7 +24,7 @@ export class PaymentService {
     this.vnpReturnUrl = this.configService.get<string>("VNPAY_RETURN_URL");
   }
 
-  async get_package() {
+  async get_all_package() {
     try {
       const Query = 'SELECT * from v_package';
       const data = await this.entityManager.query(Query);
@@ -36,6 +36,21 @@ export class PaymentService {
       });
     }
   }
+
+  async get_package(id_package) {
+    try {
+      const Query = 'SELECT * from v_package where id_package=$1';
+      const params = [id_package];
+      const data = await this.entityManager.query(Query,params);
+      return data;
+    } catch (error) {
+      throw new RpcException({
+        code: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error.message
+      });
+    }
+  }
+
   async get_method() {
     try {
       const Query = 'SELECT * from payment_method';
