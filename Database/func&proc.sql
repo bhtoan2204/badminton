@@ -500,6 +500,7 @@ DECLARE
     new_id int;
     p_price int;
     p_expired int;
+    p_method varchar;
 BEGIN
     SELECT EXISTS(SELECT 1 FROM users WHERE id_user = p_id_user) INTO user_exists;
     
@@ -513,8 +514,8 @@ BEGIN
         RAISE EXCEPTION 'Package does not match';
     ELSE
         BEGIN
-            INSERT INTO "order"(id_user, id_package, status, created_at, expired_at) 
-            VALUES (p_id_user, p_id_package, 'Pending', NOW(), NOW() + INTERVAL '1 month' * p_expired)
+            INSERT INTO "order"(id_user, id_package, status, created_at, expired_at, method) 
+            VALUES (p_id_user, p_id_package, 'Pending', NOW(), NOW() + INTERVAL '1 month' * p_expired, p_p_method)
             RETURNING id_order INTO new_id;
             RETURN new_id;
         EXCEPTION
@@ -535,14 +536,13 @@ insert into package values (2, 'Premium' , 500000 , null, now() , now() , 10)
 
 CREATE OR REPLACE VIEW v_package AS
 SELECT
-    id_package AS "Package code",
-    name AS "Name",
-    price AS "Price: ",
-    description AS "Description",
-    expired AS "Validity period"
+    id_package,
+    name ,
+    price,
+    description,
+    expired
 FROM
     package;
-
 
 CREATE OR REPLACE FUNCTION f_check_order(
     p_id_user uuid,
@@ -610,6 +610,9 @@ LANGUAGE plpgsql;
 
 
 --select * from f_get_order_info('bd94ba3a-b046-4a05-a260-890913e09df9')
+
+insert into payment_method(name, code) values('VNPAY', 'vnpay');
+insert into payment_method(name, code) values('ZaloPay', 'zalopay');
 
 
 

@@ -14,6 +14,12 @@ export class PaymentController {
     this.rmqService.ack(context);
     return this.paymentService.get_package();
   }
+
+  @EventPattern('payment/get_method')
+  async get_method(@Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.get_method();
+  }
   @EventPattern('payment/get_order')
   async get_order(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
@@ -33,4 +39,7 @@ export class PaymentController {
     this.rmqService.ack(context);
     return this.paymentService.generateVnpay(data.id_user, data.order, data.ip);
   }
+
+
+  
 }

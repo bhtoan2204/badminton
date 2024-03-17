@@ -36,6 +36,18 @@ export class PaymentService {
       });
     }
   }
+  async get_method() {
+    try {
+      const Query = 'SELECT * from payment_method';
+      const data = await this.entityManager.query(Query);
+      return data;
+    } catch (error) {
+      throw new RpcException({
+        code: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error.message
+      });
+    }
+  }
   async get_order(id_user) {
     try {
       const Query = 'SELECT * FROM f_get_order_info($1)';
@@ -49,10 +61,10 @@ export class PaymentService {
       });
     }
   }
-  async create_order(id_user, id_package, amount) {
+  async create_order(id_user, id_package, amount, method) {
     try {
-      const Query = 'SELECT * FROM f_create_order($1,$2,$3)';
-      const params = [id_user, id_package, amount];
+      const Query = 'SELECT * FROM f_create_order($1,$2,$3,$4)';
+      const params = [id_user, id_package, amount, method];
       const data = await this.entityManager.query(Query, params);
       return data[0]['f_create_order'];
     } catch (error) {
@@ -80,7 +92,7 @@ export class PaymentService {
 
   async generateVnpay(id_user, order, fullIp) {
     try {
-      const orderId = await this.create_order(id_user, order.id_package, order.amount);
+      const orderId = await this.create_order(id_user, order.id_package, order.amount, order.method);
       const vnp_Params = {
         vnp_Version: '2.1.0',
         vnp_Command: 'pay',

@@ -21,13 +21,24 @@ export class PaymentController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Create payment URL' })
+  @ApiOperation({ summary: 'Get payment method' })
+  @Get('getMethod')
+  async get_method() {
+    return this.paymentService.get_method();
+  }
+
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Create VNPAY payment URL' })
   @UseGuards(JwtAuthGuard)
-  @Post('createOrder')
+  @Post('createOrderVNPAY')
   async create_payment_url(@CurrentUser() user, @Body() order: OrderDTO, @Ip() ip) {
     const id_user = user.id_user;
     return this.paymentService.generateVnpay(id_user, order, ip);
   }
+
+
+
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Check order' })
