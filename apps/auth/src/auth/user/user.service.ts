@@ -88,6 +88,39 @@ export class UserService {
       });
     }
   }
+
+  async validateFacebookUser(accessToken: string, profile: any) {
+    try {
+      const user = await this.userRepository.findOne({where: 
+        {
+          email: profile.emails[0].value,
+          login_type: LoginType.FACEBOOK
+        }
+      });
+      if (!user) {
+        const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7)';
+        const parameters = [profile._json.email, null, null, profile.name.givenName, profile.name.familyName, null, LoginType.FACEBOOK];
+        const data = await this.entityManager.query(query, parameters);
+
+        return await this.userRepository.findOne({where: 
+          {
+            id_user: data[0].id_user,
+            login_type: LoginType.FACEBOOK
+          }
+        });
+      }
+      else {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: 404
+      });
+    }
+  }
   
   async validateUserId(id_user: string){
     const user = await this.userRepository.findOne({where: { id_user }});
@@ -250,4 +283,7 @@ export class UserService {
     }
   }
 
+  async linkGoogleAccount(data: any) {
+
+  }
 }

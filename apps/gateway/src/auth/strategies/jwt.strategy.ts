@@ -24,11 +24,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   private async validateUser(payload: any) {
-    const userRequest$ = this.authClient.send('authClient/validate_user_id', payload.id_user).pipe(
-      timeout(5000)
-    );
-
     try {
+      const userRequest$ = this.authClient.send('authClient/validate_user_id', payload.id_user).pipe(
+        timeout(5000)
+      );
       return await lastValueFrom(userRequest$);
     }
     catch (err) {

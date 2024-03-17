@@ -9,6 +9,7 @@ import { GoogleStrategy } from './strategies/oauth.strategy/google.strategy';
 import { SessionSerializer } from 'apps/gateway/src/utils/serializer';
 import { AUTH_SERVICE } from '../utils/constant/services.constant';
 import { UserModule } from './user/user.module';
+import { FacebookStrategy } from './strategies/oauth.strategy/facebook.strategy';
 
 @Module({
     imports: [
@@ -22,6 +23,7 @@ import { UserModule } from './user/user.module';
         JwtStrategy, 
         RefreshStrategy,
         GoogleStrategy,
+        FacebookStrategy,
         SessionSerializer
     ],
 })
