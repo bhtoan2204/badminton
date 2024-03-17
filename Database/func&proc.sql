@@ -491,7 +491,7 @@ $$ LANGUAGE plpgsql;
 
 
 ---------------PAYMENT------------------------
-CREATE OR REPLACE FUNCTION public.f_create_order(p_id_user uuid, p_id_package integer, p_amount int, p_method varchar
+CREATE OR REPLACE FUNCTION public.f_create_order(p_id_user uuid, p_id_package integer, p_amount int, p_method varchar, p_id_family int
 )
 RETURNS integer
 LANGUAGE plpgsql
@@ -515,8 +515,8 @@ BEGIN
         RAISE EXCEPTION 'Package does not match';
     ELSE
         BEGIN
-            INSERT INTO "order"(id_user, id_package, status, created_at, expired_at, method) 
-            VALUES (p_id_user, p_id_package, 'Pending', NOW(), NOW() + INTERVAL '1 month' * p_expired, p_method)
+            INSERT INTO "order"(id_user, id_package, status, created_at, expired_at, id_family, method) 
+            VALUES (p_id_user, p_id_package, 'Pending', NOW(), NOW() + INTERVAL '1 month' * p_expired, p_id_family, p_method)
             RETURNING id_order INTO new_id;
             RETURN new_id;
         EXCEPTION
@@ -533,7 +533,7 @@ $function$;
 insert into package values (1, 'Basic' , 100000 , null, now() , now() , 3)
 insert into package values (2, 'Premium' , 500000 , null, now() , now() , 10)
 
-select * from f_create_order('bd94ba3a-b046-4a05-a260-890913e09df9', 1, 100000, 'vnpay')
+select * from f_create_order('bd94ba3a-b046-4a05-a260-890913e09df9', 1, 100000, 'vnpay', null)
 
 CREATE OR REPLACE VIEW v_package AS
 SELECT
@@ -558,9 +558,11 @@ DECLARE
     valid_package int;
     valid_order int;
     status_payment varchar;
+   	p_id_family int; 
+    p_expired int;
 BEGIN 
-    SELECT id_package, status INTO valid_order, status_payment FROM "order" WHERE id_order = p_id_order and id_user=p_id_user; 
-    SELECT COUNT(*) INTO valid_package FROM package WHERE id_package = valid_order AND price = p_amount / 100;
+    SELECT id_package, status, id_family INTO valid_order, status_payment, p_id_family FROM "order" WHERE id_order = p_id_order and id_user=p_id_user; 
+    SELECT COUNT(*), expired INTO valid_package, p_expired FROM package WHERE id_package = valid_order AND price = p_amount / 100;
 
     IF status_payment = 'Pending' THEN
         IF valid_package > 0 THEN
@@ -568,6 +570,11 @@ BEGIN
                     IF p_ResponseCode = '00' THEN
                         UPDATE "order" SET status = 'Succeeded' WHERE id_order = p_id_order;
                         returnData := json_build_object('RspCode', '00', 'Message', 'Success');
+
+                        if p_id_family is not null then 
+                        	update family set expired_at = now() + INTERVAL '1 month' * p_expired where id_family = p_id_family;
+                        end if;
+                        
                     ELSE 
                         UPDATE "order" SET status = 'Failed' WHERE id_order = p_id_order;
                         returnData := json_build_object('RspCode', '00', 'Message', 'Success');
