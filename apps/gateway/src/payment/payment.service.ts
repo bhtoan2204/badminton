@@ -25,6 +25,23 @@ export class PaymentService {
           });
         }
       }
+
+  async get_method() {
+    try {
+      const response = this.paymentClient.send('payment/get_method', {})
+        .pipe(
+          timeout(5000),
+        );
+    const data = await lastValueFrom(response);
+    return data;
+        }
+        catch (error) {
+          throw new RpcException({
+            message: error.message,
+            statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+          });
+        }
+      }
   async get_order(id_user) {
     try {
       const response = this.paymentClient.send('payment/get_order', {id_user})
