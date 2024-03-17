@@ -117,8 +117,8 @@
     "crawler": {
       "type": "application",
       "root": "apps/crawler",
-      "entryFile": "main",
-      "sourceRoot": "apps/crawler/src",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/crawler/tsconfig.app.json"
       }

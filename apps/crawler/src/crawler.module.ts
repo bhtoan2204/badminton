@@ -3,6 +3,7 @@ import { CrawlerController } from './crawler.controller';
 import { CrawlerService } from './crawler.service';
 import { RssModule } from './rss/rss.module';
 import { ConfigModule } from '@nestjs/config';
+import { RmqModule } from '@app/common';
 import * as Joi from 'joi';
 
 @Module({
@@ -15,7 +16,8 @@ import * as Joi from 'joi';
       }),
       envFilePath: process.env.NODE_ENV === 'production' ? './apps/crawler/.env.production' : './apps/crawler/.env',
     }),
-    RssModule
+    RssModule,
+    RmqModule,
   ],
   controllers: [CrawlerController],
   providers: [CrawlerService],
