@@ -68,11 +68,5 @@ pipeline {
             sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'for deployment in \$(kubectl get deployments --no-headers -o custom-columns=\":metadata.name\"); do kubectl rollout restart deployment/\$deployment; done'"
           }
         }
-
-        stage("Clean Up") {
-          steps {
-            sh "docker system prune -f"
-          }
-        }
     }
 }
