@@ -9,6 +9,8 @@ import { AUTH_SERVICE } from '../../utils/constant/services.constant';
         RmqModule.register({ name: AUTH_SERVICE }),
     ],
     controllers: [UserController],
-    providers: [UserService],
+    providers: [
+        UserService
+    ],
 })
 export class UserModule { }

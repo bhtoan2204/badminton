@@ -22,9 +22,9 @@ export class AuthApiService {
         }
     }
 
-    async googleLogin(currentUser) {
+    async refreshToken(currentUser, refreshToken) {
         try {
-            const source = this.authClient.send('authClient/local/login', currentUser).pipe(
+            const source = this.authClient.send('authClient/refresh_token', { currentUser, refreshToken }).pipe(
                 timeout(5000)
             );
             const data = await lastValueFrom(source);
@@ -35,9 +35,9 @@ export class AuthApiService {
         }
     }
 
-    async refreshToken(currentUser) {
+    async logout(refreshToken) {
         try {
-            const source = this.authClient.send('authClient/refresh_token', currentUser).pipe(
+            const source = this.authClient.send('authClient/logout', refreshToken).pipe(
                 timeout(5000)
             );
             const data = await lastValueFrom(source);
