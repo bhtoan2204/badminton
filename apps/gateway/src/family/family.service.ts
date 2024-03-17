@@ -8,7 +8,6 @@ import { DeleteMemberDTO } from "./dto/deleteFamily.dto";
 import { UpdateFamilyDTO } from "./dto/updateFamily.dto";
 
 @Injectable()
-
 export class FamilyService {
     constructor(
         @Inject(FAMILY_SERVICE) private familyClient: ClientProxy

@@ -1,20 +1,18 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { RssService } from "./rss.service";
+import { Ctx, EventPattern, Payload, RmqContext } from "@nestjs/microservices";
+import { RmqService } from "@app/common";
 
-@Controller("rss")
+@Controller()
 export class RssController {
   constructor(
-    private readonly rssService: RssService
+    private readonly rssService: RssService,
+    private readonly rmqService: RmqService
   ) { }
 
-  @Get('nld')
-  async getNld(
-    @Query('type') type: string,
-    @Query('page') page: string,
-    @Query('itemsPerPage') itemsPerPage: string
-  ) {
-    const pageNumber = parseInt(page, 10) || 1;
-    const itemsPerPageNumber = parseInt(itemsPerPage, 10) || 10;
-    return this.rssService.getRssData(type, pageNumber, itemsPerPageNumber);
+  @EventPattern('crawlerClient/getNews')
+  async getRssData(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.rssService.getRssData(data.type, data.page, data.itemsPerPage);
   }
 }

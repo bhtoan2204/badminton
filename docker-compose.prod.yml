@@ -118,6 +118,19 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+  
+  crawler:
+    image: mjkundta/crawler:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/crawler/Dockerfile
+      target: production
+    command: node dist/apps/crawler/src/main
+    depends_on:
+      - gateway
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
 
   rabbitmq:
     image: rabbitmq
