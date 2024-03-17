@@ -3,7 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "./user/user.service";
 import { TokenPayload } from "./interface/tokenPayload.interface";
-import { Users } from "@app/common";
+import { LoginType, Users } from "@app/common";
 import { RpcException } from "@nestjs/microservices";
 import { EntityManager } from "typeorm";
 
@@ -75,11 +75,12 @@ export class AuthenticationService {
     };
   }
 
-  async refreshToken(payload: Users) {
-    const {accessToken, refreshToken} = await this.getTokens(payload);
+  async facebookValidate(facebook_accessToken: string, profile: any) {
+    const user = await this.userService.validateFacebookUser(facebook_accessToken, profile);
+    const { accessToken, refreshToken } = await this.getTokens(user);
     try {
       const query = "SELECT * FROM f_generate_refresh_token ($1, $2)";
-      const parameters = [payload.id_user, refreshToken];
+      const parameters = [user.id_user, refreshToken];
       await this.entityManager.query(query, parameters);
     }
     catch(err) {
@@ -90,14 +91,50 @@ export class AuthenticationService {
     }
     return {
       accessToken,
-      refreshToken,
-      data: {
-        id_user: payload.id_user,
-        email: payload.email,
-        phone: payload.phone,
-        isadmin: payload.isadmin
-      }
+      refreshToken
+    };
+  }
+
+  async refreshToken(payload: Users, deletedRefreshToken: string) {
+    const {accessToken, refreshToken} = await this.getTokens(payload);
+    try {
+      const genereateQuery = "SELECT * FROM f_generate_refresh_token ($1, $2)";
+      const generateTokenParameters = [payload.id_user, refreshToken];
+      const deleteQuery = "SELECT * FROM f_delete_refresh_token ($1)";
+      const deleteTokenParameters = [deletedRefreshToken];
+
+      const promises = [
+        this.entityManager.query(genereateQuery, generateTokenParameters),
+        this.entityManager.query(deleteQuery, deleteTokenParameters)
+      ];
+      await Promise.all(promises);
+    }
+    catch(err) {
+      throw new RpcException({
+        message: err.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+    return {
+      accessToken,
+      refreshToken
     };
   }
   
+  async logout(refreshToken) {
+    try {
+      const query = "SELECT * FROM f_delete_refresh_token ($1)";
+      const parameters = [refreshToken];
+      await this.entityManager.query(query, parameters);
+      return {
+        message: 'Logout successfully'
+      };
+    }
+    catch(err) {
+      throw new RpcException({
+        message: err.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
 }

@@ -54,4 +54,10 @@ export class UserController {
     this.rmqService.ack(context);
     return await this.userService.validateEmail(data);
   }
+
+  @EventPattern('authClient/google_linking')
+  async handleGoogleLinking(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.userService.linkGoogleAccount(data);
+  }
 }

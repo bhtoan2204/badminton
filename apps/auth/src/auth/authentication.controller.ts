@@ -22,9 +22,21 @@ export class AuthenticationController {
     return await this.authenticationService.googleValidate(data.accessToken, data.profile);
   }
 
+  @EventPattern('authClient/facebook_login')
+  async handleFacebookLogin(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.authenticationService.facebookValidate(data.accessToken, data.profile);
+  }
+
   @EventPattern('authClient/refresh_token')
   async handleRefreshToken(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.authenticationService.refreshToken(data);
+    return await this.authenticationService.refreshToken(data.currentUser, data.refreshToken);
+  }
+
+  @EventPattern('authClient/logout')
+  async handleLogout(@Payload() refreshToken, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.authenticationService.logout(refreshToken);
   }
 }

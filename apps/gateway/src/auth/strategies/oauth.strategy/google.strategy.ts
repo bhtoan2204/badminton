@@ -27,8 +27,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       );
       return await lastValueFrom(source);
     }
-    catch (err) {
-      throw new UnauthorizedException('Credentials are not valid: ' + err.message);
+    catch (error) {
+      throw new UnauthorizedException(error.message);
     }
   }
 }

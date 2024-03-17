@@ -1,9 +1,7 @@
-import { ConflictException, HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { AUTH_SERVICE } from "apps/gateway/src/utils/constant/services.constant";
 import { ClientProxy } from "@nestjs/microservices";
 import { lastValueFrom, timeout } from "rxjs";
-import { CreateAccountDto } from "./dto/createAccount.dto";
-import { ChangePasswordDto } from "./dto/changePassword.dto";
 
 @Injectable()
 export class AuthApiService {
@@ -24,9 +22,9 @@ export class AuthApiService {
         }
     }
 
-    async googleLogin(currentUser) {
+    async refreshToken(currentUser, refreshToken) {
         try {
-            const source = this.authClient.send('authClient/local/login', currentUser).pipe(
+            const source = this.authClient.send('authClient/refresh_token', { currentUser, refreshToken }).pipe(
                 timeout(5000)
             );
             const data = await lastValueFrom(source);
@@ -37,97 +35,13 @@ export class AuthApiService {
         }
     }
 
-    async refreshToken(currentUser) {
+    async logout(refreshToken) {
         try {
-            const source = this.authClient.send('authClient/refresh_token', currentUser).pipe(
+            const source = this.authClient.send('authClient/logout', refreshToken).pipe(
                 timeout(5000)
             );
             const data = await lastValueFrom(source);
             return data;
-        }
-        catch (error) {
-            throw new HttpException(error, error.statusCode);
-        }
-    }
-}
-
-@Injectable()
-export class UserService {
-    constructor(
-        @Inject(AUTH_SERVICE) private authClient: ClientProxy
-    ) { }
-
-    async createAccount(createAccountDto: CreateAccountDto) {
-        try {
-            const source = this.authClient.send('authClient/create_account', { createAccountDto }).pipe(
-                timeout(5000),
-            );
-            const data = await lastValueFrom(source);
-            return data;
-        }
-        catch (error) {
-            throw new HttpException(error, error.statusCode);
-        }
-    }
-
-    async changePassword(currentUser, data: ChangePasswordDto) {
-        try {
-            const source = this.authClient.send('authClient/change_password', { currentUser, data }).pipe(
-                timeout(5000),
-            );
-            const result = await lastValueFrom(source);
-            return result;
-        }
-        catch (error) {
-            throw new HttpException(error, error.statusCode);
-        }
-    }
-
-    async updateProfile(user, data) {
-        try {
-            const { firstname, lastname } = data;
-            if ((firstname && user.firstname === firstname) 
-            || (lastname && user.lastname === lastname)
-            || (!firstname && !lastname)) {
-                throw new ConflictException({
-                    message: 'No changes detected',
-                    statusCode: HttpStatus.BAD_REQUEST
-                });
-            }
-            const source = this.authClient.send('authClient/update_profile', { user , data }).pipe(
-                timeout(5000),
-            );
-            const result = await lastValueFrom(source);
-            return result;
-        }
-        catch (error) {
-            if (error instanceof ConflictException) {
-                throw error;
-            }
-            throw new HttpException(error, error.statusCode);
-        }
-    }
-
-    async changeAvatar(currentUser, file: Express.Multer.File) {
-        try {
-            const source = this.authClient.send('authClient/change_avatar', { currentUser, file } ).pipe(
-                timeout(5000),
-            );
-            const result = await lastValueFrom(source);
-            return result;
-        }
-        catch (error) {
-            throw new HttpException(error, error.statusCode);
-        }
-    }
-
-    async validateEmail(currentUser, data) {
-        try {
-            const source = this.authClient.send('authClient/validate_email', { currentUser, data }).pipe(
-                timeout(5000),
-            );
-            const result = await lastValueFrom(source);
-            return result;
         }
         catch (error) {
             throw new HttpException(error, error.statusCode);
