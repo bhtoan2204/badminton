@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from "@nestjs/common";
+import { Controller } from "@nestjs/common";
 import { RssService } from "./rss.service";
 import { Ctx, EventPattern, Payload, RmqContext } from "@nestjs/microservices";
 import { RmqService } from "@app/common";
