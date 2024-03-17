@@ -9,9 +9,9 @@ export class PaymentService {
     @Inject(PAYMENT_SERVICE) private paymentClient: ClientProxy
   ) { }
 
-  async get_package() {
+  async get_all_package() {
     try {
-      const response = this.paymentClient.send('payment/get_package', {})
+      const response = this.paymentClient.send('payment/get_all_package', {})
         .pipe(
           timeout(5000),
         );
@@ -25,7 +25,22 @@ export class PaymentService {
           });
         }
       }
-
+  async get_package(id_package) {
+    try {
+      const response = this.paymentClient.send('payment/get_package', {id_package})
+        .pipe(
+          timeout(5000),
+        );
+    const data = await lastValueFrom(response);
+    return data;
+        }
+        catch (error) {
+          throw new RpcException({
+            message: error.message,
+            statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+          });
+        }
+      }
   async get_method() {
     try {
       const response = this.paymentClient.send('payment/get_method', {})

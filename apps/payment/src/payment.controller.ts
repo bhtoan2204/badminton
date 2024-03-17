@@ -10,9 +10,15 @@ export class PaymentController {
   private readonly rmqService: RmqService) {}
 
   @EventPattern('payment/get_package')
-  async get_package(@Ctx() context: RmqContext) {
+  async get_package(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.paymentService.get_package();
+    return this.paymentService.get_package(data.id_package);
+  }
+
+  @EventPattern('payment/get_all_package')
+  async get_all_package(@Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.get_all_package();
   }
 
   @EventPattern('payment/get_method')

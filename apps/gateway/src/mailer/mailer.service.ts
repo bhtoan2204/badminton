@@ -21,9 +21,9 @@ export class MailService {
     }
   }
 
-  async sendInvitation(userInfo: any, email: string) {
+  async sendInvitation(userInfo: any) {
     try {
-      const response = this.mailerClient.send('mailClient/sendInvitation', { userInfo, email }).pipe(
+      const response = this.mailerClient.send('mailClient/sendInvitation', { userInfo }).pipe(
         timeout(8000)
       );
       return await lastValueFrom(response);
