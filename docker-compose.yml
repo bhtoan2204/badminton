@@ -127,6 +127,20 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+  
+  crawler:
+    image: mjkundta/crawler:latest
+    build:
+      context: .
+      dockerfile: ./apps/crawler/Dockerfile
+      target: development
+    command: npm run start:dev crawler
+    depends_on:
+      - gateway
+    restart: on-failure
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
 
   rabbitmq:
     image: rabbitmq

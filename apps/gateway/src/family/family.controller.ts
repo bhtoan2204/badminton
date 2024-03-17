@@ -7,11 +7,11 @@ import { CreateFamilyDto } from "./dto/createFamily.dto";
 import { MemberFamilyDto } from "./dto/memberFamily.dto";
 import { DeleteMemberDTO } from "./dto/deleteFamily.dto";
 import { UpdateFamilyDTO } from "./dto/updateFamily.dto";
+
 @ApiTags('Family')
 @Controller('family')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-
 export class FamilyController {
   constructor(private readonly familyService: FamilyService) { }
 
@@ -21,7 +21,6 @@ export class FamilyController {
   @UseGuards(JwtAuthGuard)
   async getAllFamily(@CurrentUser() currentUser) {
     const id_user = currentUser.id_user;
-
     return this.familyService.getAllFamily(id_user);
   }
 
@@ -31,7 +30,6 @@ export class FamilyController {
   @UseGuards(JwtAuthGuard)
   async getFamily(@Query('id_family') id_family: number, @CurrentUser() currentUser) {
     const id_user = currentUser.id_user;
-
     return this.familyService.getFamily(id_user, id_family);
   }
 
@@ -41,7 +39,6 @@ export class FamilyController {
   @UseGuards(JwtAuthGuard)
   async createFamily(@CurrentUser() currentUser, @Body() createFamilyDto: CreateFamilyDto) {
     const id_user = currentUser.id_user;
-
     return this.familyService.createFamily(id_user, createFamilyDto);
   }
 
@@ -51,7 +48,6 @@ export class FamilyController {
   @UseGuards(JwtAuthGuard)
   async updateFamily(@CurrentUser() currentUser, @Body() UpdateFamilyDTO: UpdateFamilyDTO) {
     const id_user = currentUser.id_user;
-
     return this.familyService.updateFamily(id_user, UpdateFamilyDTO);
   }
 
@@ -61,7 +57,6 @@ export class FamilyController {
   @UseGuards(JwtAuthGuard)
   async deleteFamily(@Query('id_family') id_family: number, @CurrentUser() currentUser) {
     const id_user = currentUser.id_user;
-
     return this.familyService.deleteFamily(id_user, id_family);
   }
 
@@ -71,7 +66,6 @@ export class FamilyController {
   @UseGuards(JwtAuthGuard)
   async getAllMember(@Query('id_family') id_family: number, @CurrentUser() currentUser) {
     const id_user = currentUser.id_user;
-
     return this.familyService.getAllMember(id_user, id_family);
   }
 
@@ -89,7 +83,6 @@ export class FamilyController {
   @UseGuards(JwtAuthGuard)
   async addMember(@CurrentUser() currentUser, @Body() data: MemberFamilyDto) {
     const id_user = currentUser.id_user;
-
     return this.familyService.addMember(id_user, data);
   }
 
@@ -99,7 +92,6 @@ export class FamilyController {
   @UseGuards(JwtAuthGuard)
   async deleteMember(@CurrentUser() currentUser, @Body() member: DeleteMemberDTO) {
     const id_user = currentUser.id_user;
-
     return this.familyService.deleteMember(id_user, member);
   }
 }
