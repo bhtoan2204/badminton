@@ -491,7 +491,8 @@ $$ LANGUAGE plpgsql;
 
 
 ---------------PAYMENT------------------------
-CREATE OR REPLACE FUNCTION public.f_create_order(p_id_user uuid, p_id_package integer, p_amount int)
+CREATE OR REPLACE FUNCTION public.f_create_order(p_id_user uuid, p_id_package integer, p_amount int, p_method varchar
+)
 RETURNS integer
 LANGUAGE plpgsql
 AS $function$
@@ -515,7 +516,7 @@ BEGIN
     ELSE
         BEGIN
             INSERT INTO "order"(id_user, id_package, status, created_at, expired_at, method) 
-            VALUES (p_id_user, p_id_package, 'Pending', NOW(), NOW() + INTERVAL '1 month' * p_expired, p_p_method)
+            VALUES (p_id_user, p_id_package, 'Pending', NOW(), NOW() + INTERVAL '1 month' * p_expired, p_method)
             RETURNING id_order INTO new_id;
             RETURN new_id;
         EXCEPTION
@@ -532,7 +533,7 @@ $function$;
 insert into package values (1, 'Basic' , 100000 , null, now() , now() , 3)
 insert into package values (2, 'Premium' , 500000 , null, now() , now() , 10)
 
---select * from f_create_order('bd94ba3a-b046-4a05-a260-890913e09df9', 1, 100000)
+select * from f_create_order('bd94ba3a-b046-4a05-a260-890913e09df9', 1, 100000, 'vnpay')
 
 CREATE OR REPLACE VIEW v_package AS
 SELECT

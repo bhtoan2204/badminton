@@ -27,7 +27,7 @@ export class FamilyController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Lay thong tin cua 1 family, sau khi current-user chon family bat ki' })
-  @Get('get-family')
+  @Get('getFamily')
   @UseGuards(JwtAuthGuard)
   async getFamily(@Query('id_family') id_family: number, @CurrentUser() currentUser) {
     const id_user = currentUser.id_user;
@@ -37,7 +37,7 @@ export class FamilyController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Create a family' })
-  @Post('create-family')
+  @Post('createFamily')
   @UseGuards(JwtAuthGuard)
   async createFamily(@CurrentUser() currentUser, @Body() createFamilyDto: CreateFamilyDto) {
     const id_user = currentUser.id_user;
@@ -47,7 +47,7 @@ export class FamilyController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update a family' })
-  @Put('update-family')
+  @Put('updateFamily')
   @UseGuards(JwtAuthGuard)
   async updateFamily(@CurrentUser() currentUser, @Body() UpdateFamilyDTO: UpdateFamilyDTO) {
     const id_user = currentUser.id_user;
@@ -57,7 +57,7 @@ export class FamilyController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a family' })
-  @Delete('delete-family')
+  @Delete('deleteFamily')
   @UseGuards(JwtAuthGuard)
   async deleteFamily(@Query('id_family') id_family: number, @CurrentUser() currentUser) {
     const id_user = currentUser.id_user;
@@ -67,7 +67,7 @@ export class FamilyController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all member infomation of specified family' })
-  @Get('get-all-member')
+  @Get('getAllMember')
   @UseGuards(JwtAuthGuard)
   async getAllMember(@Query('id_family') id_family: number, @CurrentUser() currentUser) {
     const id_user = currentUser.id_user;
@@ -77,7 +77,7 @@ export class FamilyController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get information of specified member' })
-  @Get('get-member')
+  @Get('getMember')
   @UseGuards(JwtAuthGuard)
   async getMember(@Query('id_user') id_user: string) {
     return this.familyService.getMember( id_user);
@@ -95,7 +95,7 @@ export class FamilyController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete member' })
-  @Delete('delete-member')
+  @Delete('deleteMember')
   @UseGuards(JwtAuthGuard)
   async deleteMember(@CurrentUser() currentUser, @Body() member: DeleteMemberDTO) {
     const id_user = currentUser.id_user;
