@@ -9,6 +9,6 @@ spec:
     app: calendar
   ports:
     - protocol: TCP
-      port: 8090
-      targetPort: 8090
+      port: 8089
+      targetPort: 8089
   type: ClusterIP

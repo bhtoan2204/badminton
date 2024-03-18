@@ -3,6 +3,7 @@ import { CALENDAR_SERVICE } from "../utils/constant/services.constant";
 import { ClientProxy } from "@nestjs/microservices";
 import { CreateCalendarDto } from "./dto/createCalendar.dto";
 import { lastValueFrom, timeout } from "rxjs";
+import { UpdateCalendarDto } from "./dto/updateCalendar.dto";
 
 @Injectable()
 export class CalendarService {
@@ -10,18 +11,28 @@ export class CalendarService {
     @Inject(CALENDAR_SERVICE) private readonly calendarClient: ClientProxy
   ) { }
 
-  async getAllCalendar(id_user: string) {
+  async getAllCalendar(id_user: string, id_family: number) {
     try {
-
+      const response = this.calendarClient.send('calendarClient/getAllCalendar', { id_user, id_family })
+        .pipe(
+          timeout(5000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
     }
     catch (error) {
       throw new HttpException(error, error.statusCode);
     }
   }
 
-  async getCalendarDetail() {
+  async getCalendarDetail(id_user: string, id_calendar: number) {
     try {
-
+      const response = this.calendarClient.send('calendarClient/getCalendarDetail', { id_user, id_calendar })
+        .pipe(
+          timeout(5000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
     }
     catch (error) {
       throw new HttpException(error, error.statusCode);
@@ -42,18 +53,26 @@ export class CalendarService {
     }
   }
 
-  async updateCalendar() {
+  async updateCalendar(id_user: string, dto: UpdateCalendarDto) {
     try {
-
+      const response = this.calendarClient.send('calendarClient/updateCalendar', { id_user, dto })
+        .pipe(
+          timeout(5000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
     }
     catch (error) {
       throw new HttpException(error, error.statusCode);
     }
   }
 
-  async deleteCalendar() {
+  async deleteCalendar(id_user: string, id_calendar: number) {
     try {
-
+      const response = this.calendarClient.send('calendarClient/deleteCalendar', { id_user, id_calendar })
+        .pipe(timeout(5000));
+        const data = await lastValueFrom(response);
+        return data;
     }
     catch (error) {
       throw new HttpException(error, error.statusCode);

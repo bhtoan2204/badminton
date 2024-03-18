@@ -12,13 +12,13 @@ export class CalendarController {
   @EventPattern('calendarClient/getAllCalendar')
   async getAllCalendar(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.calendarService.getAllCalendar(data.id_user);
+    return this.calendarService.getAllCalendar(data.id_user, data.id_family);
   }
   
   @EventPattern('calendarClient/getCalendarDetail')
   async getCalendarDetail(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.calendarService.getCalendarDetail();
+    return this.calendarService.getCalendarDetail(data.id_user, data.id_calendar);
   }
 
   @EventPattern('calendarClient/createCalendar')
@@ -30,12 +30,12 @@ export class CalendarController {
   @EventPattern('calendarClient/updateCalendar')
   async updateCalendar(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.calendarService.updateCalendar();
+    return this.calendarService.updateCalendar(data.id_user, data.dto);
   }
 
   @EventPattern('calendarClient/deleteCalendar')
   async deleteCalendar(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.calendarService.deleteCalendar();
+    return this.calendarService.deleteCalendar(data.id_user, data.id_calendar);
   }
 }
