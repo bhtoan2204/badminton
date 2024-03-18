@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { CalendarService } from "./calendar.service";
 import { CurrentUser } from "../utils/decorator/current-user.decorator";
 import { CreateCalendarDto } from "./dto/createCalendar.dto";
+import { UpdateCalendarDto } from "./dto/updateCalendar.dto";
 
 @ApiTags('Calendar')
 @Controller('calendar')
@@ -13,17 +14,19 @@ export class CalendarController {
   constructor(private readonly calendarService: CalendarService) { }
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get all Calendar' })
-  @Get('getAllCalendar')
-  async getAllCalendar(@CurrentUser() currentUser) {
-    return this.calendarService.getAllCalendar(currentUser.id_user);
+  @ApiOperation({ summary: 'Get all event of family' })
+  @ApiParam({ name: 'id_family', required: true })
+  @Get('getAllCalendar/:id_family')
+  async getAllCalendar(@CurrentUser() currentUser, @Param('id_family') id_family: number) {
+    return this.calendarService.getAllCalendar(currentUser.id_user, id_family);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get Calendar detail' })
-  @Get('getCalendarDetail')
-  async getCalendarDetail(@CurrentUser() currentUser) {
-    return this.calendarService.getCalendarDetail();
+  @ApiParam({ name: 'id_calendar', required: true })
+  @Get('getCalendarDetail/:id_calendar')
+  async getCalendarDetail(@CurrentUser() currentUser, @Param('id_calendar') id_calendar: number){
+    return this.calendarService.getCalendarDetail(currentUser.id_user, id_calendar);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -36,14 +39,15 @@ export class CalendarController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update a Calendar' })
   @Put('updateCalendar')
-  async updateCalendar(@CurrentUser() currentUser) {
-    return this.calendarService.updateCalendar();
+  async updateCalendar(@CurrentUser() currentUser, @Body() dto: UpdateCalendarDto){
+    return this.calendarService.updateCalendar(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a Calendar' })
-  @Delete('deleteCalendar')
-  async deleteCalendar(@CurrentUser() currentUser) {
-    return this.calendarService.deleteCalendar();
+  @ApiParam({ name: 'id_calendar', required: true })
+  @Delete('deleteCalendar/:id_calendar')
+  async deleteCalendar(@CurrentUser() currentUser, @Param('id_calendar') id_calendar: number){
+    return this.calendarService.deleteCalendar(currentUser.id_user, id_calendar);
   }
 }
