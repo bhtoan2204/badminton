@@ -9,6 +9,9 @@ export class Calendar {
   @Column({ type: 'timestamp' })
   datetime: Date;
 
+  @Column({ type: 'varchar', nullable: false })
+  title: string;
+
   @Column({ type: 'varchar', nullable: true })
   description: string;
 
