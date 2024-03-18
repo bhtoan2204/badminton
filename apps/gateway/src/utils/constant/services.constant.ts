@@ -6,3 +6,4 @@ export const MAILER_SERVICE = 'MAILER';
 export const CHAT_SERVICE = 'CHAT';
 export const ROLE_SERVICE = 'ROLE';
 export const CRAWLER_SERVICE = 'CRAWLER';
+export const CALENDAR_SERVICE = 'CALENDAR';

@@ -7,8 +7,9 @@ import { FamilyModule } from './family/family.module';
 import { AdminModule } from './admin/admin.module';
 import { MailModule } from './mailer/mailer.module';
 import { ChatModule } from './chat/chat.module';
-import * as Joi from 'joi';
 import { CrawlerModule } from './crawler/crawler.module';
+import { CalendarModule } from './calendar/calendar.module';
+import * as Joi from 'joi';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { CrawlerModule } from './crawler/crawler.module';
         RABBIT_MQ_CHAT_QUEUE: Joi.string().required(),
         RABBIT_MQ_ROLE_QUEUE: Joi.string().required(),
         RABBIT_MQ_CRAWLER_QUEUE: Joi.string().required(),
+        RABBIT_MQ_CALENDAR_QUEUE: Joi.string().required(),
 
         GOOGLE_CLIENT_ID: Joi.string().required(),
         GOOGLE_CLIENT_SECRET: Joi.string().required(),
@@ -44,6 +46,7 @@ import { CrawlerModule } from './crawler/crawler.module';
     FamilyModule,
     ChatModule,
     CrawlerModule,
+    CalendarModule,
     AdminModule,
   ],
   controllers: [],
