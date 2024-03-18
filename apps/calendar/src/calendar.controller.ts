@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { RmqService } from '@app/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
