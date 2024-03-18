@@ -3,7 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "./user/user.service";
 import { TokenPayload } from "./interface/tokenPayload.interface";
-import { LoginType, Users } from "@app/common";
+import { Users } from "@app/common";
 import { RpcException } from "@nestjs/microservices";
 import { EntityManager } from "typeorm";
 

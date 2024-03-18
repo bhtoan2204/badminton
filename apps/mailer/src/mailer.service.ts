@@ -41,12 +41,4 @@ export class MailService {
       });
     }
   }
-
-  async sendInvite(dto) {
-    
-  }
-
-  async sendResetPassword(dto) {
-
-  }
 }

@@ -282,8 +282,4 @@ export class UserService {
       });
     }
   }
-
-  async linkGoogleAccount(data: any) {
-
-  }
 }
