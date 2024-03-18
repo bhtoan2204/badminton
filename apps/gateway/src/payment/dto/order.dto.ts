@@ -7,6 +7,9 @@ export class OrderDTO {
   @ApiProperty({ example: 1 })
   id_package: number;
 
+  @ApiProperty({ example: null })
+  id_family: number;
+
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ example: 'NCB' })
@@ -26,6 +29,5 @@ export class OrderDTO {
   @ApiProperty({ example: 'vnpay' })
   method: string;
 
-  @ApiProperty({ example:  ''})
-  id_family: number;
+  
 }
