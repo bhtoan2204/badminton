@@ -11,7 +11,7 @@ export class CrawlerController {
   constructor(private readonly crawlerService: CrawlerService) { }
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: '' })
+  @ApiOperation({ summary: 'home, health, world, life, news, business, startup, entertainment, sports, law, education, newest, featured, travel, science, digital, car, opinion, confide, funny, mostviewed' })
   @ApiQuery({ name: 'type', required: true, type: String })
   @ApiQuery({ name: 'page', required: false, type: String })
   @ApiQuery({ name: 'itemsPerPage', required: false, type: String })
