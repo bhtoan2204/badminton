@@ -131,6 +131,19 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+  
+  calendar:
+    image: mjkundta/calendar:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/calendar/Dockerfile
+      target: production
+    command: node dist/apps/calendar/src/main
+    depends_on:
+      - gateway
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
 
   rabbitmq:
     image: rabbitmq

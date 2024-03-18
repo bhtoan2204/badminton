@@ -122,6 +122,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/crawler/tsconfig.app.json"
       }
+    },
+    "calendar": {
+      "type": "application",
+      "root": "apps/calendar",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
+      "compilerOptions": {
+        "tsConfigPath": "apps/calendar/tsconfig.app.json"
+      }
     }
   }
 }
