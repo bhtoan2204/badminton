@@ -1,7 +1,7 @@
 import { Controller, Get, HttpCode, HttpStatus, Param, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
-import { CurrentUser } from "../utils/decorator/current-user.decorator";
+import { CurrentUser } from "../utils";
 import { ChatService } from "./chat.service";
 
 @ApiTags('Chat')
@@ -29,5 +29,13 @@ export class ChatController {
   @ApiParam({ name: 'index', required: true, description: 'Pagination index', type: Number })
   async getFamilyMessages(@CurrentUser() user, @Param('id_family') id_family: number, @Param('index') index: number) {
     return this.chatService.getFamilyMessages(user.id_user, id_family, index);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get image' })
+  @Get('getImage/:id_image')
+  @ApiParam({ name: 'id_image', required: true, description: 'The ID of the image' })
+  async getImage(@CurrentUser() currentUser, @Param('id_image') id_image: string) {
+    return this.chatService.getImage(currentUser.id_user, id_image);
   }
 }

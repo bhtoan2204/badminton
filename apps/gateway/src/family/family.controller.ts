@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, Query, 
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { FamilyService } from "./family.service";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
-import { CurrentUser } from "../utils/decorator/current-user.decorator";
+import { CurrentUser } from "../utils";
 import { CreateFamilyDto } from "./dto/createFamily.dto";
 import { MemberFamilyDto } from "./dto/memberFamily.dto";
 import { DeleteMemberDTO } from "./dto/deleteFamily.dto";

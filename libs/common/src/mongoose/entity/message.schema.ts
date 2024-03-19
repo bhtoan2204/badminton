@@ -19,9 +19,17 @@ export class MessageContent {
   @Prop({ required: true })
   receiverId: string;
 
-  @Prop({ required: true })
-  content: string;
+  @Prop({ required: true, enum: ['text', 'photo', 'video'] })
+  type: string;
+
+  @Prop({ required: false })
+  content?: string;
+
+  @Prop({ required: false })
+  photoUrl?: string;
   
+  @Prop({ required: false })
+  videoUrl?: string;
 }
 
 export const MessageContentSchema = SchemaFactory.createForClass(MessageContent);

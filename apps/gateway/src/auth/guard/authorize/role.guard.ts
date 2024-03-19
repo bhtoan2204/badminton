@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { IS_ADMIN_KEY } from "apps/gateway/src/utils/decorator/role.decorator";
+import { IS_ADMIN_KEY } from "../../../utils";
 import { Observable } from "rxjs";
 
 @Injectable()

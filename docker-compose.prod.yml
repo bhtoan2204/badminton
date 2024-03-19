@@ -27,6 +27,19 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+
+  user:
+    image: mjkundta/user:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/user/Dockerfile
+      target: production
+    command: node dist/apps/user/src/main
+    depends_on:
+      - gateway
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
   
   payment:
     image: mjkundta/payment:${TAG}
