@@ -1,6 +1,6 @@
 import { RmqModule } from "@app/common";
 import { Module } from "@nestjs/common";
-import { CRAWLER_SERVICE } from "../utils/constant/services.constant";
+import { CRAWLER_SERVICE } from "../utils";
 import { CrawlerController } from "./crawler.controller";
 import { CrawlerService } from "./crawler.service";
 

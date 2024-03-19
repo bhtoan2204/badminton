@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
-import { RmqModule } from '@app/common';
+import { GlobalJwtModule, RmqModule, Users } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
-import { AuthenticationModule } from './auth/authentication.module';
 import { DatabaseModule } from '@app/common/database/database.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 import * as Joi from 'joi';
 
 @Module({
@@ -16,8 +18,12 @@ import * as Joi from 'joi';
       envFilePath: process.env.NODE_ENV === 'production' ? './apps/auth/.env.production' : './apps/auth/.env',
     }),
     DatabaseModule,
-    AuthenticationModule,
-    RmqModule
+    AuthModule,
+    RmqModule,
+    TypeOrmModule.forFeature([Users]),
+    GlobalJwtModule
   ],
+  controllers: [AuthController],
+  providers: [AuthService],
 })
 export class AuthModule { }

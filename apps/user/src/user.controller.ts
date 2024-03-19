@@ -11,45 +11,32 @@ export class UserController {
     private readonly userService: UserService
     ) {}
 
-  @EventPattern('authClient/create_account')
+  @EventPattern('userClient/create_account')
   async handleUserCreated(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     const payload : CreateAccountDto = data.createAccountDto;
     return await this.userService.createAccount(payload);
   }
 
-  @EventPattern('authClient/validate_user')
-  async handleValidateUser(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    const {email, password} = data;
-    return await this.userService.validateLocalUser(email, password);
-  }
-
-  @EventPattern('authClient/validate_user_id')
-  async handleValidateUserId(@Payload() id_user: string, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return await this.userService.validateUserId(id_user);
-  }
-
-  @EventPattern('authClient/change_password')
+  @EventPattern('userClient/change_password')
   async handleChangePassword(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return await this.userService.changePassword(data.currentUser, data.data);
   }
 
-  @EventPattern('authClient/update_profile')
+  @EventPattern('userClient/update_profile')
   async handleUpdateProfile(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return await this.userService.updateProfile(data.user, data.data);
   }
 
-  @EventPattern('authClient/change_avatar')
+  @EventPattern('userClient/change_avatar')
   async handleChangeAvatar(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return await this.userService.changeAvatar(data);
   }
 
-  @EventPattern('authClient/validate_email')
+  @EventPattern('userClient/validate_email')
   async handleValidateEmail(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return await this.userService.validateEmail(data);

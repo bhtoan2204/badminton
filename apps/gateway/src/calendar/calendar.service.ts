@@ -1,5 +1,5 @@
 import { HttpException, Inject, Injectable } from "@nestjs/common";
-import { CALENDAR_SERVICE } from "../utils/constant/services.constant";
+import { CALENDAR_SERVICE } from "../utils";
 import { ClientProxy } from "@nestjs/microservices";
 import { CreateCalendarDto } from "./dto/createCalendar.dto";
 import { lastValueFrom, timeout } from "rxjs";

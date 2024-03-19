@@ -1,6 +1,6 @@
 import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
-import { FAMILY_SERVICE } from "../utils/constant/services.constant";
+import { FAMILY_SERVICE } from "../utils";
 import { lastValueFrom, timeout } from "rxjs";
 import { CreateFamilyDto } from "./dto/createFamily.dto";
 import { MemberFamilyDto } from "./dto/memberFamily.dto";

@@ -9,6 +9,8 @@ import { MailModule } from './mailer/mailer.module';
 import { ChatModule } from './chat/chat.module';
 import { CrawlerModule } from './crawler/crawler.module';
 import { CalendarModule } from './calendar/calendar.module';
+import { VideoModule } from './video/video.module';
+import { UserModule } from './user/user.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -40,11 +42,13 @@ import * as Joi from 'joi';
       envFilePath: process.env.NODE_ENV === 'production' ? './apps/gateway/.env.production' : './apps/gateway/.env',
     }),
     AuthApiModule,
+    UserModule,
     PaymentModule,
     MailModule,
     SmsModule,
     FamilyModule,
     ChatModule,
+    VideoModule,
     CrawlerModule,
     CalendarModule,
     AdminModule,

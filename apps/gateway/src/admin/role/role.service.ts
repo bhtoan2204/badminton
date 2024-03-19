@@ -1,7 +1,7 @@
 import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { lastValueFrom, timeout } from "rxjs";
-import { ROLE_SERVICE } from "../../utils/constant/services.constant";
+import { ROLE_SERVICE } from "../../utils";
 
 @Injectable()
 

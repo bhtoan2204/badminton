@@ -3,7 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { ClientProxy } from "@nestjs/microservices";
 import { PassportStrategy } from "@nestjs/passport";
 import { Profile, Strategy } from "passport-facebook";
-import { AUTH_SERVICE } from '../../../utils/constant/services.constant';
+import { AUTH_SERVICE } from '../../../utils';
 import { lastValueFrom, timeout } from "rxjs";
 
 @Injectable()
