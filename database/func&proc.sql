@@ -562,10 +562,10 @@ DECLARE
     p_expired int;
 BEGIN 
     SELECT id_package, status, id_family INTO valid_order, status_payment, p_id_family FROM "order" WHERE id_order = p_id_order and id_user=p_id_user; 
-    SELECT COUNT(*), expired INTO valid_package, p_expired FROM package WHERE id_package = valid_order AND price = p_amount / 100;
+    SELECT expired INTO p_expired FROM package WHERE id_package = valid_order AND price = p_amount / 100;
 
     IF status_payment = 'Pending' THEN
-        IF valid_package > 0 THEN
+        IF p_expired is not null THEN
                 IF valid_order > 0 THEN 
                     IF p_ResponseCode = '00' THEN
                         UPDATE "order" SET status = 'Succeeded' WHERE id_order = p_id_order;
@@ -597,7 +597,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
---select * from f_check_order('e8462da1-159a-4082-8f95-5dd4cf0e777e', 1, 10000000, '00','00')
+select * from f_check_order('bd94ba3a-b046-4a05-a260-890913e09df9', 129, 10000000, '00','00')
 --CREATE TYPE status_e AS ENUM ('Failed', 'Succeeded', 'Pending', 'Refunded');
 
 --CREATE TYPE type_otp AS ENUM ('verify', 'register', 'forgot_password');
