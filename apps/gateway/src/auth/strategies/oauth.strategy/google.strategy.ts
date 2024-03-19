@@ -4,7 +4,7 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, timeout } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
-import { AUTH_SERVICE } from '../../../utils/constant/services.constant';
+import { AUTH_SERVICE } from '../../../utils';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {

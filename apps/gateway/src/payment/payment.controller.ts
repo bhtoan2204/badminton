@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import { OrderDTO } from './dto/order.dto';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
-import { CurrentUser } from '../utils/decorator/current-user.decorator';
+import { CurrentUser } from '../utils';
 import { OrderReturnDTO } from './dto/OrderReturn.dto';
 
 @ApiTags('Payment')

@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { WsException } from '@nestjs/websockets';
 import { Strategy } from 'passport-jwt';
-import { AUTH_SERVICE } from '../../utils/constant/services.constant';
+import { AUTH_SERVICE } from '../../constant/services.constant';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, timeout } from 'rxjs';
 

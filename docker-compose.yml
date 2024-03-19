@@ -30,6 +30,20 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
   
+  user:
+    image: mjkundta/user:latest
+    build:
+      context: .
+      dockerfile: ./apps/user/Dockerfile
+      target: development
+    command: npm run start:dev user
+    depends_on:
+      - gateway
+    restart: on-failure
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+  
   payment:
     image: mjkundta/payment:latest
     build:

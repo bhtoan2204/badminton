@@ -58,6 +58,7 @@ export class ChatService {
       const newMessageContent = new this.messageRepository({
         _id: null,
         senderId: id_user,
+        type: 'text',
         receiverId: messageData.receiverId,
         content: messageData.message,
       });
@@ -96,5 +97,9 @@ export class ChatService {
       const message = error.message || 'An error occurred while saving the family message.';
       throw new RpcException({ message, statusCode });
     }
+  }
+
+  async saveImageMessage(id_user, messageData) {
+    // return this.saveMessage(id_user, messageData);
   }
 }

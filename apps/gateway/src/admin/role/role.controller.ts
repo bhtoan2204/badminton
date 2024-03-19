@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { RoleService } from "./role.service";
 import { JwtAuthGuard } from "../../auth/guard/jwt-auth.guard";
 import { AdminGuard } from "../../auth/guard/authorize/role.guard";
-import { Admin } from "../../utils/decorator/role.decorator";
+import { Admin } from "../../utils";
 
 @ApiTags('Role')
 @Controller('role')

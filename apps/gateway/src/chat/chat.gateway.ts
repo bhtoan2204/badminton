@@ -2,12 +2,12 @@ import { OnModuleInit, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { JwtService } from "@nestjs/jwt";
-import { WsJwtAuthGuard } from "./guard/ws-jwt.auth.guard";
-import { WsCurrentUser } from "../utils/decorator/ws-current-user.decorator";
+import { WsCurrentUser, WsJwtAuthGuard } from "../utils";
 import { ConfigService } from "@nestjs/config";
 import { ChatService } from "./chat.service";
 import { NewMessageDto } from "./dto/newMessage.dto";
 import { NewFamilyMessageDto } from "./dto/newFamilyMessage.dto";
+import { NewImageMessageDto } from "./dto/newImageMessage.dto";
 
 interface TokenPayload {
   id_user: string;
@@ -108,6 +108,24 @@ export class ChatGateway implements OnModuleInit {
       }));
       return "Message sent";
     } catch (error) {
+      console.error('Error emitting message:', error.message);
+    }
+  }
+
+  @SubscribeMessage('newImageMessage')
+  @UseGuards(WsJwtAuthGuard)
+  async emitImageMessage(@ConnectedSocket() client: Socket, @WsCurrentUser() user, @MessageBody() message: NewImageMessageDto) {
+    try {
+      const receiverMessage = await this.chatService.saveImageMessage(user.id_user, message);
+      const receiverSocketIds = this.socketMap.get(message.receiverId);
+      if (receiverSocketIds) {
+        for (const socketId of receiverSocketIds) {
+          client.to(socketId).emit('onNewImageMessage', receiverMessage);
+        }
+      }
+      return "Message sent";
+    }
+    catch (error) {
       console.error('Error emitting message:', error.message);
     }
   }

@@ -1,13 +1,13 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../guard/jwt-auth.guard";
+import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { ImageFileInterceptor } from "../interceptor/imageFile.interceptor";
-import { CurrentUser } from "../../utils/decorator/current-user.decorator";
-import { ValidateEmailDto } from "../dto/validateEmail.dto";
-import { UpdateProfileDto } from "../dto/updateProfile.dto";
-import { ChangePasswordDto } from "../dto/changePassword.dto";
-import { CreateAccountDto } from "../dto/createAccount.dto";
+import { ImageFileInterceptor } from "./interceptor/imageFile.interceptor";
+import { CurrentUser } from "../utils";
+import { ValidateEmailDto } from "./dto/validateEmail.dto";
+import { UpdateProfileDto } from "./dto/updateProfile.dto";
+import { ChangePasswordDto } from "./dto/changePassword.dto";
+import { CreateAccountDto } from "./dto/createAccount.dto";
 import { UserService } from "./user.service";
 
 @ApiTags('User')

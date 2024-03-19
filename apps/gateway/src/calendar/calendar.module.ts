@@ -1,6 +1,6 @@
 import { RmqModule } from "@app/common";
 import { Module } from "@nestjs/common";
-import { CALENDAR_SERVICE } from "../utils/constant/services.constant";
+import { CALENDAR_SERVICE } from "../utils";
 import { CalendarController } from "./calendar.controller";
 import { CalendarService } from "./calendar.service";
 

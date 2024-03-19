@@ -4,7 +4,7 @@ import { MailService } from "./mailer.service";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { SendEmailRegisterDto } from "./dto/sendEmailRegister.dto";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
-import { CurrentUser } from "../utils/decorator/current-user.decorator";
+import { CurrentUser } from "../utils";
 @ApiTags('Mailer')
 @Controller('mailer')
 @ApiBearerAuth()

@@ -1,7 +1,7 @@
 import { HttpException, Inject, Injectable } from "@nestjs/common";
-import { AUTH_SERVICE } from "apps/gateway/src/utils/constant/services.constant";
 import { ClientProxy } from "@nestjs/microservices";
 import { lastValueFrom, timeout } from "rxjs";
+import { AUTH_SERVICE } from "../utils";
 
 @Injectable()
 export class AuthApiService {

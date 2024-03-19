@@ -2,11 +2,11 @@ import { RmqModule } from '@app/common';
 import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { AUTH_SERVICE } from '../../utils/constant/services.constant';
+import { USER_SERVICE } from '../utils';
 
 @Module({
     imports: [
-        RmqModule.register({ name: AUTH_SERVICE }),
+        RmqModule.register({ name: USER_SERVICE }),
     ],
     controllers: [UserController],
     providers: [

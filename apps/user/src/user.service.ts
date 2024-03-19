@@ -5,7 +5,7 @@ import { CreateAccountDto } from "./dto/createAccount.dto";
 import { ConfigService } from "@nestjs/config";
 import { DeleteFileRequest, LoginType, UploadFileRequest, Users } from "@app/common";
 import { RpcException } from "@nestjs/microservices";
-import { StorageService } from "../../storage/storage.service";
+import { StorageService } from "./storage/storage.service";
 
 @Injectable()
 export class UserService {
@@ -15,124 +15,6 @@ export class UserService {
     private readonly entityManager: EntityManager,
     private readonly storageService: StorageService
   ) {}
-
-  async validateLocalUser(email: string, inputPassword: string) {
-    let user;
-    try {
-      user = await this.userRepository.findOne({ where: { email, login_type: LoginType.LOCAL } });
-    } catch (error) {
-      throw new RpcException({
-        message: 'An error occurred while retrieving user information',
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  
-    if (!user) {
-      throw new RpcException({
-        message: 'User not found',
-        statusCode: HttpStatus.UNAUTHORIZED,
-      });
-    }
-
-    const Query = 'SELECT * FROM compare_passwords($1,$2)';
-    const param = [inputPassword,  user.password];
-    const isMatch= await this.entityManager.query(Query, param);
-
-    if (!isMatch) {
-      throw new RpcException({
-        message: 'Credentials are not valid',
-        statusCode: HttpStatus.UNAUTHORIZED,
-      });
-    }
-    
-    const configService = new ConfigService();
-    const dbUrl = configService.get('DATABASE_URL');
-    const newUsername = user.id_user;
-    const newPassword = inputPassword;
-    const newDbUrl = dbUrl.replace(/\/\/([^:]+):([^@]+)@/, `//${newUsername}:${newPassword}@`);
-    process.env.DATABASE_URL = newDbUrl;
-
-    const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
-  }
-
-  async validateGoogleUser(accessToken: string, profile: any) {
-    try {
-      const user = await this.userRepository.findOne({where: 
-        {
-          email: profile.emails[0].value,
-          login_type: LoginType.GOOGLE
-        }
-      });
-      if (!user) {
-        const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7)';
-        const parameters = [profile.emails[0].value, null, null, profile.name.givenName, profile.name.familyName, null, LoginType.GOOGLE];
-        const data = await this.entityManager.query(query, parameters);
-
-        return await this.userRepository.findOne({where: 
-          {
-            id_user: data[0].id_user,
-            login_type: LoginType.GOOGLE
-          }
-        });
-      }
-      else {
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
-      }
-    }
-    catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: 404
-      });
-    }
-  }
-
-  async validateFacebookUser(accessToken: string, profile: any) {
-    try {
-      const user = await this.userRepository.findOne({where: 
-        {
-          email: profile.emails[0].value,
-          login_type: LoginType.FACEBOOK
-        }
-      });
-      if (!user) {
-        const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7)';
-        const parameters = [profile._json.email, null, null, profile.name.givenName, profile.name.familyName, null, LoginType.FACEBOOK];
-        const data = await this.entityManager.query(query, parameters);
-
-        return await this.userRepository.findOne({where: 
-          {
-            id_user: data[0].id_user,
-            login_type: LoginType.FACEBOOK
-          }
-        });
-      }
-      else {
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
-      }
-    }
-    catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: 404
-      });
-    }
-  }
-  
-  async validateUserId(id_user: string){
-    const user = await this.userRepository.findOne({where: { id_user }});
-    if (!user) {
-      throw new RpcException({
-        message: 'User not found',
-        statusCode: 404
-      });
-    };
-    const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
-  }
 
   async createAccount(createAccountDto: CreateAccountDto) {
     try {

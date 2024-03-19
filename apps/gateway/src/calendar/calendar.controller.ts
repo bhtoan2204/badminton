@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, 
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { CalendarService } from "./calendar.service";
-import { CurrentUser } from "../utils/decorator/current-user.decorator";
+import { CurrentUser } from "../utils";
 import { CreateCalendarDto } from "./dto/createCalendar.dto";
 import { UpdateCalendarDto } from "./dto/updateCalendar.dto";
 
