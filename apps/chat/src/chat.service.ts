@@ -100,6 +100,6 @@ export class ChatService {
   }
 
   async saveImageMessage(id_user, messageData) {
-    // return this.saveMessage(id_user, messageData);
+    // save image to database
   }
 }

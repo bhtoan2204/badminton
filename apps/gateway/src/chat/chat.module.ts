@@ -1,9 +1,8 @@
 import { GlobalJwtModule, RmqModule } from "@app/common";
 import { Module } from "@nestjs/common";
-import { AUTH_SERVICE, CHAT_SERVICE, FAMILY_SERVICE } from "../utils";
+import { AUTH_SERVICE, CHAT_SERVICE, FAMILY_SERVICE, WsJwtStrategy } from "../utils";
 import { ChatGateway } from "./chat.gateway";
 import { ChatController } from "./chat.controller";
-import { WsJwtStrategy } from "../utils";
 import { ChatService } from "./chat.service";
 
 @Module({

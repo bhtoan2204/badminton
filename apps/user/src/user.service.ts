@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, EntityManager } from "typeorm";
 import { CreateAccountDto } from "./dto/createAccount.dto";
 import { ConfigService } from "@nestjs/config";
-import { DeleteFileRequest, LoginType, UploadFileRequest, Users } from "@app/common";
+import { DeleteFileRequest, UploadFileRequest, Users } from "@app/common";
 import { RpcException } from "@nestjs/microservices";
 import { StorageService } from "./storage/storage.service";
 
