@@ -32,3 +32,8 @@ spec:
           requests:
             cpu: "200m"
             memory: "512Mi"
+        env:
+          - name: RABBITMQ_DEFAULT_USER  
+            value: "user"
+          - name: RABBITMQ_DEFAULT_PASS  
+            value: "password"
