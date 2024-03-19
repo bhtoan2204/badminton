@@ -1,6 +1,6 @@
 import { RmqModule } from "@app/common";
 import { Module } from "@nestjs/common";
-import { SMS_SERVICE } from "apps/gateway/src/utils/constant/services.constant";
+import { SMS_SERVICE } from "../utils";
 import { SmsController } from "./sms.controller";
 import { SmsService } from "./sms.service";
 

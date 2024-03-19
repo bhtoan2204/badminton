@@ -2,7 +2,7 @@ import { RmqModule } from "@app/common";
 import { Module } from "@nestjs/common";
 import { RoleService } from "./role.service";
 import { RoleController } from "./role.controller";
-import { ROLE_SERVICE } from "../../utils/constant/services.constant";
+import { ROLE_SERVICE } from "../../utils";
 
 @Module({
   imports: [

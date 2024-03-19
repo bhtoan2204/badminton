@@ -1,5 +1,5 @@
 import { HttpException, Inject, Injectable } from "@nestjs/common";
-import { CRAWLER_SERVICE } from "../utils/constant/services.constant";
+import { CRAWLER_SERVICE } from "../utils";
 import { ClientProxy } from "@nestjs/microservices";
 import { lastValueFrom, timeout } from "rxjs";
 
