@@ -240,7 +240,10 @@ export class AuthService {
 
     const Query = 'SELECT * FROM compare_passwords($1,$2)';
     const param = [inputPassword, user.password];
-    const isMatch = await this.entityManager.query(Query, param);
+    const result = await this.entityManager.query(Query, param);
+
+    const isMatch = result[0]['compare_passwords'];
+    console.log(isMatch);
 
     if (!isMatch) {
       throw new RpcException({
@@ -249,12 +252,12 @@ export class AuthService {
       });
     }
 
-    const configService = new ConfigService();
-    const dbUrl = configService.get('DATABASE_URL');
-    const newUsername = user.id_user;
-    const newPassword = inputPassword;
-    const newDbUrl = dbUrl.replace(/\/\/([^:]+):([^@]+)@/, `//${newUsername}:${newPassword}@`);
-    process.env.DATABASE_URL = newDbUrl;
+    // const configService = new ConfigService();
+    // const dbUrl = configService.get('DATABASE_URL');
+    // const newUsername = user.id_user;
+    // const newPassword = inputPassword;
+    // const newDbUrl = dbUrl.replace(/\/\/([^:]+):([^@]+)@/, `//${newUsername}:${newPassword}@`);
+    // process.env.DATABASE_URL = newDbUrl;
 
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;

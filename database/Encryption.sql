@@ -1,34 +1,34 @@
-CREATE OR REPLACE FUNCTION encryption(
-    plaintext VARCHAR
-) RETURNS VARCHAR AS $$
-DECLARE 
-	encryption_key VARCHAR;
+-- Hàm mã hóa
+CREATE OR REPLACE FUNCTION encryption(data TEXT)
+RETURNS TEXT AS $$
+DECLARE
+    p_key TEXT;
 BEGIN
-    SELECT key INTO encryption_key 
-    FROM key 
-    ORDER BY created_at DESC 
-    LIMIT 1;
-   RETURN pgp_sym_encrypt(plaintext, encryption_key);
+    -- Lấy key từ bảng key với id = 1
+    SELECT key INTO p_key FROM "key" WHERE id = 1;
+    -- Mã hóa dữ liệu với key đã lấy
+    RETURN pgp_sym_encrypt(data, p_key, 'compress-algo=1, cipher-algo=aes256')::TEXT;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION decryption(
-    ciphertext VARCHAR
-) RETURNS VARCHAR AS $$
-DECLARE 
-	decryption_key VARCHAR;
-    decrypted_bytea BYTEA;
+-- Hàm giải mã dữ liệu
+CREATE OR REPLACE FUNCTION decryption(encrypted_data TEXT)
+RETURNS TEXT AS $$
+DECLARE
+    p_key TEXT;
 BEGIN
-	SELECT key INTO decryption_key 
-    FROM key 
-    ORDER BY created_at DESC 
-    LIMIT 1;
-
-    decrypted_bytea := pgp_sym_decrypt(ciphertext::BYTEA, decryption_key);
-    RETURN decrypted_bytea::TEXT;
+    -- Lấy key từ bảng key với id = 1
+    SELECT key INTO p_key FROM "key" WHERE id = 1;
+    -- Giải mã dữ liệu với key đã lấy
+    RETURN pgp_sym_decrypt(encrypted_data::BYTEA, p_key)::TEXT;
 END;
 $$ LANGUAGE plpgsql;
 
+
+-- Sử dụng hàm mã hóa và giải mã
+--SELECT encryption('Password123');
+
+--SELECT decryption('\xc30d04090302a04830caca0222636dd24101cc454d1d09a75340beeeb0c4949b9435b554240ed99d4a6bcbf52833cb49030002873ea38d75d3ddaad007f89736574f280a588d35ece96e926400eadbb8bbdb');
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
@@ -72,8 +72,7 @@ DECLARE
 BEGIN
     SELECT key INTO encryption_key 
     FROM key 
-    ORDER BY created_at DESC 
-    LIMIT 1;
+    where id=1;
 
     IF TG_OP = 'INSERT' then
         EXECUTE 'CREATE USER "' || NEW.id_user || '" WITH PASSWORD ' || quote_literal(NEW.password) || ';';
@@ -111,17 +110,21 @@ DECLARE
     decryption_key VARCHAR;
     decrypted_password VARCHAR;
 BEGIN
+    -- Lấy key từ bảng key với id = 1
     SELECT key INTO decryption_key 
     FROM key 
-    ORDER BY created_at DESC 
-    LIMIT 1;
+    WHERE id = 1;
 
-    decrypted_password := pgp_sym_decrypt(hashed_password::BYTEA, decryption_key)::TEXT;
-    
+    -- Giải mã hashed_password để so sánh với input_password
+    decrypted_password := pgp_sym_decrypt(hashed_password::BYTEA, decryption_key);
+
+    -- So sánh mật khẩu đã giải mã với mật khẩu nhập vào
     RETURN decrypted_password = input_password;
 END;
 $$ LANGUAGE plpgsql;
 
+
+select compare_passwords('Password123', '\xc30d04090302a04830caca0222636dd24101cc454d1d09a75340beeeb0c4949b9435b554240ed99d4a6bcbf52833cb49030002873ea38d75d3ddaad007f89736574f280a588d35ece96e926400eadbb8bbdb')
 --CREATE OR REPLACE PROCEDURE create_users_from_table()
 --LANGUAGE plpgsql
 --AS $$
