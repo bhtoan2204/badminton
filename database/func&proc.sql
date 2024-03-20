@@ -491,42 +491,48 @@ $$ LANGUAGE plpgsql;
 
 
 ---------------PAYMENT------------------------
-CREATE OR REPLACE FUNCTION public.f_create_order(p_id_user uuid, p_id_package integer, p_amount int, p_method varchar, p_id_family int
-)
-RETURNS integer
-LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION f_create_order(p_id_user uuid, p_id_package integer, p_amount int, p_method varchar, p_id_family int)
+RETURNS int AS $$
 DECLARE
     user_exists BOOLEAN;
     new_id int;
     p_price int;
     p_expired int;
-    p_method varchar;
 BEGIN
-    SELECT EXISTS(SELECT 1 FROM users WHERE id_user = p_id_user) INTO user_exists;
-    
-    SELECT price, expired INTO p_price, p_expired 
-    FROM package 
-    WHERE id_package = p_id_package AND price = p_amount;
+    IF p_id_family = 0 THEN
+        SELECT EXISTS(SELECT 1 FROM users WHERE id_user = p_id_user) INTO user_exists;
+        
+        SELECT price, expired INTO p_price, p_expired 
+        FROM package 
+        WHERE id_package = p_id_package AND price = p_amount;
 
-    IF NOT user_exists THEN
-        RAISE EXCEPTION 'User does not exist';
-    ELSIF p_price IS NULL THEN
-        RAISE EXCEPTION 'Package does not match';
-    ELSE
+        IF NOT user_exists THEN
+            RAISE EXCEPTION 'User does not exist';
+        ELSIF p_price IS NULL THEN
+            RAISE EXCEPTION 'Package does not match';
+        ELSE
+            BEGIN
+                INSERT INTO "order"(id_user, id_package, status, created_at, expired_at, id_family, method) 
+                VALUES (p_id_user, p_id_package, 'Pending', NOW(), NOW() + INTERVAL '1 month' * p_expired, null, p_method)
+                RETURNING id_order INTO new_id;
+                RETURN new_id;
+            EXCEPTION
+                WHEN others THEN
+                    RAISE EXCEPTION 'Failed to create order: %', SQLERRM;
+            END;
+        END IF;
+    ELSE 
         BEGIN
             INSERT INTO "order"(id_user, id_package, status, created_at, expired_at, id_family, method) 
             VALUES (p_id_user, p_id_package, 'Pending', NOW(), NOW() + INTERVAL '1 month' * p_expired, p_id_family, p_method)
             RETURNING id_order INTO new_id;
-            RETURN new_id;
-        EXCEPTION
-            WHEN others THEN
-                RAISE EXCEPTION 'Failed to create order: %', SQLERRM;
+           	RETURN new_id;
+
         END;
     END IF;
-
 END;
-$function$;
+$$ LANGUAGE plpgsql;
+
 
 
 
@@ -562,7 +568,11 @@ DECLARE
     p_expired int;
 BEGIN 
     SELECT id_package, status, id_family INTO valid_order, status_payment, p_id_family FROM "order" WHERE id_order = p_id_order and id_user=p_id_user; 
+<<<<<<< Updated upstream:database/func&proc.sql
     SELECT expired INTO p_expired FROM package WHERE id_package = valid_order AND price = p_amount / 100;
+=======
+    SELECT expired INTO p_expired FROM package WHERE id_package = valid_order AND price*100 = p_amount;
+>>>>>>> Stashed changes:Database/func&proc.sql
 
     IF status_payment = 'Pending' THEN
         IF p_expired is not null THEN
@@ -587,7 +597,8 @@ BEGIN
                 UPDATE "order" SET status = 'Failed' WHERE id_order = p_id_order;
                 returnData := json_build_object('RspCode', '97', 'Message', 'Checksum failed');
             END IF;
-        ELSE
+        else
+        	UPDATE "order" SET status = 'Failed' WHERE id_order = p_id_order;
             returnData := json_build_object('RspCode', '02', 'Message', 'This order has been updated to the payment status');
         END IF;
     
@@ -597,7 +608,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+<<<<<<< Updated upstream:database/func&proc.sql
 select * from f_check_order('bd94ba3a-b046-4a05-a260-890913e09df9', 129, 10000000, '00','00')
+=======
+select * from f_check_order('bd94ba3a-b046-4a05-a260-890913e09df9', 64, 10000000, '00','00')
+>>>>>>> Stashed changes:Database/func&proc.sql
 --CREATE TYPE status_e AS ENUM ('Failed', 'Succeeded', 'Pending', 'Refunded');
 
 --CREATE TYPE type_otp AS ENUM ('verify', 'register', 'forgot_password');
