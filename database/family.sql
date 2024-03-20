@@ -567,7 +567,7 @@ END;
 $function$
 ;
 
-
+select * from compare_passwords('Password123','444')
 
 
 CREATE OR REPLACE FUNCTION public.crypt(text, text)
