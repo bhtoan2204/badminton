@@ -23,13 +23,6 @@ spec:
       - name: chat
         image: mjkundta/chat:<TAG>
         command: ["node", "dist/apps/chat/src/main"]
-        resources:
-          limits:
-            cpu: "0.25"
-            memory: "512Mi"
-          requests:
-            cpu: "0.1"
-            memory: "128Mi"
         env:
         - name: NODE_ENV
           value: "production"
