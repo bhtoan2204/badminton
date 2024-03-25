@@ -23,6 +23,13 @@ spec:
       - name: crawler
         image: mjkundta/crawler:<TAG>
         command: ["node", "dist/apps/crawler/src/main"]
+        resources:
+          limits:
+            cpu: "0.25"
+            memory: "512Mi"
+          requests:
+            cpu: "0.1"
+            memory: "128Mi"
         env:
         - name: NODE_ENV
           value: "production"
