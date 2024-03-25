@@ -11,7 +11,7 @@ pipeline {
     }
 
     environment {
-        SSH_password = credentials('SSH-password')
+        SSH_password = credentials('SSH_password')
         SSH_user = credentials('SSH_user')
         SSH_ip = credentials('SSH_ip')
     }
