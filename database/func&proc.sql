@@ -667,5 +667,3 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
-select f_generate_link_invite(92)
