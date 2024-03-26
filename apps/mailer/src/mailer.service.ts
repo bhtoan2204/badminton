@@ -42,9 +42,38 @@ export class MailService {
     }
   }
 
-  async sendInvite(dto) {
+  async sendInvite(id_user, id_family) {
+
+    try {
+        const Query = 'select f_generate_link_invite($1)';
+        const params = [id_family];
+        const result = await this.entityManager.query(Query, params);
+        const inviteLink = result[0].f_generate_link_invite;
+
+        const emailContent = `
+            Join Famfund!
+
+            We are a community of warmth, support, and love. We are thrilled to welcome you to join our family!
+
+            Please use the following link to join Famfund: ${inviteLink}
+        `;
+        return emailContent;
+        // return {
+        //     message: 'success',
+        //     content: emailContent
+        // };
+    }
+    catch (err) {
+        throw new RpcException({
+            code: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: err.message
+        });
+    }
+}
+
+  
     
-  }
+  
 
   async sendResetPassword(dto) {
 

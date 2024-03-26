@@ -119,12 +119,16 @@ BEGIN
     decrypted_password := pgp_sym_decrypt(hashed_password::BYTEA, decryption_key);
 
     -- So sánh mật khẩu đã giải mã với mật khẩu nhập vào
-    RETURN decrypted_password = input_password;
+    if decrypted_password = input_password then
+    	return true;
+    else 
+    	return false;
+    end if;
 END;
 $$ LANGUAGE plpgsql;
 
 
-select compare_passwords('Password123', '\xc30d04090302a04830caca0222636dd24101cc454d1d09a75340beeeb0c4949b9435b554240ed99d4a6bcbf52833cb49030002873ea38d75d3ddaad007f89736574f280a588d35ece96e926400eadbb8bbdb')
+select compare_passwords('Password123', '\xc30d040903029ac876ed0fa8fd7b70d241019803e40a4f3ed07f1e6a79286f0ff61bc5dc03fdaf6e3e6b1cb26a958b6999aa974ca523627b4b9a16a9df6dc8b3ab94346a8cdb1e57fc9f733c71ea5ec78715')
 --CREATE OR REPLACE PROCEDURE create_users_from_table()
 --LANGUAGE plpgsql
 --AS $$
