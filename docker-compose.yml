@@ -171,15 +171,10 @@ services:
       - /usr/src/app/node_modules
 
   rabbitmq:
-    image: rabbitmq:management
+    image: rabbitmq
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 30s
       timeout: 10s
       retries: 5
     restart: on-failure
-    ports:
-    - "15672:15672"
-    environment:
-      - RABBITMQ_DEFAULT_USER=username
-      - RABBITMQ_DEFAULT_PASS=password
