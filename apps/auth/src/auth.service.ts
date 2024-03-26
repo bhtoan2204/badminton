@@ -243,7 +243,7 @@ export class AuthService {
     const result = await this.entityManager.query(Query, param);
 
     const isMatch = result[0]['compare_passwords'];
-    console.log(isMatch);
+    //console.log(isMatch);
 
     if (!isMatch) {
       throw new RpcException({

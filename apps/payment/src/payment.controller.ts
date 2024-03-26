@@ -46,6 +46,6 @@ export class PaymentController {
     return this.paymentService.generateVnpay(data.id_user, data.order, data.ip);
   }
 
-
+  
   
 }

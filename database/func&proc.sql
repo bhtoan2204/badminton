@@ -568,11 +568,8 @@ DECLARE
     p_expired int;
 BEGIN 
     SELECT id_package, status, id_family INTO valid_order, status_payment, p_id_family FROM "order" WHERE id_order = p_id_order and id_user=p_id_user; 
-<<<<<<< Updated upstream:database/func&proc.sql
     SELECT expired INTO p_expired FROM package WHERE id_package = valid_order AND price = p_amount / 100;
-=======
     SELECT expired INTO p_expired FROM package WHERE id_package = valid_order AND price*100 = p_amount;
->>>>>>> Stashed changes:Database/func&proc.sql
 
     IF status_payment = 'Pending' THEN
         IF p_expired is not null THEN
@@ -608,11 +605,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-<<<<<<< Updated upstream:database/func&proc.sql
 select * from f_check_order('bd94ba3a-b046-4a05-a260-890913e09df9', 129, 10000000, '00','00')
-=======
+
 select * from f_check_order('bd94ba3a-b046-4a05-a260-890913e09df9', 64, 10000000, '00','00')
->>>>>>> Stashed changes:Database/func&proc.sql
 --CREATE TYPE status_e AS ENUM ('Failed', 'Succeeded', 'Pending', 'Refunded');
 
 --CREATE TYPE type_otp AS ENUM ('verify', 'register', 'forgot_password');
@@ -638,7 +633,39 @@ insert into payment_method(name, code) values('VNPAY', 'vnpay');
 insert into payment_method(name, code) values('ZaloPay', 'zalopay');
 
 
+CREATE OR REPLACE FUNCTION "public".generate_unique_invite_code()
+RETURNS varchar AS
+DECLARE
+    characters VARCHAR := 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    invite_code VARCHAR := '';
+    i INT := 0;
+BEGIN
+    FOR i IN 1..10 LOOP -- Độ dài mã mời mong muốn (10 ký tự)
+        invite_code := invite_code || substr(characters, floor(random() * length(characters) + 1)::integer, 1);
+    END LOOP;
+    
+    RETURN invite_code;
+END;
+LANGUAGE plpgsql;
+
+select generate_unique_invite_code();
+
+CREATE OR REPLACE FUNCTION f_generate_link_invite(p_id_family INT)
+RETURNS VARCHAR AS $$
+DECLARE 
+    invite_code VARCHAR;
+BEGIN 
+    -- Kiểm tra xem mã mời đã tồn tại cho family hay chưa
+    SELECT code_invite INTO invite_code FROM family WHERE id_family = p_id_family;
+
+    IF invite_code IS NULL THEN
+        invite_code := generate_unique_invite_code();
+        UPDATE family SET code_invite = invite_code WHERE id_family = p_id_family;
+    END IF;
+
+    RETURN 'http://localhost:8080/invite/' || invite_code;
+END;
+$$ LANGUAGE plpgsql;
 
 
-
-
+select f_generate_link_invite(92)
