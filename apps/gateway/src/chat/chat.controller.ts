@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, UseGuards } from "@nestjs/common";
+import { Controller, Get, HttpCode, HttpStatus, Param, Res, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { CurrentUser } from "../utils";
@@ -33,9 +33,9 @@ export class ChatController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get image' })
-  @Get('getImage/:id_image')
-  @ApiParam({ name: 'id_image', required: true, description: 'The ID of the image' })
-  async getImage(@CurrentUser() currentUser, @Param('id_image') id_image: string) {
-    return this.chatService.getImage(currentUser.id_user, id_image);
+  @Get('getImage/:image_name')
+  @ApiParam({ name: 'image_name', required: true, description: 'The name of the image' })
+  async getImage(@CurrentUser() user, @Param('image_name') image_name: string, @Res() response){
+    return await this.chatService.getImage(image_name);
   }
 }
