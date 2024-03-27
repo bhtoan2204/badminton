@@ -1,7 +1,8 @@
-import { FamilyMessageContent, MessageContent } from '@app/common';
+import { FamilyMessageContent, MessageContent, UploadFileRequest } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
+import { StorageService } from './storage/storage.service';
 
 const limit = 20;
 
@@ -10,7 +11,13 @@ export class ChatService {
   constructor(
     @InjectModel(MessageContent.name) private messageRepository,
     @InjectModel(FamilyMessageContent.name) private familyMessageRepository,
+    private readonly storageService: StorageService
   ) { }
+
+  async base64ToUint8Array(base64: string): Promise<Uint8Array> {
+    const buffer = Buffer.from(base64, 'base64');
+    return new Uint8Array(buffer);
+  }
 
   async getMessages(senderId: string, receiverId: string, index: number): Promise<MessageContent[]> {
     try {
@@ -100,6 +107,32 @@ export class ChatService {
   }
 
   async saveImageMessage(id_user, messageData) {
-    // save image to database
+    try {
+      const fileName = 'chat_' + id_user + '_' + Date.now();
+      const fileUint8Array = await this.base64ToUint8Array(messageData.imageData)
+      const params: UploadFileRequest = {
+        fileName: fileName,
+        file: fileUint8Array,
+      };
+
+      const uploadImageData = await this.storageService.uploadImageChat(params);
+      const fileUrl = uploadImageData.fileUrl;
+      
+      if (!id_user || !messageData.receiverId || id_user === messageData.receiverId) {
+        throw new Error('Invalid sender or receiver ID.');
+      }
+      const newMessageContent = new this.messageRepository({
+        _id: null,
+        senderId: id_user,
+        type: 'photo',
+        receiverId: messageData.receiverId,
+        content: fileUrl,
+      });
+      return await newMessageContent.save();
+    } catch (error) {
+      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
+      const message = error.message || 'An error occurred while saving the message.';
+      throw new RpcException({ message, statusCode });
+    }
   }
 }
