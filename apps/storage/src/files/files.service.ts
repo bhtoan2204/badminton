@@ -68,7 +68,7 @@ export class FilesService {
           reject(err);
         });
         stream.on('finish', () => {
-          const publicUrl = `${this.configService.get("FRONTEND_URL")}${this.bucket}/${path}`;
+          const publicUrl = `https://storage.googleapis.com/${this.bucket}/${path}`;
           resolve({
             fileName: fileName,
             fileUrl: publicUrl,
