@@ -12,8 +12,8 @@ export class StorageService implements OnModuleInit{
     this.storageService = this.storageClient.getService<StorageServiceClient>(STORAGE_SERVICE_NAME);
   }
 
-  async uploadFile(request: UploadFileRequest): Promise<UploadFileResponse> {
-    return this.storageService.uploadFile(request).toPromise();
+  async uploadImageChat(request: UploadFileRequest): Promise<UploadFileResponse> {
+    return this.storageService.uploadImageChat(request).toPromise();
   }
 
   async readFile(request: ReadFileRequest): Promise<ReadFileResponse> {

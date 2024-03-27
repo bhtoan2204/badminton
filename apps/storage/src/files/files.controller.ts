@@ -9,11 +9,17 @@ export class FilesController implements StorageServiceController {
   constructor(private readonly filesService: FilesService) {}
   
   async uploadFile(request: UploadFileRequest): Promise<UploadFileResponse> {
-    return await this.filesService.uploadFile(request);
+    return await this.filesService.uploadFileToAvatar(request);
   }
-  readFile(request: ReadFileRequest): ReadFileResponse | Observable<ReadFileResponse> | Promise<ReadFileResponse> {
-    throw new Error('Method not implemented.');
+
+  async uploadImageChat(request: UploadFileRequest): Promise<UploadFileResponse> {
+    return await this.filesService.uploadFileToChat(request);
   }
+
+  async readFile(request: ReadFileRequest): Promise<ReadFileResponse> {
+    return await this.filesService.readFile(request);
+  }
+
   async deleteFile(request: DeleteFileRequest): Promise<DeleteFileResponse> {
     return await this.filesService.deleteFile(request);
   }

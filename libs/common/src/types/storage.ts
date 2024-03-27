@@ -17,12 +17,14 @@ export interface UploadFileResponse {
 
 export interface ReadFileRequest {
   fileName: string;
+  filePath: string;
 }
 
 export interface ReadFileResponse {
   fileName: string;
-  fileUrl: string;
+  fileContent: string;
   message: string;
+  mimeType: string;
 }
 
 export interface DeleteFileRequest {
@@ -42,6 +44,8 @@ export interface StorageServiceClient {
   readFile(request: ReadFileRequest): Observable<ReadFileResponse>;
 
   deleteFile(request: DeleteFileRequest): Observable<DeleteFileResponse>;
+
+  uploadImageChat(request: UploadFileRequest): Observable<UploadFileResponse>;
 }
 
 export interface StorageServiceController {
@@ -54,11 +58,15 @@ export interface StorageServiceController {
   deleteFile(
     request: DeleteFileRequest,
   ): Promise<DeleteFileResponse> | Observable<DeleteFileResponse> | DeleteFileResponse;
+
+  uploadImageChat(
+    request: UploadFileRequest,
+  ): Promise<UploadFileResponse> | Observable<UploadFileResponse> | UploadFileResponse;
 }
 
 export function StorageServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["uploadFile", "readFile", "deleteFile"];
+    const grpcMethods: string[] = ["uploadFile", "readFile", "deleteFile", "uploadImageChat"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("StorageService", method)(constructor.prototype[method], method, descriptor);
