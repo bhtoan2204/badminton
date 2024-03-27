@@ -135,15 +135,4 @@ export class ChatService {
       throw new RpcException({ message, statusCode });
     }
   }
-
-  async getImage(image_name) {
-    try {
-      const image = await this.storageService.readFile({fileName: image_name, filePath: 'chat'});
-      return image;
-    } catch (error) {
-      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
-      const message = error.message || 'An error occurred while getting the image.';
-      throw new RpcException({ message, statusCode });
-    }
-  }
 }

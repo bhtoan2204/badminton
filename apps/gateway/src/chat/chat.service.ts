@@ -70,14 +70,4 @@ export class ChatService {
       throw new HttpException(error, error.statusCode);
     }
   }
-
-  async getImage(image_name: string): Promise<ReadFileResponse> {
-    try {
-      const response = this.chatClient.send('chatClient/getImage', { image_name });
-      return await lastValueFrom(response);
-    }
-    catch (error) {
-      throw new HttpException(error, error.statusCode);
-    }
-  }
 }
