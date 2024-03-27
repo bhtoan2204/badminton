@@ -2,6 +2,7 @@ import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { CHAT_SERVICE, FAMILY_SERVICE } from '../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, timeout } from 'rxjs';
+import { ReadFileResponse } from '@app/common';
 
 @Injectable()
 export class ChatService {
@@ -70,9 +71,9 @@ export class ChatService {
     }
   }
 
-  async getImage(id_user: string, id_image: string) {
+  async getImage(image_name: string): Promise<ReadFileResponse> {
     try {
-      const response = this.chatClient.send('chatClient/getImage', { id_user, id_image });
+      const response = this.chatClient.send('chatClient/getImage', { image_name });
       return await lastValueFrom(response);
     }
     catch (error) {

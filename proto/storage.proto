@@ -6,6 +6,7 @@ service StorageService {
   rpc uploadFile(UploadFileRequest) returns (UploadFileResponse);
   rpc readFile(ReadFileRequest) returns (ReadFileResponse);
   rpc deleteFile(DeleteFileRequest) returns (DeleteFileResponse);
+  rpc uploadImageChat(UploadFileRequest) returns (UploadFileResponse);
 }
 
 message UploadFileRequest {
@@ -21,12 +22,14 @@ message UploadFileResponse {
 
 message ReadFileRequest {
   string file_name = 1;
+  string file_path = 2;
 }
 
 message ReadFileResponse {
   string file_name = 1;
-  string file_url = 2;
+  string file_content = 2;
   string message = 3;
+  string mime_type = 4;
 }
 
 message DeleteFileRequest {

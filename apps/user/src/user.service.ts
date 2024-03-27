@@ -2,7 +2,6 @@ import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, EntityManager } from "typeorm";
 import { CreateAccountDto } from "./dto/createAccount.dto";
-import { ConfigService } from "@nestjs/config";
 import { DeleteFileRequest, UploadFileRequest, Users } from "@app/common";
 import { RpcException } from "@nestjs/microservices";
 import { StorageService } from "./storage/storage.service";
@@ -11,7 +10,6 @@ import { StorageService } from "./storage/storage.service";
 export class UserService {
   constructor(
     @InjectRepository(Users) private userRepository: Repository<Users>,
-    private readonly configService: ConfigService,
     private readonly entityManager: EntityManager,
     private readonly storageService: StorageService
   ) {}
