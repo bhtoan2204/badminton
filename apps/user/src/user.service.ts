@@ -17,7 +17,7 @@ export class UserService {
   async createAccount(createAccountDto: CreateAccountDto) {
     try {
       const { email, phone, password, firstname, lastname } = createAccountDto;
-
+      
       const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6)';
       const parameters = [email, phone, password, firstname, lastname, null];
 

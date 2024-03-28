@@ -26,8 +26,11 @@ export class AuthService {
         }
       });
       if (!user) {
-        const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7)';
-        const parameters = [profile.emails[0].value, null, null, profile.name.givenName, profile.name.familyName, null, LoginType.GOOGLE];
+        const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7, $8)';
+        const parameters = [profile.emails[0].value, null, '',
+        profile.name.givenName, profile.name.familyName,
+          null, LoginType.GOOGLE, profile.photos[0].value];
+
         const data = await this.entityManager.query(query, parameters);
 
         return await this.userRepository.findOne({
@@ -61,8 +64,9 @@ export class AuthService {
         }
       });
       if (!user) {
-        const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7)';
-        const parameters = [profile._json.email, null, null, profile.name.givenName, profile.name.familyName, null, LoginType.FACEBOOK];
+        console.log(profile)
+        const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7, $8)';
+        const parameters = [profile._json.email, null, '', profile.name.givenName, profile.name.familyName, '', LoginType.FACEBOOK, profile.photos[0].value];
         const data = await this.entityManager.query(query, parameters);
 
         return await this.userRepository.findOne({
@@ -243,7 +247,6 @@ export class AuthService {
     const result = await this.entityManager.query(Query, param);
 
     const isMatch = result[0]['compare_passwords'];
-    //console.log(isMatch);
 
     if (!isMatch) {
       throw new RpcException({
