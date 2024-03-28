@@ -2,7 +2,6 @@ import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { CHAT_SERVICE, FAMILY_SERVICE } from '../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, timeout } from 'rxjs';
-import { ReadFileResponse } from '@app/common';
 
 @Injectable()
 export class ChatService {

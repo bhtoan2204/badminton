@@ -130,12 +130,6 @@ export class ChatGateway implements OnModuleInit {
     }
   }
 
-  @SubscribeMessage('newVideoMessage')
-  @UseGuards(WsJwtAuthGuard)
-  async emitVideoMessage(@ConnectedSocket() client: Socket, @WsCurrentUser() user, @MessageBody() message: NewImageMessageDto) {
-
-  }
-
   @SubscribeMessage('join_room')
   @UseGuards(WsJwtAuthGuard)
   async joinRoom( @MessageBody() roomName: string, @ConnectedSocket() socket: Socket, @WsCurrentUser() user ) {
