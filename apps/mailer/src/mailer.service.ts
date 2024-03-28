@@ -58,10 +58,6 @@ export class MailService {
             Please use the following link to join Famfund: ${inviteLink}
         `;
         return emailContent;
-        // return {
-        //     message: 'success',
-        //     content: emailContent
-        // };
     }
     catch (err) {
         throw new RpcException({

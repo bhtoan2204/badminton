@@ -1,7 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { DeleteFileRequest, DeleteFileResponse, ReadFileRequest, ReadFileResponse, StorageServiceController, StorageServiceControllerMethods, UploadFileRequest, UploadFileResponse } from '@app/common';
-import { Observable } from 'rxjs';
 
 @Controller()
 @StorageServiceControllerMethods()

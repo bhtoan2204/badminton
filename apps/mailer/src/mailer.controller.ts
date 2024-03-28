@@ -2,7 +2,6 @@ import { Controller } from '@nestjs/common';
 import { MailService } from './mailer.service';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { RmqService } from '@app/common';
-import { data } from 'cheerio/lib/api/attributes';
 
 @Controller()
 export class MailController {
