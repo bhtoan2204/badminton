@@ -1,6 +1,7 @@
-import { Injectable, HttpException } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { EntityManager } from "typeorm";
 import { ConfigService } from "@nestjs/config";
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class RoleService {
@@ -18,7 +19,10 @@ export class RoleService {
       return data;
     }
     catch (error) {
-      throw new HttpException(error, error.statusCode);
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
     };
   }
 
@@ -29,7 +33,10 @@ export class RoleService {
       return data;
     }
     catch (error) {
-      throw new HttpException(error, error.statusCode);
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
     };
   }
 }

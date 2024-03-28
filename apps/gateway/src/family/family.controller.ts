@@ -18,7 +18,6 @@ export class FamilyController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all family' })
   @Get('getAllFamily')
-  @UseGuards(JwtAuthGuard)
   async getAllFamily(@CurrentUser() currentUser) {
     return this.familyService.getAllFamily(currentUser.id_user);
   }
