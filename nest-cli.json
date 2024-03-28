@@ -148,6 +148,15 @@
         ],
         "watchAssets": true
       }
+    },
+    "guideline": {
+      "type": "application",
+      "root": "apps/guideline",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
+      "compilerOptions": {
+        "tsConfigPath": "apps/guideline/tsconfig.app.json"
+      }
     }
   }
 }
