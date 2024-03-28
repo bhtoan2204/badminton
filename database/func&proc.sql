@@ -279,7 +279,7 @@ begin
 end;
 $$ LANGUAGE plpgsql;
 
---select * from f_update_family('bd94ba3a-b046-4a05-a260-890913e09df9', 45 , 'vdbfvj', 'fnjdf')
+--select * from f_update_family('bd94ba3a-b046-4a05-a260-890913e09df9', 93 , 'vdbfvj', 'fnjdf')
 
 
 CREATE OR REPLACE function f_delete_family(
@@ -388,19 +388,19 @@ $$ LANGUAGE plpgsql;
 
 --select * from f_delete_member('75531187-fa7c-4bff-8b2c-db9b515b8f63', '75531187-fa7c-4bff-8b2c-db9b515b8f63', 43)
 
-CREATE OR REPLACE FUNCTION public.f_get_all_member(p_id_user uuid, p_id_family integer)
- RETURNS SETOF view_users
+CREATE OR REPLACE FUNCTION f_get_all_member(p_id_user uuid, p_id_family integer)
+ RETURNS SETOF view_users_role
  LANGUAGE plpgsql
 AS $function$
 DECLARE
     recordCount int;
-    userRecord view_users%ROWTYPE;
+    userRecord view_users_role%ROWTYPE;
 BEGIN
     SELECT COUNT(*) INTO recordCount FROM member_family WHERE id_user = p_id_user AND id_family = p_id_family;
 
     IF recordCount > 0 THEN
         FOR userRecord IN 
-            SELECT * FROM view_users WHERE id_user IN (SELECT id_user FROM member_family WHERE id_family = p_id_family)
+            SELECT * FROM view_users_role WHERE id_user = p_id_user and id_family=p_id_family
         LOOP
             RETURN NEXT userRecord;
         END LOOP;
@@ -410,6 +410,23 @@ BEGIN
 END;
 $function$
 
+select* from f_get_all_member('bd94ba3a-b046-4a05-a260-890913e09df9', 92)
+
+CREATE OR REPLACE VIEW public.view_users_role
+AS 
+SELECT 
+    users.id_user,
+    users.email,
+    users.phone,
+    users.language,
+    users.firstname,
+    users.lastname,
+    m.id_family,
+    m.role
+FROM 
+    users 
+JOIN 
+    member_family m ON users.id_user = m.id_user;
 
 
 
@@ -611,23 +628,54 @@ select * from f_check_order('bd94ba3a-b046-4a05-a260-890913e09df9', 64, 10000000
 --CREATE TYPE status_e AS ENUM ('Failed', 'Succeeded', 'Pending', 'Refunded');
 
 --CREATE TYPE type_otp AS ENUM ('verify', 'register', 'forgot_password');
+CREATE VIEW order_and_family_view AS
+SELECT o.id_order, o.id_package, p.name AS package_name, p.price AS package_price, p.description AS package_description, 
+       o.id_family AS order_family_id, o.expired_at AS order_expired_at,
+       f.name AS family_name, f.quantity AS family_quantity
+FROM "order" o
+JOIN package p ON o.id_package = p.id_package
+LEFT JOIN family f ON o.id_family = f.id_family;
 
+-- Define a composite type
+CREATE TYPE order_info_type AS (
+    id_order INT, 
+    id_package INT, 
+    package_name VARCHAR,
+    package_price INT,
+    package_description VARCHAR,
+    order_family_id INT,
+    order_expired_at TIMESTAMP,
+    family_name VARCHAR,
+    family_quantity INT
+);
 
-CREATE OR REPLACE FUNCTION f_get_order_info(p_id_user uuid) 
-RETURNS TABLE (id_order INT, id_package INT, name varchar, price INT, description VARCHAR, id_family int, expired_at TIMESTAMP) AS
+-- Create the function using the composite type
+CREATE OR REPLACE FUNCTION f_get_order_info(p_id_user uuid)
+RETURNS SETOF order_info_type AS
 $$
+DECLARE
+    order_record order_info_type;
 BEGIN
-    RETURN QUERY 
-    SELECT o.id_order, o.id_package,p.name, p.price, p.description, o.id_family, o.expired_at
-    FROM "order" o
-    JOIN package p ON o.id_package = p.id_package
-    WHERE o.status = 'Succeeded' AND o.id_user = p_id_user;
+    FOR order_record IN
+        SELECT o.id_order, o.id_package, p.name AS package_name, p.price AS package_price, p.description AS package_description, 
+               o.id_family AS order_family_id, o.expired_at AS order_expired_at,
+               f.name AS family_name, f.quantity AS family_quantity
+        FROM "order" o
+        JOIN package p ON o.id_package = p.id_package
+        LEFT JOIN family f ON o.id_family = f.id_family
+        WHERE o.status = 'Succeeded' AND o.id_user = p_id_user
+    LOOP
+        RETURN NEXT order_record;
+    END LOOP;
+
+    RETURN;
 END;
 $$
 LANGUAGE plpgsql;
 
 
---select * from f_get_order_info('bd94ba3a-b046-4a05-a260-890913e09df9')
+
+select * from f_get_order_info('bd94ba3a-b046-4a05-a260-890913e09df9')
 
 insert into payment_method(name, code) values('VNPAY', 'vnpay');
 insert into payment_method(name, code) values('ZaloPay', 'zalopay');
@@ -666,4 +714,11 @@ BEGIN
     RETURN 'http://localhost:8080/invite/' || invite_code;
 END;
 $$ LANGUAGE plpgsql;
+
+
+
+
+
+
+
 

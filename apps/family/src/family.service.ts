@@ -101,13 +101,13 @@ export class FamilyService {
     }
   }
 
-  async updateFamily(id_user: string, UpdateFamilyDTO: any) {
+  async updateFamily(id_user: string, UpdateFamilyDTO) {
     try {
       const { id_family, description, name } = UpdateFamilyDTO;
       const Query = 'select * from f_update_family($1,$2,$3,$4)';
       const param = [id_user, id_family, name, description];
       const data = await this.entityManager.query(Query, param);
-      return data[0]['f_update_family'];
+      return data;
     }
     catch (error) {
       throw new RpcException({
