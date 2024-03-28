@@ -64,7 +64,6 @@ export class AuthService {
         }
       });
       if (!user) {
-        console.log(profile)
         const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7, $8)';
         const parameters = [profile._json.email, null, '', profile.name.givenName, profile.name.familyName, '', LoginType.FACEBOOK, profile.photos[0].value];
         const data = await this.entityManager.query(query, parameters);

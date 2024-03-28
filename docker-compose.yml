@@ -170,6 +170,20 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
 
+  guideline:
+    image: mjkundta/guideline:latest
+    build:
+      context: .
+      dockerfile: ./apps/guideline/Dockerfile
+      target: development
+    command: npm run start:dev guideline
+    depends_on:
+      - gateway
+    restart: on-failure
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
   rabbitmq:
     image: rabbitmq
     healthcheck:

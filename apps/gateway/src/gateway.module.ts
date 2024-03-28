@@ -12,6 +12,7 @@ import { CalendarModule } from './calendar/calendar.module';
 import { VideoModule } from './video/video.module';
 import { UserModule } from './user/user.module';
 import * as Joi from 'joi';
+import { GuidelineModule } from './guideline/guideline.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import * as Joi from 'joi';
         RABBIT_MQ_ROLE_QUEUE: Joi.string().required(),
         RABBIT_MQ_CRAWLER_QUEUE: Joi.string().required(),
         RABBIT_MQ_CALENDAR_QUEUE: Joi.string().required(),
+        RABBIT_MQ_GUIDELINE_QUEUE: Joi.string().required(),
 
         GOOGLE_CLIENT_ID: Joi.string().required(),
         GOOGLE_CLIENT_SECRET: Joi.string().required(),
@@ -51,6 +53,7 @@ import * as Joi from 'joi';
     VideoModule,
     CrawlerModule,
     CalendarModule,
+    GuidelineModule,
     AdminModule,
   ],
   controllers: [],

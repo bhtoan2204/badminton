@@ -8,7 +8,7 @@ export class MailService {
   constructor(
     private readonly mailerService: MailerService,
     private readonly entityManager: EntityManager
-    ) {}
+  ) { }
 
   async sendUserConfirmation(dto) {
     const { userInfo, email } = dto;
@@ -16,9 +16,9 @@ export class MailService {
       const generateOtpQuery = 'SELECT * FROM f_generate_otp($1, $2)';
       const generateOtpParams = [userInfo.id_user, email];
       const code = await this.entityManager.query(generateOtpQuery, generateOtpParams);
-      
+
       const sendConfirmation = await this.mailerService.sendMail({
-        to: email, 
+        to: email,
         from: '"Famfund" <famfund@famfund.com>',
         subject: `Your OTP for Famfund Account Verification is ${code[0].f_generate_otp}`,
         template: 'verifyAccount',
@@ -27,49 +27,44 @@ export class MailService {
           otp: code[0].f_generate_otp
         }
       });
-      
+
       return {
         message: 'OTP has been sent to your email',
         data: sendConfirmation
       };
     }
-    catch (err) {
-      console.log(err);
+    catch (error) {
       throw new RpcException({
-        code: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: err.message
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
       });
     }
   }
 
   async sendInvite(id_user, id_family) {
-
     try {
-        const Query = 'select f_generate_link_invite($1)';
-        const params = [id_family];
-        const result = await this.entityManager.query(Query, params);
-        const inviteLink = result[0].f_generate_link_invite;
+      const Query = 'select f_generate_link_invite($1)';
+      const params = [id_family];
+      const result = await this.entityManager.query(Query, params);
+      const inviteLink = result[0].f_generate_link_invite;
 
-        const emailContent = `
+      const emailContent = `
             Join Famfund!
 
             We are a community of warmth, support, and love. We are thrilled to welcome you to join our family!
 
             Please use the following link to join Famfund: ${inviteLink}
         `;
-        return emailContent;
-    }
-    catch (err) {
-        throw new RpcException({
-            code: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: err.message
-        });
-    }
-}
+      return emailContent;
 
-  
-    
-  
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
 
   async sendResetPassword(dto) {
 

@@ -84,7 +84,6 @@ export class CalendarService {
 
   async deleteCalendar(id_user: string, id_calendar: number) {
     try {
-      console.log(id_user, id_calendar);
       const query = 'SELECT * FROM f_delete_calendar_event($1, $2)';
       const params = [id_user, id_calendar];
       const data = await this.entityManager.query(query, params);
