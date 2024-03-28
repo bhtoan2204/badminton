@@ -51,9 +51,9 @@ export class FamilyController {
   }
 
   @EventPattern('family/update_Family')
-  async updateFamily(@Payload() data:  any, @Ctx() context: RmqContext) {
+  async updateFamily(@Payload() data:  {id_user, updateFamilyDTO}, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.familyService.updateFamily(data.id_user,data.UpdateFamilyDTO);
+    return this.familyService.updateFamily(data.id_user,data.updateFamilyDTO);
 
   }
   @EventPattern('family/delete_Family')
