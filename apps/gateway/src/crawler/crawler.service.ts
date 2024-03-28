@@ -15,8 +15,7 @@ export class CrawlerService {
         .pipe(
           timeout(5000),
         );
-      const data = await lastValueFrom(response);
-      return data;
+      return await lastValueFrom(response);
     } catch (error) {
       throw new HttpException(error, error.statusCode);
   }

@@ -41,7 +41,7 @@ export class PaymentService {
     try {
       const Query = 'SELECT * from v_package where id_package=$1';
       const params = [id_package];
-      const data = await this.entityManager.query(Query,params);
+      const data = await this.entityManager.query(Query, params);
       return data;
     } catch (error) {
       throw new RpcException({
@@ -58,8 +58,8 @@ export class PaymentService {
       return data;
     } catch (error) {
       throw new RpcException({
-        code: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: error.message
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
       });
     }
   }
@@ -71,8 +71,8 @@ export class PaymentService {
       return data;
     } catch (error) {
       throw new RpcException({
-        code: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: error.message
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
       });
     }
   }
@@ -84,8 +84,8 @@ export class PaymentService {
       return data[0]['f_create_order'];
     } catch (error) {
       throw new RpcException({
-        code: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: error.message
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
       });
     }
   }
@@ -99,8 +99,8 @@ export class PaymentService {
       return data[0]['f_check_order'];
     } catch (error) {
       throw new RpcException({
-        code: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: error.message
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
       });
     }
   }
@@ -115,7 +115,7 @@ export class PaymentService {
         vnp_Locale: order.language || 'vn',
         vnp_CurrCode: 'VND',
         vnp_TxnRef: orderId,
-        vnp_OrderInfo: `Thanh toan cho ma giao dich: ${orderId}`,
+        vnp_OrderInfo: `Pay for transaction code: ${orderId}`,
         vnp_OrderType: 'other',
         vnp_Amount: order.amount * 100,
         vnp_ReturnUrl: `${this.vnpReturnUrl}${orderId}`,
@@ -123,21 +123,21 @@ export class PaymentService {
         vnp_CreateDate: moment().format('YYYYMMDDHHmmss'),
         ...(order.bankCode && { vnp_BankCode: order.bankCode })
       };
-      
+
       const sortedVnpParams = sortObject(vnp_Params);
       const signData = qs.stringify(sortedVnpParams, { encode: false });
       const hmac = crypto.createHmac("sha512", this.vnpHashSecret);
       const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest("hex");
       sortedVnpParams['vnp_SecureHash'] = signed;
-  
+
       return {
         isSuccess: true,
         paymentUrl: `${this.vnpUrl}?${qs.stringify(sortedVnpParams, { encode: false })}`
       };
     } catch (error) {
       throw new RpcException({
-        code: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: error.message
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
       });
     }
   }

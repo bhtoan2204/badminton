@@ -158,6 +158,19 @@ services:
     environment:
       - NODE_ENV=production
 
+  guideline:
+    image: mjkundta/guideline:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/guideline/Dockerfile
+      target: production
+    command: node dist/apps/guideline/src/main
+    depends_on:
+      - gateway
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
+
   rabbitmq:
     image: rabbitmq
     healthcheck:

@@ -6,8 +6,8 @@ import { RmqService } from '@app/common';
 @Controller()
 export class PaymentController {
   constructor(
-  private readonly paymentService: PaymentService,
-  private readonly rmqService: RmqService) {}
+    private readonly paymentService: PaymentService,
+    private readonly rmqService: RmqService) { }
 
   @EventPattern('payment/get_package')
   async get_package(@Payload() data: any, @Ctx() context: RmqContext) {
@@ -26,13 +26,12 @@ export class PaymentController {
     this.rmqService.ack(context);
     return this.paymentService.get_method();
   }
+
   @EventPattern('payment/get_order')
   async get_order(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.paymentService.get_order(data.id_user);
   }
-
-
 
   @EventPattern('payment/check_order_return')
   async UpdateStatus(@Payload() data: any, @Ctx() context: RmqContext) {
@@ -45,7 +44,4 @@ export class PaymentController {
     this.rmqService.ack(context);
     return this.paymentService.generateVnpay(data.id_user, data.order, data.ip);
   }
-
-  
-  
 }

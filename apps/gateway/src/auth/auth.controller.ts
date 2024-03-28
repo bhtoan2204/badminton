@@ -71,7 +71,6 @@ export class AuthApiController {
     @Get('facebook/callback')
     async facebookLoginCallback(@Req() request: any, @Res({ passthrough: true }) response: Response) {
         const { accessToken, refreshToken } = await this.authService.localLogin(request.user);
-
         response.cookie('accessToken', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
