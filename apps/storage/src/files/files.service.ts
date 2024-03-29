@@ -15,44 +15,9 @@ export class FilesService {
     this.bucket = this.configService.get<string>('GOOGLE_MEDIA_BUCKET');
   }
 
-  async uploadFileToAvatar({ fileName, file }: UploadFileRequest): Promise<UploadFileResponse> {
+  async uploadFile({ fileName, file }: { fileName: string; file: Uint8Array}, uploadType: string): Promise<UploadFileResponse> {
     try {
-      const path = `avatar/${fileName}`;
-      const fileRef = this.storage.bucket(this.bucket).file(path);
-      const contentType = fileName.endsWith('.png') ? 'image/png' : 'image/jpeg';
-  
-      return new Promise<UploadFileResponse>((resolve, reject) => {
-        const stream = fileRef.createWriteStream({
-          metadata: {
-            contentType: contentType,
-          },
-        });
-  
-        stream.on('error', (err) => {
-          console.log(err); 
-          reject(err);
-        });
-        stream.on('finish', () => {
-          const publicUrl = `https://storage.googleapis.com/${this.bucket}/${path}`;
-          resolve({
-            fileName: fileName,
-            fileUrl: publicUrl,
-            message: "File uploaded successfully",
-          });
-        });
-        
-        const buffer = Buffer.from(file instanceof Uint8Array ? file : new Uint8Array([])); // Chuyển đổi an toàn
-        stream.end(buffer);
-      });
-    } catch (e) {
-      console.log(e.message); 
-      throw e;
-    }
-  }
-
-  async uploadFileToChat({ fileName, file }: UploadFileRequest): Promise<UploadFileResponse> {
-    try {
-      const path = `chat/${fileName}`;
+      const path = `${uploadType}/${fileName}`;
       const fileRef = this.storage.bucket(this.bucket).file(path);
       const contentType = fileName.endsWith('.png') ? 'image/png' : 'image/jpeg';
   
@@ -84,6 +49,7 @@ export class FilesService {
       throw e;
     }
   }
+  
 
   async readFile(request: ReadFileRequest): Promise<ReadFileResponse> {
     const { fileName, filePath } = request;

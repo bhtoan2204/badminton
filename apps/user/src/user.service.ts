@@ -60,7 +60,6 @@ export class UserService {
       return data;
     }
     catch (error) {
-      console.log(error);
       if (error instanceof RpcException) {
         throw error;
       }
@@ -130,7 +129,6 @@ export class UserService {
       };
     }
     catch (error) {
-      console.log(error.message);
       throw new RpcException({
         message: error.message,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR

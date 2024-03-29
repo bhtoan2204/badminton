@@ -39,4 +39,16 @@ export class GuidelineController {
     this.rmqService.ack(context);
     return await this.guidelineService.deleteGuideline(data.id_user, data.id_family, data.id_guideline);
   }
+
+  @EventPattern('guidelineClient/get_step')
+  async getStep(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.guidelineService.getStep(data.id_user, data.id_family, data.id_guideline);
+  }
+
+  @EventPattern('guidelineClient/add_step')
+  async addStep(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.guidelineService.addStep(data.id_user, data.dto, data.file);
+  }
 }
