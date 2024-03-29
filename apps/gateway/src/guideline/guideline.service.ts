@@ -97,4 +97,28 @@ export class GuidelineService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async updateStep(id_user: string, dto: AddStepGuidelineDto, file: Express.Multer.File) {
+    try {
+      const response = this.guidelineClient.send('guidelineClient/update_step', { id_user, dto, file })
+        .pipe(
+          timeout(5000),
+        );
+      return await lastValueFrom(response);
+    } catch (error) {
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async deleteStep(id_user: string, id_family: number, id_guideline: number, index: number) {
+    try {
+      const response = this.guidelineClient.send('guidelineClient/delete_step', { id_user, id_family, id_guideline, index })
+        .pipe(
+          timeout(5000),
+        );
+      return await lastValueFrom(response);
+    } catch (error) {
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }

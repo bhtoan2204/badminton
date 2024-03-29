@@ -68,9 +68,9 @@ export class FilesService {
     };
   }
   
-  async deleteFile({ fileName }: DeleteFileRequest): Promise<DeleteFileResponse> {
+  async deleteFile({ fileName }: DeleteFileRequest, uploadType: string): Promise<DeleteFileResponse> {
     try {
-        const path = `avatar/${fileName}`;
+        const path = `${uploadType}/${fileName}`;
         const fileRef = this.storage.bucket(this.bucket).file(path);
         const [exists] = await fileRef.exists();
         if (!exists) {

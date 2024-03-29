@@ -20,7 +20,7 @@ export class StorageService implements OnModuleInit{
     return this.storageService.readFile(request).toPromise();
   }
 
-  async deleteFile(request: DeleteFileRequest): Promise<DeleteFileResponse> {
-    return this.storageService.deleteFile(request).toPromise();
+  async deleteImageStep(request: DeleteFileRequest): Promise<DeleteFileResponse> {
+    return this.storageService.deleteImageStep(request).toPromise();
   }
 }
