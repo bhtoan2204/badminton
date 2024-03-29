@@ -11,12 +11,12 @@ export class RoleController {
   @EventPattern('role/getallrole')
   async getallrole(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.roleService.getallrole();
+    return this.roleService.getAllRole();
   }
 
   @EventPattern('role/getrole')
   async getrole(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.roleService.getrole(data.user, data.family);
+    return this.roleService.getRole(data.user, data.family);
   }
 }
