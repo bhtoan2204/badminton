@@ -1,11 +1,10 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { GuidelineService } from "./guideline.service";
 import { CurrentUser } from "../utils";
 import { CreateGuidelineDto } from "./dto/createGuideline.dto";
 import { UpdateGuidelineDto } from "./dto/updateGuideline.dto";
-import { AddStepGuidelineDto } from "./dto/addStep.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ImageFileInterceptor } from "../user/interceptor/imageFile.interceptor";
 
@@ -114,17 +113,58 @@ export class GuidelineController {
     return this.guidelineService.addStep(currentUser.id_user, dto, file);
   }
 
-  // @HttpCode(HttpStatus.OK)
-  // @ApiOperation({ summary: 'Update step' })
-  // @Put('updateStep')
-  // async updateStep(@CurrentUser() currentUser, @Body() dto: any) {
-  //   return this.guidelineService.updateStep(currentUser.id_user, dto);
-  // }
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Add step' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        stepImage: {
+          type: 'string',
+          format: 'binary',
+          description: 'The image of the step (optional)',
+        },
+        id_family: {
+          type: 'number',
+          description: 'The ID of the family',
+        },
+        id_guideline: {
+          type: 'number',
+          description: 'The ID of the guideline',
+        },
+        index: {
+          type: 'number',
+          description: 'The index of the step',
+        },
+        name: {
+          type: 'string',
+          description: 'The title of the step',
+        },
+        description: {
+          type: 'string',
+          description: 'The description of the step (optional)',
+        },
+      },
+      required: ["id_family", "id_guideline", "index"],
+    },
+  })
+  @UseInterceptors(FileInterceptor('stepImage', new ImageFileInterceptor().createMulterOptions()))
+  @Put('updateStep')
+  async updateStep(@CurrentUser() currentUser, @Body() dto: any, @UploadedFile() file: Express.Multer.File) {
+    if (!file && !dto.name && !dto.description) {
+      throw new HttpException('At least one field (image, name, description) must be filled', HttpStatus.BAD_REQUEST);
+    }
+    dto.id_family = parseInt(dto.id_family);
+    dto.id_guideline = parseInt(dto.id_guideline);
+    dto.index = parseInt(dto.index);
+    return this.guidelineService.updateStep(currentUser.id_user, dto, file);
+  }
 
-  // @HttpCode(HttpStatus.OK)
-  // @ApiOperation({ summary: 'Delete step' })
-  // @Delete('deleteStep/:id_family/:id_guideline/:id_step')
-  // async deleteStep(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_guideline') id_guideline: number, @Param('id_step') id_step: number) {
-  //   return this.guidelineService.deleteStep(currentUser.id_user, id_family, id_guideline, id_step);
-  // }
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Delete step' })
+  @Delete('deleteStep/:id_family/:id_guideline/:index')
+  async deleteStep(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_guideline') id_guideline: number, @Param('index') index: number) {
+    return this.guidelineService.deleteStep(currentUser.id_user, id_family, id_guideline, index);
+  }
 }
