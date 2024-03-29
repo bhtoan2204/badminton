@@ -22,7 +22,8 @@ export class ChatService {
   async getMessages(senderId: string, receiverId: string, index: number): Promise<MessageContent[]> {
     try {
       const skip = index * limit;
-      return this.messageRepository.find({
+      console.log(this.messageRepository.find({ senderId: senderId, receiverId: receiverId }));
+      return await this.messageRepository.find({
         $or: [
           { senderId: senderId, receiverId: receiverId },
           { senderId: receiverId, receiverId: senderId }

@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import { EntityManager } from "typeorm";
 import { ConfigService } from "@nestjs/config";
 import { RpcException } from '@nestjs/microservices';
@@ -10,9 +10,9 @@ export class RoleService {
     private readonly entityManager: EntityManager
   ) { }
 
-  async getrole(user, family) {
+  async getRole(user, family) {
     try {
-      const q2 = 'select * from f_get_role_member($1, $2)';
+      const q2 = 'SELECT * FROM f_get_role_member($1, $2)';
       const param = [user, family];
 
       const data = await this.entityManager.query(q2, param);
@@ -26,9 +26,9 @@ export class RoleService {
     };
   }
 
-  async getallrole() {
+  async getAllRole() {
     try {
-      const q2 = 'select * from v_get_role';
+      const q2 = 'SELECT * FROM v_get_role';
       const data = await this.entityManager.query(q2);
       return data;
     }

@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { GuidelineService } from './guideline.service';
 import { RmqService } from '@app/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
@@ -38,5 +38,29 @@ export class GuidelineController {
   async deleteGuideline(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return await this.guidelineService.deleteGuideline(data.id_user, data.id_family, data.id_guideline);
+  }
+
+  @EventPattern('guidelineClient/get_step')
+  async getStep(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.guidelineService.getStep(data.id_user, data.id_family, data.id_guideline);
+  }
+
+  @EventPattern('guidelineClient/add_step')
+  async addStep(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.guidelineService.addStep(data.id_user, data.dto, data.file);
+  }
+
+  @EventPattern('guidelineClient/update_step')
+  async updateStep(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.guidelineService.updateStep(data.id_user, data.dto, data.file);
+  }
+
+  @EventPattern('guidelineClient/delete_step')
+  async deleteStep(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.guidelineService.deleteStep(data.id_user, data.id_family, data.id_guideline, data.index);
   }
 }
