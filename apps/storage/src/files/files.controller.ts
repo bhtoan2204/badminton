@@ -8,11 +8,15 @@ export class FilesController implements StorageServiceController {
   constructor(private readonly filesService: FilesService) {}
   
   async uploadFile(request: UploadFileRequest): Promise<UploadFileResponse> {
-    return await this.filesService.uploadFileToAvatar(request);
+    return await this.filesService.uploadFile(request, 'avatar');
   }
 
   async uploadImageChat(request: UploadFileRequest): Promise<UploadFileResponse> {
-    return await this.filesService.uploadFileToChat(request);
+    return await this.filesService.uploadFile(request, 'chat');
+  }
+
+  async uploadImageStep(request: UploadFileRequest): Promise<UploadFileResponse> {
+    return await this.filesService.uploadFile(request, 'step');
   }
 
   async readFile(request: ReadFileRequest): Promise<ReadFileResponse> {
