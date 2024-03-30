@@ -15,7 +15,7 @@ export class FilesService {
     this.bucket = this.configService.get<string>('GOOGLE_MEDIA_BUCKET');
   }
 
-  async uploadFile({ fileName, file }: { fileName: string; file: Uint8Array}, uploadType: string): Promise<UploadFileResponse> {
+  async uploadFile({ fileName, file }: UploadFileRequest, uploadType: string): Promise<UploadFileResponse> {
     try {
       const path = `${uploadType}/${fileName}`;
       const fileRef = this.storage.bucket(this.bucket).file(path);
