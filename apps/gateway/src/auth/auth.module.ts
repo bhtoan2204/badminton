@@ -15,9 +15,9 @@ import { FacebookStrategy } from './strategies/oauth.strategy/facebook.strategy'
     ],
     controllers: [AuthApiController],
     providers: [
-        AuthApiService, 
-        LocalStrategy, 
-        JwtStrategy, 
+        AuthApiService,
+        LocalStrategy,
+        JwtStrategy,
         RefreshStrategy,
         GoogleStrategy,
         FacebookStrategy,

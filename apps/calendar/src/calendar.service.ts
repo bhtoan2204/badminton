@@ -30,7 +30,7 @@ export class CalendarService {
 
   async getEventOnDate(id_user: string, dto) {
     try {
-      const {id_family, date} = dto;
+      const { id_family, date } = dto;
 
       const query = 'SELECT * FROM f_get_events_for_family($1, $2, $3)';
       const params = [id_user, id_family, date];

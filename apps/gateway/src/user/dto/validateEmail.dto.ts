@@ -10,6 +10,6 @@ export class ValidateEmailDto {
     @IsNotEmpty()
     @IsString()
     @IsEmail()
-    @ApiProperty({ example: 'banhhaotoan2002@gmail.com'})
+    @ApiProperty({ example: 'banhhaotoan2002@gmail.com' })
     email: string;
 }

@@ -86,8 +86,8 @@ export class CalendarService {
     try {
       const response = this.calendarClient.send('calendarClient/deleteCalendar', { id_user, id_calendar })
         .pipe(timeout(5000));
-        const data = await lastValueFrom(response);
-        return data;
+      const data = await lastValueFrom(response);
+      return data;
     }
     catch (error) {
       throw new HttpException(error, error.statusCode);

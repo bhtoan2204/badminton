@@ -7,12 +7,12 @@ import { ChatService } from "./chat.service";
 
 @Module({
   imports: [
-    RmqModule.register({name: CHAT_SERVICE}),
-    RmqModule.register({name: AUTH_SERVICE}),
+    RmqModule.register({ name: CHAT_SERVICE }),
+    RmqModule.register({ name: AUTH_SERVICE }),
     RmqModule.register({ name: FAMILY_SERVICE }),
     GlobalJwtModule,
   ],
   controllers: [ChatController],
   providers: [ChatGateway, WsJwtStrategy, ChatService],
 })
-export class ChatModule {}
+export class ChatModule { }

@@ -1,7 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, 
-    ValidatorConstraint, ValidationArguments, ValidatorConstraintInterface, ValidationOptions, 
-    registerDecorator } from "class-validator";
+import {
+    IsString, IsOptional,
+    ValidatorConstraint, ValidationArguments, ValidatorConstraintInterface, ValidationOptions,
+    registerDecorator
+} from "class-validator";
 
 @ValidatorConstraint({ async: false })
 export class IsNotEmptyPropertyConstraint implements ValidatorConstraintInterface {

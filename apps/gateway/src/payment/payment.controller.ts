@@ -11,7 +11,7 @@ import { OrderReturnDTO } from './dto/OrderReturn.dto';
 @UseGuards(JwtAuthGuard)
 @Controller('payment')
 export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) {}
+  constructor(private readonly paymentService: PaymentService) { }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all package' })
@@ -23,7 +23,7 @@ export class PaymentController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get package' })
   @Get('getPackage')
-  async get_package(@Query('id_package') id_package: number){
+  async get_package(@Query('id_package') id_package: number) {
     return this.paymentService.get_package(id_package);
   }
 
@@ -51,7 +51,7 @@ export class PaymentController {
   @ApiOperation({ summary: 'Check order' })
   @UseGuards(JwtAuthGuard)
   @Post('checkOrder')
-  async check_order_return(@CurrentUser() user,@Body() orderReturn: OrderReturnDTO) {
+  async check_order_return(@CurrentUser() user, @Body() orderReturn: OrderReturnDTO) {
     const id_user = user.id_user;
     return this.paymentService.check_order_return(id_user, orderReturn);
   }
