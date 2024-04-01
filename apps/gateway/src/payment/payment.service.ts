@@ -15,70 +15,42 @@ export class PaymentService {
         .pipe(
           timeout(5000),
         );
-    const data = await lastValueFrom(response);
-    return data;
-        }
-        catch (error) {
-          throw new RpcException({
-            message: error.message,
-            statusCode: HttpStatus.INTERNAL_SERVER_ERROR
-          });
-        }
-      }
+      const data = await lastValueFrom(response);
+      return data;
+    }
+    catch (error) {
+      throw new HttpException(error, error.statusCode);
+    }
+  }
   async get_package(id_package) {
     try {
-      const response = this.paymentClient.send('payment/get_package', {id_package})
+      const response = this.paymentClient.send('payment/get_package', { id_package })
         .pipe(
           timeout(5000),
         );
-    const data = await lastValueFrom(response);
-    return data;
-        }
-        catch (error) {
-          throw new RpcException({
-            message: error.message,
-            statusCode: HttpStatus.INTERNAL_SERVER_ERROR
-          });
-        }
-      }
+      const data = await lastValueFrom(response);
+      return data;
+    }
+    catch (error) {
+      throw new HttpException(error, error.statusCode);
+    }
+  }
   async get_method() {
     try {
       const response = this.paymentClient.send('payment/get_method', {})
         .pipe(
           timeout(5000),
         );
-    const data = await lastValueFrom(response);
-    return data;
-        }
-        catch (error) {
-          throw new RpcException({
-            message: error.message,
-            statusCode: HttpStatus.INTERNAL_SERVER_ERROR
-          });
-        }
-      }
+      const data = await lastValueFrom(response);
+      return data;
+    }
+    catch (error) {
+      throw new HttpException(error, error.statusCode);
+    }
+  }
   async get_order(id_user) {
     try {
-      const response = this.paymentClient.send('payment/get_order', {id_user})
-        .pipe(
-          timeout(5000),
-        );
-    const data = await lastValueFrom(response);
-    return data;
-        }
-        catch (error) {
-          throw new RpcException({
-            message: error.message,
-            statusCode: HttpStatus.INTERNAL_SERVER_ERROR
-          });
-        }
-      }
-  
-
-  async 
-  async generateVnpay(id_user, order, ip) {
-    try {
-      const response = this.paymentClient.send('payment/generateVnpay', { id_user, ip, order } )
+      const response = this.paymentClient.send('payment/get_order', { id_user })
         .pipe(
           timeout(5000),
         );
@@ -90,17 +62,31 @@ export class PaymentService {
     }
   }
 
-  async check_order_return(id_user, orderReturn){
-    try{
-      const response = this.paymentClient.send('payment/check_order_return', {id_user,orderReturn} )
-          .pipe(
-            timeout(5000),
-          );
-        const data = await lastValueFrom(response);
-        return data;
-      }
-      catch (error) {
-        throw new HttpException(error, error.statusCode);
-      }
+  async generateVnpay(id_user, order, ip) {
+    try {
+      const response = this.paymentClient.send('payment/generateVnpay', { id_user, ip, order })
+        .pipe(
+          timeout(5000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
+    }
+    catch (error) {
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async check_order_return(id_user, orderReturn) {
+    try {
+      const response = this.paymentClient.send('payment/check_order_return', { id_user, orderReturn })
+        .pipe(
+          timeout(5000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
+    }
+    catch (error) {
+      throw new HttpException(error, error.statusCode);
+    }
   }
 }
