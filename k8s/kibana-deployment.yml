@@ -20,23 +20,23 @@ spec:
     spec:
       automountServiceAccountToken: false
       containers:
-      - name: kibana
-        image: docker.elastic.co/kibana/kibana:7.14.1
-        env:
-        - name: ELASTICSEARCH_HOSTS
-          value: "http://elasticsearch:9200"
-        - name: ELASTICSEARCH_USERNAME
-          value: "elastic"
-        - name: ELASTICSEARCH_PASSWORD
-          value: "Toan123456789"
-        - name: TZ
-          value: "Asia/Ho_Chi_Minh"
-        ports:
-        - containerPort: 5601
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
+        - name: kibana
+          image: docker.elastic.co/kibana/kibana:7.14.1
+          env:
+          - name: ELASTICSEARCH_HOSTS
+            value: "http://elasticsearch:9200"
+          - name: ELASTICSEARCH_USERNAME
+            value: "elastic"
+          - name: ELASTICSEARCH_PASSWORD
+            value: "Toan123456789"
+          - name: TZ
+            value: "Asia/Ho_Chi_Minh"
+          ports:
+          - containerPort: 5601
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "200m"

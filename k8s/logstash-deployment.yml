@@ -20,15 +20,15 @@ spec:
     spec:
       automountServiceAccountToken: false
       containers:
-      - name: logstash
-        image: docker.elastic.co/logstash/logstash:7.14.1
-        env:
-          - name: TZ
-            value: "Asia/Ho_Chi_Minh"
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
+        - name: logstash
+          image: docker.elastic.co/logstash/logstash:7.14.1
+          env:
+            - name: TZ
+              value: "Asia/Ho_Chi_Minh"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Gi"
+              cpu: "400m"
