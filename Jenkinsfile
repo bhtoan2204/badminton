@@ -67,9 +67,7 @@ pipeline {
             sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'kubectl apply -f ./k8s'"
             sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} \
                   'for deployment in \$(kubectl get deployments --no-headers -o custom-columns=\":metadata.name\"); do \
-                  if [[ \"\$deployment\" != \"rabbitmq-deployment\" && \"\$deployment\" != \"nextjs-deployment\" && \
-                  \"\$deployment\" != \"elasticsearch-deployment\" && \"\$deployment\" != \"kibana-deployment\" && \
-                  \"\$deployment\" != \"logstash-deployment\" ]]; then \
+                  if [[ \"\$deployment\" != \"rabbitmq-deployment\" && \"\$deployment\" != \"nextjs-deployment\" ]]; then \
                   kubectl rollout restart deployment/\$deployment; \
                   fi; \
                   done'"

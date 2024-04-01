@@ -18,4 +18,4 @@ import * as Joi from 'joi';
   controllers: [],
   providers: [],
 })
-export class StorageModule { }
+export class StorageModule {}

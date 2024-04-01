@@ -10,7 +10,7 @@ export class RefreshToken {
   refresh_token: string;
 
   @ManyToOne(() => Users)
-  @JoinColumn({ name: 'id_user' })
+  @JoinColumn({ name: 'id_user' }) 
   id_user: Users;
 
   @CreateDateColumn()

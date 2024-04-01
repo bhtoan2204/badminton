@@ -132,7 +132,7 @@ export class ChatGateway implements OnModuleInit {
 
   @SubscribeMessage('join_room')
   @UseGuards(WsJwtAuthGuard)
-  async joinRoom(@MessageBody() roomName: string, @ConnectedSocket() socket: Socket, @WsCurrentUser() user) {
+  async joinRoom( @MessageBody() roomName: string, @ConnectedSocket() socket: Socket, @WsCurrentUser() user ) {
     const room = this.server.in(roomName);
 
     const roomSockets = await room.fetchSockets();
@@ -151,7 +151,7 @@ export class ChatGateway implements OnModuleInit {
 
   @SubscribeMessage('send_connection_offer')
   @UseGuards(WsJwtAuthGuard)
-  async sendConnectionOffer(@MessageBody() { offer, roomName, }: { offer: RTCSessionDescriptionInit; roomName: string; }, @ConnectedSocket() socket: Socket,) {
+  async sendConnectionOffer(@MessageBody() { offer, roomName, }: { offer: RTCSessionDescriptionInit; roomName: string; }, @ConnectedSocket() socket: Socket, ) {
     const userId = socket.data.userId;
     console.log(offer);
     this.server.in(roomName).except(socket.id).emit('send_connection_offer', { offer, roomName, userId });
@@ -159,7 +159,7 @@ export class ChatGateway implements OnModuleInit {
 
   @SubscribeMessage('send_candidate')
   @UseGuards(WsJwtAuthGuard)
-  async sendCandidate(@MessageBody() { candidate, roomName }: { candidate: unknown; roomName: string; }, @ConnectedSocket() socket: Socket) {
+  async sendCandidate(@MessageBody() { candidate, roomName}: { candidate: unknown; roomName: string; }, @ConnectedSocket() socket: Socket) {
     const userId = socket.data.userId;
     console.log('Candidate: ', candidate);
     this.server.in(roomName).except(socket.id).emit('send_candidate', { candidate, roomName, userId, });
@@ -167,7 +167,7 @@ export class ChatGateway implements OnModuleInit {
 
   @SubscribeMessage('answer')
   @UseGuards(WsJwtAuthGuard)
-  async answer(@MessageBody() { answer, roomName, }: { answer: RTCSessionDescriptionInit; roomName: string; }, @ConnectedSocket() socket: Socket) {
+  async answer( @MessageBody() { answer, roomName, }: { answer: RTCSessionDescriptionInit; roomName: string; }, @ConnectedSocket() socket: Socket) {
     const userId = socket.data.userId;
     console.log(answer);
     this.server.in(roomName).except(socket.id).emit('answer', { answer, roomName, userId, });

@@ -6,9 +6,9 @@ import { StorageService } from "./storage.service";
   imports: [
     GrpcModule.register({ name: 'STORAGE' }),
   ],
-  providers: [StorageService],
+  providers: [ StorageService ],
   exports: [
     StorageService
   ]
 })
-export class StorageModule { }
+export class StorageModule {}

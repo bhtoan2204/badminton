@@ -79,10 +79,10 @@ export class VideoGateway implements OnModuleInit {
     @ConnectedSocket() socket: Socket,
   ) {
     const room = this.server.in(roomName);
-
+ 
     const roomSockets = await room.fetchSockets();
     const numberOfPeopleInRoom = roomSockets.length;
-
+ 
     if (numberOfPeopleInRoom > 1) {
       room.emit('too_many_people');
       return;
@@ -91,17 +91,17 @@ export class VideoGateway implements OnModuleInit {
     if (numberOfPeopleInRoom === 1) {
       room.emit('another_person_ready');
     }
-
+ 
     socket.join(roomName);
   }
 
   @SubscribeMessage('send_connection_offer')
   async sendConnectionOffer(
     @MessageBody()
-    {
-      offer,
-      roomName,
-    }: {
+      {
+        offer,
+        roomName,
+      }: {
       offer: RTCSessionDescriptionInit;
       roomName: string;
     },
@@ -116,10 +116,10 @@ export class VideoGateway implements OnModuleInit {
   @SubscribeMessage('answer')
   async answer(
     @MessageBody()
-    {
-      answer,
-      roomName,
-    }: {
+      {
+        answer,
+        roomName,
+      }: {
       answer: RTCSessionDescriptionInit;
       roomName: string;
     },
@@ -134,10 +134,10 @@ export class VideoGateway implements OnModuleInit {
   @SubscribeMessage('send_candidate')
   async sendCandidate(
     @MessageBody()
-    {
-      candidate,
-      roomName,
-    }: {
+      {
+        candidate,
+        roomName,
+      }: {
       candidate: unknown;
       roomName: string;
     },
