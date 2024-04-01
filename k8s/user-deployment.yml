@@ -25,8 +25,8 @@ spec:
           command: ["node", "dist/apps/user/src/main"]
           resources:
             requests:
-              memory: "800Mi"  
-              cpu: "220m"     
+              memory: "400Mi"  
+              cpu: "110m"     
             limits:
               memory: "800Mi" 
               cpu: "220m" 
