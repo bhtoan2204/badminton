@@ -69,8 +69,7 @@ export class PaymentService {
       const params = [id_user];
       const data = await this.entityManager.query(Query, params);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR

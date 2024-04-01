@@ -2,7 +2,6 @@ import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { CRAWLER_SERVICE } from "../utils";
 import { ClientProxy } from "@nestjs/microservices";
 import { lastValueFrom, timeout } from "rxjs";
-import { logger } from "@app/common";
 
 @Injectable()
 export class CrawlerService {
@@ -18,8 +17,7 @@ export class CrawlerService {
         );
       return await lastValueFrom(response);
     } catch (error) {
-      logger.error(error);
       throw new HttpException(error, error.statusCode);
-    }
+  }
   }
 }

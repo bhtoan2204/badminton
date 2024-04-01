@@ -7,7 +7,7 @@ import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 export class CalendarController {
   constructor(
     private readonly rmqService: RmqService,
-    private readonly calendarService: CalendarService) { }
+    private readonly calendarService: CalendarService) {}
 
   @EventPattern('calendarClient/getAllCalendar')
   async getAllCalendar(@Payload() data: any, @Ctx() context: RmqContext) {
@@ -20,7 +20,7 @@ export class CalendarController {
     this.rmqService.ack(context);
     return this.calendarService.getEventOnDate(data.id_user, data.dto);
   }
-
+  
   @EventPattern('calendarClient/getCalendarDetail')
   async getCalendarDetail(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
