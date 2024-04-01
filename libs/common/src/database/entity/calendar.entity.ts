@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
-import { Family } from './family.entity';
+import { Family } from './family.entity'; 
 
 @Entity('calendar')
 export class Calendar {
@@ -16,7 +16,7 @@ export class Calendar {
   description: string;
 
   @ManyToOne(() => Family)
-  @JoinColumn({ name: 'id_family' })
+  @JoinColumn({ name: 'id_family' }) 
   id_family: Family;
 
   @CreateDateColumn()

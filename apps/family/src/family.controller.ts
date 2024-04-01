@@ -8,7 +8,7 @@ export class FamilyController {
 
   constructor(
     private readonly familyService: FamilyService,
-    private readonly rmqService: RmqService) { }
+    private readonly rmqService: RmqService) {}
 
   @EventPattern('family/get_Family')
   async getFamily(@Payload() data: any, @Ctx() context: RmqContext) {
@@ -33,12 +33,12 @@ export class FamilyController {
   }
 
   @EventPattern('family/create_Family')
-  async createFamily(@Payload() data: { id_user, createFamilyDto }, @Ctx() context: RmqContext) {
+  async createFamily(@Payload() data: {id_user, createFamilyDto}, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.familyService.createFamily(data.id_user, data.createFamilyDto);
+    return this.familyService.createFamily(data.id_user,data.createFamilyDto);
   }
   @EventPattern('family/add_Member')
-  async addMember(@Payload() data: any, @Ctx() context: RmqContext) {
+  async addMember(@Payload() data:  any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.addMember(data.id_user, data.memberFamilyDto);
   }
@@ -51,9 +51,9 @@ export class FamilyController {
   }
 
   @EventPattern('family/update_Family')
-  async updateFamily(@Payload() data: { id_user, updateFamilyDTO }, @Ctx() context: RmqContext) {
+  async updateFamily(@Payload() data:  {id_user, updateFamilyDTO}, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.familyService.updateFamily(data.id_user, data.updateFamilyDTO);
+    return this.familyService.updateFamily(data.id_user,data.updateFamilyDTO);
 
   }
   @EventPattern('family/delete_Family')

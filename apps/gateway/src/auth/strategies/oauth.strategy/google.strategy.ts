@@ -5,7 +5,6 @@ import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, timeout } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 import { AUTH_SERVICE } from '../../../utils';
-import { logger } from '@app/common';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -29,7 +28,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       return await lastValueFrom(source);
     }
     catch (error) {
-      logger.error(error);
       throw new UnauthorizedException(error.message);
     }
   }

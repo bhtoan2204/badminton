@@ -2,7 +2,6 @@ import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { lastValueFrom, timeout } from "rxjs";
 import { ROLE_SERVICE } from "../../utils";
-import { logger } from "@app/common";
 
 @Injectable()
 
@@ -20,7 +19,6 @@ export class RoleService {
             const data = await lastValueFrom(response);
             return data;
         } catch (error) {
-            logger.error(error);
             throw new HttpException(error, error.statusCode);
         }
     }

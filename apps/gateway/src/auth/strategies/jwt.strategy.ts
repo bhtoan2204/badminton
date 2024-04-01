@@ -5,7 +5,6 @@ import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, timeout } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 import { AUTH_SERVICE } from '../../utils';
-import { logger } from '@app/common';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -31,9 +30,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       );
       return await lastValueFrom(userRequest$);
     }
-    catch (error) {
-      logger.error(error);
-      throw new UnauthorizedException(error.message);
+    catch (err) {
+      throw new UnauthorizedException(err.message);
     }
   }
 }

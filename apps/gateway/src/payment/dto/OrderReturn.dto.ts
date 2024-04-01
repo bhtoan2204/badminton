@@ -22,5 +22,5 @@ export class OrderReturnDTO {
     @IsString()
     @ApiProperty({ example: '00' })
     vnp_TransactionStatus: string;
-
+    
 }

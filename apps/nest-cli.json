@@ -25,15 +25,6 @@
         "tsConfigPath": "apps/payment/tsconfig.app.json"
       }
     },
-    "sms": {
-      "type": "application",
-      "root": "apps/sms",
-      "entryFile": "main",
-      "sourceRoot": "apps/sms/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/sms/tsconfig.app.json"
-      }
-    },
     "family": {
       "type": "application",
       "root": "apps/family",
@@ -42,7 +33,7 @@
       "compilerOptions": {
         "tsConfigPath": "apps/family/tsconfig.app.json"
       }
-    },
+    }, 
     "role": {
       "type": "application",
       "root": "apps/role",
