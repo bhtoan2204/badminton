@@ -279,7 +279,7 @@ begin
 end;
 $$ LANGUAGE plpgsql;
 
---select * from f_update_family('bd94ba3a-b046-4a05-a260-890913e09df9', 93 , 'vdbfvj', 'fnjdf')
+select * from f_update_family('bd94ba3a-b046-4a05-a260-890913e09df9', 96, 'vdbfvj', 'fnjdf')
 
 
 CREATE OR REPLACE function f_delete_family(
@@ -337,7 +337,7 @@ BEGIN
                 result_message := 'Failed to add member';
         END;
     ELSE
-        result_message :=  'Invalid family or user provided';
+        result_message :=  'Invalid user provided';
     END IF;
 
     RETURN result_message;
@@ -400,7 +400,7 @@ BEGIN
 
     IF recordCount > 0 THEN
         FOR userRecord IN 
-            SELECT * FROM view_users_role WHERE id_user = p_id_user and id_family=p_id_family
+            SELECT * FROM view_users_role WHERE  id_family=p_id_family
         LOOP
             RETURN NEXT userRecord;
         END LOOP;
@@ -410,9 +410,9 @@ BEGIN
 END;
 $function$
 
-select* from f_get_all_member('bd94ba3a-b046-4a05-a260-890913e09df9', 92)
+select* from f_get_all_member('bd94ba3a-b046-4a05-a260-890913e09df9', 98)
 
-CREATE OR REPLACE VIEW public.view_users_role
+CREATE OR REPLACE VIEW view_users_role
 AS 
 SELECT 
     users.id_user,
@@ -422,7 +422,8 @@ SELECT
     users.firstname,
     users.lastname,
     m.id_family,
-    m.role
+    m.,
+    users.avatar
 FROM 
     users 
 JOIN 
@@ -449,7 +450,7 @@ BEGIN
 END;
 $function$
 
---select * from f_getfamily('bd94ba3a-b046-4a05-a260-890913e09df9', 45)
+--select * from f_getfamily('bd94ba3a-b046-4a05-a260-890913e09df9', 98)
 
 
 --select * from f_get_all_member('bd94ba3a-b046-4a05-a260-890913e09df9', 44)
@@ -458,7 +459,7 @@ $function$
 CREATE OR REPLACE VIEW v_get_role AS
 SELECT role, name, description FROM "role";
 
-
+select * from v_get_role
 --select * from v_get_role 
 
 CREATE OR REPLACE FUNCTION f_get_role_member( 
@@ -715,8 +716,34 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+------------CALENDAR-----------------
+CREATE OR REPLACE FUNCTION f_get_events_for_family(p_id_user uuid, p_id_family int, selected_date DATE) 
+RETURNS TABLE (
+    id_calendar INT,
+    event_datetime TIMESTAMP,
+    event_description varchar,
+    event_id_family int,
+    event_title varchar,
+    count_record int
+) AS $$
+BEGIN
+    PERFORM COUNT(*) FROM member_family WHERE id_family = p_id_family AND id_user = p_id_user;
+
+    IF FOUND THEN
+        RETURN QUERY
+        SELECT c.id_calendar, c.datetime, c.description, c.id_family, c.title, count_record
+        FROM calendar c
+        WHERE c.id_family = p_id_family
+        AND DATE(c.datetime) = selected_date;
+    END IF;
+    
+    RETURN;
+END;
+$$ LANGUAGE plpgsql;
 
 
+
+SELECT * FROM f_get_events_for_family('bd94ba3a-b046-4a05-a260-890913e09df9',96,'2024-04-04');
 
 
 

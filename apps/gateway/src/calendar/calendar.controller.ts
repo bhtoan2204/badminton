@@ -1,15 +1,18 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { CalendarService } from "./calendar.service";
 import { CurrentUser } from "../utils";
 import { CreateCalendarDto } from "./dto/createCalendar.dto";
 import { UpdateCalendarDto } from "./dto/updateCalendar.dto";
+import { GetEventDTO } from "./dto/getEvent.dto";
 
 @ApiTags('Calendar')
 @Controller('calendar')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
+@Admin(true)
+
 export class CalendarController {
   constructor(private readonly calendarService: CalendarService) { }
 
@@ -19,6 +22,16 @@ export class CalendarController {
   @Get('getAllCalendar/:id_family')
   async getAllCalendar(@CurrentUser() currentUser, @Param('id_family') id_family: number) {
     return this.calendarService.getAllCalendar(currentUser.id_user, id_family);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get events for family on date' })
+  @ApiParam({ name: 'id_family', required: true })
+  @Post('getEventOnDate/:id_family')
+  async getEventOnDate(@CurrentUser() currentUser, @Body() dto: GetEventDTO) {
+  //async getEventOnDate(@CurrentUser() currentUser,  @Param('id_family') id_family: number,  @Query('date') date: Date) {
+    //console.log(date);
+    return this.calendarService.getEventOnDate(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)
