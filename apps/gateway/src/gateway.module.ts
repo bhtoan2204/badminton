@@ -2,7 +2,6 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthApiModule } from './auth/auth.module';
 import { PaymentModule } from './payment/payment.module';
-import { SmsModule } from './sms/sms.module';
 import { FamilyModule } from './family/family.module';
 import { AdminModule } from './admin/admin.module';
 import { MailModule } from './mailer/mailer.module';
@@ -11,9 +10,9 @@ import { CrawlerModule } from './crawler/crawler.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { VideoModule } from './video/video.module';
 import { UserModule } from './user/user.module';
-import * as Joi from 'joi';
 import { GuidelineModule } from './guideline/guideline.module';
 import { AppLoggerMiddleware } from './utils';
+import * as Joi from 'joi';
 
 @Module({
   imports: [
@@ -48,7 +47,6 @@ import { AppLoggerMiddleware } from './utils';
     UserModule,
     PaymentModule,
     MailModule,
-    SmsModule,
     FamilyModule,
     ChatModule,
     VideoModule,
