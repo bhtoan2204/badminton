@@ -1,5 +1,5 @@
-import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { ClientProxy, RpcException } from "@nestjs/microservices";
+import { HttpException, Inject, Injectable } from "@nestjs/common";
+import { ClientProxy } from "@nestjs/microservices";
 import { PAYMENT_SERVICE } from "../utils";
 import { lastValueFrom, timeout } from "rxjs";
 import { logger } from "@app/common";
