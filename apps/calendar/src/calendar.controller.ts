@@ -15,6 +15,12 @@ export class CalendarController {
     return this.calendarService.getAllCalendar(data.id_user, data.id_family);
   }
 
+  @EventPattern('calendarClient/getEventOnDate')
+  async getEventOnDate(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.calendarService.getEventOnDate(data.id_user, data.dto);
+  }
+
   @EventPattern('calendarClient/getCalendarDetail')
   async getCalendarDetail(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);

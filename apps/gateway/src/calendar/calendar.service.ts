@@ -27,6 +27,21 @@ export class CalendarService {
     }
   }
 
+  async getEventOnDate(id_user: string, dto) {
+    try {
+      const response = this.calendarClient.send('calendarClient/getEventOnDate', { id_user, dto })
+        .pipe(
+          timeout(5000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
+    }
+    catch (error) {
+      logger.error(error);
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
   async getCalendarDetail(id_user: string, id_calendar: number) {
     try {
       const response = this.calendarClient.send('calendarClient/getCalendarDetail', { id_user, id_calendar })
