@@ -3,11 +3,11 @@ import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import { ClientGrpc } from "@nestjs/microservices";
 
 @Injectable()
-export class StorageService implements OnModuleInit {
+export class StorageService implements OnModuleInit{
   private storageService: StorageServiceClient;
 
-  constructor(@Inject('STORAGE') private storageClient: ClientGrpc) { }
-
+  constructor(@Inject('STORAGE') private storageClient: ClientGrpc) {}
+  
   onModuleInit() {
     this.storageService = this.storageClient.getService<StorageServiceClient>(STORAGE_SERVICE_NAME);
   }

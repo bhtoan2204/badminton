@@ -6,9 +6,9 @@ metadata:
     app: family
 spec:
   strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 0
   replicas: 1
   selector:
     matchLabels:
@@ -24,12 +24,12 @@ spec:
           image: mjkundta/family:<TAG>
           command: ["node", "dist/apps/family/src/main"]
           resources:
-            requests:
-              memory: "400Mi"  
-              cpu: "110m"     
             limits:
-              memory: "800Mi" 
-              cpu: "220m" 
+              cpu: "0.25"
+              memory: "512Mi"
+            requests:
+              cpu: "0.1"
+              memory: "128Mi"
           env:
             - name: NODE_ENV
               value: "production"

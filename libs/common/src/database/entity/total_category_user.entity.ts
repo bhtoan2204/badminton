@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn} from 'typeorm';
 import { Users } from './users.entity';
 import { CategoryExpense } from './category_expense.entity'; // Giả sử bạn đã định nghĩa entity này
 
@@ -8,14 +8,14 @@ export class TotalCategoryUser {
   id: number;
 
   @ManyToOne(() => Users)
-  @JoinColumn({ name: 'id_user' })
+  @JoinColumn({ name: 'id_user' }) 
   id_user: Users;
 
   @Column('varchar', { nullable: true })
   description: string;
 
   @ManyToOne(() => CategoryExpense)
-  @JoinColumn({ name: 'id_category' })
+  @JoinColumn({ name: 'id_category' }) 
   id_cateory: CategoryExpense;
 
   @Column('money')

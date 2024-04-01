@@ -5,8 +5,8 @@ import { DeleteFileRequest, DeleteFileResponse, ReadFileRequest, ReadFileRespons
 @Controller()
 @StorageServiceControllerMethods()
 export class FilesController implements StorageServiceController {
-  constructor(private readonly filesService: FilesService) { }
-
+  constructor(private readonly filesService: FilesService) {}
+  
   async uploadFile(request: UploadFileRequest): Promise<UploadFileResponse> {
     return await this.filesService.uploadFile(request, 'avatar');
   }
