@@ -19,6 +19,10 @@ export class AppLoggerMiddleware implements NestMiddleware {
       );
     });
 
+    response.on('error', (err) => {
+      logger.error(`Error in ${method} ${url}: ${err.message}`);
+    });
+
     next();
   }
 }
