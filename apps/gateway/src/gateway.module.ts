@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthApiModule } from './auth/auth.module';
 import { PaymentModule } from './payment/payment.module';
@@ -13,6 +13,7 @@ import { VideoModule } from './video/video.module';
 import { UserModule } from './user/user.module';
 import * as Joi from 'joi';
 import { GuidelineModule } from './guideline/guideline.module';
+import { AppLoggerMiddleware } from './utils';
 
 @Module({
   imports: [
@@ -56,7 +57,10 @@ import { GuidelineModule } from './guideline/guideline.module';
     GuidelineModule,
     AdminModule,
   ],
-  controllers: [],
   providers: [],
 })
-export class GatewayModule { }
+export class GatewayModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(AppLoggerMiddleware).forRoutes('*');
+  }
+}

@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards, UseInterceptors } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { CalendarService } from "./calendar.service";
-import { CurrentUser } from "../utils";
+import { CurrentUser, LoggingInterceptor } from "../utils";
 import { CreateCalendarDto } from "./dto/createCalendar.dto";
 import { UpdateCalendarDto } from "./dto/updateCalendar.dto";
 

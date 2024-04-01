@@ -201,11 +201,14 @@ services:
     environment:
       - http.host=0.0.0.0
       - transport.host=127.0.0.1
-      - xpack.security.enabled=false
+      - "xpack.security.enabled=true"
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ELASTIC_PASSWORD=Toan123456789"
+      - "xpack.security.transport.ssl.enabled=true"
+      - "xpack.license.self_generated.type=trial"
       - TZ=Asia/Ho_Chi_Minh
   
-  ibana:
+  kibana:
     image: docker.elastic.co/kibana/kibana:7.14.1
     restart: always
     depends_on: 
@@ -214,4 +217,23 @@ services:
       - 5601:5601
     environment: 
       - "ELASTICSEARCH_HOSTS=http://elasticsearch:9200"
+      - "ELASTICSEARCH_USERNAME=elastic"
+      - "ELASTICSEARCH_PASSWORD=Toan123456789"
       - TZ=Asia/Ho_Chi_Minh
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.14.1
+    restart: always
+    depends_on:
+      - "elasticsearch"
+    ports:
+      - 5044:5044
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - XPACK_MONITORING_ENABLED=false
+      - LOG_LEVEL=info
+    volumes:
+      - ./logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logstash/postgresql-42.7.3.jar:/usr/share/logstash/logstash-core/lib/jars/postgresql-42.7.3.jar
+
