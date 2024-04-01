@@ -9,8 +9,6 @@ services:
     command: node dist/apps/gateway/src/main
     ports:
       - "8080:8080"
-    depends_on:
-      - rabbitmq
     restart: on-failure
     environment:
       - NODE_ENV=production
