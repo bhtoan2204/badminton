@@ -57,20 +57,6 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-  
-  sms:
-    image: mjkundta/sms:latest
-    build:
-      context: .
-      dockerfile: ./apps/sms/Dockerfile
-      target: development
-    command: npm run start:dev sms
-    depends_on:
-      - auth
-    restart: on-failure
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
 
   family:
     image: mjkundta/family:latest
