@@ -11,8 +11,6 @@ import { GetEventDTO } from "./dto/getEvent.dto";
 @Controller('calendar')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-@Admin(true)
-
 export class CalendarController {
   constructor(private readonly calendarService: CalendarService) { }
 
