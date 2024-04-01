@@ -24,12 +24,12 @@ spec:
           image: mjkundta/calendar:<TAG>
           command: ["node", "dist/apps/calendar/src/main"]
           resources:
-            limits:
-              cpu: "0.25"
-              memory: "512Mi"
             requests:
-              cpu: "0.1"
-              memory: "128Mi"
+              memory: "400Mi"  
+              cpu: "110m"     
+            limits:
+              memory: "800Mi" 
+              cpu: "220m" 
           env:
             - name: NODE_ENV
               value: "production"

@@ -52,19 +52,6 @@ services:
     environment:
       - NODE_ENV=production
   
-  sms:
-    image: mjkundta/sms:${TAG}
-    build:
-      context: .
-      dockerfile: ./apps/sms/Dockerfile
-      target: production
-    command: node dist/apps/sms/src/main
-    depends_on:
-      - gateway
-    restart: on-failure
-    environment:
-      - NODE_ENV=production
-  
   family:
     image: mjkundta/family:${TAG}
     build:
