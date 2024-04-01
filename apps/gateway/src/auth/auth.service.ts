@@ -2,6 +2,7 @@ import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { lastValueFrom, timeout } from "rxjs";
 import { AUTH_SERVICE } from "../utils";
+import { logger } from "@app/common";
 
 @Injectable()
 export class AuthApiService {
@@ -18,6 +19,7 @@ export class AuthApiService {
             return data;
         }
         catch (error) {
+            logger.error(error);
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -31,6 +33,7 @@ export class AuthApiService {
             return data;
         }
         catch (error) {
+            logger.error(error);
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -44,6 +47,7 @@ export class AuthApiService {
             return data;
         }
         catch (error) {
+            logger.error(error);
             throw new HttpException(error, error.statusCode);
         }
     }

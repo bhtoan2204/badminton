@@ -69,7 +69,8 @@
     "ts-proto": "^1.166.4",
     "ts-protoc-gen": "^0.15.0",
     "typeorm": "^0.3.19",
-    "vn-qr-pay": "^0.0.5"
+    "vn-qr-pay": "^0.0.5",
+    "winston": "^3.13.0"
   },
   "devDependencies": {
     "@grpc/grpc-js": "^1.10.1",

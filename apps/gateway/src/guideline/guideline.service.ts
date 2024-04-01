@@ -5,6 +5,7 @@ import { lastValueFrom, timeout } from "rxjs";
 import { CreateGuidelineDto } from "./dto/createGuideline.dto";
 import { UpdateGuidelineDto } from "./dto/updateGuideline.dto";
 import { AddStepGuidelineDto } from "./dto/addStep.dto";
+import { logger } from "@app/common";
 
 @Injectable()
 export class GuidelineService {
@@ -14,12 +15,13 @@ export class GuidelineService {
 
   async getAllGuideline(id_user: string, id_family: any, page, itemsPerPage) {
     try {
-      const response = this.guidelineClient.send('guidelineClient/get_all_guideline', { id_user, id_family, page, itemsPerPage})
+      const response = this.guidelineClient.send('guidelineClient/get_all_guideline', { id_user, id_family, page, itemsPerPage })
         .pipe(
           timeout(5000),
         );
-        return await lastValueFrom(response);
+      return await lastValueFrom(response);
     } catch (error) {
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -32,6 +34,7 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -44,7 +47,7 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
-      console.log(error.statusCode, error.message)
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -57,6 +60,7 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -69,6 +73,7 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -81,6 +86,7 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -94,6 +100,7 @@ export class GuidelineService {
       return await lastValueFrom(response);
     }
     catch (error) {
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -106,6 +113,7 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -118,6 +126,20 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      logger.error(error);
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async markShared(id_user: string, id_family: number, id_guideline: number) {
+    try {
+      const response = this.guidelineClient.send('guidelineClient/mark_shared', { id_user, id_family, id_guideline })
+        .pipe(
+          timeout(5000),
+        );
+      return await lastValueFrom(response);
+    } catch (error) {
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }

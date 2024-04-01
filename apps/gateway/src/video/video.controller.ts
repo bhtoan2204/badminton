@@ -3,6 +3,6 @@ import { VideoService } from "./video.service";
 
 @Controller('video')
 export class VideoController {
-  constructor(private readonly videoService: VideoService) {}
+  constructor(private readonly videoService: VideoService) { }
 
 }

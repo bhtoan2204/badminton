@@ -5,7 +5,7 @@ export class OTP {
   @PrimaryGeneratedColumn()
   otp_id: number;
 
-  @Column('uuid') 
+  @Column('uuid')
   id_user: string;
 
   @Column('varchar')

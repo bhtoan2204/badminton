@@ -6,6 +6,7 @@ import { CreateFamilyDto } from "./dto/createFamily.dto";
 import { MemberFamilyDto } from "./dto/memberFamily.dto";
 import { DeleteMemberDTO } from "./dto/deleteFamily.dto";
 import { UpdateFamilyDTO } from "./dto/updateFamily.dto";
+import { logger } from "@app/common";
 
 @Injectable()
 export class FamilyService {
@@ -21,7 +22,9 @@ export class FamilyService {
                 );
             const data = await lastValueFrom(response);
             return data;
-        } catch (error) {
+        }
+        catch (error) {
+            logger.error(error);
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -35,6 +38,7 @@ export class FamilyService {
             const data = await lastValueFrom(response);
             return data;
         } catch (error) {
+            logger.error(error);
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -48,6 +52,7 @@ export class FamilyService {
             const data = await lastValueFrom(response);
             return data;
         } catch (error) {
+            logger.error(error);
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -61,6 +66,7 @@ export class FamilyService {
             const data = await lastValueFrom(response);
             return data;
         } catch (error) {
+            logger.error(error);
             throw new HttpException(error, error.statusCode);
         }
 
@@ -75,6 +81,7 @@ export class FamilyService {
             const data = await lastValueFrom(response);
             return data;
         } catch (error) {
+            logger.error(error);
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -88,6 +95,7 @@ export class FamilyService {
             const data = await lastValueFrom(response);
             return data;
         } catch (error) {
+            logger.error(error);
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -96,10 +104,11 @@ export class FamilyService {
         try {
             const source = this.familyClient.send('family/create_Family', { id_user, createFamilyDto }).pipe(
                 timeout(5000)
-            );;
+            );
             const data = await lastValueFrom(source);
             return data;
         } catch (error) {
+            logger.error(error);
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -108,10 +117,11 @@ export class FamilyService {
         try {
             const source = this.familyClient.send('family/update_Family', { id_user, updateFamilyDTO }).pipe(
                 timeout(5000)
-            );;
+            );
             const data = await lastValueFrom(source);
             return data;
         } catch (error) {
+            logger.error(error);
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -120,10 +130,11 @@ export class FamilyService {
         try {
             const source = this.familyClient.send('family/delete_Family', { id_user, id_family }).pipe(
                 timeout(5000)
-            );;
+            );
             const data = await lastValueFrom(source);
             return data;
         } catch (error) {
+            logger.error(error);
             throw new HttpException(error, error.statusCode);
         }
     }
