@@ -35,7 +35,6 @@ export class CalendarService {
       return data;
     }
     catch (error) {
-      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }
