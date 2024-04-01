@@ -18,6 +18,6 @@ export class CrawlerService {
       return await lastValueFrom(response);
     } catch (error) {
       throw new HttpException(error, error.statusCode);
-  }
+    }
   }
 }

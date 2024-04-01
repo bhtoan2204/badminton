@@ -8,9 +8,9 @@ export class LoggingInterceptor implements NestInterceptor {
     const req = context.switchToHttp().getRequest();
     const body = req.body ? JSON.stringify(this.sanitizeRequestBody(req.body)) : 'No Body';
     const queryParams = req.query ? JSON.stringify(req.query) : 'No Query Params';
-    
+
     logger.info(`Incoming request: ${req.method} ${req.url} - Body: ${body} - Query: ${queryParams}`);
-    
+
     return next
       .handle()
       .pipe(
@@ -18,7 +18,7 @@ export class LoggingInterceptor implements NestInterceptor {
       );
   }
 
-  
+
   private sanitizeRequestBody(body: any): any {
     const sanitizedBody = { ...body };
     if (sanitizedBody.password) {

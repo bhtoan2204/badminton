@@ -25,4 +25,4 @@ import { Storage } from '@google-cloud/storage';
     }
   ],
 })
-export class FilesModule {}
+export class FilesModule { }

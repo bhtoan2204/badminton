@@ -11,7 +11,7 @@ export class FilesService {
   constructor(
     private readonly configService: ConfigService,
     @Inject('STORAGE') private readonly storage: Storage
-    ) {
+  ) {
     this.bucket = this.configService.get<string>('GOOGLE_MEDIA_BUCKET');
   }
 
@@ -20,16 +20,16 @@ export class FilesService {
       const path = `${uploadType}/${fileName}`;
       const fileRef = this.storage.bucket(this.bucket).file(path);
       const contentType = fileName.endsWith('.png') ? 'image/png' : 'image/jpeg';
-  
+
       return new Promise<UploadFileResponse>((resolve, reject) => {
         const stream = fileRef.createWriteStream({
           metadata: {
             contentType: contentType,
           },
         });
-  
+
         stream.on('error', (err) => {
-          console.log(err); 
+          console.log(err);
           reject(err);
         });
         stream.on('finish', () => {
@@ -40,16 +40,16 @@ export class FilesService {
             message: "File uploaded successfully",
           });
         });
-        
+
         const buffer = Buffer.from(file instanceof Uint8Array ? file : new Uint8Array([]));
         stream.end(buffer);
       });
     } catch (e) {
-      console.log(e.message); 
+      console.log(e.message);
       throw e;
     }
   }
-  
+
 
   async readFile(request: ReadFileRequest): Promise<ReadFileResponse> {
     const { fileName, filePath } = request;
@@ -67,27 +67,27 @@ export class FilesService {
       mimeType
     };
   }
-  
+
   async deleteFile({ fileName }: DeleteFileRequest, uploadType: string): Promise<DeleteFileResponse> {
     try {
-        const path = `${uploadType}/${fileName}`;
-        const fileRef = this.storage.bucket(this.bucket).file(path);
-        const [exists] = await fileRef.exists();
-        if (!exists) {
-            return {
-                fileName: fileName,
-                message: "File does not exist, nothing to delete",
-            };
-        }
-        await fileRef.delete();
+      const path = `${uploadType}/${fileName}`;
+      const fileRef = this.storage.bucket(this.bucket).file(path);
+      const [exists] = await fileRef.exists();
+      if (!exists) {
         return {
-            fileName: fileName,
-            message: "File deleted successfully",
+          fileName: fileName,
+          message: "File does not exist, nothing to delete",
         };
+      }
+      await fileRef.delete();
+      return {
+        fileName: fileName,
+        message: "File deleted successfully",
+      };
     } catch (e) {
-        console.log(e.message);
-        throw e;
+      console.log(e.message);
+      throw e;
     }
-}
+  }
 
 }

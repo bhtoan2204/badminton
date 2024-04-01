@@ -14,11 +14,11 @@ export class GuidelineService {
 
   async getAllGuideline(id_user: string, id_family: any, page, itemsPerPage) {
     try {
-      const response = this.guidelineClient.send('guidelineClient/get_all_guideline', { id_user, id_family, page, itemsPerPage})
+      const response = this.guidelineClient.send('guidelineClient/get_all_guideline', { id_user, id_family, page, itemsPerPage })
         .pipe(
           timeout(5000),
         );
-        return await lastValueFrom(response);
+      return await lastValueFrom(response);
     } catch (error) {
       throw new HttpException(error, error.statusCode);
     }

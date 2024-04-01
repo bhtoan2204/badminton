@@ -11,8 +11,8 @@ import { CurrentUser } from "../utils/decorator/current-user.decorator";
 export class MailController {
   constructor(
     private readonly mailerService: MailService
-  ) {}
-  
+  ) { }
+
   @ApiOperation({ summary: 'Send user confirmation' })
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(JwtAuthGuard)

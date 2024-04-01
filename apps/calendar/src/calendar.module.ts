@@ -21,4 +21,4 @@ import * as Joi from 'joi';
   controllers: [CalendarController],
   providers: [CalendarService],
 })
-export class CalendarModule {}
+export class CalendarModule { }

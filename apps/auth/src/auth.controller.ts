@@ -8,7 +8,7 @@ export class AuthController {
   constructor(
     private readonly rmqService: RmqService,
     private readonly authService: AuthService
-  ){}
+  ) { }
 
   @EventPattern('authClient/local/login')
   async handleLocalLogin(@Payload() data: any, @Ctx() context: RmqContext) {
@@ -49,7 +49,7 @@ export class AuthController {
   @EventPattern('authClient/validate_user')
   async handleValidateUser(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    const {email, password} = data;
+    const { email, password } = data;
     return await this.authService.validateLocalUser(email, password);
   }
 }

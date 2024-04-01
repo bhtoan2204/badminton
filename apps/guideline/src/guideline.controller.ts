@@ -8,7 +8,7 @@ export class GuidelineController {
   constructor(
     private readonly guidelineService: GuidelineService,
     private readonly rmqService: RmqService
-    ) {}
+  ) { }
 
   @EventPattern('guidelineClient/get_all_guideline')
   async getAllGuideline(@Payload() data: any, @Ctx() context: RmqContext) {

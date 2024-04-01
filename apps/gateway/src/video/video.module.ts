@@ -11,4 +11,4 @@ import { VideoGateway } from "./video.gateway";
   controllers: [VideoController],
   providers: [VideoService, VideoGateway]
 })
-export class VideoModule {}
+export class VideoModule { }

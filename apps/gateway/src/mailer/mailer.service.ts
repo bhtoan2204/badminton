@@ -7,7 +7,7 @@ import { lastValueFrom, timeout } from "rxjs";
 export class MailService {
   constructor(
     @Inject(MAILER_SERVICE) private mailerClient: ClientProxy
-  ) {}
+  ) { }
 
   async sendUserConfirmation(userInfo: any, email: string) {
     try {
@@ -23,7 +23,7 @@ export class MailService {
 
   async sendInvitation(id_user, id_family) {
     try {
-      const response = this.mailerClient.send('mailClient/sendInvitation', { id_user, id_family}).pipe(
+      const response = this.mailerClient.send('mailClient/sendInvitation', { id_user, id_family }).pipe(
         timeout(8000)
       );
       return await lastValueFrom(response);
