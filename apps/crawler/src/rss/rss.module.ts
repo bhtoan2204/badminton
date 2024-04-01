@@ -8,4 +8,4 @@ import { RmqModule } from "@app/common";
   controllers: [RssController],
   providers: [RssService],
 })
-export class RssModule { }
+export class RssModule {}

@@ -230,22 +230,4 @@ export class GuidelineService {
       });
     }
   }
-
-  async markShared(id_user: string, id_family: number, id_guideline: number) {
-    try {
-      const query = 'SELECT * FROM f_mark_guideline_shared($1, $2, $3)';
-      const parameters = [id_user, id_family, id_guideline];
-      const data = await this.entityManager.query(query, parameters);
-      return {
-        message: "Success",
-        data: data[0].f_mark_guideline_shared
-      };
-    }
-    catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
-      });
-    }
-  }
 }

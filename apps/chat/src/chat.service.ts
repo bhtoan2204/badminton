@@ -118,7 +118,7 @@ export class ChatService {
 
       const uploadImageData = await this.storageService.uploadImageChat(params);
       const fileUrl = uploadImageData.fileUrl;
-
+      
       if (!id_user || !messageData.receiverId || id_user === messageData.receiverId) {
         throw new Error('Invalid sender or receiver ID.');
       }

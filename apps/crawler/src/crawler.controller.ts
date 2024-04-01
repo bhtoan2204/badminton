@@ -3,7 +3,7 @@ import { CrawlerService } from './crawler.service';
 
 @Controller()
 export class CrawlerController {
-  constructor(private readonly crawlerService: CrawlerService) { }
+  constructor(private readonly crawlerService: CrawlerService) {}
 
   @Get()
   async crawlByKeyword(): Promise<any[]> {
