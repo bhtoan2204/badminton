@@ -22,4 +22,4 @@ import * as Joi from 'joi';
   controllers: [CrawlerController],
   providers: [CrawlerService],
 })
-export class CrawlerModule {}
+export class CrawlerModule { }

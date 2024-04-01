@@ -25,7 +25,7 @@ export class CalendarController {
   @ApiOperation({ summary: 'Get Calendar detail' })
   @ApiParam({ name: 'id_calendar', required: true })
   @Get('getCalendarDetail/:id_calendar')
-  async getCalendarDetail(@CurrentUser() currentUser, @Param('id_calendar') id_calendar: number){
+  async getCalendarDetail(@CurrentUser() currentUser, @Param('id_calendar') id_calendar: number) {
     return this.calendarService.getCalendarDetail(currentUser.id_user, id_calendar);
   }
 
@@ -39,7 +39,7 @@ export class CalendarController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update a Calendar' })
   @Put('updateCalendar')
-  async updateCalendar(@CurrentUser() currentUser, @Body() dto: UpdateCalendarDto){
+  async updateCalendar(@CurrentUser() currentUser, @Body() dto: UpdateCalendarDto) {
     return this.calendarService.updateCalendar(currentUser.id_user, dto);
   }
 
@@ -47,7 +47,7 @@ export class CalendarController {
   @ApiOperation({ summary: 'Delete a Calendar' })
   @ApiParam({ name: 'id_calendar', required: true })
   @Delete('deleteCalendar/:id_calendar')
-  async deleteCalendar(@CurrentUser() currentUser, @Param('id_calendar') id_calendar: number){
+  async deleteCalendar(@CurrentUser() currentUser, @Param('id_calendar') id_calendar: number) {
     return this.calendarService.deleteCalendar(currentUser.id_user, id_calendar);
   }
 }

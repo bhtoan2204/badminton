@@ -9,15 +9,15 @@ export class MemberFamily {
   id: number;
 
   @ManyToOne(() => Users)
-  @JoinColumn({ name: 'id_user' }) 
+  @JoinColumn({ name: 'id_user' })
   id_user: Users;
 
   @ManyToOne(() => Family)
-  @JoinColumn({ name: 'id_family' }) 
+  @JoinColumn({ name: 'id_family' })
   id_family: Family;
 
   @ManyToOne(() => Role)
-  @JoinColumn({ name: 'id_role' }) 
+  @JoinColumn({ name: 'id_role' })
   role: Role;
 
   @CreateDateColumn()

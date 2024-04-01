@@ -21,6 +21,6 @@ async function bootstrap() {
     cookie: { secure: true }
   }));
 
-  await app.listen(configService.get<number>('PORT'));;
+  await app.listen(configService.get<number>('PORT'));
 }
 bootstrap();

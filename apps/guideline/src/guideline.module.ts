@@ -26,4 +26,4 @@ import { StorageModule } from './storage/storage.module';
   controllers: [GuidelineController],
   providers: [GuidelineService],
 })
-export class GuidelineModule {}
+export class GuidelineModule { }

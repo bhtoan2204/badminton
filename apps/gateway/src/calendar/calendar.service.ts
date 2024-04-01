@@ -4,6 +4,7 @@ import { ClientProxy } from "@nestjs/microservices";
 import { CreateCalendarDto } from "./dto/createCalendar.dto";
 import { lastValueFrom, timeout } from "rxjs";
 import { UpdateCalendarDto } from "./dto/updateCalendar.dto";
+import { logger } from "@app/common";
 
 @Injectable()
 export class CalendarService {
@@ -21,6 +22,7 @@ export class CalendarService {
       return data;
     }
     catch (error) {
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -35,6 +37,7 @@ export class CalendarService {
       return data;
     }
     catch (error) {
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -49,6 +52,7 @@ export class CalendarService {
       return data;
     }
     catch (error) {
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -63,6 +67,7 @@ export class CalendarService {
       return data;
     }
     catch (error) {
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -71,10 +76,11 @@ export class CalendarService {
     try {
       const response = this.calendarClient.send('calendarClient/deleteCalendar', { id_user, id_calendar })
         .pipe(timeout(5000));
-        const data = await lastValueFrom(response);
-        return data;
+      const data = await lastValueFrom(response);
+      return data;
     }
     catch (error) {
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }

@@ -6,8 +6,8 @@ import { ValidatePhoneDto } from "./dto/validatePhone";
 @ApiTags('SMS')
 @Controller('sms')
 export class SmsController {
-  constructor(private readonly smsService: SmsService) {}
-  
+  constructor(private readonly smsService: SmsService) { }
+
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Send validation OTP' })
   @Post('validate/sendValidateSms')

@@ -90,7 +90,7 @@ export class FamilyService {
     try {
       const { description, name, id_order } = createFamilyDto;
       const Query = 'SELECT * FROM f_create_family($1, $2, $3, $4)';
-      const params = [id_user, description, name, id_order] ;
+      const params = [id_user, description, name, id_order];
       const data = await this.entityManager.query(Query, params);
       return data[0]['f_create_family'];
     } catch (error) {

@@ -8,7 +8,7 @@ export class GuidelineController {
   constructor(
     private readonly guidelineService: GuidelineService,
     private readonly rmqService: RmqService
-    ) {}
+  ) { }
 
   @EventPattern('guidelineClient/get_all_guideline')
   async getAllGuideline(@Payload() data: any, @Ctx() context: RmqContext) {
@@ -62,5 +62,11 @@ export class GuidelineController {
   async deleteStep(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return await this.guidelineService.deleteStep(data.id_user, data.id_family, data.id_guideline, data.index);
+  }
+
+  @EventPattern('guidelineClient/mark_shared')
+  async markShared(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.guidelineService.markShared(data.id_user, data.id_family, data.id_guideline);
   }
 }
