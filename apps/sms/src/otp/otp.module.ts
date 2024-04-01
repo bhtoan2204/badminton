@@ -10,8 +10,8 @@ import { RmqModule } from "@app/common";
     TwilioModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
-          accountSid: config.get('TWILIO_ACCOUNT_SID'),
-          authToken: config.get('TWILIO_AUTH_TOKEN'),
+        accountSid: config.get('TWILIO_ACCOUNT_SID'),
+        authToken: config.get('TWILIO_AUTH_TOKEN'),
       }),
       inject: [ConfigService],
     }),
@@ -20,4 +20,4 @@ import { RmqModule } from "@app/common";
   controllers: [OTPController],
   providers: [OTPService],
 })
-export class OTPModule {}
+export class OTPModule { }

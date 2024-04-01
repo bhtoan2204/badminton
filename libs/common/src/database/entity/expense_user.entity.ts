@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
-import { Users } from './users.entity'; 
+import { Users } from './users.entity';
 import { CategoryExpense } from './category_expense.entity';
-import { WalletUser } from './wallet_user.entity'; 
+import { WalletUser } from './wallet_user.entity';
 
 @Entity('expense_user')
 export class ExpenseUser {
@@ -16,11 +16,11 @@ export class ExpenseUser {
   description: string;
 
   @ManyToOne(() => CategoryExpense)
-  @JoinColumn({ name: 'id_category' }) 
+  @JoinColumn({ name: 'id_category' })
   id_category: CategoryExpense;
 
   @ManyToOne(() => WalletUser)
-  @JoinColumn({ name: 'id_wallet' }) 
+  @JoinColumn({ name: 'id_wallet' })
   wallet: WalletUser;
 
   @CreateDateColumn()

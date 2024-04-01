@@ -192,3 +192,26 @@ services:
       timeout: 10s
       retries: 5
     restart: on-failure
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+    restart: always
+    ports:
+      - 9200:9200
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=127.0.0.1
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - TZ=Asia/Ho_Chi_Minh
+  
+  ibana:
+    image: docker.elastic.co/kibana/kibana:7.14.1
+    restart: always
+    depends_on: 
+      - "elasticsearch"
+    ports: 
+      - 5601:5601
+    environment: 
+      - "ELASTICSEARCH_HOSTS=http://elasticsearch:9200"
+      - TZ=Asia/Ho_Chi_Minh

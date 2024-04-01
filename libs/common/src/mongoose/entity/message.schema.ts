@@ -27,7 +27,7 @@ export class MessageContent {
 
   @Prop({ required: false })
   photoUrl?: string;
-  
+
   @Prop({ required: false })
   videoUrl?: string;
 }

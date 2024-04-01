@@ -21,7 +21,7 @@ import { StorageModule } from './storage/storage.module';
     RmqModule,
     MongooseModule.forFeature([
       { name: MessageContent.name, schema: MessageContentSchema },
-      { name: FamilyMessageContent.name, schema: FamilyMessageContentSchema}
+      { name: FamilyMessageContent.name, schema: FamilyMessageContentSchema }
     ]),
     StorageModule,
     GrpcModule.register({ name: 'STORAGE' }),
@@ -29,4 +29,4 @@ import { StorageModule } from './storage/storage.module';
   controllers: [ChatController],
   providers: [ChatService],
 })
-export class ChatModule {}
+export class ChatModule { }

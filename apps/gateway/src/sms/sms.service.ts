@@ -3,6 +3,7 @@ import { ClientProxy } from "@nestjs/microservices";
 import { SMS_SERVICE } from "../utils";
 import { lastValueFrom, timeout } from "rxjs";
 import { ValidatePhoneDto } from "./dto/validatePhone";
+import { logger } from "@app/common";
 
 @Injectable()
 export class SmsService {
@@ -19,6 +20,7 @@ export class SmsService {
       return data;
     }
     catch (error) {
+      logger.error(error);
       throw new HttpException(error, error.statusCode);
     }
   }

@@ -21,4 +21,4 @@ import * as Joi from 'joi';
   controllers: [FamilyController],
   providers: [FamilyService],
 })
-export class FamilyModule {}
+export class FamilyModule { }

@@ -8,7 +8,7 @@ export class OTPController {
   constructor(
     private readonly rmqService: RmqService,
     private readonly OTPService: OTPService
-  ) {}
+  ) { }
 
   @EventPattern('smsClient/sendValidatePhoneSms')
   async sendValidatePhoneSms(@Payload() data: any, @Ctx() context: RmqContext) {

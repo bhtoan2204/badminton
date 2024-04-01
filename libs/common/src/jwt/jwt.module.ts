@@ -26,4 +26,4 @@ import * as Joi from 'joi';
   ],
   exports: [JwtModule]
 })
-export class GlobalJwtModule {}
+export class GlobalJwtModule { }
