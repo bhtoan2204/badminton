@@ -3,8 +3,18 @@
   "compilerOptions": {
     "declaration": false,
     "outDir": "../../dist/apps/gateway",
-    "types": ["node", "multer"],
+    "types": [
+      "node",
+      "multer"
+    ],
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test",
+    "**/*spec.ts"
+  ]
 }

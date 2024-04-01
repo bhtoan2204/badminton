@@ -6,9 +6,9 @@ metadata:
     app: gateway
 spec:
   strategy:
-      rollingUpdate:
-        maxSurge: 1
-        maxUnavailable: 0
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   replicas: 1
   selector:
     matchLabels:
@@ -20,18 +20,18 @@ spec:
     spec:
       automountServiceAccountToken: false
       containers:
-      - name: gateway
-        image: mjkundta/gateway:<TAG>
-        command: ["node", "dist/apps/gateway/src/main"]
-        ports:
-        - containerPort: 8080
-        resources:
-          limits:
-            cpu: "0.25"
-            memory: "512Mi"
-          requests:
-            cpu: "0.1"
-            memory: "128Mi"
-        env:
-        - name: NODE_ENV
-          value: "production"
+        - name: gateway
+          image: mjkundta/gateway:<TAG>
+          command: ["node", "dist/apps/gateway/src/main"]
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "0.25"
+              memory: "512Mi"
+            requests:
+              cpu: "0.1"
+              memory: "128Mi"
+          env:
+            - name: NODE_ENV
+              value: "production"

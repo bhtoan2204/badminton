@@ -6,9 +6,9 @@ metadata:
     app: mailer
 spec:
   strategy:
-      rollingUpdate:
-        maxSurge: 1
-        maxUnavailable: 0
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   replicas: 1
   selector:
     matchLabels:
@@ -20,16 +20,16 @@ spec:
     spec:
       automountServiceAccountToken: false
       containers:
-      - name: mailer
-        image: mjkundta/mailer:<TAG>
-        command: ["node", "dist/apps/mailer/src/main"]
-        resources:
-          limits:
-            cpu: "0.25"
-            memory: "512Mi"
-          requests:
-            cpu: "0.1"
-            memory: "128Mi"
-        env:
-        - name: NODE_ENV
-          value: "production"
+        - name: mailer
+          image: mjkundta/mailer:<TAG>
+          command: ["node", "dist/apps/mailer/src/main"]
+          resources:
+            limits:
+              cpu: "0.25"
+              memory: "512Mi"
+            requests:
+              cpu: "0.1"
+              memory: "128Mi"
+          env:
+            - name: NODE_ENV
+              value: "production"

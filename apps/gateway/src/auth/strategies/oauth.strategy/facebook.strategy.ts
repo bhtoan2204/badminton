@@ -5,6 +5,7 @@ import { PassportStrategy } from "@nestjs/passport";
 import { Profile, Strategy } from "passport-facebook";
 import { AUTH_SERVICE } from '../../../utils';
 import { lastValueFrom, timeout } from "rxjs";
+import { logger } from "@app/common";
 
 @Injectable()
 export class FacebookStrategy extends PassportStrategy(Strategy, "facebook") {
@@ -34,6 +35,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, "facebook") {
             return await lastValueFrom(source);
         }
         catch (error) {
+            logger.error(error);
             throw new UnauthorizedException(error.message);
         }
     }

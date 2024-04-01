@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { RoleController } from './role.controller';
 import { RoleService } from './role.service';
-import { RmqModule , DatabaseModule} from '@app/common';
+import { RmqModule, DatabaseModule } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 

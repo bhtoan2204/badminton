@@ -9,12 +9,12 @@ export class UserController {
   constructor(
     private readonly rmqService: RmqService,
     private readonly userService: UserService
-    ) {}
+  ) { }
 
   @EventPattern('userClient/create_account')
   async handleUserCreated(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    const payload : CreateAccountDto = data.createAccountDto;
+    const payload: CreateAccountDto = data.createAccountDto;
     return await this.userService.createAccount(payload);
   }
 

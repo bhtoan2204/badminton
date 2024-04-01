@@ -4,6 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { lastValueFrom, timeout } from 'rxjs';
 import { AUTH_SERVICE } from '../../utils';
+import { logger } from '@app/common';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
@@ -28,8 +29,9 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
       );
       return await lastValueFrom(userValidation$);
     }
-    catch (err) {
-      throw new UnauthorizedException(err.message);
+    catch (error) {
+      logger.error(error);
+      throw new UnauthorizedException(error.message);
     }
   }
 }

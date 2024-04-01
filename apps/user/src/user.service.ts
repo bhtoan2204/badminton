@@ -12,17 +12,17 @@ export class UserService {
     @InjectRepository(Users) private userRepository: Repository<Users>,
     private readonly entityManager: EntityManager,
     private readonly storageService: StorageService
-  ) {}
+  ) { }
 
   async createAccount(createAccountDto: CreateAccountDto) {
     try {
       const { email, phone, password, firstname, lastname } = createAccountDto;
-      
+
       const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6)';
       const parameters = [email, phone, password, firstname, lastname, null];
 
       const data = await this.entityManager.query(query, parameters);
-      
+
       return data;
     }
     catch (error) {
@@ -43,10 +43,10 @@ export class UserService {
         });
       }
 
-      const { password } = await this.userRepository.findOne({where: { id_user: user.id_user }});
+      const { password } = await this.userRepository.findOne({ where: { id_user: user.id_user } });
       const Query = 'SELECT * FROM compare_passwords($1,$2)';
-      const param = [oldPassword,  password];
-      const isMatch= await this.entityManager.query(Query, param);
+      const param = [oldPassword, password];
+      const isMatch = await this.entityManager.query(Query, param);
 
       if (!isMatch) {
         throw new RpcException({
