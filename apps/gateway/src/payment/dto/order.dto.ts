@@ -29,5 +29,5 @@ export class OrderDTO {
   @ApiProperty({ example: 'vnpay' })
   method: string;
 
-
+  
 }

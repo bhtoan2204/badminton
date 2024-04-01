@@ -29,4 +29,4 @@ import * as Joi from 'joi';
   providers: [UserService],
   exports: [UserService]
 })
-export class UserModule { }
+export class UserModule {}

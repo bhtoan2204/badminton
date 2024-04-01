@@ -4,12 +4,12 @@ import { IsNotEmpty, IsString, Matches } from "class-validator";
 export class ChangePasswordDto {
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ description: 'Old password' })
+  @ApiProperty({ description: 'Old password'})
   oldPassword: string;
 
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ description: 'New password' })
+  @ApiProperty({ description: 'New password'})
   @Matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[a-z]).{8,}$/, {
     message: 'newPassword must be at least 8 characters, include at least one uppercase letter, one lowercase letter, and one number.'
   })
@@ -17,6 +17,6 @@ export class ChangePasswordDto {
 
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ description: 'Confirm password' })
+  @ApiProperty({ description: 'Confirm password'})
   confirmPassword: string;
 }

@@ -14,7 +14,7 @@ export type FamilyMessageContentDocument = FamilyMessageContent & Document;
     getters: true,
     virtuals: true,
   },
-  timestamps: false,
+  timestamps: false, 
 })
 export class FamilyMessageContent {
   @Prop({ required: true, unique: true })
@@ -26,7 +26,7 @@ export class FamilyMessageContent {
 
 export const FamilyMessageContentSchema = SchemaFactory.createForClass(FamilyMessageContent);
 
-FamilyMessageContentSchema.methods.addMessage = function (familyId: number, senderId: string, content: string) {
+FamilyMessageContentSchema.methods.addMessage = function(familyId: number, senderId: string, content: string) {
   this.messages.push({ senderId, content, timestamp: new Date() });
   return this.save();
 };
