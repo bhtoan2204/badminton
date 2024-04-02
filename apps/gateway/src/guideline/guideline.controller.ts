@@ -167,4 +167,21 @@ export class GuidelineController {
   async deleteStep(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_guideline') id_guideline: number, @Param('index') index: number) {
     return this.guidelineService.deleteStep(currentUser.id_user, id_family, id_guideline, index);
   }
+  
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Mark shared' })
+  @Put('markShared/:id_family/:id_guideline')
+  async markShared(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_guideline') id_guideline: number) {
+    return this.guidelineService.markShared(currentUser.id_user, id_family, id_guideline);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get shared guideline' })
+  @Get('getSharedGuideline')
+  @ApiQuery({ name: 'page', required: false, type: String })
+  @ApiQuery({ name: 'itemsPerPage', required: false, type: String })
+  @ApiQuery({ name: 'text', required: false, type: String })
+  async getSharedGuideline(@CurrentUser() currentUser, @Query('page') page: number, @Query('itemsPerPage') itemsPerPage: number, @Query('text') text: string) {
+    return this.guidelineService.getSharedGuideline(currentUser.id_user, page, itemsPerPage, text);
+  }
 }

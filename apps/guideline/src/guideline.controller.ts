@@ -63,4 +63,10 @@ export class GuidelineController {
     this.rmqService.ack(context);
     return await this.guidelineService.deleteStep(data.id_user, data.id_family, data.id_guideline, data.index);
   }
+
+  @EventPattern('guidelineClient/mark_shared')
+  async markShared(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.guidelineService.markShared(data.id_user, data.id_family, data.id_guideline);
+  }
 }
