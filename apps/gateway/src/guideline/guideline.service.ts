@@ -121,4 +121,28 @@ export class GuidelineService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async markShared(id_user: string, id_family: number, id_guideline: number) {
+    try {
+      const response = this.guidelineClient.send('guidelineClient/mark_shared', { id_user, id_family, id_guideline })
+        .pipe(
+          timeout(5000),
+        );
+      return await lastValueFrom(response);
+    } catch (error) {
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async getSharedGuideline(id_user: string, page: number, itemsPerPage: number, text: string) {
+    try {
+      const response = this.guidelineClient.send('guidelineClient/getSharedGuideline', { id_user })
+        .pipe(
+          timeout(5000),
+        );
+      return await lastValueFrom(response);
+    } catch (error) {
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }
