@@ -24,6 +24,19 @@ export class UserService {
         }
     }
 
+    async checkPhone(phone: string) {
+        try {
+            const source = this.userClient.send('userClient/check_phone', { phone }).pipe(
+                timeout(5000),
+            );
+            const data = await lastValueFrom(source);
+            return data;
+        }
+        catch (error) {
+            throw new HttpException(error, error.statusCode);
+        }
+    }
+
     async changePassword(currentUser, data: ChangePasswordDto) {
         try {
             const source = this.userClient.send('userClient/change_password', { currentUser, data }).pipe(
