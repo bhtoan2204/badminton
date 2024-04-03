@@ -33,6 +33,24 @@ export class UserService {
     }
   }
 
+  
+  async check_phone(phone) {
+    try {
+
+      const query = 'SELECT * FROM check_phone_number_exists($1)';
+      const parameters = [phone];
+
+      const data = await this.entityManager.query(query, parameters);
+
+      return data;
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.CONFLICT
+      });
+    }
+  }
   async changePassword(user: any, passwordDto: any) {
     try {
       const { oldPassword, newPassword } = passwordDto;

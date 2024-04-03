@@ -717,7 +717,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 ------------CALENDAR-----------------
-CREATE OR REPLACE FUNCTION f_get_events_for_family(p_id_user uuid, p_id_family int, selected_date DATE) 
+CREATE OR REPLACE FUNCTION f_get_events_for_family(p_id_user uuid, p_id_family int, selected_date varchar) 
 RETURNS TABLE (
     id_calendar INT,
     event_datetime TIMESTAMP,
@@ -734,7 +734,7 @@ BEGIN
         SELECT c.id_calendar, c.datetime, c.description, c.id_family, c.title, count_record
         FROM calendar c
         WHERE c.id_family = p_id_family
-        AND DATE(c.datetime) = selected_date;
+        AND DATE(c.datetime) = selected_date::DATE; 
     END IF;
     
     RETURN;
@@ -743,9 +743,32 @@ $$ LANGUAGE plpgsql;
 
 
 
-SELECT * FROM f_get_events_for_family('bd94ba3a-b046-4a05-a260-890913e09df9',96,'2024-04-04');
+-- DROP FUNCTION public.f_delete_calendar_event(uuid, int4);
 
+CREATE OR REPLACE FUNCTION public.f_delete_calendar_event(p_id_user uuid, p_id_calendar integer)
+ RETURNS boolean
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_role VARCHAR;
+BEGIN
+    SELECT role INTO v_role
+    FROM member_family mf
+    JOIN calendar c ON mf.id_family = c.id_family
+    WHERE mf.id_user = p_id_user AND c.id_calendar = p_id_calendar;
 
+    IF v_role IS NULL THEN
+        RAISE EXCEPTION 'User is not associated with the specified event or does not exist.';
+    ELSE
+        DELETE FROM calendar
+        WHERE id_calendar = p_id_calendar;
+        RETURN TRUE;
+    END IF;
+
+    RETURN FALSE;
+END;
+$function$
+;
 
 
 
