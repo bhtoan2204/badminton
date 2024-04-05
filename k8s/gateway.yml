@@ -100,7 +100,7 @@ data:
 
     output.elasticsearch:
       hosts: ["http://34.92.206.189:9200"]
-      index: "famfund-app"
+      index: "famfund-app-production"
       username: "elastic"
       password: "Toan123456789"
 
