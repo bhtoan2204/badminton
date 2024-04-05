@@ -8,11 +8,12 @@ import { MailModule } from './mailer/mailer.module';
 import { ChatModule } from './chat/chat.module';
 import { CrawlerModule } from './crawler/crawler.module';
 import { CalendarModule } from './calendar/calendar.module';
-import { VideoModule } from './video/video.module';
 import { UserModule } from './user/user.module';
 import { GuidelineModule } from './guideline/guideline.module';
 import { AppLoggerMiddleware } from './utils';
 import * as Joi from 'joi';
+import { NotificationModule } from './notification/notification.module';
+import { EducationModule } from './education/education.module';
 
 @Module({
   imports: [
@@ -48,10 +49,11 @@ import * as Joi from 'joi';
     MailModule,
     FamilyModule,
     ChatModule,
-    VideoModule,
+    NotificationModule,
     CrawlerModule,
     CalendarModule,
     GuidelineModule,
+    EducationModule,
     AdminModule,
   ],
   providers: [],

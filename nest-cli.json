@@ -152,6 +152,33 @@
         ],
         "watchAssets": true
       }
+    },
+    "notification": {
+      "type": "application",
+      "root": "apps/notification",
+      "entryFile": "main",
+      "sourceRoot": "apps/notification/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notification/tsconfig.app.json"
+      }
+    },
+    "education": {
+      "type": "application",
+      "root": "apps/education",
+      "entryFile": "main",
+      "sourceRoot": "apps/education/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/education/tsconfig.app.json"
+      }
+    },
+    "elasticsearch": {
+      "type": "application",
+      "root": "apps/elasticsearch",
+      "entryFile": "main",
+      "sourceRoot": "apps/elasticsearch/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/elasticsearch/tsconfig.app.json"
+      }
     }
   }
 }

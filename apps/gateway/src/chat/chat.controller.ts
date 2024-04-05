@@ -17,7 +17,7 @@ export class ChatController {
   @ApiOperation({ summary: 'Get messages' })
   @Get('getMessages/:id_user/:index')
   @ApiParam({ name: 'id_user', required: true, description: 'The ID of the other user' })
-  @ApiParam({ name: 'index', required: true, description: 'Pagination index', type: Number })
+  @ApiParam({ name: 'index', required: true, description: 'Index', type: Number })
   async getMessages(@CurrentUser() user, @Param('id_user') id_user: string, @Param('index') index: number) {
     return this.chatService.getMessages(user.id_user, id_user, index);
   }

@@ -1,7 +1,7 @@
-import { HttpException, Inject, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { GUIDELINE_SERVICE } from "../utils";
 import { ClientProxy } from "@nestjs/microservices";
-import { lastValueFrom, timeout } from "rxjs";
+import { TimeoutError, lastValueFrom, timeout } from "rxjs";
 import { CreateGuidelineDto } from "./dto/createGuideline.dto";
 import { UpdateGuidelineDto } from "./dto/updateGuideline.dto";
 import { AddStepGuidelineDto } from "./dto/addStep.dto";
@@ -20,6 +20,9 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
