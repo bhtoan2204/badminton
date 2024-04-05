@@ -19,6 +19,7 @@
     "test:e2e": "jest --config ./apps/gateway/test/jest-e2e.json"
   },
   "dependencies": {
+    "@elastic/ecs-winston-format": "^1.5.3",
     "@google-cloud/logging-winston": "^6.0.0",
     "@google-cloud/storage": "^7.7.0",
     "@nestjs-modules/mailer": "^1.11.2",
@@ -72,7 +73,8 @@
     "ts-proto": "^1.166.4",
     "ts-protoc-gen": "^0.15.0",
     "typeorm": "^0.3.19",
-    "vn-qr-pay": "^0.0.5"
+    "vn-qr-pay": "^0.0.5",
+    "winston-logstash-transport": "^2.0.0"
   },
   "devDependencies": {
     "@grpc/grpc-js": "^1.10.1",

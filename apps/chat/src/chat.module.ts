@@ -4,8 +4,8 @@ import { ChatService } from './chat.service';
 import { MessageContentSchema, MgDatabaseModule, RmqModule, MessageContent, FamilyMessageContentSchema, FamilyMessageContent, GrpcModule } from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
-import * as Joi from 'joi';
 import { StorageModule } from './storage/storage.module';
+import * as Joi from 'joi';
 
 @Module({
   imports: [

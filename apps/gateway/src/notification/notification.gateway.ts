@@ -1,26 +1,26 @@
 import { OnModuleInit, UnauthorizedException } from "@nestjs/common";
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Server, Socket } from "socket.io";
-import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import { VideoService } from "./video.service";
+import { JwtService } from "@nestjs/jwt";
+import { ConnectedSocket, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { NotificationService } from "./notification.service";
+import { Server, Socket } from "socket.io";
 
 interface TokenPayload {
   id_user: string;
 }
 
 @WebSocketGateway({
-  namespace: 'video',
+  namespace: 'notification',
   cors: { origin: '*', },
 })
-export class VideoGateway implements OnModuleInit {
+export class NotificationGateway implements OnModuleInit {
   @WebSocketServer() server: Server;
   socketMap = new Map<string, string[]>();
 
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly videoService: VideoService
+    private readonly notificationService: NotificationService
   ) { }
 
   async onModuleInit() {
@@ -71,81 +71,5 @@ export class VideoGateway implements OnModuleInit {
       console.error('Error handling disconnection:', error.message);
       client.disconnect(true);
     }
-  }
-
-  @SubscribeMessage('join_room')
-  async joinRoom(
-    @MessageBody() roomName: string,
-    @ConnectedSocket() socket: Socket,
-  ) {
-    const room = this.server.in(roomName);
-
-    const roomSockets = await room.fetchSockets();
-    const numberOfPeopleInRoom = roomSockets.length;
-
-    if (numberOfPeopleInRoom > 1) {
-      room.emit('too_many_people');
-      return;
-    }
-
-    if (numberOfPeopleInRoom === 1) {
-      room.emit('another_person_ready');
-    }
-
-    socket.join(roomName);
-  }
-
-  @SubscribeMessage('send_connection_offer')
-  async sendConnectionOffer(
-    @MessageBody()
-    {
-      offer,
-      roomName,
-    }: {
-      offer: RTCSessionDescriptionInit;
-      roomName: string;
-    },
-    @ConnectedSocket() socket: Socket,
-  ) {
-    this.server.in(roomName).except(socket.id).emit('send_connection_offer', {
-      offer,
-      roomName,
-    });
-  }
-
-  @SubscribeMessage('answer')
-  async answer(
-    @MessageBody()
-    {
-      answer,
-      roomName,
-    }: {
-      answer: RTCSessionDescriptionInit;
-      roomName: string;
-    },
-    @ConnectedSocket() socket: Socket,
-  ) {
-    this.server.in(roomName).except(socket.id).emit('answer', {
-      answer,
-      roomName,
-    });
-  }
-
-  @SubscribeMessage('send_candidate')
-  async sendCandidate(
-    @MessageBody()
-    {
-      candidate,
-      roomName,
-    }: {
-      candidate: unknown;
-      roomName: string;
-    },
-    @ConnectedSocket() socket: Socket,
-  ) {
-    this.server.in(roomName).except(socket.id).emit('send_candidate', {
-      candidate,
-      roomName,
-    });
   }
 }
