@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calendar-deployment
+  labels:
+    app: calendar
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: calendar
+  template:
+    metadata:
+      labels:
+        app: calendar
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: calendar
+          image: mjkundta/calendar:<TAG>
+          command: ["node", "dist/apps/calendar/src/main"]
+          resources:
+            limits:
+              cpu: "0.25"
+              memory: "512Mi"
+          env:
+            - name: NODE_ENV
+              value: "production"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: calendar
+  labels:
+    app: calendar
+spec:
+  selector:
+    app: calendar
+  ports:
+    - protocol: TCP
+      port: 8089
+      targetPort: 8089
+  type: ClusterIP
+

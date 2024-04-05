@@ -1,0 +1,122 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: log-volume-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-deployment
+  labels:
+    app: gateway
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: gateway
+          image: mjkundta/gateway:<TAG>
+          command: ["node", "dist/apps/gateway/src/main"]
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "0.25"
+              memory: "512Mi"
+          env:
+            - name: NODE_ENV
+              value: "production"
+          volumeMounts:
+          - name: log-volume
+            mountPath: /usr/src/app/logs
+
+        - name: filebeat
+          image: docker.elastic.co/beats/filebeat-oss:7.15.0
+          args: ["-c", "/usr/share/filebeat/filebeat.yml", "-e"]
+          volumeMounts:
+          - name: config
+            mountPath: /usr/share/filebeat/filebeat.yml
+            subPath: filebeat.yml
+          - name: log-volume
+            mountPath: /src/logs
+          resources:
+            limits:
+              cpu: "0.25"
+              memory: "512Mi"
+          securityContext:
+            runAsUser: 0
+      volumes:
+      - name: config
+        configMap:
+          name: filebeat-config
+      - name: log-volume
+        persistentVolumeClaim:
+          claimName: log-volume-claim
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+data:
+  filebeat.yml: |
+    name: "gateway-filebeat"
+    logging.metrics.enabled: false
+    xpack.security.enabled: false
+    xpack.monitoring.enabled: false
+    setup.ilm.enabled: false
+    setup.template.enabled: false
+
+    filebeat.inputs:
+    - type: log
+      scan_frequency: 1s
+      enabled: true
+      paths:
+        - /src/logs/app.log
+      fields:
+        service: gateway
+      fields_under_root: true
+      json:
+        keys_under_root: true
+        message_key: 'message'
+        overwrite_keys: true
+
+    output.elasticsearch:
+      hosts: ["http://34.92.206.189:9200"]
+      index: "famfund-app"
+      username: "elastic"
+      password: "Toan123456789"
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  labels:
+    app: gateway
+spec:
+  selector:
+    app: gateway
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer

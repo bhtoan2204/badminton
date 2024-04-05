@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: role-deployment
+  labels:
+    app: role
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: role
+  template:
+    metadata:
+      labels:
+        app: role
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: role
+          image: mjkundta/role:<TAG>
+          command: ["node", "dist/apps/role/src/main"]
+          resources:
+            limits:
+              cpu: "0.25"
+              memory: "512Mi"
+          env:
+            - name: NODE_ENV
+              value: "production"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: role
+  labels:
+    app: role
+spec:
+  selector:
+    app: role
+  ports:
+    - protocol: TCP
+      port: 8087
+      targetPort: 8087
+  type: ClusterIP

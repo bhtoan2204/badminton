@@ -170,6 +170,48 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
 
+  notification:
+    image: mjkundta/notification:latest
+    build:
+      context: .
+      dockerfile: ./apps/notification/Dockerfile
+      target: development
+    command: npm run start:dev notification
+    depends_on:
+      - gateway
+    restart: on-failure
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  education:
+    image: mjkundta/education:latest
+    build:
+      context: .
+      dockerfile: ./apps/education/Dockerfile
+      target: development
+    command: npm run start:dev education
+    depends_on:
+      - gateway
+    restart: on-failure
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  filebeat:
+    image: mjkundta/filebeat:latest
+    build:
+      context: .
+      dockerfile: ./apps/filebeat/Dockerfile
+    container_name: filebeat
+    command: filebeat -e -strict.perms=false
+    volumes:
+      - ./logs:/src/logs
+    labels:
+      co.elastic.logs/json.overwrite_keys: true 
+      co.elastic.logs/json.add_error_key: true 
+      co.elastic.logs/json.expand_keys: true
+
   rabbitmq:
     image: rabbitmq
     healthcheck:

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: family-deployment
+  labels:
+    app: family
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: family
+  template:
+    metadata:
+      labels:
+        app: family
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: family
+          image: mjkundta/family:<TAG>
+          command: ["node", "dist/apps/family/src/main"]
+          resources:
+            limits:
+              cpu: "0.25"
+              memory: "512Mi"
+          env:
+            - name: NODE_ENV
+              value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: family
+  labels:
+    app: family
+spec:
+  selector:
+    app: family
+  ports:
+    - protocol: TCP
+      port: 8085
+      targetPort: 8085
+  type: ClusterIP
+
