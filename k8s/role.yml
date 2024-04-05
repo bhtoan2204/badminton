@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mailer-deployment
+  name: role-deployment
   labels:
-    app: mailer
+    app: role
 spec:
   strategy:
     rollingUpdate:
@@ -12,24 +12,37 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mailer
+      app: role
   template:
     metadata:
       labels:
-        app: mailer
+        app: role
     spec:
       automountServiceAccountToken: false
       containers:
-        - name: mailer
-          image: mjkundta/mailer:<TAG>
-          command: ["node", "dist/apps/mailer/src/main"]
+        - name: role
+          image: mjkundta/role:<TAG>
+          command: ["node", "dist/apps/role/src/main"]
           resources:
             limits:
               cpu: "0.25"
               memory: "512Mi"
-            requests:
-              cpu: "0.1"
-              memory: "128Mi"
           env:
             - name: NODE_ENV
               value: "production"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: role
+  labels:
+    app: role
+spec:
+  selector:
+    app: role
+  ports:
+    - protocol: TCP
+      port: 8087
+      targetPort: 8087
+  type: ClusterIP

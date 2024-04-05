@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gateway-deployment
+  name: storage-deployment
   labels:
-    app: gateway
+    app: storage
 spec:
   strategy:
     rollingUpdate:
@@ -12,26 +12,39 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: gateway
+      app: storage
   template:
     metadata:
       labels:
-        app: gateway
+        app: storage
     spec:
       automountServiceAccountToken: false
       containers:
-        - name: gateway
-          image: mjkundta/gateway:<TAG>
-          command: ["node", "dist/apps/gateway/src/main"]
+        - name: storage
+          image: mjkundta/storage:<TAG>
+          command: ["node", "dist/apps/storage/src/main"]
           ports:
-            - containerPort: 8080
+            - containerPort: 50000
           resources:
             limits:
               cpu: "0.25"
               memory: "512Mi"
-            requests:
-              cpu: "0.1"
-              memory: "128Mi"
           env:
             - name: NODE_ENV
               value: "production"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: storage
+  labels:
+    app: storage
+spec:
+  selector:
+    app: storage
+  ports:
+    - protocol: TCP
+      port: 50000
+      targetPort: 50000
+  type: ClusterIP

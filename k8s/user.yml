@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-deployment
+  name: user-deployment
   labels:
-    app: auth
+    app: user
 spec:
   strategy:
     rollingUpdate:
@@ -12,24 +12,38 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth
+      app: user
   template:
     metadata:
       labels:
-        app: auth
+        app: user
     spec:
       automountServiceAccountToken: false
       containers:
-        - name: auth
-          image: mjkundta/auth:<TAG>
-          command: ["node", "dist/apps/auth/src/main"]
+        - name: user
+          image: mjkundta/user:<TAG>
+          command: ["node", "dist/apps/user/src/main"]
           resources:
             limits:
               cpu: "0.25"
               memory: "512Mi"
-            requests:
-              cpu: "0.1"
-              memory: "128Mi"
           env:
             - name: NODE_ENV
               value: "production"
+              
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user
+  labels:
+    app: user
+spec:
+  selector:
+    app: user
+  ports:
+    - protocol: TCP
+      port: 8090
+      targetPort: 8090
+  type: ClusterIP
+

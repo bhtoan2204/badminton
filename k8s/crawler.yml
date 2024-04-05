@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: calendar-deployment
+  name: crawler-deployment
   labels:
-    app: calendar
+    app: crawler
 spec:
   strategy:
     rollingUpdate:
@@ -12,24 +12,38 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: calendar
+      app: crawler
   template:
     metadata:
       labels:
-        app: calendar
+        app: crawler
     spec:
       automountServiceAccountToken: false
       containers:
-        - name: calendar
-          image: mjkundta/calendar:<TAG>
-          command: ["node", "dist/apps/calendar/src/main"]
+        - name: crawler
+          image: mjkundta/crawler:<TAG>
+          command: ["node", "dist/apps/crawler/src/main"]
           resources:
             limits:
               cpu: "0.25"
               memory: "512Mi"
-            requests:
-              cpu: "0.1"
-              memory: "128Mi"
           env:
             - name: NODE_ENV
               value: "production"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crawler
+  labels:
+    app: crawler
+spec:
+  selector:
+    app: crawler
+  ports:
+    - protocol: TCP
+      port: 8088
+      targetPort: 8088
+  type: ClusterIP
+

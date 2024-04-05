@@ -27,9 +27,23 @@ spec:
             limits:
               cpu: "0.25"
               memory: "512Mi"
-            requests:
-              cpu: "0.1"
-              memory: "128Mi"
           env:
             - name: NODE_ENV
               value: "production"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment
+  labels:
+    app: payment
+spec:
+  selector:
+    app: payment
+  ports:
+    - protocol: TCP
+      port: 8082
+      targetPort: 8082
+  type: ClusterIP
+

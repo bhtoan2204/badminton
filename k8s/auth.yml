@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: crawler-deployment
+  name: auth-deployment
   labels:
-    app: crawler
+    app: auth
 spec:
   strategy:
     rollingUpdate:
@@ -12,24 +12,39 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: crawler
+      app: auth
   template:
     metadata:
       labels:
-        app: crawler
+        app: auth
     spec:
       automountServiceAccountToken: false
       containers:
-        - name: crawler
-          image: mjkundta/crawler:<TAG>
-          command: ["node", "dist/apps/crawler/src/main"]
+        - name: auth
+          image: mjkundta/auth:<TAG>
+          command: ["node", "dist/apps/auth/src/main"]
           resources:
             limits:
               cpu: "0.25"
               memory: "512Mi"
-            requests:
-              cpu: "0.1"
-              memory: "128Mi"
           env:
             - name: NODE_ENV
               value: "production"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+  labels:
+    app: auth
+spec:
+  selector:
+    app: auth
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
+  type: ClusterIP
+

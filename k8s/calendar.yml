@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: family-deployment
+  name: calendar-deployment
   labels:
-    app: family
+    app: calendar
 spec:
   strategy:
     rollingUpdate:
@@ -12,24 +12,39 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: family
+      app: calendar
   template:
     metadata:
       labels:
-        app: family
+        app: calendar
     spec:
       automountServiceAccountToken: false
       containers:
-        - name: family
-          image: mjkundta/family:<TAG>
-          command: ["node", "dist/apps/family/src/main"]
+        - name: calendar
+          image: mjkundta/calendar:<TAG>
+          command: ["node", "dist/apps/calendar/src/main"]
           resources:
             limits:
               cpu: "0.25"
               memory: "512Mi"
-            requests:
-              cpu: "0.1"
-              memory: "128Mi"
           env:
             - name: NODE_ENV
               value: "production"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: calendar
+  labels:
+    app: calendar
+spec:
+  selector:
+    app: calendar
+  ports:
+    - protocol: TCP
+      port: 8089
+      targetPort: 8089
+  type: ClusterIP
+
