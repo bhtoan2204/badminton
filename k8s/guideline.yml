@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: role-deployment
+  name: guideline-deployment
   labels:
-    app: role
+    app: guideline
 spec:
   strategy:
     rollingUpdate:
@@ -12,24 +12,38 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: role
+      app: guideline
   template:
     metadata:
       labels:
-        app: role
+        app: guideline
     spec:
       automountServiceAccountToken: false
       containers:
-        - name: role
-          image: mjkundta/role:<TAG>
-          command: ["node", "dist/apps/role/src/main"]
+        - name: guideline
+          image: mjkundta/guideline:<TAG>
+          command: ["node", "dist/apps/guideline/src/main"]
           resources:
             limits:
               cpu: "0.25"
               memory: "512Mi"
-            requests:
-              cpu: "0.1"
-              memory: "128Mi"
           env:
             - name: NODE_ENV
               value: "production"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: guideline
+  labels:
+    app: guideline
+spec:
+  selector:
+    app: guideline
+  ports:
+    - protocol: TCP
+      port: 8091
+      targetPort: 8091
+  type: ClusterIP
+
