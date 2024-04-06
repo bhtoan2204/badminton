@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-deployment
+  labels:
+    app: notification
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification
+  template:
+    metadata:
+      labels:
+        app: notification
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: notification
+          image: mjkundta/notification:<TAG>
+          command: ["node", "dist/apps/notification/src/main"]
+          resources:
+            limits:
+              cpu: "0.25"
+              memory: "512Mi"
+          env:
+            - name: NODE_ENV
+              value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification
+  labels:
+    app: notification
+spec:
+  selector:
+    app: notification
+  ports:
+    - protocol: TCP
+      port: 8093
+      targetPort: 8093
+  type: ClusterIP
+

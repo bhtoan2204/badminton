@@ -14,6 +14,14 @@ export class ChatController {
   ) { }
 
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all chats' })
+  @Get('getUsersChat/:index')
+  @ApiParam({ name: 'index', required: true, description: 'Index', type: Number })
+  async getChats(@CurrentUser() user, @Param('index') index: number) {
+    return this.chatService.getUsersChat(user.id_user, index);
+  }
+
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get messages' })
   @Get('getMessages/:id_user/:index')
   @ApiParam({ name: 'id_user', required: true, description: 'The ID of the other user' })
