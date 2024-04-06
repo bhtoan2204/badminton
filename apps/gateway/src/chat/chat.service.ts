@@ -10,6 +10,16 @@ export class ChatService {
     @Inject(FAMILY_SERVICE) private readonly familyClient: ClientProxy
   ) { }
 
+  async getUsersChat(id_user: string, index: number) {
+    try {
+      const response = this.chatClient.send('chatClient/getUsersChat', { id_user, index }).pipe(timeout(5000));
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
   async getMessages(sender_id: string, receiver_id: string, index: number) {
     try {
       const response = this.chatClient.send('chatClient/getMessages', { sender_id, receiver_id, index }).pipe(timeout(5000));

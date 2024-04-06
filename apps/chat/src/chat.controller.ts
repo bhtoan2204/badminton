@@ -9,6 +9,12 @@ export class ChatController {
     private readonly rmqService: RmqService,
     private readonly chatService: ChatService) { }
 
+  @EventPattern('chatClient/getUsersChat')
+  async getChats(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.chatService.getUsersChat(data.id_user, data.index);
+  }
+
   @EventPattern('chatClient/getMessages')
   async getMessages(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
