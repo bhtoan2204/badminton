@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: education-deployment
+  labels:
+    app: education
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: education
+  template:
+    metadata:
+      labels:
+        app: education
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: education
+          image: mjkundta/education:<TAG>
+          command: ["node", "dist/apps/education/src/main"]
+          resources:
+            limits:
+              cpu: "0.25"
+              memory: "512Mi"
+          env:
+            - name: NODE_ENV
+              value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: education
+  labels:
+    app: education
+spec:
+  selector:
+    app: education
+  ports:
+    - protocol: TCP
+      port: 8092
+      targetPort: 8092
+  type: ClusterIP
+

@@ -1,17 +1,19 @@
-import { FamilyMessageContent, MessageContent, UploadFileRequest } from '@app/common';
+import { FamilyMessageContent, UploadFileRequest, UserConversations } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import { StorageService } from './storage/storage.service';
+import { EntityManager } from 'typeorm';
 
-const limit = 20;
+const limit = 30;
 
 @Injectable()
 export class ChatService {
   constructor(
-    @InjectModel(MessageContent.name) private messageRepository,
+    @InjectModel(UserConversations.name) private userConversationsRepository,
     @InjectModel(FamilyMessageContent.name) private familyMessageRepository,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
+    private readonly entityManager: EntityManager
   ) { }
 
   async base64ToUint8Array(base64: string): Promise<Uint8Array> {
@@ -19,18 +21,43 @@ export class ChatService {
     return new Uint8Array(buffer);
   }
 
-  async getMessages(senderId: string, receiverId: string, index: number): Promise<MessageContent[]> {
+  async getUsersChat(id_user: string, index: number): Promise<any> {
     try {
-      const skip = index * limit;
-      console.log(this.messageRepository.find({ senderId: senderId, receiverId: receiverId }));
-      return await this.messageRepository.find({
-        $or: [
-          { senderId: senderId, receiverId: receiverId },
-          { senderId: receiverId, receiverId: senderId }
-        ]
-      }).sort({ timestamp: -1 })
-        .skip(skip)
-        .limit(limit);
+      const skipAmount = index * limit;
+
+      const results = await this.userConversationsRepository.aggregate([
+        { $match: { userId: id_user } },
+        { $unwind: "$conversations" },
+        { $unwind: "$conversations.messages" },
+        { $sort: { "conversations.messages.timestamp": -1 } },
+        {
+          $group: {
+            _id: "$conversations.receiverId",
+            lastMessage: { $first: "$conversations.messages" }
+          }
+        },
+        { $skip: skipAmount },
+        { $limit: limit },
+      ]).exec();
+
+      const userIds = results.map(result => result._id);
+      const usersQuery = 'SELECT * FROM f_get_users_info($1)';
+      const usersParams = [userIds];
+      const usersInfo = await this.entityManager.query(usersQuery, usersParams);
+
+      const enrichedResults = results.map(conversation => {
+        const userInfo = usersInfo.find(user => user.id_user === conversation._id.toString());
+        return {
+          ...conversation,
+          user: userInfo ? {
+            firstname: userInfo.firstname,
+            lastname: userInfo.lastname,
+            avatar: userInfo.avatar,
+          } : null,
+        };
+      });
+
+      return enrichedResults;
     }
     catch (error) {
       throw new RpcException({
@@ -39,6 +66,54 @@ export class ChatService {
       });
     }
   }
+
+  async getMessages(senderId: string, receiverId: string, index: number): Promise<any[]> {
+    try {
+      const skip = index * limit;
+      const conversationForCount = await this.userConversationsRepository.findOne({
+        userId: senderId,
+        'conversations.receiverId': receiverId,
+      }, { 'conversations.$': 1 });
+
+      if (!conversationForCount || conversationForCount.conversations.length === 0) {
+        throw new RpcException({
+          message: 'Conversation not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      const totalMessages = conversationForCount.conversations[0].messages.length;
+
+      if (skip >= totalMessages) {
+        return [];
+      }
+      const messagesPosition = Math.max(totalMessages - skip - limit, 0);
+      const conversation = await this.userConversationsRepository.aggregate([
+        { $match: { userId: senderId, 'conversations.receiverId': receiverId } },
+        { $unwind: '$conversations' },
+        { $match: { 'conversations.receiverId': receiverId } },
+        {
+          $project: {
+            messages: {
+              $slice: ['$conversations.messages', messagesPosition, limit]
+            }
+          }
+        }
+      ]).exec();
+
+      if (!conversation || conversation.length === 0 || conversation[0].messages.length === 0) {
+        return [];
+      }
+
+      const messages = conversation[0].messages.reverse();
+      return messages;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
 
   async getFamilyMessages(id_user: string, id_family: number, index: number): Promise<any> {
     try {
@@ -58,26 +133,51 @@ export class ChatService {
     }
   }
 
-  async saveMessage(id_user: string, messageData: { message: string; receiverId: string; }): Promise<MessageContent> {
+  async saveMessage(id_user: string, messageData: { message: string; receiverId: string }): Promise<any> {
     try {
       if (!id_user || !messageData.receiverId || id_user === messageData.receiverId) {
         throw new Error('Invalid sender or receiver ID.');
       }
-      const newMessageContent = new this.messageRepository({
-        _id: null,
+      const newMessage = {
         senderId: id_user,
-        type: 'text',
         receiverId: messageData.receiverId,
+        type: 'text',
         content: messageData.message,
-      });
+        isRead: false,
+        timestamp: new Date(),
+      };
+      const updateOrCreateConversation = async (userId: string, partnerId: string) => {
+        const conversationExists = await this.userConversationsRepository.findOne({ userId, 'conversations.receiverId': partnerId });
 
-      return await newMessageContent.save();
+        if (conversationExists) {
+          return this.userConversationsRepository.findOneAndUpdate(
+            { userId, 'conversations.receiverId': partnerId },
+            { $push: { 'conversations.$.messages': newMessage } },
+            { new: true }
+          );
+        } else {
+          return this.userConversationsRepository.findOneAndUpdate(
+            { userId },
+            { $addToSet: { conversations: { receiverId: partnerId, messages: [newMessage] } } },
+            { upsert: true, new: true }
+          );
+        }
+      };
+
+      await Promise.all([
+        updateOrCreateConversation(id_user, messageData.receiverId),
+        updateOrCreateConversation(messageData.receiverId, id_user),
+      ]);
+
+      return newMessage;
     } catch (error) {
-      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
-      const message = error.message || 'An error occurred while saving the message.';
-      throw new RpcException({ message, statusCode });
+      throw new RpcException({
+        message: error.message || 'An error occurred while saving the message.',
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+      });
     }
   }
+
 
   async saveFamilyMessage(id_user: string, messageData: { message: string; familyId: number; }): Promise<any> {
     try {
@@ -122,14 +222,39 @@ export class ChatService {
       if (!id_user || !messageData.receiverId || id_user === messageData.receiverId) {
         throw new Error('Invalid sender or receiver ID.');
       }
-      const newMessageContent = new this.messageRepository({
-        _id: null,
+      const newMessage = {
         senderId: id_user,
-        type: 'photo',
         receiverId: messageData.receiverId,
+        type: 'photo',
         content: fileUrl,
-      });
-      return await newMessageContent.save();
+        isRead: false,
+        timestamp: new Date(),
+      };
+
+      const updateOrCreateConversation = async (userId: string, partnerId: string) => {
+        const conversationExists = await this.userConversationsRepository.findOne({ userId, 'conversations.receiverId': partnerId });
+
+        if (conversationExists) {
+          return this.userConversationsRepository.findOneAndUpdate(
+            { userId, 'conversations.receiverId': partnerId },
+            { $push: { 'conversations.$.messages': newMessage } },
+            { new: true }
+          );
+        } else {
+          return this.userConversationsRepository.findOneAndUpdate(
+            { userId },
+            { $addToSet: { conversations: { receiverId: partnerId, messages: [newMessage] } } },
+            { upsert: true, new: true }
+          );
+        }
+      };
+
+      await Promise.all([
+        updateOrCreateConversation(id_user, messageData.receiverId),
+        updateOrCreateConversation(messageData.receiverId, id_user),
+      ]);
+
+      return newMessage;
     } catch (error) {
       const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
       const message = error.message || 'An error occurred while saving the message.';
