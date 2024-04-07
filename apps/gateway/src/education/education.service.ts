@@ -24,12 +24,33 @@ export class EducationService {
     }
   }
 
-  async getAllEducationProgress() {
+  async getAllEducationProgress(id_user: string, pageNumber, itemsPerPage, id_family) {
+    try {
+      const response = this.educationClient.send('educationClient/getAllEducationProgress', { id_user, pageNumber, itemsPerPage, id_family })
+        .pipe(
+          timeout(5000),
+        );
+      return await lastValueFrom(response);
+    } catch (error) {
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
 
   }
 
-  async getDetailEducationProgress() {
-
+  async getDetailEducationProgress(id_user: string, id_family: number, id_education_progress: number) {
+    try {
+      const response = this.educationClient.send('educationClient/getDetailEducationProgress', { id_user, id_family, id_education_progress })
+        .pipe(
+          timeout(5000),
+        );
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      throw new HttpException(error, error.statusCode);
+    }
   }
 
   async updateDetailEducationProgress() {
