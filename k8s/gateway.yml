@@ -31,6 +31,13 @@ spec:
         app: gateway
     spec:
       automountServiceAccountToken: false
+      initContainers:
+      - name: init-logs
+        image: busybox
+        command: ['sh', '-c', 'if [ -d "/usr/src/app/logs" ]; then cp -R /usr/src/app/logs /usr/src/app/logs_backup; fi']
+        volumeMounts:
+        - name: log-volume
+          mountPath: /usr/src/app/logs
       containers:
         - name: gateway
           image: mjkundta/gateway:<TAG>
