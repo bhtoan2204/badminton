@@ -101,6 +101,19 @@ export class GuidelineService {
     }
   }
 
+  async insertStep(id_user: string, dto: AddStepGuidelineDto, file: Express.Multer.File) {
+    try {
+      const response = this.guidelineClient.send('guidelineClient/insert_step', { id_user, dto, file })
+        .pipe(
+          timeout(10000),
+        );
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
   async updateStep(id_user: string, dto: AddStepGuidelineDto, file: Express.Multer.File) {
     try {
       const response = this.guidelineClient.send('guidelineClient/update_step', { id_user, dto, file })

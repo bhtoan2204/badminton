@@ -162,6 +162,47 @@ export class GuidelineService {
     }
   }
 
+  async insertStep(id_user: string, { id_family, id_guideline, name, description, index }, file: any) {
+    try {
+      const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
+      const parameters = [id_user, id_family];
+      const isUserMemberOfFamily = await this.entityManager.query(query, parameters);
+      if (isUserMemberOfFamily[0].f_is_user_member_of_family === false) {
+        throw new RpcException({
+          message: 'You are not a member of this family',
+          statusCode: HttpStatus.UNAUTHORIZED
+        });
+      }
+      let fileUrl = null;
+      if (file) {
+        const filename = 'step_' + id_user + '_' + Date.now() + '_' + file.originalname;
+        const params: UploadFileRequest = {
+          fileName: filename,
+          file: new Uint8Array(file.buffer.data)
+        }
+        const uploadImageData = await this.storageService.uploadImageStep(params);
+        fileUrl = uploadImageData.fileUrl;
+      }
+      const addStepQuery = 'SELECT * FROM f_insert_guideline_step($1, $2, $3, $4, $5, $6, $7)';
+      const addStepParameters = [id_user, id_family, id_guideline, name, description, fileUrl, index];
+      const data = await this.entityManager.query(addStepQuery, addStepParameters);
+
+      return {
+        message: "Success",
+        data: data[0].f_insert_guideline_step
+      };
+    }
+    catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
   async updateStep(id_user: string, { id_family, id_guideline, name, description, index }, file: any) {
     try {
       const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
