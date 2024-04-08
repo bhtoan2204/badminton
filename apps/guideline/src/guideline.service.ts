@@ -20,7 +20,7 @@ export class GuidelineService {
       const data = await this.entityManager.query(query, parameters);
       return {
         message: "Success",
-        data: data
+        data: data[0].f_get_guidelines
       };
     }
     catch (error) {
