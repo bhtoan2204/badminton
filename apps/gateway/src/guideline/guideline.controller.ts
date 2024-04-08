@@ -89,7 +89,7 @@ export class GuidelineController {
           type: 'number',
           description: 'The ID of the guideline',
         },
-        title: {
+        name: {
           type: 'string',
           description: 'The title of the step',
         },
@@ -98,7 +98,7 @@ export class GuidelineController {
           description: 'The description of the step (optional)',
         },
       },
-      required: ["id_family", "id_guideline", "title"],
+      required: ["id_family", "id_guideline", "name"],
     },
   })
   @UseInterceptors(FileInterceptor('stepImage', new ImageFileInterceptor().createMulterOptions()))
@@ -133,6 +133,55 @@ export class GuidelineController {
           type: 'number',
           description: 'The ID of the guideline',
         },
+        name: {
+          type: 'string',
+          description: 'The title of the step',
+        },
+        description: {
+          type: 'string',
+          description: 'The description of the step (optional)',
+        },
+        index: {
+          type: 'number',
+          description: 'The index of the step',
+        }
+      },
+      required: ["id_family", "id_guideline", "name", "index"],
+    },
+  })
+  @UseInterceptors(FileInterceptor('stepImage', new ImageFileInterceptor().createMulterOptions()))
+  @Post('insertStep')
+  async insertStep(
+    @CurrentUser() currentUser,
+    @Body() dto: any,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    dto.id_family = parseInt(dto.id_family);
+    dto.id_guideline = parseInt(dto.id_guideline);
+    dto.index = parseInt(dto.index);
+    return this.guidelineService.insertStep(currentUser.id_user, dto, file);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Insert step' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        stepImage: {
+          type: 'string',
+          format: 'binary',
+          description: 'The image of the step (optional)',
+        },
+        id_family: {
+          type: 'number',
+          description: 'The ID of the family',
+        },
+        id_guideline: {
+          type: 'number',
+          description: 'The ID of the guideline',
+        },
         index: {
           type: 'number',
           description: 'The index of the step',
@@ -146,7 +195,7 @@ export class GuidelineController {
           description: 'The description of the step (optional)',
         },
       },
-      required: ["id_family", "id_guideline", "index"],
+      required: ["id_family", "id_guideline", "index", "name"],
     },
   })
   @UseInterceptors(FileInterceptor('stepImage', new ImageFileInterceptor().createMulterOptions()))
