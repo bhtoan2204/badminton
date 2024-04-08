@@ -89,7 +89,7 @@ export class GuidelineController {
           type: 'number',
           description: 'The ID of the guideline',
         },
-        name: {
+        title: {
           type: 'string',
           description: 'The title of the step',
         },
