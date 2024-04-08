@@ -53,7 +53,7 @@ pipeline {
                         sh "echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin"
                         sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml push"
                         sh "tar -czvf k8s.tar.gz k8s/"
-                        sh "sshpass -p ${SSH_password} scp -r k8s.tar.gz ${SSH_user}@${SSH_ip}:~/"
+                        sh "sshpass -p ${SSH_password} scp -o StrictHostKeyChecking=no -r k8s.tar.gz ${SSH_user}@${SSH_ip}:~/"
                         sh "rm -rf k8s.tar.gz"
                     }
                 }
@@ -62,10 +62,10 @@ pipeline {
 
         stage("Deploy to Kubernetes") {
           steps {
-            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'TAG=${COMMIT_ID} tar -xzvf k8s.tar.gz'"
-            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'find ./k8s -type f -name \"*.yml\" -print0 | xargs -0 sed -i \"s/<TAG>/${COMMIT_ID}/g\"'"
-            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} 'kubectl apply -f ./k8s'"
-            sh "sshpass -p ${SSH_password} ssh ${SSH_user}@${SSH_ip} \
+            sh "sshpass -p ${SSH_password} ssh -o StrictHostKeyChecking=no ${SSH_user}@${SSH_ip} 'TAG=${COMMIT_ID} tar -xzvf k8s.tar.gz'"
+            sh "sshpass -p ${SSH_password} ssh -o StrictHostKeyChecking=no ${SSH_user}@${SSH_ip} 'find ./k8s -type f -name \"*.yml\" -print0 | xargs -0 sed -i \"s/<TAG>/${COMMIT_ID}/g\"'"
+            sh "sshpass -p ${SSH_password} ssh -o StrictHostKeyChecking=no ${SSH_user}@${SSH_ip} 'kubectl apply -f ./k8s'"
+            sh "sshpass -p ${SSH_password} ssh -o StrictHostKeyChecking=no ${SSH_user}@${SSH_ip} \
                   'for deployment in \$(kubectl get deployments --no-headers -o custom-columns=\":metadata.name\"); do \
                   if [[ \"\$deployment\" != \"rabbitmq-deployment\" && \"\$deployment\" != \"nextjs-deployment\" ]]; then \
                   kubectl rollout restart deployment/\$deployment; \
