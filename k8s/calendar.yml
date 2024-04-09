@@ -32,7 +32,6 @@ spec:
               value: "production"
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -47,4 +46,3 @@ spec:
       port: 8089
       targetPort: 8089
   type: ClusterIP
-

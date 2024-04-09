@@ -8,7 +8,7 @@ export class NotificationController {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly rmqService: RmqService,
-  ) {}
+  ) { }
 
   @EventPattern('notificationClient/getNotifications')
   async getNotification(@Payload() dto: any, @Ctx() context: RmqContext) {

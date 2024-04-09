@@ -8,13 +8,16 @@ export class NotificationService {
   constructor(
     @Inject(NOTIFICATION_SERVICE) private readonly notificationClient: ClientProxy
   ) { }
-  
+
   async getNotifications(id_user: string, index: number) {
     try {
       const response = this.notificationClient.send('notificationClient/getNotifications', { id_user, index }).pipe(timeout(5000));
       return await lastValueFrom(response);
     }
     catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }

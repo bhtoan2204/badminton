@@ -17,6 +17,9 @@ export class MailService {
       return await lastValueFrom(response);
     }
     catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -29,6 +32,9 @@ export class MailService {
       return await lastValueFrom(response);
     }
     catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }

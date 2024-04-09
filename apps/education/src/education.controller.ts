@@ -33,7 +33,7 @@ export class EducationController {
     this.rmqService.ack(context);
     return this.educationService.updateDetailEducationProgress(data.id_user, data.dto);
   }
-  
+
   @EventPattern('educationClient/deleteEducationProgress')
   async deleteEducationProgress(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);

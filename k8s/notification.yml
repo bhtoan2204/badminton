@@ -45,4 +45,3 @@ spec:
       port: 8093
       targetPort: 8093
   type: ClusterIP
-

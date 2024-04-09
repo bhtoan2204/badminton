@@ -32,12 +32,17 @@ spec:
     spec:
       automountServiceAccountToken: false
       initContainers:
-      - name: init-logs
-        image: busybox
-        command: ['sh', '-c', 'if [ -d "/usr/src/app/logs" ]; then cp -R /usr/src/app/logs /usr/src/app/logs_backup; fi']
-        volumeMounts:
-        - name: log-volume
-          mountPath: /usr/src/app/logs
+        - name: init-logs
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              'if [ -d "/usr/src/app/logs" ]; then cp -R /usr/src/app/logs /usr/src/app/logs_backup; fi',
+            ]
+          volumeMounts:
+            - name: log-volume
+              mountPath: /usr/src/app/logs
       containers:
         - name: gateway
           image: mjkundta/gateway:<TAG>
@@ -52,18 +57,18 @@ spec:
             - name: NODE_ENV
               value: "production"
           volumeMounts:
-          - name: log-volume
-            mountPath: /usr/src/app/logs
+            - name: log-volume
+              mountPath: /usr/src/app/logs
 
         - name: filebeat
           image: docker.elastic.co/beats/filebeat-oss:7.15.0
           args: ["-c", "/usr/share/filebeat/filebeat.yml", "-e"]
           volumeMounts:
-          - name: config
-            mountPath: /usr/share/filebeat/filebeat.yml
-            subPath: filebeat.yml
-          - name: log-volume
-            mountPath: /src/logs
+            - name: config
+              mountPath: /usr/share/filebeat/filebeat.yml
+              subPath: filebeat.yml
+            - name: log-volume
+              mountPath: /src/logs
           resources:
             limits:
               cpu: "0.25"
@@ -71,12 +76,12 @@ spec:
           securityContext:
             runAsUser: 0
       volumes:
-      - name: config
-        configMap:
-          name: filebeat-config
-      - name: log-volume
-        persistentVolumeClaim:
-          claimName: log-volume-claim
+        - name: config
+          configMap:
+            name: filebeat-config
+        - name: log-volume
+          persistentVolumeClaim:
+            claimName: log-volume-claim
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -110,7 +115,6 @@ data:
       index: "famfund-app-production"
       username: "elastic"
       password: "Toan123456789"
-
 
 ---
 apiVersion: v1

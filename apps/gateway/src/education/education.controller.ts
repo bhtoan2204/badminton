@@ -32,7 +32,7 @@ export class EducationController {
     const pageNumber = parseInt(page, 10) || 1;
     const itemsPerPageNumber = parseInt(itemsPerPage, 10) || 10;
     return this.educationService.getAllEducationProgress(currentUser.id_user, pageNumber, itemsPerPageNumber, id_family);
-    
+
   }
 
   @HttpCode(HttpStatus.OK)

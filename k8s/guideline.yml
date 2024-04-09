@@ -46,4 +46,3 @@ spec:
       port: 8091
       targetPort: 8091
   type: ClusterIP
-
