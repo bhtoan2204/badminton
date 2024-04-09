@@ -23,6 +23,9 @@ export class GuidelineService {
       if (error instanceof TimeoutError) {
         throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
       }
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -35,6 +38,9 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -48,6 +54,9 @@ export class GuidelineService {
       return await lastValueFrom(response);
     } catch (error) {
       console.log(error.statusCode, error.message)
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -60,6 +69,9 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -72,6 +84,9 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -84,6 +99,9 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -97,6 +115,9 @@ export class GuidelineService {
       return await lastValueFrom(response);
     }
     catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -110,6 +131,9 @@ export class GuidelineService {
       return await lastValueFrom(response);
     }
     catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -122,6 +146,9 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -134,6 +161,9 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -146,6 +176,9 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -158,6 +191,9 @@ export class GuidelineService {
         );
       return await lastValueFrom(response);
     } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }

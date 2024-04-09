@@ -13,4 +13,4 @@ import { SubjectModule } from "./subjects/subject.module";
   controllers: [EducationController],
   providers: [EducationService],
 })
-export class EducationModule {}
+export class EducationModule { }

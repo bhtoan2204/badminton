@@ -22,6 +22,9 @@ export class FamilyService {
             const data = await lastValueFrom(response);
             return data;
         } catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -35,6 +38,9 @@ export class FamilyService {
             const data = await lastValueFrom(response);
             return data;
         } catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -48,6 +54,9 @@ export class FamilyService {
             const data = await lastValueFrom(response);
             return data;
         } catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -61,6 +70,9 @@ export class FamilyService {
             const data = await lastValueFrom(response);
             return data;
         } catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
 
@@ -75,6 +87,9 @@ export class FamilyService {
             const data = await lastValueFrom(response);
             return data;
         } catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -88,6 +103,9 @@ export class FamilyService {
             const data = await lastValueFrom(response);
             return data;
         } catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -100,6 +118,9 @@ export class FamilyService {
             const data = await lastValueFrom(source);
             return data;
         } catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -112,6 +133,9 @@ export class FamilyService {
             const data = await lastValueFrom(source);
             return data;
         } catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -124,6 +148,9 @@ export class FamilyService {
             const data = await lastValueFrom(source);
             return data;
         } catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
     }

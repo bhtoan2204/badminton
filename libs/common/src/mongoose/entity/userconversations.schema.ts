@@ -16,7 +16,7 @@ export class Message {
 
   @Prop({ required: true })
   receiverId: string;
-  
+
   @Prop({ required: true, enum: ['text', 'photo', 'video'] })
   type: string;
 
@@ -59,7 +59,7 @@ const ConversationSchema = SchemaFactory.createForClass(Conversation);
 export class UserConversations {
   _id: Types.ObjectId;
 
-  @Prop({ required: true, unique: true})
+  @Prop({ required: true, unique: true })
   userId: string;
 
   @Prop({ type: [ConversationSchema], default: [] })

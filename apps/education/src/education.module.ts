@@ -21,4 +21,4 @@ import * as Joi from 'joi';
   controllers: [EducationController],
   providers: [EducationService],
 })
-export class EducationModule {}
+export class EducationModule { }

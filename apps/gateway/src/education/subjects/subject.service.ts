@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { EDUCATION_SERVICE } from "../../utils";
 import { ClientProxy } from "@nestjs/microservices";
 import { CreateSubjectDto } from "./dto/createSubject.dto";
@@ -23,7 +23,10 @@ export class SubjectService {
         );
       return await lastValueFrom(response);
     } catch (error) {
-      throw error;
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
     }
   }
 
@@ -35,7 +38,10 @@ export class SubjectService {
         );
       return await lastValueFrom(response);
     } catch (error) {
-      throw error;
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
     }
 
   }
@@ -48,7 +54,10 @@ export class SubjectService {
         );
       return await lastValueFrom(response);
     } catch (error) {
-      throw error;
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
     }
   }
 
@@ -60,7 +69,10 @@ export class SubjectService {
         );
       return await lastValueFrom(response);
     } catch (error) {
-      throw error;
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
     }
   }
 
@@ -72,7 +84,10 @@ export class SubjectService {
         );
       return await lastValueFrom(response);
     } catch (error) {
-      throw error;
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
     }
   }
 
@@ -84,7 +99,10 @@ export class SubjectService {
         );
       return await lastValueFrom(response);
     } catch (error) {
-      throw error;
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
     }
   }
 
@@ -96,7 +114,10 @@ export class SubjectService {
         );
       return await lastValueFrom(response);
     } catch (error) {
-      throw error;
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
     }
   }
 
@@ -108,7 +129,10 @@ export class SubjectService {
         );
       return await lastValueFrom(response);
     } catch (error) {
-      throw error;
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
     }
   }
 
@@ -120,7 +144,10 @@ export class SubjectService {
         );
       return await lastValueFrom(response);
     } catch (error) {
-      throw error;
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
     }
   }
 
@@ -132,7 +159,10 @@ export class SubjectService {
         );
       return await lastValueFrom(response);
     } catch (error) {
-      throw error;
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
     }
   }
 
@@ -144,7 +174,10 @@ export class SubjectService {
         );
       return await lastValueFrom(response);
     } catch (error) {
-      throw error;
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
     }
   }
 }

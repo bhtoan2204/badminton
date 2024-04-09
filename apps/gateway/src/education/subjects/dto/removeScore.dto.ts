@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator"
+import { IsEnum, IsNotEmpty, IsNumber } from "class-validator"
 
 enum ScoreName {
   MIDTERM_SCORE = "midterm_score",
@@ -23,7 +23,7 @@ export class RemoveScoreDto {
   @IsNotEmpty()
   id_education_progress: number
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Name of score (midterm_score, final_score, bonus_score)',
     enum: ScoreName
   })
