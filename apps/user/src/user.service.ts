@@ -33,7 +33,7 @@ export class UserService {
     }
   }
 
-  
+
   async check_phone(phone) {
     try {
 

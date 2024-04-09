@@ -20,6 +20,9 @@ export class UserService {
             return data;
         }
         catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -33,6 +36,9 @@ export class UserService {
             return data;
         }
         catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -46,6 +52,9 @@ export class UserService {
             return result;
         }
         catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -71,6 +80,9 @@ export class UserService {
             if (error instanceof ConflictException) {
                 throw error;
             }
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -84,6 +96,9 @@ export class UserService {
             return result;
         }
         catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
     }
@@ -97,6 +112,9 @@ export class UserService {
             return result;
         }
         catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
             throw new HttpException(error, error.statusCode);
         }
     }

@@ -12,12 +12,12 @@ export class ChangeStatusSubjectDto {
   @IsNotEmpty()
   id_subject: number
 
-  @ApiProperty({ description: 'Education progress id'})
+  @ApiProperty({ description: 'Education progress id' })
   @IsNumber()
   @IsNotEmpty()
   id_education_progress: number
 
-  @ApiProperty({ description: 'Family id'})
+  @ApiProperty({ description: 'Family id' })
   @IsNumber()
   @IsNotEmpty()
   id_family: number

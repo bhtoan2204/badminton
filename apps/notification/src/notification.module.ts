@@ -21,4 +21,4 @@ import { MgDatabaseModule, RmqModule } from '@app/common';
   controllers: [NotificationController],
   providers: [NotificationService],
 })
-export class NotificationModule {}
+export class NotificationModule { }

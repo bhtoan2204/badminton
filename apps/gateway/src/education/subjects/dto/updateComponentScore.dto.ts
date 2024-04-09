@@ -6,7 +6,7 @@ export class UpdateComponentScoreDto {
   @IsNumber()
   @IsNotEmpty()
   id_subject: number
-  
+
   @ApiProperty({ description: "Education progress id", example: 1 })
   @IsNumber()
   @IsNotEmpty()
@@ -33,5 +33,5 @@ export class UpdateComponentScoreDto {
   @Min(0.0, { message: 'Score must be at least 0.0' })
   @Max(10.0, { message: 'Score must not be greater than 10.0' })
   score: number
-  
+
 }

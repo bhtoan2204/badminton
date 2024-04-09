@@ -21,6 +21,9 @@ export class EducationService {
       if (error instanceof TimeoutError) {
         throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
       }
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -36,6 +39,9 @@ export class EducationService {
       if (error instanceof TimeoutError) {
         throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
       }
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
 
@@ -50,6 +56,9 @@ export class EducationService {
       return await lastValueFrom(response);
     }
     catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
@@ -63,6 +72,9 @@ export class EducationService {
       return await lastValueFrom(response);
     }
     catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
 
@@ -77,6 +89,9 @@ export class EducationService {
       return await lastValueFrom(response);
     }
     catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
       throw new HttpException(error, error.statusCode);
     }
   }
