@@ -8,7 +8,7 @@ const limit = 20;
 export class EducationService {
   constructor(
     private readonly entityManager: EntityManager
-  ) {}
+  ) { }
 
   async createEducationProgress(owner_id_user: string, dto: any) {
     try {
@@ -253,7 +253,7 @@ export class EducationService {
       });
     }
   }
-  
+
   async modifyScore(id_user: string, dto: any) {
     const { id_subject, id_education_progress, id_family, midterm_score, final_score, bonus_score } = dto;
     try {

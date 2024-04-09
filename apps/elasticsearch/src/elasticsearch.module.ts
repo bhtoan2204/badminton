@@ -7,4 +7,4 @@ import { ElasticsearchService } from './elasticsearch.service';
   controllers: [ElasticsearchController],
   providers: [ElasticsearchService],
 })
-export class ElasticsearchModule {}
+export class ElasticsearchModule { }

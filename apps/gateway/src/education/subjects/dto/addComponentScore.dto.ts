@@ -6,7 +6,7 @@ export class AddComponentScoreDto {
   @IsNumber()
   @IsNotEmpty()
   id_subject: number
-  
+
   @ApiProperty({ description: "Education progress id", example: 1 })
   @IsNumber()
   @IsNotEmpty()

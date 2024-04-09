@@ -15,4 +15,4 @@ import { SubjectService } from "./subject.service";
     SubjectService
   ]
 })
-export class SubjectModule {}
+export class SubjectModule { }

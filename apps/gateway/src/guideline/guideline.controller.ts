@@ -216,7 +216,7 @@ export class GuidelineController {
   async deleteStep(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_guideline') id_guideline: number, @Param('index') index: number) {
     return this.guidelineService.deleteStep(currentUser.id_user, id_family, id_guideline, index);
   }
-  
+
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Mark shared' })
   @Put('markShared/:id_family/:id_guideline')
