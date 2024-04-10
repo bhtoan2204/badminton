@@ -34,7 +34,7 @@ export * from './jwt/jwt.module';
 
 export * from './mongoose/mgdatabase.module';
 
-export * from './mongoose/entity/userConversations.schema';
+export * from './mongoose/entity/userconversations.schema';
 export * from './mongoose/entity/familyConversations.schema';
 
 
