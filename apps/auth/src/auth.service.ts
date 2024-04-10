@@ -108,14 +108,17 @@ export class AuthService {
     ]);
     return {
       accessToken,
-      accessTokenExpiresIn: this.configService.get<number>('JWT_EXPIRATION') * 1000,
       refreshToken, 
+      accessTokenExpiresIn: this.configService.get<number>('JWT_EXPIRATION') * 1000,
       refreshTokenExpiresIn: this.configService.get<number>('JWT_REFRESH_EXPIRATION') * 1000
     };
   }
 
   async localLogin(payload: Users) {
-    const { accessToken, refreshToken } = await this.getTokens(payload);
+    const { 
+      accessToken, refreshToken, 
+      accessTokenExpiresIn, refreshTokenExpiresIn
+     } = await this.getTokens(payload);
     try {
       const query = "SELECT * FROM f_generate_refresh_token ($1, $2)";
       const parameters = [payload.id_user, refreshToken];
@@ -129,13 +132,18 @@ export class AuthService {
     }
     return {
       accessToken,
-      refreshToken
+      refreshToken,
+      accessTokenExpiresIn,
+      refreshTokenExpiresIn
     };
   }
 
   async googleValidate(google_accessToken: string, profile: any) {
     const user = await this.validateGoogleUser(google_accessToken, profile);
-    const { accessToken, refreshToken } = await this.getTokens(user);
+    const { 
+      accessToken, refreshToken,
+      accessTokenExpiresIn, refreshTokenExpiresIn
+     } = await this.getTokens(user);
     try {
       const query = "SELECT * FROM f_generate_refresh_token ($1, $2)";
       const parameters = [user.id_user, refreshToken];
@@ -149,13 +157,18 @@ export class AuthService {
     }
     return {
       accessToken,
-      refreshToken
+      refreshToken,
+      accessTokenExpiresIn, 
+      refreshTokenExpiresIn
     };
   }
 
   async facebookValidate(facebook_accessToken: string, profile: any) {
     const user = await this.validateFacebookUser(facebook_accessToken, profile);
-    const { accessToken, refreshToken } = await this.getTokens(user);
+    const { 
+      accessToken, refreshToken,
+      accessTokenExpiresIn, refreshTokenExpiresIn
+     } = await this.getTokens(user);
     try {
       const query = "SELECT * FROM f_generate_refresh_token ($1, $2)";
       const parameters = [user.id_user, refreshToken];
@@ -169,12 +182,14 @@ export class AuthService {
     }
     return {
       accessToken,
-      refreshToken
+      refreshToken,
+      accessTokenExpiresIn, 
+      refreshTokenExpiresIn
     };
   }
 
   async refreshToken(payload: Users, deletedRefreshToken: string) {
-    const { accessToken, refreshToken } = await this.getTokens(payload);
+    const { accessToken, refreshToken, accessTokenExpiresIn, refreshTokenExpiresIn } = await this.getTokens(payload);
     try {
       const genereateQuery = "SELECT * FROM f_generate_refresh_token ($1, $2)";
       const generateTokenParameters = [payload.id_user, refreshToken];
@@ -195,7 +210,9 @@ export class AuthService {
     }
     return {
       accessToken,
-      refreshToken
+      refreshToken,
+      accessTokenExpiresIn, 
+      refreshTokenExpiresIn
     };
   }
 
@@ -258,13 +275,6 @@ export class AuthService {
         statusCode: HttpStatus.UNAUTHORIZED,
       });
     }
-
-    // const configService = new ConfigService();
-    // const dbUrl = configService.get('DATABASE_URL');
-    // const newUsername = user.id_user;
-    // const newPassword = inputPassword;
-    // const newDbUrl = dbUrl.replace(/\/\/([^:]+):([^@]+)@/, `//${newUsername}:${newPassword}@`);
-    // process.env.DATABASE_URL = newDbUrl;
 
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
