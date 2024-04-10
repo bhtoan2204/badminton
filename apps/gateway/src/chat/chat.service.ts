@@ -75,6 +75,19 @@ export class ChatService {
     }
   }
 
+  async saveFamilyImageMessage(id_user: string, message: any) {
+    try {
+      const response = this.chatClient.send('chatClient/sendFamilyImageMessage', { id_user, message });
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
   async getListReceiverId(id_user: string, id_family: number) {
     try {
       const response = this.familyClient.send('family/getIdsMember', { id_user, id_family });

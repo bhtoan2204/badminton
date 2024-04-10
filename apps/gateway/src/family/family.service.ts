@@ -114,7 +114,7 @@ export class FamilyService {
         try {
             const source = this.familyClient.send('family/create_Family', { id_user, createFamilyDto }).pipe(
                 timeout(5000)
-            );;
+            );
             const data = await lastValueFrom(source);
             return data;
         } catch (error) {
@@ -129,7 +129,7 @@ export class FamilyService {
         try {
             const source = this.familyClient.send('family/update_Family', { id_user, updateFamilyDTO }).pipe(
                 timeout(5000)
-            );;
+            );
             const data = await lastValueFrom(source);
             return data;
         } catch (error) {
@@ -144,7 +144,7 @@ export class FamilyService {
         try {
             const source = this.familyClient.send('family/delete_Family', { id_user, id_family }).pipe(
                 timeout(5000)
-            );;
+            );
             const data = await lastValueFrom(source);
             return data;
         } catch (error) {

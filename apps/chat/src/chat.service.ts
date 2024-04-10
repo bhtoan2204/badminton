@@ -1,4 +1,4 @@
-import { FamilyMessageContent, UploadFileRequest, UserConversations } from '@app/common';
+import { FamilyConversations, UploadFileRequest, UserConversations } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
@@ -11,7 +11,7 @@ const limit = 30;
 export class ChatService {
   constructor(
     @InjectModel(UserConversations.name) private userConversationsRepository,
-    @InjectModel(FamilyMessageContent.name) private familyMessageRepository,
+    @InjectModel(FamilyConversations.name) private familyConversationsRepository,
     private readonly storageService: StorageService,
     private readonly entityManager: EntityManager
   ) { }
@@ -103,7 +103,7 @@ export class ChatService {
       if (!conversation || conversation.length === 0 || conversation[0].messages.length === 0) {
         return [];
       }
-
+      
       const messages = conversation[0].messages.reverse();
       return messages;
     } catch (error) {
@@ -114,16 +114,35 @@ export class ChatService {
     }
   }
 
-
   async getFamilyMessages(id_user: string, id_family: number, index: number): Promise<any> {
     try {
+      const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
+      const checkParams = [id_user, id_family];
+      const results = await this.entityManager.query(query, checkParams);
+      const isMember = results[0].f_is_user_member_of_family;
+      if (!isMember) {
+        throw new RpcException({
+          message: 'User is not a member of the family',
+          statusCode: HttpStatus.FORBIDDEN
+        });
+      }
+
       const skip = index * limit;
-      const familyMessage = await this.familyMessageRepository.findOne({ _id: id_family });
-      if (!familyMessage) {
+      
+      const messages = await this.familyConversationsRepository.
+        findOne({
+          familyId: id_family
+        }, {
+          conversations: {
+            $slice: [-skip - limit, limit]
+          }
+        });
+
+      if (!messages || messages.length === 0) {
         return [];
       }
-      return familyMessage.messages.sort((a, b) => b.timestamp - a.timestamp)
-        .slice(skip, skip + limit);
+
+      return messages.conversations;
     }
     catch (error) {
       throw new RpcException({
@@ -181,23 +200,76 @@ export class ChatService {
 
   async saveFamilyMessage(id_user: string, messageData: { message: string; familyId: number; }): Promise<any> {
     try {
-      if (!id_user || !messageData.familyId) {
-        throw new Error('Invalid sender or family ID.');
-      }
-      let familyMessage = await this.familyMessageRepository.findOne({ _id: messageData.familyId });
-      if (!familyMessage) {
-        familyMessage = new this.familyMessageRepository({
-          _id: messageData.familyId,
-          messages: [],
+      const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
+      const checkParams = [id_user, messageData.familyId];
+      const results = await this.entityManager.query(query, checkParams);
+      const isMember = results[0].f_is_user_member_of_family;
+      if (!isMember) {
+        throw new RpcException({
+          message: 'User is not a member of the family',
+          statusCode: HttpStatus.FORBIDDEN
         });
       }
+      
       const newMessage = {
         senderId: id_user,
+        type: 'text',
         content: messageData.message,
+        isRead: false,
         timestamp: new Date(),
       };
-      familyMessage.messages.push(newMessage);
-      await familyMessage.save();
+
+      await this.familyConversationsRepository.findOneAndUpdate(
+        { familyId: messageData.familyId },
+        { $push: { conversations: newMessage } },
+        { new: true, upsert: true }
+      ).exec();
+
+      return newMessage;
+
+    } catch (error) {
+      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
+      const message = error.message || 'An error occurred while saving the family message.';
+      throw new RpcException({ message, statusCode });
+    }
+  }
+
+  async saveFamilyImageMessage(id_user: string, messageData: { imageData: string; familyId: number; }): Promise<any> {
+    try {
+      const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
+      const checkParams = [id_user, messageData.familyId];
+      const results = await this.entityManager.query(query, checkParams);
+      const isMember = results[0].f_is_user_member_of_family;
+      if (!isMember) {
+        throw new RpcException({
+          message: 'User is not a member of the family',
+          statusCode: HttpStatus.FORBIDDEN
+        });
+      }
+
+      const fileName = 'family_' + messageData.familyId + '_' + Date.now();
+      const fileUint8Array = await this.base64ToUint8Array(messageData.imageData);
+      const params: UploadFileRequest = {
+        fileName: fileName,
+        file: fileUint8Array,
+      };
+
+      const uploadImageData = await this.storageService.uploadImageChat(params);
+      const fileUrl = uploadImageData.fileUrl;
+
+      const newMessage = {
+        senderId: id_user,
+        type: 'photo',
+        content: fileUrl,
+        isRead: false,
+        timestamp: new Date(),
+      };
+
+      await this.familyConversationsRepository.findOneAndUpdate(
+        { familyId: messageData.familyId },
+        { $push: { conversations: newMessage } },
+        { new: true, upsert: true }
+      ).exec();
 
       return newMessage;
     } catch (error) {
