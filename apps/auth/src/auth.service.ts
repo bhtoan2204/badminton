@@ -109,12 +109,13 @@ export class AuthService {
     ]);
 
     const currentTime = Math.floor(Date.now() / 1000);
-
+    const accessTokenExpiresIn = currentTime + parseInt(this.configService.get<string>('JWT_EXPIRATION'), 10);
+    const refreshTokenExpiresIn = currentTime + parseInt(this.configService.get<string>('JWT_REFRESH_EXPIRATION'), 10);
     return {
       accessToken,
-      refreshToken, 
-      accessTokenExpiresIn: this.configService.get<number>('JWT_EXPIRATION') + currentTime,
-      refreshTokenExpiresIn: this.configService.get<number>('JWT_REFRESH_EXPIRATION') + currentTime
+      refreshToken,
+      accessTokenExpiresIn,
+      refreshTokenExpiresIn
     };
   }
 
