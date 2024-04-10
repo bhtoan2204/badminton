@@ -129,14 +129,14 @@ export class ChatService {
 
       const skip = index * limit;
       
-      const messages = await this.familyConversationsRepository.
-        findOne({
-          familyId: id_family
-        }, {
-          conversations: {
-            $slice: [-skip - limit, limit]
-          }
-        });
+      const messages = await this.familyConversationsRepository.findOne(
+        { familyId: id_family }, 
+        { conversations: { 
+          $slice: [{ $reverseArray: "$conversations" }, skip, limit] 
+        } }
+      ).exec();
+
+      console.log(messages)
 
       if (!messages || messages.length === 0) {
         return [];
