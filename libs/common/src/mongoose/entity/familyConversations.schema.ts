@@ -1,22 +1,11 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Types, Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Types } from "mongoose";
 
-export type UserConversationsDocument = UserConversations & Document;
-
-@Schema({
-  toJSON: {
-    getters: true,
-    virtuals: true,
-  },
-  timestamps: true,
-})
-class Message {
+@Schema()
+class Conversation {
   @Prop({ required: true })
   senderId: string;
-
-  @Prop({ required: true })
-  receiverId: string;
-
+  
   @Prop({ required: true, enum: ['text', 'photo', 'video'] })
   type: string;
 
@@ -35,18 +24,6 @@ class Message {
   @Prop({ required: true, default: () => Date.now() })
   timestamp: Date;
 }
-
-const MessageSchema = SchemaFactory.createForClass(Message);
-
-@Schema()
-class Conversation {
-  @Prop({ required: true })
-  receiverId: string;
-
-  @Prop({ type: [MessageSchema], default: [] })
-  messages: Message[];
-}
-
 const ConversationSchema = SchemaFactory.createForClass(Conversation);
 
 @Schema({
@@ -56,14 +33,14 @@ const ConversationSchema = SchemaFactory.createForClass(Conversation);
   },
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
 })
-export class UserConversations {
+export class FamilyConversations {
   _id: Types.ObjectId;
 
   @Prop({ required: true, unique: true })
-  userId: string;
+  familyId: number;
 
   @Prop({ type: [ConversationSchema], default: [] })
   conversations: Conversation[];
 }
 
-export const UserConversationsSchema = SchemaFactory.createForClass(UserConversations);
+export const FamilyConversationsSchema = SchemaFactory.createForClass(FamilyConversations);

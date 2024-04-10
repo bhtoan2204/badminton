@@ -1,7 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
-import { MgDatabaseModule, RmqModule, FamilyMessageContentSchema, FamilyMessageContent, GrpcModule, UserConversationsSchema, UserConversations, DatabaseModule } from '@app/common';
+import {
+  MgDatabaseModule, RmqModule, GrpcModule,
+  UserConversationsSchema, UserConversations,
+  DatabaseModule, FamilyConversations,
+  FamilyConversationsSchema
+} from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { StorageModule } from './storage/storage.module';
@@ -21,7 +26,7 @@ import * as Joi from 'joi';
     RmqModule,
     MongooseModule.forFeature([
       { name: UserConversations.name, schema: UserConversationsSchema },
-      { name: FamilyMessageContent.name, schema: FamilyMessageContentSchema }
+      { name: FamilyConversations.name, schema: FamilyConversationsSchema }
     ]),
     DatabaseModule,
     StorageModule,
