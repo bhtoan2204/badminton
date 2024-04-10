@@ -21,13 +21,21 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: rabbitmq
-          image: rabbitmq
+          image: rabbitmq:management
           ports:
             - containerPort: 5672
+              name: amqp
+            - containerPort: 15672
+              name: management
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: "rabbitmq"
+            - name: RABBITMQ_DEFAULT_PASS
+              value: "Toan123456789"
           resources:
             limits:
-              cpu: "500m"
-              memory: "1024Mi"
+              cpu: "1000m"
+              memory: "2048Mi"
 
 ---
 apiVersion: v1
@@ -44,4 +52,9 @@ spec:
       protocol: TCP
       port: 5672
       targetPort: 5672
-  type: ClusterIP
+    - name: management
+      protocol: TCP
+      port: 15672
+      targetPort: 15672
+      nodePort: 30002
+  type: NodePort

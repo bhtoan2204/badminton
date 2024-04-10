@@ -103,10 +103,15 @@ export class AuthService {
       }),
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>('JWT_SECRET_REFRESH'),
-        expiresIn: '7d',
+        expiresIn: '3d',
       })
     ]);
-    return { accessToken, refreshToken };
+    return {
+      accessToken,
+      accessTokenExpiresIn: this.configService.get<number>('JWT_EXPIRATION') * 1000,
+      refreshToken, 
+      refreshTokenExpiresIn: this.configService.get<number>('JWT_REFRESH_EXPIRATION') * 1000
+    };
   }
 
   async localLogin(payload: Users) {
