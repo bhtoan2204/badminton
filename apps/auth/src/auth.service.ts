@@ -96,6 +96,7 @@ export class AuthService {
       phone: payload.phone,
       isadmin: payload.isadmin
     };
+    
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>('JWT_SECRET'),
@@ -106,11 +107,14 @@ export class AuthService {
         expiresIn: '3d',
       })
     ]);
+
+    const currentTime = Math.floor(Date.now() / 1000);
+
     return {
       accessToken,
       refreshToken, 
-      accessTokenExpiresIn: this.configService.get<number>('JWT_EXPIRATION') * 1000,
-      refreshTokenExpiresIn: this.configService.get<number>('JWT_REFRESH_EXPIRATION') * 1000
+      accessTokenExpiresIn: this.configService.get<number>('JWT_EXPIRATION') + currentTime,
+      refreshTokenExpiresIn: this.configService.get<number>('JWT_REFRESH_EXPIRATION') + currentTime
     };
   }
 
