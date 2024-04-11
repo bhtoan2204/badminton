@@ -82,11 +82,11 @@ export class GuidelineController {
           description: 'The image of the step (optional)',
         },
         id_family: {
-          type: 'number',
+          type: 'string',
           description: 'The ID of the family',
         },
         id_guideline: {
-          type: 'number',
+          type: 'string',
           description: 'The ID of the guideline',
         },
         name: {
@@ -114,7 +114,7 @@ export class GuidelineController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Add step' })
+  @ApiOperation({ summary: 'Insert step' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -126,11 +126,11 @@ export class GuidelineController {
           description: 'The image of the step (optional)',
         },
         id_family: {
-          type: 'number',
+          type: 'string',
           description: 'The ID of the family',
         },
         id_guideline: {
-          type: 'number',
+          type: 'string',
           description: 'The ID of the guideline',
         },
         name: {
@@ -142,7 +142,7 @@ export class GuidelineController {
           description: 'The description of the step (optional)',
         },
         index: {
-          type: 'number',
+          type: 'string',
           description: 'The index of the step',
         }
       },
@@ -175,15 +175,15 @@ export class GuidelineController {
           description: 'The image of the step (optional)',
         },
         id_family: {
-          type: 'number',
+          type: 'string',
           description: 'The ID of the family',
         },
         id_guideline: {
-          type: 'number',
+          type: 'string',
           description: 'The ID of the guideline',
         },
         index: {
-          type: 'number',
+          type: 'string',
           description: 'The index of the step',
         },
         name: {
