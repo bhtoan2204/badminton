@@ -20,7 +20,6 @@
   },
   "dependencies": {
     "@elastic/ecs-winston-format": "^1.5.3",
-    "@google-cloud/logging-winston": "^6.0.0",
     "@google-cloud/storage": "^7.7.0",
     "@nestjs-modules/mailer": "^1.11.2",
     "@nestjs/common": "^10.3.7",
