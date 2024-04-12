@@ -15,7 +15,6 @@ export class AppLoggerMiddleware implements NestMiddleware {
       const [sec, nanosec] = process.hrtime(start);
       const responseTime = (sec * 1000 + nanosec / 1e6).toFixed(0);
       const errorMessage = response.statusMessage || 'No error message provided';
-
       const logEntry = {
         ip: ip,
         method: method,
@@ -25,7 +24,7 @@ export class AppLoggerMiddleware implements NestMiddleware {
         responseTimeMs: responseTime,
         message: `${statusCode >= 400 ? `${errorMessage}` : 'Successful'}`
       };
-
+      
       if (statusCode >= 400) {
         logger.error(logEntry);
       } else {

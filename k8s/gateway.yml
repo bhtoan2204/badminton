@@ -38,8 +38,7 @@ spec:
             [
               "sh",
               "-c",
-              'rm -rf /usr/src/app/logs/*',
-              # 'if [ -d "/usr/src/app/logs" ]; then cp -R /usr/src/app/logs /usr/src/app/logs_backup; fi',
+              'if [ -d "/usr/src/app/logs" ]; then cp -R /usr/src/app/logs /usr/src/app/logs_backup; fi',
             ]
           volumeMounts:
             - name: log-volume

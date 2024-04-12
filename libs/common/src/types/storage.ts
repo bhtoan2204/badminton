@@ -52,10 +52,12 @@ export interface StorageServiceClient {
   deleteImageStep(request: DeleteFileRequest): Observable<DeleteFileResponse>;
 }
 
+type UploadFileResult = Promise<UploadFileResponse> | Observable<UploadFileResponse> | UploadFileResponse;
+
 export interface StorageServiceController {
   uploadFile(
     request: UploadFileRequest,
-  ): Promise<UploadFileResponse> | Observable<UploadFileResponse> | UploadFileResponse;
+  ): UploadFileResult;
 
   readFile(request: ReadFileRequest): Promise<ReadFileResponse> | Observable<ReadFileResponse> | ReadFileResponse;
 
@@ -65,11 +67,11 @@ export interface StorageServiceController {
 
   uploadImageChat(
     request: UploadFileRequest,
-  ): Promise<UploadFileResponse> | Observable<UploadFileResponse> | UploadFileResponse;
+  ): UploadFileResult;
 
   uploadImageStep(
     request: UploadFileRequest,
-  ): Promise<UploadFileResponse> | Observable<UploadFileResponse> | UploadFileResponse;
+  ): UploadFileResult;
 
   deleteImageStep(
     request: DeleteFileRequest,
