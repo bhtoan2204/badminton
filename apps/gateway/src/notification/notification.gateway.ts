@@ -1,9 +1,10 @@
-import { OnModuleInit, UnauthorizedException } from "@nestjs/common";
+import { OnModuleInit, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { ConnectedSocket, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { NotificationService } from "./notification.service";
 import { Server, Socket } from "socket.io";
+import { WsCurrentUser, WsJwtAuthGuard } from "../utils";
 
 interface TokenPayload {
   id_user: string;
@@ -47,6 +48,9 @@ export class NotificationGateway implements OnModuleInit {
         socket.disconnect(true);
       }
     });
+
+    // Schedule a notification to be sent to all connected users every 10 seconds
+    // this.setupScheduledNotification();
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
@@ -71,5 +75,26 @@ export class NotificationGateway implements OnModuleInit {
       console.error('Error handling disconnection:', error.message);
       client.disconnect(true);
     }
+  }
+
+  @SubscribeMessage('newNotification')
+  @UseGuards(WsJwtAuthGuard)
+  async newNotification(@ConnectedSocket() client: Socket, @WsCurrentUser() user, data: any) {
+    try {
+      const notification = await this.notificationService.createNotification(user.id_user, data);
+      client.emit('onNewNotification', notification);
+    } catch (error) {
+      console.error('Error handling newNotification:', error.message);
+    }
+  }
+
+  private async setupScheduledNotification() {
+    setInterval(() => {
+      this.emitToAllUsers("This is a scheduled notification to all connected users!");
+    }, 10000);
+  }
+
+  private async emitToAllUsers(message: string) {
+    this.server.emit('broadcastNotification', message);
   }
 }

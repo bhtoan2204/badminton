@@ -7,7 +7,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 5Gi
 
 ---
 apiVersion: apps/v1
@@ -38,7 +38,8 @@ spec:
             [
               "sh",
               "-c",
-              'if [ -d "/usr/src/app/logs" ]; then cp -R /usr/src/app/logs /usr/src/app/logs_backup; fi',
+              'rm -rf /usr/src/app/logs/*',
+              # 'if [ -d "/usr/src/app/logs" ]; then cp -R /usr/src/app/logs /usr/src/app/logs_backup; fi',
             ]
           volumeMounts:
             - name: log-volume
