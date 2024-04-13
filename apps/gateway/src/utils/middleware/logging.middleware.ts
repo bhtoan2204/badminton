@@ -22,7 +22,7 @@ export class AppLoggerMiddleware implements NestMiddleware {
         statusCode: statusCode,
         contentLength: contentLength,
         responseTimeMs: responseTime,
-        message: `${statusCode >= 400 ? `${errorMessage}` : 'Successful'}`
+        message: `${statusCode >= 400 ? errorMessage : 'Successful'}`
       };
       
       if (statusCode >= 400) {

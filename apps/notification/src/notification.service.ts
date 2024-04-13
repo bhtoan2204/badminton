@@ -27,7 +27,7 @@ export class NotificationService {
     }
     catch (error) {
       throw new RpcException({
-        statusCode: 500 || error.statusCode,
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
         message: error.message
       })
     }
@@ -56,7 +56,7 @@ export class NotificationService {
     }
     catch (error) {
       throw new RpcException({
-        statusCode: 500 || error.statusCode,
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
         message: error.message
       })
     }
