@@ -36,6 +36,6 @@ export * from './mongoose/mgdatabase.module';
 
 export * from './mongoose/entity/userconversations.schema';
 export * from './mongoose/entity/familyConversations.schema';
-
+export * from './mongoose/entity/notification.schema';
 
 export * from './logger/logger';

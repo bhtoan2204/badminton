@@ -181,3 +181,16 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+
+  search:
+    image: mjkundta/search:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/elasticsearch/Dockerfile
+      target: production
+    command: node dist/apps/elasticsearch/src/main
+    depends_on:
+      - gateway
+    restart: on-failure
+    environment:
+      - NODE_ENV=production

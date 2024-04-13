@@ -1,10 +1,11 @@
 import { OnModuleInit, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { NotificationService } from "./notification.service";
 import { Server, Socket } from "socket.io";
 import { WsCurrentUser, WsJwtAuthGuard } from "../utils";
+import { NewNotificationDto } from "./dto/newNotification.dto";
 
 interface TokenPayload {
   id_user: string;
@@ -79,10 +80,17 @@ export class NotificationGateway implements OnModuleInit {
 
   @SubscribeMessage('newNotification')
   @UseGuards(WsJwtAuthGuard)
-  async newNotification(@ConnectedSocket() client: Socket, @WsCurrentUser() user, data: any) {
+  async newNotification(@ConnectedSocket() client: Socket, @WsCurrentUser() user, @MessageBody() dto: NewNotificationDto) {
     try {
-      const notification = await this.notificationService.createNotification(user.id_user, data);
-      client.emit('onNewNotification', notification);
+      const notification = await this.notificationService.createNotification(user.id_user, dto);
+      const listReceiverId = await this.notificationService.getListReceiverId(user.id_user, dto.family_id);
+      await Promise.all(listReceiverId.map(async (receiverId) => {
+        const receiverSocketIds = this.socketMap.get(receiverId) || [];
+        receiverSocketIds.forEach(socketId => {
+          client.to(socketId).emit('onNewFamilyImageMessage', notification);
+        });
+      }));
+      return notification;
     } catch (error) {
       console.error('Error handling newNotification:', error.message);
     }

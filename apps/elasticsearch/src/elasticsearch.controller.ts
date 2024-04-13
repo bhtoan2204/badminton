@@ -1,12 +1,18 @@
 import { Controller, Get } from '@nestjs/common';
-import { ElasticsearchService } from './elasticsearch.service';
+import { SearchService } from './elasticsearch.service';
+import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
+import { RmqService } from '@app/common';
 
 @Controller()
-export class ElasticsearchController {
-  constructor(private readonly elasticsearchService: ElasticsearchService) { }
+export class SearchController {
+  constructor(
+    private readonly elasticsearchService: SearchService,
+    private readonly rmqService: RmqService
+  ) { }
 
-  @Get()
-  getHello(): string {
-    return this.elasticsearchService.getHello();
+  @EventPattern('elasticsearchClient/getLogsCount')
+  async getLogs(@Payload() data: any, @Ctx() context: RmqContext) {
+    this
+    return await this.elasticsearchService.getLogsCount();
   }
 }

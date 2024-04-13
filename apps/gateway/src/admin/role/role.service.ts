@@ -4,7 +4,6 @@ import { lastValueFrom, timeout } from "rxjs";
 import { ROLE_SERVICE } from "../../utils";
 
 @Injectable()
-
 export class RoleService {
     constructor(
         @Inject(ROLE_SERVICE) private roleClient: ClientProxy
