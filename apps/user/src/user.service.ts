@@ -36,12 +36,9 @@ export class UserService {
 
   async check_phone(phone) {
     try {
-
       const query = 'SELECT * FROM check_phone_number_exists($1)';
       const parameters = [phone];
-
       const data = await this.entityManager.query(query, parameters);
-
       return data;
     }
     catch (error) {
@@ -89,6 +86,7 @@ export class UserService {
       }
     }
   }
+  
   async updateProfile(user: any, data: any) {
     try {
       const { firstname, lastname } = data;

@@ -126,9 +126,8 @@ export class ChatService {
           statusCode: HttpStatus.FORBIDDEN
         });
       }
-
-      const skip = index * limit;
       
+      const skip = index * limit;
       const messages = await this.familyConversationsRepository.findOne(
         { familyId: id_family }, 
         { conversations: { 

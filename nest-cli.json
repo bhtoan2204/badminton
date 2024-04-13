@@ -56,7 +56,10 @@
       "entryFile": "src/main",
       "sourceRoot": "./",
       "compilerOptions": {
-        "tsConfigPath": "apps/family/tsconfig.app.json"
+        "tsConfigPath": "apps/family/tsconfig.app.json",
+        "assets": [
+          "proto/*.proto"
+        ]
       }
     },
     "mailer": {
