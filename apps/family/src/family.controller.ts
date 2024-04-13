@@ -5,7 +5,6 @@ import { RmqService } from '@app/common';
 
 @Controller()
 export class FamilyController {
-
   constructor(
     private readonly familyService: FamilyService,
     private readonly rmqService: RmqService) { }
@@ -37,6 +36,7 @@ export class FamilyController {
     this.rmqService.ack(context);
     return this.familyService.createFamily(data.id_user, data.createFamilyDto);
   }
+
   @EventPattern('family/add_Member')
   async addMember(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
@@ -54,8 +54,8 @@ export class FamilyController {
   async updateFamily(@Payload() data: { id_user, updateFamilyDTO }, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.updateFamily(data.id_user, data.updateFamilyDTO);
-
   }
+
   @EventPattern('family/delete_Family')
   async deleteFamily(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
@@ -66,5 +66,11 @@ export class FamilyController {
   async getIdsMember(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.getIdsMember(data.id_user, data.id_family);
+  }
+
+  @EventPattern('family/change_avatar')
+  async changeAvatar(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.familyService.changeAvatar(data.id_user, data.id_family, data.file);
   }
 }

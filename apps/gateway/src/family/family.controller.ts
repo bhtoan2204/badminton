@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, Query, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { FamilyService } from "./family.service";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { CurrentUser } from "../utils";
@@ -7,6 +7,8 @@ import { CreateFamilyDto } from "./dto/createFamily.dto";
 import { MemberFamilyDto } from "./dto/memberFamily.dto";
 import { DeleteMemberDTO } from "./dto/deleteFamily.dto";
 import { UpdateFamilyDTO } from "./dto/updateFamily.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { ImageFileInterceptor } from "../user/interceptor/imageFile.interceptor";
 
 @ApiTags('Family')
 @Controller('family')
@@ -77,5 +79,24 @@ export class FamilyController {
   @Delete('deleteMember')
   async deleteMember(@CurrentUser() currentUser, @Body() member: DeleteMemberDTO) {
     return this.familyService.deleteMember(currentUser.id_user, member);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Change Avatar' })
+  @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        avatar: { type: 'string', format: 'binary' },
+        id_family: { type: 'integer' }
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('avatar', new ImageFileInterceptor().createMulterOptions()))
+  @Put('changeAvatar')
+  async changeAvatar(@CurrentUser() currentUser, @UploadedFile() file: Express.Multer.File, @Body('id_family') id_family: number) {
+    return this.familyService.changeAvatar(currentUser.id_user, id_family, file);
   }
 }

@@ -155,4 +155,18 @@ export class FamilyService {
         }
     }
 
+    async changeAvatar(id_user: string, id_family: number, file: Express.Multer.File) {
+        try {
+            const source = this.familyClient.send('family/change_avatar', { id_user, id_family, file }).pipe(
+                timeout(5000)
+            );
+            const data = await lastValueFrom(source);
+            return data;
+        } catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
+            throw new HttpException(error, error.statusCode);
+        }
+    }
 }
