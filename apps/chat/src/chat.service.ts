@@ -28,18 +28,19 @@ export class ChatService {
       const results = await this.userConversationsRepository.aggregate([
         { $match: { userId: id_user } },
         { $unwind: "$conversations" },
-        { $unwind: "$conversations.messages" },
-        { $sort: { "conversations.messages.timestamp": -1 } },
+        { $sort: { "conversations.updated_at": -1 } },
         {
           $group: {
-            _id: "$conversations.receiverId",
-            lastMessage: { $first: "$conversations.messages" }
+            _id: "$_id",
+            receiverId: { $first: "$conversations.receiverId" },
+            lastMessage: { $first: "$conversations.messages" },
+            lastUpdated: { $first: "$conversations.updated_at" }
           }
         },
         { $skip: skipAmount },
-        { $limit: limit },
-      ]).exec();
-
+        { $limit: limit }
+      ]).exec();      
+      
       const userIds = results.map(result => result._id);
       const usersQuery = 'SELECT * FROM f_get_users_info($1)';
       const usersParams = [userIds];

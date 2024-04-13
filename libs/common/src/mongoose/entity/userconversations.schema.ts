@@ -3,13 +3,7 @@ import { Types, Document } from 'mongoose';
 
 export type UserConversationsDocument = UserConversations & Document;
 
-@Schema({
-  toJSON: {
-    getters: true,
-    virtuals: true,
-  },
-  timestamps: true,
-})
+@Schema()
 class Message {
   @Prop({ required: true })
   senderId: string;
@@ -38,7 +32,13 @@ class Message {
 
 const MessageSchema = SchemaFactory.createForClass(Message);
 
-@Schema()
+@Schema({
+  toJSON: {
+    getters: true,
+    virtuals: true,
+  },
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+})
 class Conversation {
   @Prop({ required: true })
   receiverId: string;
