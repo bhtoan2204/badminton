@@ -20,4 +20,12 @@ export class NotificationController {
   async getNotifications(@CurrentUser() user, @Param('index') index: number) {
     return this.notificationService.getNotifications(user.id_user, index);
   }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Mark Read' })
+  @Get('markRead/:id_notification')
+  @ApiParam({ name: 'id_notification', required: true, description: 'Notification ID', type: String })
+  async markRead(@CurrentUser() currentUser, @Param('id_notification') id_notification: string) {
+    return this.notificationService.markRead(currentUser.id_user, id_notification);
+  }
 }

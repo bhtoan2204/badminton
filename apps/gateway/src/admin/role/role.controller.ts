@@ -15,14 +15,12 @@ export class RoleController {
 
   @HttpCode(HttpStatus.OK)
   @Get('getAllRole')
-  @UseGuards(JwtAuthGuard)
   async getallrole() {
     return this.roleService.getAllRole();
   }
 
   @HttpCode(HttpStatus.OK)
   @Get('getRole')
-  @UseGuards(JwtAuthGuard)
   async getrole(@Query('family') family: number, @Query('user') user: string) {
     return this.roleService.getRole(family, user);
   }

@@ -33,6 +33,9 @@ import { EducationModule } from './education/education.module';
         RABBIT_MQ_CRAWLER_QUEUE: Joi.string().required(),
         RABBIT_MQ_CALENDAR_QUEUE: Joi.string().required(),
         RABBIT_MQ_GUIDELINE_QUEUE: Joi.string().required(),
+        RABBIT_MQ_NOTIFICATION_QUEUE: Joi.string().required(),
+        RABBIT_MQ_EDUCATION_QUEUE: Joi.string().required(),
+        RABBIT_MQ_ELASTICSEARCH_QUEUE: Joi.string().required(),
 
         GOOGLE_CLIENT_ID: Joi.string().required(),
         GOOGLE_CLIENT_SECRET: Joi.string().required(),

@@ -3,7 +3,8 @@ import { NotificationController } from './notification.controller';
 import { NotificationService } from './notification.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { MgDatabaseModule, RmqModule } from '@app/common';
+import { MgDatabaseModule, RmqModule, NotificationData, NotificationDataSchema } from '@app/common';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -16,7 +17,10 @@ import { MgDatabaseModule, RmqModule } from '@app/common';
       envFilePath: process.env.NODE_ENV === 'production' ? './apps/notification/.env.production' : './apps/notification/.env',
     }),
     RmqModule,
-    MgDatabaseModule
+    MgDatabaseModule,
+    MongooseModule.forFeature([
+      { name: NotificationData.name, schema: NotificationDataSchema }
+    ])
   ],
   controllers: [NotificationController],
   providers: [NotificationService],

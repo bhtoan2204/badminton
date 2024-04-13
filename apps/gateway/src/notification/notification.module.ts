@@ -1,6 +1,6 @@
 import { GlobalJwtModule, RmqModule } from "@app/common";
 import { Module } from "@nestjs/common";
-import { AUTH_SERVICE, NOTIFICATION_SERVICE, WsJwtStrategy } from "../utils";
+import { AUTH_SERVICE, FAMILY_SERVICE, NOTIFICATION_SERVICE, WsJwtStrategy } from "../utils";
 import { NotificationController } from "./notification.controller";
 import { NotificationService } from "./notification.service";
 import { NotificationGateway } from "./notification.gateway";
@@ -9,6 +9,7 @@ import { NotificationGateway } from "./notification.gateway";
   imports: [
     RmqModule.register({ name: NOTIFICATION_SERVICE }),
     RmqModule.register({ name: AUTH_SERVICE }),
+    RmqModule.register({ name: FAMILY_SERVICE }),
     GlobalJwtModule
   ],
   controllers: [
