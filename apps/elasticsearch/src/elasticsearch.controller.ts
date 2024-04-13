@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { SearchService } from './elasticsearch.service';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { RmqService } from '@app/common';
@@ -12,7 +12,7 @@ export class SearchController {
 
   @EventPattern('elasticsearchClient/getLogsCount')
   async getLogs(@Payload() data: any, @Ctx() context: RmqContext) {
-    this
+    this.rmqService.ack(context);
     return await this.elasticsearchService.getLogsCount();
   }
 }
