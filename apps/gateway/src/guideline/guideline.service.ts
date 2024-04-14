@@ -23,9 +23,6 @@ export class GuidelineService {
       if (error instanceof TimeoutError) {
         throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
       }
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
       throw new HttpException(error, error.statusCode);
     }
   }
