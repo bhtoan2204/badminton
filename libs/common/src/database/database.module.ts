@@ -27,7 +27,9 @@ import * as Joi from 'joi';
           database: connectionOptions.database,
           synchronize: true,
           autoLoadEntities: true,
-          ssl: true
+          ssl: {
+            rejectUnauthorized: false
+          }
         }
       },
       inject: [ConfigService]

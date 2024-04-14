@@ -333,4 +333,36 @@ export class ChatService {
       throw new RpcException({ message, statusCode });
     }
   }
+
+  async markSeen(id_user: string, receiver_id: string): Promise<any> {
+    try {
+      const updatedConversation = await this.userConversationsRepository.findOneAndUpdate(
+        { userId: id_user, 'conversations.receiverId': receiver_id },
+        {
+          $set: {
+            'conversations.$.messages.$[elem].isRead': true,
+            'conversations.$.messages.$[elem].timestamp': new Date()
+          }
+        },
+        {
+          arrayFilters: [{ 'elem.isRead': false }],
+          new: true
+        }
+      );
+
+      if (!updatedConversation) {
+        throw new RpcException({
+          message: 'Conversation not found',
+          statusCode: HttpStatus.NOT_FOUND
+        });
+      }
+
+      return { message: 'Mark Seen successfully' };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
 }

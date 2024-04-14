@@ -182,6 +182,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/elasticsearch/tsconfig.app.json"
       }
+    },
+    "household": {
+      "type": "application",
+      "root": "apps/household",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
+      "compilerOptions": {
+        "tsConfigPath": "apps/household/tsconfig.app.json"
+      }
     }
   }
 }

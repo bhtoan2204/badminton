@@ -113,4 +113,17 @@ export class ChatService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async markSeen(id_user: string, receiver_id: string) {
+    try {
+      const response = this.chatClient.send('chatClient/markSeenMessage', { id_user, receiver_id });
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }
