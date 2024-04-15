@@ -107,7 +107,7 @@ export class ChatGateway implements OnModuleInit {
           client.to(socketId).emit('onNewFamilyMessage', receiverMessage);
         });
       }));
-      return "Message sent";
+      return receiverMessage;
     } catch (error) {
       console.error('Error emitting message:', error.message);
     }
@@ -125,7 +125,7 @@ export class ChatGateway implements OnModuleInit {
           client.to(socketId).emit('onNewFamilyImageMessage', receiverMessage);
         });
       }));
-      return "Message sent";
+      return receiverMessage;
     }
     catch (error) {
       console.error('Error emitting message:', error.message);
