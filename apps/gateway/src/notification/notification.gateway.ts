@@ -87,7 +87,7 @@ export class NotificationGateway implements OnModuleInit {
       await Promise.all(listReceiverId.map(async (receiverId) => {
         const receiverSocketIds = this.socketMap.get(receiverId) || [];
         receiverSocketIds.forEach(socketId => {
-          client.to(socketId).emit('onNewFamilyImageMessage', notification);
+          client.to(socketId).emit('onNewNotification', notification);
         });
       }));
       return notification;
