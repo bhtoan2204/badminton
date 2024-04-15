@@ -1,0 +1,56 @@
+version: '3.8'
+services:
+  calendar:
+    image: mjkundta/calendar:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/calendar/Dockerfile
+      target: production
+    command: node dist/apps/calendar/src/main
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
+
+  guideline:
+    image: mjkundta/guideline:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/guideline/Dockerfile
+      target: production
+    command: node dist/apps/guideline/src/main
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
+
+  notification:
+    image: mjkundta/notification:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/notification/Dockerfile
+      target: production
+    command: node dist/apps/notification/src/main
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
+
+  education:
+    image: mjkundta/education:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/education/Dockerfile
+      target: production
+    command: node dist/apps/education/src/main
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
+
+  search:
+    image: mjkundta/search:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/elasticsearch/Dockerfile
+      target: production
+    command: node dist/apps/elasticsearch/src/main
+    restart: on-failure
+    environment:
+      - NODE_ENV=production

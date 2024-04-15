@@ -41,7 +41,8 @@ pipeline {
         stage("Build Docker Images") {
             steps {
                 script {
-                  sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml build"
+                  sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod1.yml build"
+                  sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod2.yml build"
                 }
             }
         }
@@ -51,7 +52,8 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'Dockerhub Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh "echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin"
-                        sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod.yml push"
+                        sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod1.yml push"
+                        sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod2.yml push"
                         sh "tar -czvf k8s.tar.gz k8s/"
                         sh "sshpass -p ${SSH_password} scp -o StrictHostKeyChecking=no -r k8s.tar.gz ${SSH_user}@${SSH_ip}:~/"
                         sh "rm -rf k8s.tar.gz"
