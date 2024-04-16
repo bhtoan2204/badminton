@@ -78,19 +78,31 @@ export class NotificationGateway implements OnModuleInit {
     }
   }
 
-  @SubscribeMessage('newNotification')
+  @SubscribeMessage('newNotificationFamily')
   @UseGuards(WsJwtAuthGuard)
   async newNotification(@ConnectedSocket() client: Socket, @WsCurrentUser() user, @MessageBody() dto: NewNotificationDto) {
     try {
-      const notification = await this.notificationService.createNotification(user.id_user, dto);
       const listReceiverId = await this.notificationService.getListReceiverId(user.id_user, dto.family_id);
-      await Promise.all(listReceiverId.map(async (receiverId) => {
-        const receiverSocketIds = this.socketMap.get(receiverId) || [];
-        receiverSocketIds.forEach(socketId => {
-          client.to(socketId).emit('onNewNotification', notification);
-        });
-      }));
-      return notification;
+      const notifications = await this.notificationService.createNotification(user.id_user, dto, listReceiverId);
+
+      const emitPromises = notifications.flatMap(notification => {
+        const receiverSocketIds = this.socketMap.get(notification.id_user) || [];
+        return receiverSocketIds.map(socketId => 
+          new Promise(() => {
+            client.to(socketId).emit('onNewNotificationFamily', {
+              _id: notification._id,
+              title: notification.title,
+              content: notification.content,
+              type: notification.type,
+              data: notification.data,
+              isRead: notification.isRead
+            });
+          })
+        );
+      });
+
+      await Promise.all(emitPromises);
+
     } catch (error) {
       console.error('Error handling newNotification:', error.message);
     }
