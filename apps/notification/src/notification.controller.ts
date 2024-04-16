@@ -19,7 +19,7 @@ export class NotificationController {
   @EventPattern('notificationClient/createNotification')
   async createNotification(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.notificationService.createNotification(data.id_user, data.dto);
+    return await this.notificationService.createNotification(data.id_user, data.dto, data.listReceiverId);
   }
 
   @EventPattern('notificationClient/markRead')

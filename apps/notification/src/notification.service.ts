@@ -33,26 +33,36 @@ export class NotificationService {
     }
   }
 
-  async createNotification(id_user: string, dto: any) {
+  async createNotification(id_user: string, dto: any, listReceiverId: string[]) {
     try {
-      const { receiver_id, title, content, type, data } = dto;
+      const { title, content, type, data } = dto;
 
-      const newNotification ={
-        _id: new Types.ObjectId(), 
-        title, 
-        content, 
-        type, 
-        data, 
+      const newNotifications = listReceiverId.map(() => ({
+        _id: new Types.ObjectId(),
+        title,
+        content,
+        type,
+        data,
         isRead: false
-      };
+      }));
 
-      await this.notificationRepository.findOneAndUpdate(
-        { id_user: receiver_id },
-        { $push: { notificationArr: { $each: [newNotification], $position: 0 } } },
-        { new: true, upsert: true }
-      ).exec();
+      await Promise.all(newNotifications.map((newNotification, index) =>
+        this.notificationRepository.updateOne(
+          { id_user: listReceiverId[index] },
+          { $push: { notificationArr: { $each: [newNotification], $position: 0 } } },
+          { upsert: true }
+        )
+      ));
 
-      return newNotification;
+      return newNotifications.map((notification, index) => ({
+        _id: notification._id,
+        id_user: listReceiverId[index],
+        title,
+        content,
+        type,
+        data,
+        isRead: false
+      }));
     }
     catch (error) {
       throw new RpcException({

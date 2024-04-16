@@ -104,10 +104,9 @@ export class ChatGateway implements OnModuleInit {
       await Promise.all(listReceiverId.map(async (receiverId) => {
         const receiverSocketIds = this.socketMap.get(receiverId) || [];
         receiverSocketIds.forEach(socketId => {
-          client.to(socketId).emit('onNewFamilyMessage', receiverMessage);
+          client.to(socketId).emit('onNewFamilyMessage', { ...receiverMessage, familyId: message.familyId});
         });
       }));
-      return receiverMessage;
     } catch (error) {
       console.error('Error emitting message:', error.message);
     }
@@ -122,10 +121,9 @@ export class ChatGateway implements OnModuleInit {
       await Promise.all(listReceiverId.map(async (receiverId) => {
         const receiverSocketIds = this.socketMap.get(receiverId) || [];
         receiverSocketIds.forEach(socketId => {
-          client.to(socketId).emit('onNewFamilyImageMessage', receiverMessage);
+          client.to(socketId).emit('onNewFamilyImageMessage', { ...receiverMessage, familyId: message.familyId});
         });
       }));
-      return receiverMessage;
     }
     catch (error) {
       console.error('Error emitting message:', error.message);

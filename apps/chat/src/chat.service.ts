@@ -22,6 +22,7 @@ export class ChatService {
   }
 
   async getUsersChat(id_user: string, index: number): Promise<any> {
+    console.log('id_user', id_user);
     try {
       const skipAmount = index * limit;
 
@@ -40,8 +41,8 @@ export class ChatService {
         { $skip: skipAmount },
         { $limit: limit }
       ]).exec();      
-      
-      const userIds = results.map(result => result._id);
+      console.log(results);
+      const userIds = results.map(result => result.receiverId);
       const usersQuery = 'SELECT * FROM f_get_users_info($1)';
       const usersParams = [userIds];
       const usersInfo = await this.entityManager.query(usersQuery, usersParams);

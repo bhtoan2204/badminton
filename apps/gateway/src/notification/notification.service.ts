@@ -23,9 +23,9 @@ export class NotificationService {
     }
   }
 
-  async createNotification(id_user: string, dto: any) {
+  async createNotification(id_user: string, dto: any, listReceiverId: string[]) {
     try {
-      const response = this.notificationClient.send('notificationClient/createNotification', { id_user, dto }).pipe(timeout(5000));
+      const response = this.notificationClient.send('notificationClient/createNotification', { id_user, dto, listReceiverId }).pipe(timeout(5000));
       return await lastValueFrom(response);
     }
     catch (error) {
