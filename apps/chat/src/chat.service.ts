@@ -22,33 +22,32 @@ export class ChatService {
   }
 
   async getUsersChat(id_user: string, index: number): Promise<any> {
-    console.log('id_user', id_user);
     try {
       const skipAmount = index * limit;
 
       const results = await this.userConversationsRepository.aggregate([
         { $match: { userId: id_user } },
         { $unwind: "$conversations" },
-        { $sort: { "conversations.updated_at": -1 } },
+        { $unwind: "$conversations.messages" },
+        { $sort: { "conversations.updated_at": -1, "conversations.messages.timestamp": -1 } },
         {
-          $group: {
-            _id: "$_id",
-            receiverId: { $first: "$conversations.receiverId" },
-            lastMessage: { $first: "$conversations.messages" },
-            lastUpdated: { $first: "$conversations.updated_at" }
-          }
+            $group: {
+                _id: "$_id",
+                receiverId: { $first: "$conversations.receiverId" },
+                lastMessage: { $first: "$conversations.messages" },
+                lastUpdated: { $first: "$conversations.updated_at" }
+            }
         },
         { $skip: skipAmount },
         { $limit: limit }
-      ]).exec();      
-      console.log(results);
+    ]).exec();
+
       const userIds = results.map(result => result.receiverId);
       const usersQuery = 'SELECT * FROM f_get_users_info($1)';
       const usersParams = [userIds];
       const usersInfo = await this.entityManager.query(usersQuery, usersParams);
-
       const enrichedResults = results.map(conversation => {
-        const userInfo = usersInfo.find(user => user.id_user === conversation._id.toString());
+        const userInfo = usersInfo.find(user => user.id_user === conversation.receiverId);
         return {
           ...conversation,
           user: userInfo ? {
@@ -136,8 +135,6 @@ export class ChatService {
           $slice: [{ $reverseArray: "$conversations" }, skip, limit] 
         } }
       ).exec();
-
-      console.log(messages)
 
       if (!messages || messages.length === 0) {
         return [];
