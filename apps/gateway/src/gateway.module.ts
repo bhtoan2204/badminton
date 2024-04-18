@@ -14,6 +14,7 @@ import { AppLoggerMiddleware } from './utils';
 import * as Joi from 'joi';
 import { NotificationModule } from './notification/notification.module';
 import { EducationModule } from './education/education.module';
+import { HouseholdModule } from './household/household.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { EducationModule } from './education/education.module';
         RABBIT_MQ_NOTIFICATION_QUEUE: Joi.string().required(),
         RABBIT_MQ_EDUCATION_QUEUE: Joi.string().required(),
         RABBIT_MQ_ELASTICSEARCH_QUEUE: Joi.string().required(),
+        RABBIT_MQ_HOUSEHOLD_QUEUE: Joi.string().required(),
 
         GOOGLE_CLIENT_ID: Joi.string().required(),
         GOOGLE_CLIENT_SECRET: Joi.string().required(),
@@ -57,7 +59,8 @@ import { EducationModule } from './education/education.module';
     CalendarModule,
     GuidelineModule,
     EducationModule,
-    AdminModule,
+    HouseholdModule,
+    AdminModule
   ],
   providers: [],
 })

@@ -111,3 +111,16 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+
+  household:
+    image: mjkundta/household:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/household/Dockerfile
+      target: production
+    command: node dist/apps/household/src/main
+    depends_on:
+      - gateway
+    restart: on-failure
+    environment:
+      - NODE_ENV=production

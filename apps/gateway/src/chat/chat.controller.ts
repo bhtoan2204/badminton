@@ -38,4 +38,12 @@ export class ChatController {
   async getFamilyMessages(@CurrentUser() user, @Param('id_family') id_family: number, @Param('index') index: number) {
     return this.chatService.getFamilyMessages(user.id_user, id_family, index);
   }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Mark message is seen' })
+  @Get('markSeenMessage/:receiver_id')
+  @ApiParam({ name: 'receiver_id', required: true, description: 'The ID of the receiver' })
+  async markSeen(@CurrentUser() user, @Param('receiver_id') receiver_id: string) {
+    return this.chatService.markSeen(user.id_user, receiver_id);
+  }
 }
