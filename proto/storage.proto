@@ -9,6 +9,8 @@ service StorageService {
   rpc uploadImageChat(UploadFileRequest) returns (UploadFileResponse);
   rpc uploadImageStep(UploadFileRequest) returns (UploadFileResponse);
   rpc deleteImageStep(DeleteFileRequest) returns (DeleteFileResponse);
+  rpc uploadImageHousehold(UploadFileRequest) returns (UploadFileResponse);
+  rpc deleteImageHousehold(DeleteFileRequest) returns (DeleteFileResponse);
 }
 
 message UploadFileRequest {

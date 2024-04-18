@@ -4,6 +4,7 @@ import { HouseholdService } from './household.service';
 import { DatabaseModule, RmqModule } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import * as Joi from 'joi';
       envFilePath: process.env.NODE_ENV === 'production' ? './apps/household/.env.production' : './apps/household/.env',
     }),
     RmqModule,
-    DatabaseModule
+    DatabaseModule,
+    StorageModule
   ],
   controllers: [HouseholdController],
   providers: [HouseholdService],
