@@ -12,7 +12,7 @@ export class GuidelineService {
     @Inject(GUIDELINE_SERVICE) private guidelineClient: ClientProxy
   ) { }
 
-  async getAllGuideline(id_user: string, id_family: any, page, itemsPerPage) {
+  async getAllGuideline(id_user: string, id_family: number, page: number, itemsPerPage: number) {
     try {
       const response = this.guidelineClient.send('guidelineClient/get_all_guideline', { id_user, id_family, page, itemsPerPage })
         .pipe(
