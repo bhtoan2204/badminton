@@ -18,14 +18,14 @@ export class GuidelineController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all guideline' })
   @Get('getAllGuideline/:id_family')
-  @ApiQuery({ name: 'page', required: false, type: String })
-  @ApiQuery({ name: 'itemsPerPage', required: false, type: String })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'itemsPerPage', required: false, type: Number })
   @ApiParam({ name: 'id_family', required: true, description: 'The ID of the family' })
   async getAllGuideline(
     @CurrentUser() currentUser,
     @Param('id_family') id_family: number,
-    @Query('page') page: string,
-    @Query('itemsPerPage') itemsPerPage: string
+    @Query('page') page: number,
+    @Query('itemsPerPage') itemsPerPage: number
   ) {
     return this.guidelineService.getAllGuideline(currentUser.id_user, id_family, page, itemsPerPage);
   }
