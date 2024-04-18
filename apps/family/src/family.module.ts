@@ -3,8 +3,8 @@ import { FamilyController } from './family.controller';
 import { DatabaseModule, RmqModule } from '@app/common';
 import { FamilyService } from './family.service';
 import { ConfigModule } from '@nestjs/config';
-import * as Joi from 'joi';
 import { StorageModule } from './storage/storage.module';
+import * as Joi from 'joi';
 
 @Module({
   imports: [

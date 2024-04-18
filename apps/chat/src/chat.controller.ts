@@ -50,4 +50,16 @@ export class ChatController {
     this.rmqService.ack(context);
     return this.chatService.saveImageMessage(data.id_user, data.message);
   }
+
+  @EventPattern('chatClient/markSeenMessage')
+  async markSeen(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.chatService.markSeen(data.id_user, data.receiver_id);
+  }
+
+  // @EventPattern('chatClient/markFamilySeenMessage')
+  // async markFamilySeen(@Payload() data: any, @Ctx() context: RmqContext) {
+  //   this.rmqService.ack(context);
+  //   return this.chatService.markFamilySeen(data.id_user, data.id_family);
+  // }
 }
