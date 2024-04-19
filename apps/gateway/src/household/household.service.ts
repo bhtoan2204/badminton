@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { HOUSEHOLD_SERVICE } from "../utils";
 import { ClientProxy } from "@nestjs/microservices";
 import { TimeoutError, lastValueFrom, timeout } from "rxjs";
+import { InputDurableItemDto } from "./dto/inputDurableItem.dto";
+import { InputConsumableItemDto } from "./dto/inputConsumableItem.dto";
 
 @Injectable()
 export class HouseholdService {
@@ -60,6 +62,54 @@ export class HouseholdService {
   async createItem(id_user: string, dto: any, file: Express.Multer.File) {
     try {
       const response = this.householdClient.send('householdClient/createItem', { id_user, dto, file })
+        .pipe(
+          timeout(5000),
+        );
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async updateItem(id_user: string, dto: any, file: Express.Multer.File) {
+    try {
+      const response = this.householdClient.send('householdClient/updateItem', { id_user, dto, file })
+        .pipe(
+          timeout(5000),
+        );
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async inputDurableItem(id_user: string, dto: InputDurableItemDto) {
+    try {
+      const response = this.householdClient.send('householdClient/inputDurableItem', { id_user, dto })
+        .pipe(
+          timeout(5000),
+        );
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async inputConsumableItem(id_user: string, dto: InputConsumableItemDto) {
+    try {
+      const response = this.householdClient.send('householdClient/inputConsumableItem', { id_user, dto })
         .pipe(
           timeout(5000),
         );

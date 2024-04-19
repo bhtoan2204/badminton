@@ -83,6 +83,79 @@ export class HouseholdService {
     }
   }
 
+  async updateItem(id_user: string, dto: any, file: any) {
+    try {
+      const { id_family, id_item, item_name, id_category, item_description } = dto;
+      let item_imageUrl = null;
+      if (file) {
+        const fileName = 'household_' + id_user + '_' + Date.now();
+        const params: UploadFileRequest = {
+          fileName: fileName,
+          file: new Uint8Array(file.buffer.data)
+        };
+        const uploadImageData = await this.storageService.uploadImageHousehold(params);
+        item_imageUrl = uploadImageData.fileUrl;
+      }
+      const query = 'SELECT * FROM f_update_household_item($1, $2, $3, $4, $5, $6, $7)';
+      const params = [id_user, id_family, id_item, item_name, item_description, id_category, item_imageUrl];
+      const data = await this.entityManager.query(query, params);
+      const oldImageUrl = data[0].old_imageurl;
+      if (oldImageUrl) {
+        const deleteParams: DeleteFileRequest = {
+          fileName: (oldImageUrl).split('/').pop()
+        }
+        await this.storageService.deleteImageHousehold(deleteParams);
+      }
+      delete data[0].old_imageurl;
+      return {
+        message: 'Updated Successfully',
+        data: data[0]
+      };
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async inputDurableItem(id_user: string, dto: any) {
+    try {
+      const { id_family, id_item, condition } = dto;
+      const query = 'SELECT * FROM f_update_household_durable_item($1, $2, $3, $4)';
+      const params = [id_user, id_family, id_item, condition];
+      const data = await this.entityManager.query(query, params);
+      return {
+        message: data[0].f_update_household_durable_item || 'Updated Successfully'
+      };
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async inputConsumableItem(id_user: string, dto: any) {
+    try {
+      const { id_family, id_item, quantity, threshold, expired_date } = dto;
+      const query = 'SELECT * FROM f_update_household_consumable_item($1, $2, $3, $4, $5, $6)';
+      const params = [id_user, id_family, id_item, quantity, threshold, expired_date];
+      const data = await this.entityManager.query(query, params);
+      return {
+        message: data[0].f_update_household_consumable_item || 'Updated Successfully'
+      };
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
   async deleteItem(id_user: string, id_family: number, id_item: number) {
     try {
       const query = 'SELECT * FROM f_delete_household_item($1, $2, $3)';
