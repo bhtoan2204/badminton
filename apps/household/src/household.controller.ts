@@ -33,6 +33,24 @@ export class HouseholdController {
     return await this.householdService.createItem(data.id_user, data.dto, data.file);
   }
 
+  @EventPattern('householdClient/updateItem')
+  async updateItem(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.householdService.updateItem(data.id_user, data.dto, data.file);
+  }
+
+  @EventPattern('householdClient/inputDurableItem')
+  async inputDurableItem(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.householdService.inputDurableItem(data.id_user, data.dto);
+  }
+
+  @EventPattern('householdClient/inputConsumableItem')
+  async inputConsumableItem(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.householdService.inputConsumableItem(data.id_user, data.dto);
+  }
+
   @EventPattern('householdClient/deleteItem')
   async deleteItem(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
