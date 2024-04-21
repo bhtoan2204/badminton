@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class FinanceService {
-  getHello(): string {
-    return 'Hello World!';
+  constructor(
+    private readonly entityManager: EntityManager,
+  ) { }
+
+  getAllFinance(): string {
+    return 'finance :D';
   }
 }

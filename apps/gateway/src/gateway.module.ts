@@ -15,6 +15,7 @@ import * as Joi from 'joi';
 import { NotificationModule } from './notification/notification.module';
 import { EducationModule } from './education/education.module';
 import { HouseholdModule } from './household/household.module';
+import { FinanceModule } from './finance/finance.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { HouseholdModule } from './household/household.module';
     GuidelineModule,
     EducationModule,
     HouseholdModule,
+    FinanceModule,
     AdminModule
   ],
   providers: [],
