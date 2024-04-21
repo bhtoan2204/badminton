@@ -41,4 +41,10 @@ export class UserController {
     this.rmqService.ack(context);
     return await this.userService.validateEmail(data);
   }
+
+  @EventPattern('userClient/get_all_user')
+  async handleGetAllUser(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.userService.getAllUser();
+  }
 }

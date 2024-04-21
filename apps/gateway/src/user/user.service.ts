@@ -118,4 +118,20 @@ export class UserService {
             throw new HttpException(error, error.statusCode);
         }
     }
+
+    async getAllUser() {
+        try {
+            const source = this.userClient.send('userClient/get_all_user', {}).pipe(
+                timeout(5000),
+            );
+            const result = await lastValueFrom(source);
+            return result;
+        }
+        catch (error) {
+            if (error.name === 'TimeoutError') {
+                throw new HttpException('Timeout', 408);
+            }
+            throw new HttpException(error, error.statusCode);
+        }
+    }
 }

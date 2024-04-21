@@ -72,4 +72,12 @@ export class UserController {
     async validateEmail(@CurrentUser() user, @Body() data: ValidateEmailDto) {
         return this.userService.validateEmail(user, data);
     }
+
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Get All User' })
+    @UseGuards(JwtAuthGuard)
+    @Get('getAllUser')
+    async getAllUser() {
+        return this.userService.getAllUser();
+    }
 }
