@@ -225,6 +225,20 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+  
+  finance:
+    image: mjkundta/finance:latest
+    build:
+      context: .
+      dockerfile: ./apps/finance/Dockerfile
+      target: development
+    command: npm run start:dev finance
+    depends_on:
+      - gateway
+    restart: on-failure
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
 
   filebeat:
     image: mjkundta/filebeat:latest

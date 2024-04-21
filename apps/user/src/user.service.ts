@@ -48,6 +48,7 @@ export class UserService {
       });
     }
   }
+
   async changePassword(user: any, passwordDto: any) {
     try {
       const { oldPassword, newPassword } = passwordDto;
@@ -86,7 +87,7 @@ export class UserService {
       }
     }
   }
-  
+
   async updateProfile(user: any, data: any) {
     try {
       const { firstname, lastname } = data;
@@ -119,6 +120,7 @@ export class UserService {
       });
     }
   }
+
   async changeAvatar(data: any) {
     try {
       const { currentUser, file } = data;
@@ -151,6 +153,7 @@ export class UserService {
       });
     }
   }
+
   async validateEmail(dto: any) {
     try {
       const { currentUser, data } = dto;
@@ -168,6 +171,20 @@ export class UserService {
         message: 'Email has been verified',
         data: result
       };
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async getAllUser() {
+    try {
+      const query = 'SELECT * FROM view_all_users_details';
+      const data = await this.entityManager.query(query);
+      return data;
     }
     catch (error) {
       throw new RpcException({
