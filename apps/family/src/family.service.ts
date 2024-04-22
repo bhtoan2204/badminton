@@ -79,7 +79,10 @@ export class FamilyService {
       const q2 = 'select * from f_add_member($1,$2,$3,$4,$5)';
       const param = [id_user, id_family, phone, gmail, role];
       const data = await this.entityManager.query(q2, param);
-      return data[0]['f_add_member'];
+      return {
+        data: data[0]['f_add_member'],
+        message: 'Member added'
+      };
     }
     catch (error) {
       throw new RpcException({
@@ -95,7 +98,10 @@ export class FamilyService {
       const Query = 'SELECT * FROM f_create_family($1, $2, $3, $4)';
       const params = [id_user, description, name, id_order];
       const data = await this.entityManager.query(Query, params);
-      return data[0]['f_create_family'];
+      return { 
+        data: data[0]['f_create_family'] ,
+        message: 'Family created'
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -125,7 +131,10 @@ export class FamilyService {
       const Query = 'select * from f_delete_family($1, $2)';
       const param = [id_user, id_family];
       const data = await this.entityManager.query(Query, param);
-      return data[0]['f_delete_family'];
+      return {
+        data: data[0]['f_delete_family'],
+        message: 'Family deleted'
+      };
     }
 
     catch (error) {
@@ -143,7 +152,10 @@ export class FamilyService {
       const Query = 'select * from f_delete_member($1, $2, $3)';
       const param = [id_user, id_user, id_family];
       const data = await this.entityManager.query(Query, param);
-      return data[0]['f_delete_member'];
+      return {
+        data: data[0]['f_delete_member'],
+        message: 'Member deleted'
+      }
     }
 
     catch (error) {

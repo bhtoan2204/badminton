@@ -50,12 +50,15 @@ CREATE TABLE financial_summary (
     total_income DECIMAL(12, 2) DEFAULT 0,
     total_expenditure DECIMAL(12, 2) DEFAULT 0,
     daily_balance DECIMAL(12, 2) DEFAULT 0,
-    weekly_balance DECIMAL(12, 2),
-    monthly_balance DECIMAL(12, 2),
-    yearly_balance DECIMAL(12, 2),
-    current_balance DECIMAL(12, 2),
+    weekly_balance DECIMAL(12, 2) DEFAULT 0,
+    monthly_balance DECIMAL(12, 2) DEFAULT 0,
+    yearly_balance DECIMAL(12, 2) DEFAULT 0,
+    current_balance DECIMAL(12, 2) DEFAULT 0,
     FOREIGN KEY (id_family) REFERENCES family(id_family)
 );
+
+ALTER TABLE financial_summary
+ADD CONSTRAINT unique_family_date UNIQUE (id_family, summary_date);
 
 CREATE INDEX idx_summary_date ON financial_summary(summary_date);
 

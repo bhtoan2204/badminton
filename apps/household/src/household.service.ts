@@ -73,7 +73,10 @@ export class HouseholdService {
       const params = [id_user, id_family, item_name, item_description, id_category, item_type, item_imageUrl];
       const data = await this.entityManager.query(query, params);
 
-      return data[0];
+      return {
+        data: data[0],
+        message: 'Item created',
+      }
     }
     catch (error) {
       throw new RpcException({
