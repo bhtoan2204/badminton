@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finance-deployment
+  labels:
+    app: finance
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: finance
+  template:
+    metadata:
+      labels:
+        app: finance
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: finance
+          image: mjkundta/finance:<TAG>
+          command: ["node", "dist/apps/finance/src/main"]
+          resources:
+            limits:
+              cpu: "0.25"
+              memory: "512Mi"
+          env:
+            - name: NODE_ENV
+              value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: finance
+  labels:
+    app: finance
+spec:
+  selector:
+    app: finance
+  ports:
+    - protocol: TCP
+      port: 8095
+      targetPort: 8095
+  type: ClusterIP

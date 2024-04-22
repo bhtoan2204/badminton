@@ -65,3 +65,14 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+  
+  finance:
+    image: mjkundta/finance:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/finance/Dockerfile
+      target: production
+    command: node dist/apps/finance/src/main
+    restart: on-failure
+    environment:
+      - NODE_ENV=production

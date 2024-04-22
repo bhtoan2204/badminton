@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, UseGuards } from "@nestjs/common";
+import { Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../../auth/guard/jwt-auth.guard";
 import { IncomeService } from "./income.service";
@@ -19,21 +19,21 @@ export class IncomeController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Create Income' })
-  @Get('createIncome')
+  @Post('createIncome')
   async createIncome() {
     return this.incomeService.createIncome();
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update Income' })
-  @Get('updateIncome')
+  @Put('updateIncome')
   async updateIncome() {
     return this.incomeService.updateIncome();
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete Income' })
-  @Get('deleteIncome')
+  @Delete('deleteIncome')
   async deleteIncome() {
     return this.incomeService.deleteIncome();
   }
