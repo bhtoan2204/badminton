@@ -81,7 +81,10 @@ export class PaymentService {
       const Query = 'SELECT * FROM f_create_order($1,$2,$3,$4, $5)';
       const params = [id_user, id_package, amount, method, id_family];
       const data = await this.entityManager.query(Query, params);
-      return data[0]['f_create_order'];
+      return {
+        data: data[0]['f_create_order'],
+        message: 'Order created'
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -96,7 +99,10 @@ export class PaymentService {
       const Query = 'select * from f_check_order($1, $2, $3, $4, $5)';
       const params = [id_user, id_order, amount, vnp_ResponseCode, vnp_TransactionStatus];
       const data = await this.entityManager.query(Query, params);
-      return data[0]['f_check_order'];
+      return {
+        data: data[0]['f_check_order'],
+        message: 'Check order'
+      }
     } catch (error) {
       throw new RpcException({
         message: error.message,

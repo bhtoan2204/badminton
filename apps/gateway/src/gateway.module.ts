@@ -39,6 +39,7 @@ import { FinanceModule } from './finance/finance.module';
         RABBIT_MQ_EDUCATION_QUEUE: Joi.string().required(),
         RABBIT_MQ_ELASTICSEARCH_QUEUE: Joi.string().required(),
         RABBIT_MQ_HOUSEHOLD_QUEUE: Joi.string().required(),
+        RABBIT_MQ_FINANCE_QUEUE: Joi.string().required(),
 
         GOOGLE_CLIENT_ID: Joi.string().required(),
         GOOGLE_CLIENT_SECRET: Joi.string().required(),

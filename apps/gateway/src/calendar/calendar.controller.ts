@@ -27,8 +27,6 @@ export class CalendarController {
   @ApiParam({ name: 'id_family', required: true })
   @Post('getEventOnDate/:id_family')
   async getEventOnDate(@CurrentUser() currentUser, @Body() dto: GetEventDTO) {
-    //async getEventOnDate(@CurrentUser() currentUser,  @Param('id_family') id_family: number,  @Query('date') date: Date) {
-    //console.log(date);
     return this.calendarService.getEventOnDate(currentUser.id_user, dto);
   }
 
