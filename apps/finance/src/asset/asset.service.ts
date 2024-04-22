@@ -1,11 +1,10 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { FINANCE_SERVICE } from "../../utils";
-import { ClientProxy } from "@nestjs/microservices";
+import { Injectable } from "@nestjs/common";
+import { EntityManager } from "typeorm";
 
 @Injectable()
 export class AssetService {
   constructor(
-    @Inject(FINANCE_SERVICE) private financeClient: ClientProxy
+    private readonly entityManager: EntityManager,
   ) {}
 
   async getAsset() {
