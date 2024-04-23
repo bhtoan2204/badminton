@@ -6,7 +6,7 @@ import { CrawlerService } from "./crawler.service";
 @ApiTags('RSS and Crawler')
 @Controller('crawler')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 export class CrawlerController {
   constructor(private readonly crawlerService: CrawlerService) { }
 
@@ -24,5 +24,12 @@ export class CrawlerController {
     const pageNumber = parseInt(page, 10) || 1;
     const itemsPerPageNumber = parseInt(itemsPerPage, 10) || 10;
     return this.crawlerService.getRssData(type, pageNumber, itemsPerPageNumber);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get local bank interest' })
+  @Get('localBankInterest')
+  async getInternationalBankData() {
+    return this.crawlerService.scrapeInterestRatesLocalBank();
   }
 }
