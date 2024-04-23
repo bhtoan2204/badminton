@@ -111,7 +111,7 @@ data:
         overwrite_keys: true
 
     output.elasticsearch:
-      hosts: ["http://35.220.223.228:9200"]
+      hosts: ["http://35.220.167.78:9200"]
       index: "famfund-app-production"
       username: "elastic"
       password: "Toan123456789"
