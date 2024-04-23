@@ -23,4 +23,20 @@ export class CrawlerService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async scrapeInterestRatesLocalBank() {
+    try {
+      const response = this.crawlerClient.send('crawlerClient/scrapeInterestRatesLocalBank', {})
+        .pipe(
+          timeout(5000),
+        );
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }
