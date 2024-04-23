@@ -12,6 +12,13 @@ export class ExpenseditureController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get expenseditures' })
+  @Get('getExpenseType')
+  async getExpenseType() {
+    return this.expenseService.getExpenseditureType();
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get expenseditures' })
   @Get('getExpense')
   async getExpense() {
     return this.expenseService.getExpensediture();

@@ -109,3 +109,16 @@ CREATE TABLE finance_savings (
 
 CREATE INDEX idx_savings_date ON finance_savings(savings_date);
 
+CREATE TABLE finance_expenditure_type (
+    id_expense_type SERIAL PRIMARY KEY,
+    expense_name VARCHAR(255) NOT NULL
+);
+
+insert into finance_expenditure_type(expense_name) values
+('Food & Dining'),
+('Transportation'),
+('Utility Bills'),
+('Education'),
+('Healthcare'),
+('Entertainment'),
+('Travel');
