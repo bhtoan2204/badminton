@@ -22,7 +22,9 @@ RUN npm run build crawler
 FROM node:20.10.0-alpine AS production
 
 ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
+ENV NODE_ENV=${NODE_ENV} \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 WORKDIR /usr/src/app
 
