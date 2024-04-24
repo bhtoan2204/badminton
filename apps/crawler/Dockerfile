@@ -21,6 +21,8 @@ RUN npm run build crawler
 
 FROM node:20.10.0-alpine AS production
 
+RUN apk update && apk add --no-cache chromium nss freetype harfbuzz ca-certificates ttf-freefont
+
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV} \
     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
