@@ -6,7 +6,7 @@ import { CrawlerService } from "./crawler.service";
 @ApiTags('RSS and Crawler')
 @Controller('crawler')
 @ApiBearerAuth()
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class CrawlerController {
   constructor(private readonly crawlerService: CrawlerService) { }
 
