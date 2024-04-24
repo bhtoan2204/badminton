@@ -34,7 +34,7 @@ spec:
               value: "Toan123456789"
           resources:
             limits:
-              cpu: "250m"
+              cpu: "400m"
               memory: "1024Mi"
 
 ---
