@@ -1,7 +1,9 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../../auth/guard/jwt-auth.guard";
 import { InvestmentService } from "./investment.service";
+import { CurrentUser } from "../../utils";
+import { CreateInvestmentDto } from "./dto/createInvestment.dto";
 
 @ApiTags('Investment')
 @Controller('finance/investment')
@@ -9,6 +11,20 @@ import { InvestmentService } from "./investment.service";
 @UseGuards(JwtAuthGuard)
 export class InvestmentController {
   constructor(private readonly InvestmentService: InvestmentService) { }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get investment type' })
+  @Get('getInvestmentType')
+  async getInvestmentType() {
+    return this.InvestmentService.getInvestmentType();
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get investment risk level' })
+  @Get('getInvestmentRiskLevel')
+  async getInvestmentRiskLevel() {
+    return this.InvestmentService.getInvestmentRiskLevel();
+  }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get investment' })
@@ -20,8 +36,8 @@ export class InvestmentController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Create investment' })
   @Post('createInvestment')
-  async createInvestment() {
-    return this.InvestmentService.createInvestment();
+  async createInvestment(@CurrentUser() currentUser, @Body() dto: CreateInvestmentDto) {
+    return this.InvestmentService.createInvestment(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)

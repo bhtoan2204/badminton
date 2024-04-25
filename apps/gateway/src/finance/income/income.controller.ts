@@ -11,6 +11,13 @@ export class IncomeController {
   constructor(private readonly incomeService: IncomeService) { }
 
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get Income Source' })
+  @Get('getIncomeSource')
+  async getIncomeSource() {
+    return this.incomeService.getIncomeSource();
+  }
+
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get Income' })
   @Get('getIncome')
   async getIncome() {

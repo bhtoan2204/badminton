@@ -28,7 +28,7 @@ export class CrawlerService {
     try {
       const response = this.crawlerClient.send('crawlerClient/scrapeInterestRatesLocalBank', {})
         .pipe(
-          timeout(5000),
+          timeout(20000),
         );
       return await lastValueFrom(response);
     }

@@ -21,4 +21,10 @@ export class InvestmentController {
     this.rmqService.ack(context);
     return this.investmentService.getInvestmentRiskLevel();
   }
+
+  @EventPattern('financeClient/createInvestment')
+  async createInvestment(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.investmentService.createInvestment(data.userId, data.dto);
+  }
 }

@@ -11,6 +11,13 @@ export class LoanController {
   constructor(private readonly loanService: LoanService) { }
 
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get Loan Type' })
+  @Get('getLoanType')
+  async getLoanType() {
+    return this.loanService.getLoanCreditorType();
+  }
+
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get Loan' })
   @Get('getLoan')
   async getLoan() {
