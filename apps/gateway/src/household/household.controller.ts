@@ -86,7 +86,7 @@ export class HouseholdController {
     dto.id_family = parseInt(dto.id_family);
     dto.id_category = parseInt(dto.id_category);
     if (!dto.item_description) dto.item_description = null;
-    return this.householdService.createItem(currentUser.id_user, dto, file ? file : null);
+    return this.householdService.createItem(currentUser.id_user, dto, file);
   }
 
   @HttpCode(HttpStatus.OK)
