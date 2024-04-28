@@ -15,4 +15,34 @@ export class IncomeController {
     this.rmqService.ack(context);
     return this.incomeService.getIncomeSource();
   }
+
+  @EventPattern('financeClient/getIncome')
+  async getIncome(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.incomeService.getIncome(data.id_user, data.id_family, data.page, data.itemsPerPage);
+  }
+
+  @EventPattern('financeClient/getIncomeById')
+  async getIncomeById(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.incomeService.getIncomeById(data.id_user, data.id_family, data.id_income);
+  }
+
+  @EventPattern('financeClient/createIncome')
+  async createIncome(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.incomeService.createIncome(data.id_user, data.dto);
+  }
+
+  @EventPattern('financeClient/updateIncome')
+  async updateIncome(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.incomeService.updateIncome(data.id_user, data.dto);
+  }
+
+  @EventPattern('financeClient/deleteIncome')
+  async deleteIncome(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.incomeService.deleteIncome(data.id_user, data.id_family, data.id_income);
+  }
 }
