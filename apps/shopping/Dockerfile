@@ -8,11 +8,11 @@ RUN npm install --ignore-scripts
 
 COPY libs ./libs
 COPY proto ./proto
-COPY apps/role ./apps/role
+COPY apps/shopping ./apps/shopping
 COPY tsconfig.json .
 COPY nest-cli.json .
 
-RUN npm run build role
+RUN npm run build shopping
 
 FROM node:20.10.0-alpine AS production
 
@@ -29,9 +29,9 @@ RUN adduser -D nonroot && chown -R nonroot:nonroot /usr/src/app
 
 USER nonroot
 
-COPY --from=development /usr/src/app/apps/role ./apps/role
+COPY --from=development /usr/src/app/apps/shopping ./apps/shopping
 COPY --from=development /usr/src/app/dist ./dist
 COPY --from=development /usr/src/app/libs ./libs
 COPY --from=development /usr/src/app/proto ./proto
 
-CMD [ "node", "dist/apps/role/src/main" ]
+CMD [ "node", "dist/apps/shopping/src/main" ]

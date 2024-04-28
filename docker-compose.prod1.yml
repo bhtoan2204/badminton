@@ -89,18 +89,7 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
-
-  role:
-    image: mjkundta/role:${TAG}
-    build:
-      context: .
-      dockerfile: ./apps/role/Dockerfile
-      target: production
-    command: node dist/apps/role/src/main
-    restart: on-failure
-    environment:
-      - NODE_ENV=production
-  
+      
   crawler:
     image: mjkundta/crawler:${TAG}
     build:
