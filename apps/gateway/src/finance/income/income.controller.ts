@@ -1,7 +1,10 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../../auth/guard/jwt-auth.guard";
 import { IncomeService } from "./income.service";
+import { CurrentUser } from "../../utils";
+import { CreateIncomeDto } from "./dto/createIncome.dto";
+import { UpdateIncomeDto } from "./dto/updateIncome.dto";
 
 @ApiTags('Income')
 @Controller('finance/income')
@@ -19,29 +22,41 @@ export class IncomeController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get Income' })
-  @Get('getIncome')
-  async getIncome() {
-    return this.incomeService.getIncome();
+  @ApiParam({ name: 'id_family', required: true })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @Get('getIncome/:id_family')
+  async getIncome(@CurrentUser() currentUser, @Query('page') page: number, @Query('itemsPerPage') itemsPerPage: number, @Param('id_family') id_family: number) {
+    if (!page) page = 1;
+    if (!itemsPerPage) itemsPerPage = 10;
+    return this.incomeService.getIncome(currentUser.id_user, id_family, page, itemsPerPage);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get Income By Id' })
+  @Get('getIncomeById/:id_family/:id_income')
+  async getIncomeById(@CurrentUser() currentUser, @Param('id_income') id_income: number, @Param('id_family') id_family: number) {
+    return this.incomeService.getIncomeById(currentUser.id_user, id_family, id_income);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Create Income' })
   @Post('createIncome')
-  async createIncome() {
-    return this.incomeService.createIncome();
+  async createIncome(@CurrentUser() currentUser, @Body() dto: CreateIncomeDto) {
+    return this.incomeService.createIncome(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update Income' })
   @Put('updateIncome')
-  async updateIncome() {
-    return this.incomeService.updateIncome();
+  async updateIncome(@CurrentUser() currentUser, @Body() dto: UpdateIncomeDto) {
+    return this.incomeService.updateIncome(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete Income' })
-  @Delete('deleteIncome')
-  async deleteIncome() {
-    return this.incomeService.deleteIncome();
+  @Delete('deleteIncome/:id_family/:id_income')
+  async deleteIncome(@CurrentUser() currentUser, @Param('id_income') id_income: number, @Param('id_family') id_family: number){
+    return this.incomeService.deleteIncome(currentUser.id_user, id_family, id_income);
   }
 }

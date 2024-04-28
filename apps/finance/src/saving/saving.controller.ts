@@ -8,6 +8,5 @@ export class SavingController {
     private readonly savingService: SavingService,
     private readonly rmqService: RmqService
   ) { }
-
   
 }

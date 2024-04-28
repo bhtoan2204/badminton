@@ -103,15 +103,6 @@
         "watchAssets": true
       }
     },
-    "role": {
-      "type": "application",
-      "root": "apps/role",
-      "entryFile": "src/main",
-      "sourceRoot": "./",
-      "compilerOptions": {
-        "tsConfigPath": "apps/role/tsconfig.app.json"
-      }
-    },
     "crawler": {
       "type": "application",
       "root": "apps/crawler",
@@ -212,6 +203,15 @@
       "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/admin/tsconfig.app.json"
+      }
+    },
+    "shopping": {
+      "type": "application",
+      "root": "apps/shopping",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
+      "compilerOptions": {
+        "tsConfigPath": "apps/shopping/tsconfig.app.json"
       }
     }
   }
