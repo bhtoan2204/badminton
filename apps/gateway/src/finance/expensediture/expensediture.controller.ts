@@ -39,6 +39,13 @@ export class ExpenseditureController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get statiscal expenseditures last six months' })
+  @Get('getStatiscalExpense/:id_family')
+  async getStatiscalExpense(@CurrentUser() currentUser, @Param('id_family') id_family: number) {
+    return this.expenseService.getStatiscalExpensediture(currentUser.id_user, id_family);
+  }
+
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Create expensediture' })
   @Post('createExpense')
   async createExpense(@CurrentUser() currentUser, @Body() dto: CreateExpenseDto) {

@@ -62,6 +62,23 @@ export class ExpenseditureService {
     }
   }
 
+  async getStatiscalExpensediture(id_user: string, id_family: number) {
+    try {
+      const response = this.financeClient.send('financeClient/getStatiscalExpensediture', { id_user, id_family })
+        .pipe(
+          timeout(5000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
   async createExpensediture(id_user: string, dto: CreateExpenseDto) {
     try {
       const response = this.financeClient.send('financeClient/createExpensediture', { id_user, dto })

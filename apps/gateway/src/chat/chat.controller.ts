@@ -46,4 +46,13 @@ export class ChatController {
   async markSeen(@CurrentUser() user, @Param('receiver_id') receiver_id: string) {
     return this.chatService.markSeen(user.id_user, receiver_id);
   }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Remove message' })
+  @Get('removeMessage/:receiver_id/:id_message')
+  @ApiParam({ name: 'receiver_id', required: true, description: 'The ID of the receiver' })
+  @ApiParam({ name: 'id_message', required: true, description: 'The ID of the message' })
+  async removeMessage(@CurrentUser() user, @Param('receiver_id') receiver_id: string, @Param('id_message') id_message: string) {
+    return this.chatService.removeMessage(user.id_user, receiver_id, id_message);
+  }
 }
