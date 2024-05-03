@@ -1,12 +1,20 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { RpcException } from "@nestjs/microservices";
 import { EntityManager } from "typeorm";
+import { validate, version, NIL } from 'uuid';
 
 @Injectable()
 export class ExpenseditureService {
   constructor(
     private readonly entityManager: EntityManager,
   ) { }
+
+  convertStringToUUID(string: string): string {
+    if (validate(string) && version(string)) {
+      return string;
+    }
+    return NIL;
+  }
 
   async getExpenseditureType() {
     try {
@@ -51,6 +59,24 @@ export class ExpenseditureService {
       return {
         data: data,
         message: 'Get expenditure by id',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async getStatiscalExpensediture(id_user, id_family) {
+    try {
+      const query = 'SELECT * FROM f_get_statiscal_expenditure($1, $2)';
+      const params = [this.convertStringToUUID(id_user), id_family];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data,
+        message: 'Get statiscal expenditure',
       }
     }
     catch (error) {

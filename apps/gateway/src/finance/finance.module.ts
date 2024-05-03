@@ -13,12 +13,12 @@ import { AssetModule } from "./asset/asset.module";
 @Module({
   imports: [
     RmqModule.register({ name: FINANCE_SERVICE }),
-    forwardRef(() => AssetModule),
     forwardRef(() => ExpenseditureModule),
     forwardRef(() => IncomeModule),
-    forwardRef(() => InvestmentModule),
-    forwardRef(() => LoanModule),
-    forwardRef(() => SavingModule)
+    forwardRef(() => AssetModule),
+    // forwardRef(() => InvestmentModule),
+    // forwardRef(() => LoanModule),
+    // forwardRef(() => SavingModule)
   ],
   controllers: [FinanceController],
   providers: [FinanceService],

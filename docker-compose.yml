@@ -240,6 +240,20 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
 
+  shopping:
+    image: mjkundta/shopping:latest
+    build:
+      context: .
+      dockerfile: ./apps/shopping/Dockerfile
+      target: development
+    command: npm run start:dev shopping
+    depends_on:
+      - gateway
+    restart: on-failure
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
   filebeat:
     image: mjkundta/filebeat:latest
     build:

@@ -1,12 +1,20 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { RpcException } from "@nestjs/microservices";
 import { EntityManager } from "typeorm";
+import { validate, version, NIL } from 'uuid';
 
 @Injectable()
 export class IncomeService {
   constructor(
     private readonly entityManager: EntityManager,
   ) { }
+
+  convertStringToUUID(string: string): string {
+    if (validate(string) && version(string)) {
+      return string;
+    }
+    return NIL;
+  }
 
   async getIncomeSource() {
     try {
@@ -78,6 +86,24 @@ export class IncomeService {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR
       });
     
+    }
+  }
+
+  async getStasticalIncome(id_user: string, id_family: number) {
+    try {
+      const query = 'SELECT * FROM f_get_statiscal_income($1, $2)';
+      const params = [this.convertStringToUUID(id_user), id_family];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data,
+        message: 'Get statiscal income',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
     }
   }
 

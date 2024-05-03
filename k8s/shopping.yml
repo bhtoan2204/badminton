@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shopping-deployment
+  labels:
+    app: shopping
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shopping
+  template:
+    metadata:
+      labels:
+        app: shopping
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: shopping
+          image: mjkundta/shopping:<TAG>
+          command: ["node", "dist/apps/shopping/src/main"]
+          resources:
+            limits:
+              cpu: "150m"
+              memory: "256Mi"
+          env:
+            - name: NODE_ENV
+              value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shopping
+  labels:
+    app: shopping
+spec:
+  selector:
+    app: shopping
+  ports:
+    - protocol: TCP
+      port: 8095
+      targetPort: 8095
+  type: ClusterIP

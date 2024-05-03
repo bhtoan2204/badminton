@@ -126,4 +126,17 @@ export class ChatService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async removeMessage(id_user: string, receiver_id: string, id_message: string) {
+    try {
+      const response = this.chatClient.send('chatClient/removeMessage', { id_user, receiver_id, id_message });
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }

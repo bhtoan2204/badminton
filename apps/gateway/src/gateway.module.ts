@@ -11,11 +11,12 @@ import { CalendarModule } from './calendar/calendar.module';
 import { UserModule } from './user/user.module';
 import { GuidelineModule } from './guideline/guideline.module';
 import { AppLoggerMiddleware } from './utils';
-import * as Joi from 'joi';
 import { NotificationModule } from './notification/notification.module';
 import { EducationModule } from './education/education.module';
 import { HouseholdModule } from './household/household.module';
 import { FinanceModule } from './finance/finance.module';
+import { ShoppingModule } from './shopping/shopping.module';
+import * as Joi from 'joi';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { FinanceModule } from './finance/finance.module';
         RABBIT_MQ_ELASTICSEARCH_QUEUE: Joi.string().required(),
         RABBIT_MQ_HOUSEHOLD_QUEUE: Joi.string().required(),
         RABBIT_MQ_FINANCE_QUEUE: Joi.string().required(),
+        RABBIT_MQ_SHOPPING_QUEUE: Joi.string().required(),
 
         GOOGLE_CLIENT_ID: Joi.string().required(),
         GOOGLE_CLIENT_SECRET: Joi.string().required(),
@@ -63,6 +65,7 @@ import { FinanceModule } from './finance/finance.module';
     EducationModule,
     HouseholdModule,
     FinanceModule,
+    ShoppingModule,
     AdminModule
   ],
   providers: [],

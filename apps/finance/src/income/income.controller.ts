@@ -28,6 +28,12 @@ export class IncomeController {
     return this.incomeService.getIncomeById(data.id_user, data.id_family, data.id_income);
   }
 
+  @EventPattern('financeClient/getStatiscalIncome')
+  async getStatiscalIncome(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.incomeService.getStasticalIncome(data.id_user, data.id_family);
+  }
+
   @EventPattern('financeClient/createIncome')
   async createIncome(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);

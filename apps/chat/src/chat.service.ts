@@ -29,18 +29,29 @@ export class ChatService {
         { $match: { userId: id_user } },
         { $unwind: "$conversations" },
         { $unwind: "$conversations.messages" },
-        { $sort: { "conversations.updated_at": -1, "conversations.messages.timestamp": -1 } },
+        { $sort: { "conversations.messages.timestamp": -1 } },
         {
-            $group: {
-                _id: "$_id",
-                receiverId: { $first: "$conversations.receiverId" },
-                lastMessage: { $first: "$conversations.messages" },
-                lastUpdated: { $first: "$conversations.updated_at" }
-            }
+          $group: {
+            _id: {
+              conversationId: "$_id",
+              receiverId: "$conversations.receiverId",
+              senderId: "$conversations.messages.senderId"
+            },
+            lastMessage: { $first: "$conversations.messages" },
+            lastUpdated: { $first: "$conversations.updated_at" }
+          }
         },
         { $skip: skipAmount },
-        { $limit: limit }
-    ]).exec();
+        { $limit: limit },
+        {
+          $project: {
+            _id: "$_id.conversationId",
+            receiverId: "$_id.receiverId",
+            lastMessage: 1,
+            lastUpdated: 1
+          }
+        }
+      ]).exec();
 
       const userIds = results.map(result => result.receiverId);
       const usersQuery = 'SELECT * FROM f_get_users_info($1)';
@@ -356,6 +367,32 @@ export class ChatService {
       }
 
       return { message: 'Mark Seen successfully' };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async removeMessage(id_user: string, receiver_id: string, id_message: string): Promise<any> {
+    try {
+      const updatedConversation = await this.userConversationsRepository.findOneAndUpdate(
+        { userId: id_user, 'conversations.receiverId': receiver_id },
+        {
+          $pull: { 'conversations.$.messages': { _id: id_message } }
+        },
+        { new: true }
+      );
+
+      if (!updatedConversation) {
+        throw new RpcException({
+          message: 'Conversation not found',
+          statusCode: HttpStatus.NOT_FOUND
+        });
+      }
+
+      return { message: 'Remove message successfully' };
     } catch (error) {
       throw new RpcException({
         message: error.message,

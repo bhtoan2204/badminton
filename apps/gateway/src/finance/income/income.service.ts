@@ -60,6 +60,23 @@ export class IncomeService {
     }
   }
 
+  async getStasticalIncome(id_user: string, id_family: number) {
+    try {
+      const response = this.financeClient.send('financeClient/getStatiscalIncome', {id_user, id_family})
+        .pipe(
+          timeout(5000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
   async createIncome(id_user: string, dto: any) {
     try {
       const response = this.financeClient.send('financeClient/createIncome', {id_user, dto})

@@ -62,4 +62,10 @@ export class ChatController {
   //   this.rmqService.ack(context);
   //   return this.chatService.markFamilySeen(data.id_user, data.id_family);
   // }
+
+  @EventPattern('chatClient/removeMessage')
+  async removeMessage(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.chatService.removeMessage(data.id_user, data.receiver_id, data.id_message);
+  }
 }

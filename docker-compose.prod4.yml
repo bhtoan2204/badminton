@@ -10,3 +10,14 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+
+  shopping:
+    image: mjkundta/shopping:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/shopping/Dockerfile
+      target: production
+    command: node dist/apps/shopping/src/main
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
