@@ -31,7 +31,7 @@ export class FamilyController {
     return this.familyService.getFamily(currentUser.id_user, id_family);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a family' })
   @Post('createFamily')
   async createFamily(@CurrentUser() currentUser, @Body() createFamilyDto: CreateFamilyDto) {
@@ -67,7 +67,7 @@ export class FamilyController {
     return this.familyService.getMember(id_user);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Add member' })
   @Post('addMember')
   async addMember(@CurrentUser() currentUser, @Body() data: MemberFamilyDto) {

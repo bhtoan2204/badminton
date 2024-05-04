@@ -1,7 +1,6 @@
 import { DeleteFileRequest, UploadFileRequest } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-
 import { EntityManager } from 'typeorm';
 import { StorageService } from './storage/storage.service';
 
@@ -57,7 +56,7 @@ export class HouseholdService {
   }
 
   async createItem(id_user: string, dto: any, file: any) {
-    const { id_family, item_name, id_category, item_description, item_type } = dto;
+    const { id_family, item_name, id_category, item_description, item_type, id_room } = dto;
     let item_imageUrl = null;
     if (file) {
       const fileName = 'household_' + id_user + '_' + Date.now();
@@ -69,8 +68,8 @@ export class HouseholdService {
       item_imageUrl = uploadImageData.fileUrl;
     }
     try {
-      const query = 'SELECT * FROM f_create_household_item($1, $2, $3, $4, $5, $6, $7)';
-      const params = [id_user, id_family, item_name, item_description, id_category, item_type, item_imageUrl];
+      const query = 'SELECT * FROM f_create_household_item($1, $2, $3, $4, $5, $6, $7, $8)';
+      const params = [id_user, id_family, item_name, id_room, item_description, id_category, item_type, item_imageUrl];
       const data = await this.entityManager.query(query, params);
 
       return {
@@ -88,7 +87,7 @@ export class HouseholdService {
 
   async updateItem(id_user: string, dto: any, file: any) {
     try {
-      const { id_family, id_item, item_name, id_category, item_description } = dto;
+      const { id_family, id_item, item_name, id_category, item_description, id_room } = dto;
       let item_imageUrl = null;
       if (file) {
         const fileName = 'household_' + id_user + '_' + Date.now();
@@ -99,8 +98,8 @@ export class HouseholdService {
         const uploadImageData = await this.storageService.uploadImageHousehold(params);
         item_imageUrl = uploadImageData.fileUrl;
       }
-      const query = 'SELECT * FROM f_update_household_item($1, $2, $3, $4, $5, $6, $7)';
-      const params = [id_user, id_family, id_item, item_name, item_description, id_category, item_imageUrl];
+      const query = 'SELECT * FROM f_update_household_item($1, $2, $3, $4, $5, $6, $7, $8)';
+      const params = [id_user, id_family, id_item, id_room, item_name, item_description, id_category, item_imageUrl];
       const data = await this.entityManager.query(query, params);
       const oldImageUrl = data[0].old_imageurl;
       if (oldImageUrl) {

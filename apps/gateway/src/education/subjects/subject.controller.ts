@@ -21,7 +21,7 @@ export class SubjectController {
     private readonly subjectService: SubjectService
   ) { }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new subject' })
   @Post('create')
   async createSubject(@CurrentUser() currentUser, @Body() dto: CreateSubjectDto) {
@@ -55,14 +55,14 @@ export class SubjectController {
     return this.subjectService.deleteSubject(user.id_user, id_family, id_education_progress, id_subject);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Add component score' })
   @Post('addComponentScore')
   async addComponentScore(@CurrentUser() currentUser, @Body() dto: AddComponentScoreDto) {
     return this.subjectService.addComponentScore(currentUser.id_user, dto);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Insert component score' })
   @Post('insertComponentScore/:index')
   @ApiParam({ name: 'index', required: true, type: Number })
