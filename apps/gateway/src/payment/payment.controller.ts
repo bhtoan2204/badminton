@@ -35,7 +35,7 @@ export class PaymentController {
   }
 
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create VNPAY payment URL' })
   @UseGuards(JwtAuthGuard)
   @Post('createOrderVNPAY')
@@ -43,9 +43,6 @@ export class PaymentController {
     const id_user = user.id_user;
     return this.paymentService.generateVnpay(id_user, order, ip);
   }
-
-
-
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Check order' })

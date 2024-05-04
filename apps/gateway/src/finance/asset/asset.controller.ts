@@ -28,7 +28,7 @@ export class AssetController {
     return this.expenseService.getAsset(currentUser.id_user, id_family, pageNumber, itemsPerPageNumber);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create Asset' })
   @Post('createAsset')
   async createAsset(@CurrentUser() currentUser, @Body() dto: CreateAssetDto){

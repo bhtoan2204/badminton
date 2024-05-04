@@ -44,14 +44,14 @@ export class ShoppingController {
     return this.shoppingService.getShoppingItem(currentUser.id_user, id_list, page, itemsPerPage);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create shopping list' })
   @Post('createShoppingList')
   async createShoppingList(@CurrentUser() currentUser, @Body() dto: CreateShoppingListDto) {
     return this.shoppingService.createShoppingList(currentUser.id_user, dto);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create shopping item' })
   @Post('createShoppingItem')
   async createShoppingItem(@CurrentUser() currentUser, @Body() dto: CreateShoppingItemDto) {

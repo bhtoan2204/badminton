@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { HouseholdController } from './household.controller';
 import { HouseholdService } from './household.service';
 import { DatabaseModule, RmqModule } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
-import * as Joi from 'joi';
 import { StorageModule } from './storage/storage.module';
+import * as Joi from 'joi';
+import { RoomModule } from './room/room.module';
 
 @Module({
   imports: [
@@ -18,9 +19,11 @@ import { StorageModule } from './storage/storage.module';
     }),
     RmqModule,
     DatabaseModule,
-    StorageModule
+    StorageModule,
+    forwardRef(() => RoomModule)
   ],
   controllers: [HouseholdController],
   providers: [HouseholdService],
+  exports: [RmqModule]
 })
 export class HouseholdModule {}

@@ -38,7 +38,7 @@ export class CalendarController {
     return this.calendarService.getCalendarDetail(currentUser.id_user, id_calendar);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a Calendar' })
   @Post('createCalendar')
   async createCalendar(@CurrentUser() currentUser, @Body() dto: CreateCalendarDto) {

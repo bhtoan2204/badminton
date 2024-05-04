@@ -46,7 +46,7 @@ export class IncomeController {
     return this.incomeService.getStasticalIncome(currentUser.id_user, id_family);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create Income' })
   @Post('createIncome')
   async createIncome(@CurrentUser() currentUser, @Body() dto: CreateIncomeDto) {

@@ -15,7 +15,7 @@ export class EducationController {
     private readonly educationService: EducationService
   ) { }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Get all education progress' })
   @Post('create')
   async createEducationProgress(@CurrentUser() currentUser, @Body() dto: CreateEducationDto) {
