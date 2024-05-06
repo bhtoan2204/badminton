@@ -5,10 +5,8 @@ import { FinanceService } from "./finance.service";
 import { FinanceController } from "./finance.controller";
 import { ExpenseditureModule } from "./expensediture/expensediture.module";
 import { IncomeModule } from "./income/income.module";
-import { LoanModule } from "./loan/loan.module";
-import { SavingModule } from "./saving/saving.module";
-import { InvestmentModule } from "./investment/investment.module";
 import { AssetModule } from "./asset/asset.module";
+import { WalletModule } from "./wallet/wallet.module";
 
 @Module({
   imports: [
@@ -16,9 +14,7 @@ import { AssetModule } from "./asset/asset.module";
     forwardRef(() => ExpenseditureModule),
     forwardRef(() => IncomeModule),
     forwardRef(() => AssetModule),
-    // forwardRef(() => InvestmentModule),
-    // forwardRef(() => LoanModule),
-    // forwardRef(() => SavingModule)
+    forwardRef(() => WalletModule)
   ],
   controllers: [FinanceController],
   providers: [FinanceService],

@@ -10,6 +10,7 @@ import { IncomeModule } from './income/income.module';
 import { InvestmentModule } from './investment/investment.module';
 import { LoanModule } from './loan/loan.module';
 import { SavingModule } from './saving/saving.module';
+import { FamilyWalletModule } from './familyWallet/familyWallet.module';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { SavingModule } from './saving/saving.module';
     forwardRef(() => IncomeModule),
     forwardRef(() => InvestmentModule),
     forwardRef(() => LoanModule),
-    forwardRef(() => SavingModule)
+    forwardRef(() => SavingModule),
+    forwardRef(() => FamilyWalletModule)
   ],
   controllers: [FinanceController],
   providers: [FinanceService],
