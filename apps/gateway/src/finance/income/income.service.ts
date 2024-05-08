@@ -9,23 +9,6 @@ export class IncomeService {
     @Inject(FINANCE_SERVICE) private financeClient: ClientProxy
   ) {}
 
-  async getIncomeSource() {
-    try {
-      const response = this.financeClient.send('financeClient/getIncomeSource', {})
-        .pipe(
-          timeout(5000),
-        );
-      const data = await lastValueFrom(response);
-      return data;
-    }
-    catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
-    }
-  }
-
   async getIncome(id_user: string, id_family: number, page: number, itemsPerPage: number) {
     try {
       const response = this.financeClient.send('financeClient/getIncome', {id_user, id_family, page, itemsPerPage})

@@ -15,13 +15,6 @@ export class ExpenseditureController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get expenseditures' })
-  @Get('getExpenseType')
-  async getExpenseType() {
-    return this.expenseService.getExpenseditureType();
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get expenseditures' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @Get('getExpense/:id_family')
