@@ -16,6 +16,24 @@ export class ChatService {
     private readonly entityManager: EntityManager
   ) { }
 
+  async updateConversation (userId: string, partnerId: string, newMessage: any) {
+    const conversationExists = await this.userConversationsRepository.findOne({ userId, 'conversations.receiverId': partnerId });
+
+    if (conversationExists) {
+      return this.userConversationsRepository.findOneAndUpdate(
+        { userId, 'conversations.receiverId': partnerId },
+        { $push: { 'conversations.$.messages': newMessage } },
+        { new: true }
+      );
+    } else {
+      return this.userConversationsRepository.findOneAndUpdate(
+        { userId },
+        { $addToSet: { conversations: { receiverId: partnerId, messages: [newMessage] } } },
+        { upsert: true, new: true }
+      );
+    }
+  };
+
   async base64ToUint8Array(base64: string): Promise<Uint8Array> {
     const buffer = Buffer.from(base64, 'base64');
     return new Uint8Array(buffer);
@@ -174,27 +192,10 @@ export class ChatService {
         isRead: false,
         timestamp: new Date(),
       };
-      const updateOrCreateConversation = async (userId: string, partnerId: string) => {
-        const conversationExists = await this.userConversationsRepository.findOne({ userId, 'conversations.receiverId': partnerId });
-
-        if (conversationExists) {
-          return this.userConversationsRepository.findOneAndUpdate(
-            { userId, 'conversations.receiverId': partnerId },
-            { $push: { 'conversations.$.messages': newMessage } },
-            { new: true }
-          );
-        } else {
-          return this.userConversationsRepository.findOneAndUpdate(
-            { userId },
-            { $addToSet: { conversations: { receiverId: partnerId, messages: [newMessage] } } },
-            { upsert: true, new: true }
-          );
-        }
-      };
 
       await Promise.all([
-        updateOrCreateConversation(id_user, messageData.receiverId),
-        updateOrCreateConversation(messageData.receiverId, id_user),
+        this.updateConversation(id_user, messageData.receiverId, newMessage),
+        this.updateConversation(messageData.receiverId, id_user, newMessage),
       ]);
 
       return newMessage;

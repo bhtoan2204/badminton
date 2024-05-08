@@ -196,15 +196,6 @@
         "tsConfigPath": "apps/finance/tsconfig.app.json"
       }
     },
-    "admin": {
-      "type": "application",
-      "root": "apps/admin",
-      "entryFile": "src/main",
-      "sourceRoot": "./",
-      "compilerOptions": {
-        "tsConfigPath": "apps/admin/tsconfig.app.json"
-      }
-    },
     "shopping": {
       "type": "application",
       "root": "apps/shopping",

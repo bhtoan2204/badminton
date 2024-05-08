@@ -31,7 +31,7 @@ export class ExpenseditureController {
   @EventPattern('financeClient/getExpenseditureById')
   async getExpenseById(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.expenseService.getExpenseditureById(data.id_user, data.id_family, data.id_expenditure);
+    return this.expenseService.getExpenditureById(data.id_user, data.id_family, data.id_expenditure);
   }
 
   @EventPattern('financeClient/getStatiscalExpensediture')
