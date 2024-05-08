@@ -10,23 +10,6 @@ export class ExpenseditureService {
     @Inject(FINANCE_SERVICE) private financeClient: ClientProxy
   ) { }
 
-  async getExpenseditureType() {
-    try {
-      const response = this.financeClient.send('financeClient/getExpenseditureType', {})
-        .pipe(
-          timeout(5000),
-        );
-      const data = await lastValueFrom(response);
-      return data;
-    }
-    catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
-    }
-  }
-
   async getExpensediture(id_user: string, id_family: number, page: number, itemsPerPage: number) {
     try {
       const response = this.financeClient.send('financeClient/getExpensediture', { id_user, id_family, page, itemsPerPage })

@@ -13,7 +13,25 @@ export class IncomeController {
   @EventPattern('financeClient/getIncomeSource')
   async getIncomeSource(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.incomeService.getIncomeSource();
+    return this.incomeService.getIncomeSource(data.id_user, data.id_family);
+  }
+
+  @EventPattern('financeClient/createIncomeSource')
+  async createIncomeSource(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.incomeService.createIncomeSource(data.id_user, data.dto);
+  }
+
+  @EventPattern('financeClient/updateIncomeSource')
+  async updateIncomeSource(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.incomeService.updateIncomeSource(data.id_user, data.dto);
+  }
+
+  @EventPattern('financeClient/deleteIncomeSource')
+  async deleteIncomeSource(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.incomeService.deleteIncomeSource(data.id_user, data.id_family, data.id_income_source);
   }
 
   @EventPattern('financeClient/getIncome')

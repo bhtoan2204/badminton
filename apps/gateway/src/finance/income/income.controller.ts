@@ -14,13 +14,6 @@ export class IncomeController {
   constructor(private readonly incomeService: IncomeService) { }
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get Income Source' })
-  @Get('getIncomeSource')
-  async getIncomeSource() {
-    return this.incomeService.getIncomeSource();
-  }
-
-  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get Income' })
   @ApiParam({ name: 'id_family', required: true })
   @ApiQuery({ name: 'page', required: false })

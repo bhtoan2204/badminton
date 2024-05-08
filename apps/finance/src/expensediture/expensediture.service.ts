@@ -16,13 +16,74 @@ export class ExpenseditureService {
     return NIL;
   }
 
-  async getExpenseditureType() {
+  async getExpenseditureType(id_user: string, id_family: number) {
     try {
-      const query = 'SELECT * FROM finance_expenditure_type';
-      const data = await this.entityManager.query(query);
+      const query = 'SELECT * FROM f_get_finance_expenditure_type($1, $2)';
+      const params = [id_user, id_family];
+      const data = await this.entityManager.query(query, params);
       return {
         data: data,
         message: 'Get expenditure type',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async createExpenseditureType(id_user: string, dto: any) {
+    try {
+      const { id_family, name } = dto;
+      const query = 'SELECT * FROM f_create_expenditure_type($1, $2, $3)';
+      const params = [id_user, id_family, name];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: {
+          id_family: id_family,
+          name: name,
+          id_expenditure_type: data[0].f_create_expenditure_type.id_expenditure_type
+        },
+        message: 'Create expenditure type',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async updateExpenseditureType(id_user: string, dto: any) {
+    try {
+      const { id_expense_type, id_family, name } = dto;
+      const query = 'SELECT * FROM f_update_expenditure_type($1, $2, $3, $4)';
+      const params = [id_user, id_expense_type, id_family, name];
+      await this.entityManager.query(query, params);
+      return {
+        data: "Update expenditure type successfully",
+        message: 'Update expenditure type',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async deleteExpenseditureType(id_user: string, id_family: number, id_expenditure_type: number) {
+    try {
+      const query = 'SELECT * FROM f_delete_expenditure_type($1, $2, $3)';
+      const params = [id_user, id_family, id_expenditure_type];
+      await this.entityManager.query(query, params);
+      return {
+        data: 'Expenditure type deleted successfully',
+        message: 'Delete expenditure type',
       }
     }
     catch (error) {

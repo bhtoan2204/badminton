@@ -16,10 +16,11 @@ export class IncomeService {
     return NIL;
   }
 
-  async getIncomeSource() {
+  async getIncomeSource(id_user: string, id_family: number) {
     try {
-      const query = 'SELECT * FROM finance_income_source';
-      const data = await this.entityManager.query(query);
+      const query = 'SELECT * FROM f_get_finance_income_source($1, $2)';
+      const params = [id_user, id_family];
+      const data = await this.entityManager.query(query, params);
       return {
         data: data,
         message: 'Get income source',
@@ -29,6 +30,70 @@ export class IncomeService {
       throw new RpcException({
         message: error.message,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async createIncomeSource(id_user: string, dto: any) {
+    try {
+      const { id_family, name } = dto;
+      const query = 'SELECT * FROM f_create_finance_income_source($1, $2, $3)';
+      const params = [id_user, id_family, name];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: {
+          id_family: id_family,
+          name: name,
+          id_income_source: data[0].f_create_finance_income_source
+        },
+        message: 'Create income source',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async updateIncomeSource(id_user: string, dto: any) {
+    try {
+      const { id_income, id_family, name } = dto;
+      const query = 'SELECT * FROM f_update_finance_income_source($1, $2, $3, $4)';
+      const params = [id_user, id_income, id_family, name];
+      await this.entityManager.query(query, params);
+      return {
+        data: {
+          id_income_source: id_income,
+          income_name: name,
+          id_family
+        },
+        message: 'Update income source',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async deleteIncomeSource(id_user: string, id_family: number, id_income_source: number) {
+    try {
+      const query = 'SELECT * FROM f_delete_finance_income_source($1, $2, $3)';
+      const params = [id_user, id_family, id_income_source];
+      await this.entityManager.query(query, params);
+      return {
+        data: 'Income source deleted successfully',
+        message: 'Delete income source',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
       });
     }
   }

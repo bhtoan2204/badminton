@@ -13,7 +13,25 @@ export class ExpenseditureController {
   @EventPattern('financeClient/getExpenseditureType')
   async getExpenseType(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.expenseService.getExpenseditureType();
+    return this.expenseService.getExpenseditureType(data.id_user, data.id_family);
+  }
+
+  @EventPattern('financeClient/createExpenseditureType')
+  async createExpenseType(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.expenseService.createExpenseditureType(data.id_user, data.dto);
+  }
+
+  @EventPattern('financeClient/updateExpenseditureType')
+  async updateExpenseType(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.expenseService.updateExpenseditureType(data.id_user, data.dto);
+  }
+
+  @EventPattern('financeClient/deleteExpenseditureType')
+  async deleteExpenseType(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.expenseService.deleteExpenseditureType(data.id_user, data.id_family, data.id_expenditure_type);
   }
 
   @EventPattern('financeClient/getExpensediture')
