@@ -5,7 +5,7 @@ import { AdminGuard } from "../../auth/guard/authorize/role.guard";
 import { Admin } from "../../utils";
 import { SearchService } from "./search.service";
 
-@ApiTags('Logs')
+@ApiTags('Admin Logs')
 @Controller('logs')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, AdminGuard)

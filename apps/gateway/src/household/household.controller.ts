@@ -145,7 +145,7 @@ export class HouseholdController {
     if (!dto.item_name) dto.item_name = null;
     if (!dto.item_description) dto.item_description = null;
     if (!dto.id_room) dto.id_room = null;
-    return this.householdService.updateItem(currentUser.id_user, dto, file ? file : null);
+    return this.householdService.updateItem(currentUser.id_user, dto, file);
   }
 
   @HttpCode(HttpStatus.OK)

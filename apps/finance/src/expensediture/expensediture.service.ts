@@ -51,7 +51,7 @@ export class ExpenseditureService {
     }
   }
 
-  async getExpenseditureById(id_user: string, id_family: number, id_expenditure: number) {
+  async getExpenditureById(id_user: string, id_family: number, id_expenditure: number) {
     try {
       const query = 'SELECT * FROM f_get_expenditure_by_id($1, $2, $3)';
       const params = [id_user, id_family, id_expenditure];
@@ -77,24 +77,6 @@ export class ExpenseditureService {
       return {
         data: data,
         message: 'Get statiscal expenditure',
-      }
-    }
-    catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
-      });
-    }
-  }
-
-  async getExpenditureById(id_user: string, id_family: number, id_expenditure: number) {
-    try {
-      const query = 'SELECT * FROM f_get_expenditure_by_id($1, $2, $3)';
-      const params = [id_user, id_family, id_expenditure];
-      const data = await this.entityManager.query(query, params);
-      return {
-        data: data,
-        message: 'Get expenditure by id',
       }
     }
     catch (error) {

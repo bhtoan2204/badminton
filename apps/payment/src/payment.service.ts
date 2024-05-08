@@ -121,10 +121,10 @@ export class PaymentService {
         vnp_Locale: order.language || 'vn',
         vnp_CurrCode: 'VND',
         vnp_TxnRef: orderId,
-        vnp_OrderInfo: `Pay for transaction code: ${orderId}`,
+        vnp_OrderInfo: `Pay for transaction code: ${String(orderId)}`,
         vnp_OrderType: 'other',
         vnp_Amount: order.amount * 100,
-        vnp_ReturnUrl: `${this.vnpReturnUrl}${orderId}`,
+        vnp_ReturnUrl: `${this.vnpReturnUrl}${String(orderId)}`,
         vnp_IpAddr: fullIp.split(":").pop(),
         vnp_CreateDate: moment().format('YYYYMMDDHHmmss'),
         ...(order.bankCode && { vnp_BankCode: order.bankCode })
