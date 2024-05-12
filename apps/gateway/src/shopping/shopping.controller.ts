@@ -1,10 +1,12 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { ShoppingService } from "./shopping.service";
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { CurrentUser } from "../utils";
 import { CreateShoppingListDto } from "./dto/createShoppingList.dto";
 import { CreateShoppingItemDto } from "./dto/createShoppingItem.dto";
+import { UpdateShoppingListDto } from "./dto/updateShoppingList.dto";
+import { UpdateShoppingItemDto } from "./dto/updateShoppingItem.dto";
 
 @ApiTags('Shopping')
 @Controller('shopping')
@@ -56,5 +58,33 @@ export class ShoppingController {
   @Post('createShoppingItem')
   async createShoppingItem(@CurrentUser() currentUser, @Body() dto: CreateShoppingItemDto) {
     return this.shoppingService.createShoppingItem(currentUser.id_user, dto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update shopping list' })
+  @Put('updateShoppingList')
+  async updateShoppingList(@CurrentUser() currentUser, @Body() dto: UpdateShoppingListDto) {
+    return this.shoppingService.updateShoppingList(currentUser.id_user, dto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update shopping item' })
+  @Put('updateShoppingItem')
+  async updateShoppingItem(@CurrentUser() currentUser, @Body() dto: UpdateShoppingItemDto) {
+    return this.shoppingService.updateShoppingItem(currentUser.id_user, dto);
+  }
+
+  @HttpCode(204)
+  @ApiOperation({ summary: 'Delete shopping list' })
+  @Delete('deleteShoppingList/:id_family/:id_list')
+  async deleteShoppingList(@CurrentUser() currentUser, @Param('id_list') id_list: number, @Param('id_family') id_family: number){
+    return this.shoppingService.deleteShoppingList(currentUser.id_user, id_family, id_list);
+  }
+
+  @HttpCode(204)
+  @ApiOperation({ summary: 'Delete shopping item' })
+  @Delete('deleteShoppingItem/:id_family/:id_list/:id_item')
+  async deleteShoppingItem(@CurrentUser() currentUser, @Param('id_list') id_list: number, @Param('id_item') id_item: number, @Param('id_family') id_family: number) {
+    return this.shoppingService.deleteShoppingItem(currentUser.id_user, id_family, id_list, id_item);
   }
 }
