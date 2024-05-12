@@ -88,4 +88,68 @@ export class ShoppingService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async updateShoppingList(id_user: string, dto: any) {
+    try {
+      const response = this.shoppingClient.send('shoppingClient/updateShoppingList', { id_user, dto })
+      .pipe(
+        timeout(5000),
+      );
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async updateShoppingItem(id_user: string, dto: any) {
+    try {
+      const response = this.shoppingClient.send('shoppingClient/updateShoppingItem', { id_user, dto })
+      .pipe(
+        timeout(5000),
+      );
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async deleteShoppingList(id_user: string, id_family: number, id_list: number) {
+    try {
+      const response = this.shoppingClient.send('shoppingClient/deleteShoppingList', { id_user, id_family, id_list })
+      .pipe(
+        timeout(5000),
+      );
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async deleteShoppingItem(id_user: number, id_family: number, id_list: number, id_item: number) {
+    try {
+      const response = this.shoppingClient.send('shoppingClient/deleteShoppingItem', { id_user, id_list, id_item, id_family })
+      .pipe(
+        timeout(5000),
+      );
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }

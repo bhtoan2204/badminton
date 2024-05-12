@@ -25,7 +25,7 @@ export class ShoppingController {
   @EventPattern('shoppingClient/getShoppingItem')
   async getShoppingItem(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.shoppingService.getShoppingItem(data.id_user, data.id_family, data.page, data.itemsPerPage);
+    return this.shoppingService.getShoppingItem(data.id_user, data.id_list, data.page, data.itemsPerPage);
   }
 
   @EventPattern('shoppingClient/createShoppingList')
@@ -38,5 +38,29 @@ export class ShoppingController {
   async createShoppingItem(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.shoppingService.createShoppingItem(data.id_user, data.dto);
+  }
+
+  @EventPattern('shoppingClient/updateShoppingList')
+  async updateShoppingList(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.shoppingService.updateShoppingList(data.id_user, data.dto);
+  }
+
+  @EventPattern('shoppingClient/updateShoppingItem')
+  async updateShoppingItem(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.shoppingService.updateShoppingItem(data.id_user, data.dto);
+  }
+
+  @EventPattern('shoppingClient/deleteShoppingList')
+  async deleteShoppingList(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.shoppingService.deleteShoppingList(data.id_user, data.id_family, data.id_list);
+  }
+
+  @EventPattern('shoppingClient/deleteShoppingItem')
+  async deleteShoppingItem(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.shoppingService.deleteShoppingItem(data.id_user, data.id_family, data.id_list, data.id_item);
   }
 }
