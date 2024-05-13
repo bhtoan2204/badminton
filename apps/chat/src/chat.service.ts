@@ -16,7 +16,7 @@ export class ChatService {
     private readonly entityManager: EntityManager
   ) { }
 
-  async updateConversation (userId: string, partnerId: string, newMessage: any) {
+  async updateConversationWithExistOne (userId: string, partnerId: string, newMessage: any) {
     const conversationExists = await this.userConversationsRepository.findOne({ userId, 'conversations.receiverId': partnerId });
 
     if (conversationExists) {
@@ -233,8 +233,8 @@ export class ChatService {
       };
 
       await Promise.all([
-        this.updateConversation(id_user, messageData.receiverId, newMessage),
-        this.updateConversation(messageData.receiverId, id_user, newMessage),
+        this.updateConversationWithExistOne(id_user, messageData.receiverId, newMessage),
+        this.updateConversationWithExistOne(messageData.receiverId, id_user, newMessage),
       ]);
 
       return newMessage;
