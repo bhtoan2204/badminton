@@ -31,6 +31,13 @@ export class ChatController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get family chats list' })
+  @Get('getFamilyChats')
+  async getFamilyChats(@CurrentUser() user) {
+    return this.chatService.getFamilyChats(user.id_user);
+  }
+
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get messages of family' })
   @Get('getFamilyMessages/:id_family/:index')
   @ApiParam({ name: 'id_family', required: true, description: 'The ID of the family' })
