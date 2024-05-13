@@ -21,6 +21,12 @@ export class ChatController {
     return this.chatService.getMessages(data.sender_id, data.receiver_id, data.index);
   }
 
+  @EventPattern('chatClient/getFamilyChats')
+  async getFamilyChats(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.chatService.getFamilyChats(data.familyId);
+  }
+
   @EventPattern('chatClient/getFamilyMessages')
   async getFamilyMessages(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);

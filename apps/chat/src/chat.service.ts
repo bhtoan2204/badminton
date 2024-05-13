@@ -144,6 +144,31 @@ export class ChatService {
     }
   }
 
+  async getFamilyChats(familyId): Promise<any> {
+    try {
+      const conversations = await this.familyConversationsRepository.aggregate([
+        { $match: { familyId: { $in: familyId } } },
+        { $unwind: "$conversations" },
+        { $sort: { "conversations.timestamp": -1 } },
+        { $group: {
+          _id: "$_id",
+          lastMessage: { $first: "$conversations" },
+          lastUpdated: { $first: "$updated_at" }
+        } },
+        { $sort: { "lastMessage.timestamp": -1 } },
+        { $limit: familyId.length }
+      ]).exec();
+
+      return conversations;
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
   async getFamilyMessages(id_user: string, id_family: number, index: number): Promise<any> {
     try {
       const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
@@ -163,13 +188,27 @@ export class ChatService {
         { conversations: { 
           $slice: [{ $reverseArray: "$conversations" }, skip, limit] 
         } }
-      ).exec();
+      ).lean().exec();
 
       if (!messages || messages.length === 0) {
         return [];
       }
 
-      return messages.conversations;
+      const userIds = messages.conversations.reduce((uniqueIds, message) => {
+        if (!uniqueIds.includes(message.senderId)) {
+          uniqueIds.push(message.senderId);
+        }
+        return uniqueIds;
+      }, []);
+
+      const userInfos = await this.entityManager.query('SELECT * FROM f_get_users_infos($1)', [userIds]);
+      const userInfoMap = new Map(userInfos.map(user => [user.id_user, user]));
+
+      const result = messages.conversations.map(conversation => ({
+        ...conversation,
+        userInfo: userInfoMap.get(conversation.senderId)
+      }));
+      return result;
     }
     catch (error) {
       throw new RpcException({
@@ -289,6 +328,24 @@ export class ChatService {
     }
   }
 
+  async updateOrCreateConversation (userId: string, partnerId: string, newMessage: any) {
+    const conversationExists = await this.userConversationsRepository.findOne({ userId, 'conversations.receiverId': partnerId });
+
+    if (conversationExists) {
+      return this.userConversationsRepository.findOneAndUpdate(
+        { userId, 'conversations.receiverId': partnerId },
+        { $push: { 'conversations.$.messages': newMessage } },
+        { new: true }
+      );
+    } else {
+      return this.userConversationsRepository.findOneAndUpdate(
+        { userId },
+        { $addToSet: { conversations: { receiverId: partnerId, messages: [newMessage] } } },
+        { upsert: true, new: true }
+      );
+    }
+  };
+
   async saveImageMessage(id_user, messageData) {
     try {
       const fileName = 'chat_' + id_user + '_' + Date.now();
@@ -313,27 +370,9 @@ export class ChatService {
         timestamp: new Date(),
       };
 
-      const updateOrCreateConversation = async (userId: string, partnerId: string) => {
-        const conversationExists = await this.userConversationsRepository.findOne({ userId, 'conversations.receiverId': partnerId });
-
-        if (conversationExists) {
-          return this.userConversationsRepository.findOneAndUpdate(
-            { userId, 'conversations.receiverId': partnerId },
-            { $push: { 'conversations.$.messages': newMessage } },
-            { new: true }
-          );
-        } else {
-          return this.userConversationsRepository.findOneAndUpdate(
-            { userId },
-            { $addToSet: { conversations: { receiverId: partnerId, messages: [newMessage] } } },
-            { upsert: true, new: true }
-          );
-        }
-      };
-
       await Promise.all([
-        updateOrCreateConversation(id_user, messageData.receiverId),
-        updateOrCreateConversation(messageData.receiverId, id_user),
+        this.updateOrCreateConversation(id_user, messageData.receiverId, newMessage),
+        this.updateOrCreateConversation(messageData.receiverId, id_user, newMessage),
       ]);
 
       return newMessage;

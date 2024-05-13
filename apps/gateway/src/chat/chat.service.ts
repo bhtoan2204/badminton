@@ -36,6 +36,22 @@ export class ChatService {
     }
   }
 
+  async getFamilyChats(id_user: string) {
+    try {
+      const listFamilyId = this.familyClient.send('family/get_all_Family', id_user).pipe(timeout(5000));
+      const family = await lastValueFrom(listFamilyId);
+      const familyId = family.map((item: any) => item.id_family);
+      const response = this.chatClient.send('chatClient/getFamilyChats', { familyId }).pipe(timeout(5000));
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
   async getFamilyMessages(id_user: string, id_family: number, index: number) {
     try {
       const response = this.chatClient.send('chatClient/getFamilyMessages', { id_user, id_family, index }).pipe(timeout(5000));
