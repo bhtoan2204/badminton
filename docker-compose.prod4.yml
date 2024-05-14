@@ -21,3 +21,14 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+
+  invoice:
+    image: mjkundta/invoice:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/invoice/Dockerfile
+      target: production
+    command: node dist/apps/invoice/src/main
+    restart: on-failure
+    environment:
+      - NODE_ENV=production

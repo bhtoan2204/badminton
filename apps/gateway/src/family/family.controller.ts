@@ -45,7 +45,7 @@ export class FamilyController {
     return this.familyService.updateFamily(currentUser.id_user, UpdateFamilyDTO);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(204)
   @ApiOperation({ summary: 'Delete a family' })
   @Delete('deleteFamily')
   async deleteFamily(@Query('id_family') id_family: number, @CurrentUser() currentUser) {
@@ -74,7 +74,7 @@ export class FamilyController {
     return this.familyService.addMember(currentUser.id_user, data);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(204)
   @ApiOperation({ summary: 'Delete member' })
   @Delete('deleteMember')
   async deleteMember(@CurrentUser() currentUser, @Body() member: DeleteMemberDTO) {

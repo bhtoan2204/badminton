@@ -52,7 +52,7 @@ export class EducationController {
     return this.educationService.updateDetailEducationProgress(currentUser.id_user, dto);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(204)
   @ApiOperation({ summary: 'Delete education progress' })
   @Delete('delete/:id_education_progress/:id_family')
   @ApiParam({ name: 'id_family', required: true, type: Number })

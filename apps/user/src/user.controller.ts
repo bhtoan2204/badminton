@@ -2,7 +2,6 @@ import { Controller } from "@nestjs/common";
 import { Ctx, EventPattern, Payload, RmqContext } from "@nestjs/microservices";
 import { RmqService } from "@app/common";
 import { UserService } from "./user.service";
-import { CreateAccountDto } from "./dto/createAccount.dto";
 
 @Controller()
 export class UserController {
@@ -14,8 +13,7 @@ export class UserController {
   @EventPattern('userClient/create_account')
   async handleUserCreated(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    const payload: CreateAccountDto = data.createAccountDto;
-    return await this.userService.createAccount(payload);
+    return await this.userService.createAccount(data.createAccountDto);
   }
 
   @EventPattern('userClient/change_password')

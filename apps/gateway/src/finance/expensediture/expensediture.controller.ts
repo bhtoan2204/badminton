@@ -52,7 +52,7 @@ export class ExpenseditureController {
     return this.expenseService.updateExpensediture(currentUser.id_user, dto);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(204)
   @ApiOperation({ summary: 'Delete expensediture' })
   @Delete('deleteExpense/:id_family/:id_income')
   async deleteExpense(@CurrentUser() currentUser, @Param('id_income') id_income: number, @Param('id_family') id_family: number) {

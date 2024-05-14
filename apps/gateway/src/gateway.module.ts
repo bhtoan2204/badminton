@@ -17,6 +17,7 @@ import { HouseholdModule } from './household/household.module';
 import { FinanceModule } from './finance/finance.module';
 import { ShoppingModule } from './shopping/shopping.module';
 import * as Joi from 'joi';
+import { InvoiceModule } from './invoice/invoice.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import * as Joi from 'joi';
         RABBIT_MQ_HOUSEHOLD_QUEUE: Joi.string().required(),
         RABBIT_MQ_FINANCE_QUEUE: Joi.string().required(),
         RABBIT_MQ_SHOPPING_QUEUE: Joi.string().required(),
+        RABBIT_MQ_INVOICE_QUEUE: Joi.string().required(),
 
         GOOGLE_CLIENT_ID: Joi.string().required(),
         GOOGLE_CLIENT_SECRET: Joi.string().required(),
@@ -66,6 +68,7 @@ import * as Joi from 'joi';
     HouseholdModule,
     FinanceModule,
     ShoppingModule,
+    InvoiceModule,
     AdminModule
   ],
   providers: [],
