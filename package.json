@@ -73,6 +73,7 @@
     "rss-parser": "^3.13.0",
     "rxjs": "^7.8.1",
     "socket.io": "^4.7.4",
+    "tesseract.js": "^5.1.0",
     "ts-proto": "^1.166.4",
     "ts-protoc-gen": "^0.15.0",
     "typeorm": "^0.3.19",

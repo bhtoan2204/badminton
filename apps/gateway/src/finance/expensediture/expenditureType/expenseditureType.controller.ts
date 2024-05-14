@@ -34,7 +34,7 @@ export class ExpenseditureTypeController {
     return this.expenseTypeService.updateExpenseditureType(currentUser.id_user, dto);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(204)
   @ApiOperation({ summary: 'Delete expensediture' })
   @Delete('deleteExpenseType/:id_family/:id_expenditure_type')
   async deleteExpenseType(@CurrentUser() currentUser, @Param('id_expenditure_type') id_expenditure_type: number, @Param('id_family') id_family: number) {

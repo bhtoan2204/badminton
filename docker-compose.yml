@@ -253,6 +253,20 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+  
+  invoice:
+    image: mjkundta/invoice:latest
+    build:
+      context: .
+      dockerfile: ./apps/invoice/Dockerfile
+      target: development
+    command: npm run start:dev invoice
+    depends_on:
+      - gateway
+    restart: on-failure
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
 
   filebeat:
     image: mjkundta/filebeat:latest

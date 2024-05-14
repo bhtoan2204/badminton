@@ -162,7 +162,7 @@ export class HouseholdController {
     return this.householdService.inputConsumableItem(currentUser.id_user, dto);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(204)
   @ApiOperation({ summary: 'Delete household item' })
   @ApiParam({ name: 'id_family', required: true, description: 'The ID of the family' })
   @ApiParam({ name: 'id_item', required: true, description: 'The ID of the item' })

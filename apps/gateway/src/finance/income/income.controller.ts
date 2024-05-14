@@ -53,7 +53,7 @@ export class IncomeController {
     return this.incomeService.updateIncome(currentUser.id_user, dto);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(204)
   @ApiOperation({ summary: 'Delete Income' })
   @Delete('deleteIncome/:id_family/:id_income')
   async deleteIncome(@CurrentUser() currentUser, @Param('id_income') id_income: number, @Param('id_family') id_family: number){
