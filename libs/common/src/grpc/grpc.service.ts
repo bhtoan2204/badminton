@@ -14,6 +14,8 @@ export class GrpcService {
                 package: this.configService.get<string>(`GRPC_${service}_PACKAGE`),
                 protoPath: join(dirname(__filename), '..', this.configService.get<string>(`GRPC_${service}_PROTO_PATH`)),
                 url: this.configService.get<string>(`GRPC_${service}_URL`),
+                maxReceiveMessageLength: 500 * 1024 * 1024,
+                maxSendMessageLength: 500 * 1024 * 1024
             },
         };
     }

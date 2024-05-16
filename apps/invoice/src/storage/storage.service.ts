@@ -12,15 +12,15 @@ export class StorageService implements OnModuleInit {
     this.storageService = this.storageClient.getService<StorageServiceClient>(STORAGE_SERVICE_NAME);
   }
 
-  async uploadFile(request: UploadFileRequest): Promise<UploadFileResponse> {
-    return this.storageService.uploadFile(request).toPromise();
+  async uploadImageInvoice(request: UploadFileRequest): Promise<UploadFileResponse> {
+    return this.storageService.uploadImageInvoice(request).toPromise();
   }
 
   async readFile(request: ReadFileRequest): Promise<ReadFileResponse> {
     return this.storageService.readFile(request).toPromise();
   }
 
-  async deleteFile(request: DeleteFileRequest): Promise<DeleteFileResponse> {
-    return this.storageService.deleteFile(request).toPromise();
+  async deleteImageInvoice(request: DeleteFileRequest): Promise<DeleteFileResponse> {
+    return this.storageService.deleteImageInvoice(request).toPromise();
   }
 }

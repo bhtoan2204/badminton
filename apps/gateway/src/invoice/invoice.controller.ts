@@ -15,6 +15,9 @@ import { CreateInvoiceTypeDto } from "./dto/createInvoiceType.dto";
 import { UpdateInvoiceTypeDto } from "./dto/updateInvoiceType.dto";
 import { CreateInvoiceDto } from "./dto/createInvoice.dto";
 import { UpdateInvoiceDto } from "./dto/updateInvoice.dto";
+import { CreateInvoiceItemDto } from "./dto/createInvoiceItem.dto";
+import { UpdateInvoiceItemDto } from "./dto/updateInvoiceItem.dto";
+import { InvoiceImageFileInterceptor } from "../user/interceptor/invoiceImageFile.interceptor";
 
 // @WebSocketGateway({
 //   cors: { origin: '*', },
@@ -82,16 +85,106 @@ export class InvoiceController {
 
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create invoice' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        invoiceImg: {
+          type: 'string',
+          format: 'binary',
+          description: 'The image of the invoice (optional)',
+        },
+        id_family: {
+          type: 'number',
+          description: 'The ID of the family',
+        },
+        invoice_name: {
+          type: 'string',
+          description: 'The name of the invoice',
+        },
+        id_invoice_type: {
+          type: 'number',
+          description: 'The ID of the invoice type',
+        },
+        invoice_date: {
+          type: 'date',
+          description: 'The invoice date',
+        },
+        description: {
+          type: 'string',
+          description: 'The description of the invoice (optional)',
+        },
+      },
+      required: ["id_family", "id_invoice_type", "invoice_name"],
+    },
+  })
+  @UseInterceptors(FileInterceptor('invoiceImg', new ImageFileInterceptor().createMulterOptions()))
   @Post('createInvoice')
-  async createInvoice(@CurrentUser() currentUser, @Body() dto: CreateInvoiceDto){
-    return this.invoiceService.createInvoice(currentUser.id_user, dto);
+  async createInvoice(@CurrentUser() currentUser, @Body() body: any, @UploadedFile() file: Express.Multer.File){
+    const dto : CreateInvoiceDto = {
+      id_family: parseInt(body.id_family),
+      invoice_name: body.invoice_name,
+      id_invoice_type: parseInt(body.id_invoice_type),
+      invoice_date: body.invoice_date || null,
+      description: body.description,
+    }
+    return this.invoiceService.createInvoice(currentUser.id_user, dto, file);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update invoice' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        invoiceImg: {
+          type: 'string',
+          format: 'binary',
+          description: 'The image of the invoice (optional)',
+        },
+        id_invoice: {
+          type: 'number',
+          description: 'The ID of the invoice',
+        },
+        id_family: {
+          type: 'number',
+          description: 'The ID of the family',
+        },
+        invoice_name: {
+          type: 'string',
+          description: 'The name of the invoice (optional)',
+        },
+        id_invoice_type: {
+          type: 'number',
+          description: 'The ID of the invoice type (optional)',
+        },
+        invoice_date: {
+          type: 'date',
+          description: 'The invoice date (optional)',
+        },
+        description: {
+          type: 'string',
+          description: 'The description of the invoice (optional)',
+        },
+      },
+      required: ["id_family", "id_invoice"],
+    },
+  })
+  @UseInterceptors(FileInterceptor('invoiceImg', new ImageFileInterceptor().createMulterOptions()))
   @Put('updateInvoice')
-  async updateInvoice(@CurrentUser() currentUser, @Body() dto: UpdateInvoiceDto){
-    return this.invoiceService.updateInvoice(currentUser.id_user, dto);
+  async updateInvoice(@CurrentUser() currentUser, @Body() data: any, @UploadedFile() file: Express.Multer.File) {
+    const dto : UpdateInvoiceDto = {
+      id_invoice: parseInt(data.id_invoice),
+      id_family: parseInt(data.id_family),
+      id_invoice_type: parseInt(data.id_invoice_type) || null,
+      invoice_name: data.invoice_name || null,
+      invoice_date: data.invoice_date || null,
+      description: data.description || null,
+    }
+    console.log(dto);
+    return this.invoiceService.updateInvoice(currentUser.id_user, dto, file);
   }
 
   @HttpCode(204)
@@ -101,6 +194,46 @@ export class InvoiceController {
   @ApiParam({name: 'id_invoice', required: true, type: Number})
   async deleteInvoice(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice') id_invoice: number){
     return this.invoiceService.deleteInvoice(currentUser.id_user, id_family, id_invoice);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all invoices items' })
+  @Get('getAllInvoiceItems/:id_family')
+  @ApiParam({name: 'id_family', required: true, type: Number})
+  async getAllInvoiceItems(@CurrentUser() currentUser, @Param('id_family') id_family: number) {
+    return this.invoiceService.getAllInvoiceItems(currentUser.id_user, id_family);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get invoice item detail' })
+  @Get('getInvoiceItemDetail/:id_family/:id_invoice_item')
+  @ApiParam({name: 'id_family', required: true, type: Number})
+  @ApiParam({name: 'id_invoice_item', required: true, type: Number})
+  async getInvoiceItemDetail(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice_item') id_invoice_item: number) {
+    return this.invoiceService.getInvoiceItemDetail(currentUser.id_user, id_family, id_invoice_item);
+  }
+
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create invoice item' })
+  @Post('createInvoiceItem')
+  async createInvoiceItem(@CurrentUser() currentUser, @Body() dto: CreateInvoiceItemDto) {
+    return this.invoiceService.createInvoiceItem(currentUser.id_user, dto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update invoice item' })
+  @Put('updateInvoiceItem')
+  async updateInvoiceItem(@CurrentUser() currentUser, @Body() dto: UpdateInvoiceItemDto) {
+    return this.invoiceService.updateInvoiceItem(currentUser.id_user, dto);
+  }
+
+  @HttpCode(204)
+  @ApiOperation({ summary: 'Delete invoice item' })
+  @Delete('deleteInvoiceItem/:id_family/:id_invoice_item')
+  @ApiParam({name: 'id_family', required: true, type: Number})
+  @ApiParam({name: 'id_invoice_item', required: true, type: Number})
+  async deleteInvoiceItem(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice_item') id_invoice_item: number) {
+    return this.invoiceService.deleteInvoiceItem(currentUser.id_user, id_family, id_invoice_item);
   }
 
   // async onModuleInit() {
