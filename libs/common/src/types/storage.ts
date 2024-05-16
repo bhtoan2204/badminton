@@ -54,6 +54,10 @@ export interface StorageServiceClient {
   uploadImageHousehold(request: UploadFileRequest): Observable<UploadFileResponse>;
 
   deleteImageHousehold(request: DeleteFileRequest): Observable<DeleteFileResponse>;
+
+  uploadImageInvoice(request: UploadFileRequest): Observable<UploadFileResponse>;
+
+  deleteImageInvoice(request: DeleteFileRequest): Observable<DeleteFileResponse>;
 }
 
 type UploadFileResult = Promise<UploadFileResponse> | Observable<UploadFileResponse> | UploadFileResponse;
@@ -88,11 +92,19 @@ export interface StorageServiceController {
   deleteImageHousehold(
     request: DeleteFileRequest,
   ): Promise<DeleteFileResponse> | Observable<DeleteFileResponse> | DeleteFileResponse;
+
+  uploadImageInvoice(
+    request: UploadFileRequest,
+  ): UploadFileResult;
+
+  deleteImageInvoice(
+    request: DeleteFileRequest,
+  ): Promise<DeleteFileResponse> | Observable<DeleteFileResponse> | DeleteFileResponse;
 }
 
 export function StorageServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["uploadFile", "readFile", "deleteFile", "uploadImageChat", "uploadImageStep", "deleteImageStep", "uploadImageHousehold", "deleteImageHousehold"];
+    const grpcMethods: string[] = ["uploadFile", "readFile", "deleteFile", "uploadImageChat", "uploadImageStep", "deleteImageStep", "uploadImageHousehold", "deleteImageHousehold", "uploadImageInvoice", "deleteImageInvoice"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("StorageService", method)(constructor.prototype[method], method, descriptor);

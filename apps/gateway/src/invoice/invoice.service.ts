@@ -88,9 +88,9 @@ export class InvoiceService {
     }
   }
 
-  async createInvoice(id_user: string, dto: any) {
+  async createInvoice(id_user: string, dto: any, file: any) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/createInvoice', { id_user, dto }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/createInvoice', { id_user, dto, file }).pipe(timeout(5000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -101,9 +101,9 @@ export class InvoiceService {
     }
   }
 
-  async updateInvoice(id_user: string, dto: any) {
+  async updateInvoice(id_user: string, dto: any, file: any) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/updateInvoice', { id_user, dto }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/updateInvoice', { id_user, dto, file }).pipe(timeout(5000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -126,5 +126,69 @@ export class InvoiceService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async updateInvoiceItem(id_user: string, dto: any) {
+    try {
+      const response = this.invoiceClient.send('invoiceClient/updateInvoiceItem', { id_user, dto }).pipe(timeout(5000));
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async createInvoiceItem(id_user: string, dto: any) {
+    try {
+      const response = this.invoiceClient.send('invoiceClient/createInvoiceItem', { id_user, dto }).pipe(timeout(5000));
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async getInvoiceItemDetail(id_user: string, id_family: number, id_invoice_item: number) {
+    try {
+      const response = this.invoiceClient.send('invoiceClient/getInvoiceItemDetail', { id_user, id_family, id_invoice_item }).pipe(timeout(5000));
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async getAllInvoiceItems(id_user: string, id_family: number) {
+    try {
+      const response = this.invoiceClient.send('invoiceClient/getAllInvoiceItems', { id_user, id_family }).pipe(timeout(5000));
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
   
+  async deleteInvoiceItem(id_user: string, id_family: number, id_invoice_item: number) {
+    try {
+      const response = this.invoiceClient.send('invoiceClient/deleteInvoiceItem', { id_user, id_family, id_invoice_item }).pipe(timeout(5000));
+      return await lastValueFrom(response);
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }

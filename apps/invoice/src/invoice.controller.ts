@@ -49,13 +49,13 @@ export class InvoiceController {
   @EventPattern('invoiceClient/createInvoice')
   async createInvoice(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.invoiceService.createInvoice(data.id_user, data.dto);
+    return this.invoiceService.createInvoice(data.id_user, data.dto, data.file);
   }
 
   @EventPattern('invoiceClient/updateInvoice')
   async updateInvoice(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.invoiceService.updateInvoice(data.id_user, data.dto);
+    return this.invoiceService.updateInvoice(data.id_user, data.dto, data.file);
   }
 
   @EventPattern('invoiceClient/deleteInvoice')
