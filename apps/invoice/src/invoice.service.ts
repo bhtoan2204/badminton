@@ -220,4 +220,41 @@ export class InvoiceService {
       });
     }
   }
+
+  async createInvoiceItems(id_user: string, dto: any) {
+    try {
+      const { id_family, id_invoice, items } = dto;
+      const query = 'SELECT * FROM f_create_invoice_items($1, $2, $3, $4)';
+      const params = [id_user, id_family, id_invoice, JSON.stringify(items)];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data,
+        message: 'Create invoice items',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message || 'Internal server error',
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async getAllInvoiceItems(id_user: number, id_family: number, id_invoice: number) {
+    try {
+      const query = 'SELECT * FROM f_get_all_invoice_items($1, $2, $3)';
+      const params = [id_user, id_family, id_invoice];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data,
+        message: 'Get all invoice items',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message || 'Internal server error',
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
 }

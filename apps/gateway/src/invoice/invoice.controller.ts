@@ -198,10 +198,11 @@ export class InvoiceController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all invoices items' })
-  @Get('getAllInvoiceItems/:id_family')
+  @Get('getAllInvoiceItems/:id_family/:id_invoice')
   @ApiParam({name: 'id_family', required: true, type: Number})
-  async getAllInvoiceItems(@CurrentUser() currentUser, @Param('id_family') id_family: number) {
-    return this.invoiceService.getAllInvoiceItems(currentUser.id_user, id_family);
+  @ApiParam({name: 'id_invoice', required: true, type: Number})
+  async getAllInvoiceItems(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice') id_invoice: number) {
+    return this.invoiceService.getAllInvoiceItems(currentUser.id_user, id_family, id_invoice);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -215,9 +216,10 @@ export class InvoiceController {
 
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create invoice item' })
-  @Post('createInvoiceItem')
-  async createInvoiceItem(@CurrentUser() currentUser, @Body() dto: CreateInvoiceItemDto) {
-    return this.invoiceService.createInvoiceItem(currentUser.id_user, dto);
+  @ApiBody({ type: CreateInvoiceItemDto })
+  @Post('createInvoiceItems')
+  async createInvoiceItems(@CurrentUser() currentUser, @Body() dto: CreateInvoiceItemDto) {
+    return this.invoiceService.createInvoiceItems(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)
