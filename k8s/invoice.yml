@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: invoice-deployment
+  labels:
+    app: invoice
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: invoice
+  template:
+    metadata:
+      labels:
+        app: invoice
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: invoice
+          image: mjkundta/invoice:<TAG>
+          command: ["node", "dist/apps/invoice/src/main"]
+          resources:
+            limits:
+              cpu: "150m"
+              memory: "256Mi"
+          env:
+            - name: NODE_ENV
+              value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: invoice
+  labels:
+    app: invoice
+spec:
+  selector:
+    app: invoice
+  ports:
+    - protocol: TCP
+      port: 8094
+      targetPort: 8094
+  type: ClusterIP
