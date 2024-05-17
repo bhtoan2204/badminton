@@ -140,9 +140,9 @@ export class InvoiceService {
     }
   }
 
-  async createInvoiceItem(id_user: string, dto: any) {
+  async createInvoiceItems(id_user: string, dto: any) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/createInvoiceItem', { id_user, dto }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/createInvoiceItems', { id_user, dto }).pipe(timeout(5000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -166,9 +166,9 @@ export class InvoiceService {
     }
   }
 
-  async getAllInvoiceItems(id_user: string, id_family: number) {
+  async getAllInvoiceItems(id_user: string, id_family: number, id_invoice: number) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/getAllInvoiceItems', { id_user, id_family }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/getAllInvoiceItems', { id_user, id_family, id_invoice }).pipe(timeout(5000));
       return await lastValueFrom(response);
     }
     catch (error) {

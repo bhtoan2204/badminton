@@ -1,5 +1,27 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+
+class CreateInvoiceItem {
+  @ApiProperty({ required: true, type: String })
+  @IsNotEmpty()
+  @IsString()
+  item_name: string;
+
+  @ApiProperty({ required: true, type: String })
+  @IsOptional()
+  @IsString()
+  item_description: string;
+
+  @ApiProperty({ required: true, type: Number })
+  @IsNotEmpty()
+  @IsNumber()
+  quantity: number;
+
+  @ApiProperty({ required: true, type: Number })
+  @IsNotEmpty()
+  @IsNumber()
+  unit_price: number;
+}
 
 export class CreateInvoiceItemDto {
   @ApiProperty({ required: true, type: Number })
@@ -12,18 +34,7 @@ export class CreateInvoiceItemDto {
   @IsNumber()
   id_invoice: number;
 
-  @ApiProperty({ required: true, type: Number })
+  @ApiProperty({ required: true, type: [CreateInvoiceItem] })
   @IsNotEmpty()
-  @IsString()
-  item_description: number;
-
-  @ApiProperty({ required: true, type: Number })
-  @IsNotEmpty()
-  @IsNumber()
-  quantity: number;
-
-  @ApiProperty({ required: true, type: Number })
-  @IsNotEmpty()
-  @IsNumber()
-  unit_price: number;
+  items: CreateInvoiceItem[]; 
 }
