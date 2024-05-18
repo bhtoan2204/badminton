@@ -1,3 +1,5 @@
+
+
 -- Hàm mã hóa
 CREATE OR REPLACE FUNCTION encryption(data TEXT)
 RETURNS TEXT AS $$
@@ -78,7 +80,7 @@ BEGIN
         EXECUTE 'CREATE USER "' || NEW.id_user || '" WITH PASSWORD ' || quote_literal(NEW.password) || ';';
         NEW.password := encryption(NEW.password);
        
-        EXECUTE 'GRANT CONNECT ON DATABASE famfund_i2wq_a3fq TO "' || NEW.id_user || '";';
+        EXECUTE 'GRANT CONNECT ON DATABASE defaultdb TO "' || NEW.id_user || '";';
 
     ELSIF TG_OP = 'UPDATE' then
     	EXECUTE 'ALTER USER "' || NEW.id_user || '" WITH PASSWORD ' || quote_literal(NEW.password) || ';';
@@ -128,7 +130,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-select compare_passwords('Password123', '\xc30d040903029ac876ed0fa8fd7b70d241019803e40a4f3ed07f1e6a79286f0ff61bc5dc03fdaf6e3e6b1cb26a958b6999aa974ca523627b4b9a16a9df6dc8b3ab94346a8cdb1e57fc9f733c71ea5ec78715')
+select compare_passwords('Password123', '\xc30d04090302e3cafa12c4ca3c7278d2410139f267b9edcefe55db2f532e6a01cd8b4197b9a39c80b0d3a6db9f5fbc64d37b6b4ebd3af92e22f35b94ca60a6676d300571185c5afa49174af6ddf3fa51d6b0')
 --CREATE OR REPLACE PROCEDURE create_users_from_table()
 --LANGUAGE plpgsql
 --AS $$
@@ -150,7 +152,6 @@ select compare_passwords('Password123', '\xc30d040903029ac876ed0fa8fd7b70d241019
 --        END;
 --    END LOOP;
 --END;
-CREATE or replace function
 
 
 

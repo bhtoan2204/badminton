@@ -133,7 +133,7 @@ export class IncomeService {
     }
   }
 
-  async getIncomeByMonth(id_user: string, id_family: number,month : number, year: number) {
+  async getIncomeByMonth(id_user: string, id_family: number, month : number, year: number) {
     try {
       const query = 'SELECT * FROM f_get_income_by_month($1, $2, $3, $4)';
       const params = [id_user, id_family, month, year];
