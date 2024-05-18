@@ -78,13 +78,17 @@ BEGIN
             {"id_income_source": 3, "category": "Investments"},
             {"id_income_source": 4, "category": "Freelance"},
             {"id_income_source": 5, "category": "Rental"},
-            {"id_income_source": 6, "category": "Other"}
+            {"id_income_source": 6, "category": "Other"},
+            {"id_income_source": 7, "category": "Pension"},
+            {"id_income_source": 8, "category": "Gifts"},
+            {"id_income_source": 9, "category": "Royalties"}
         ]'::jsonb
     );
 
     RETURN NEW;
 END;
 $$;
+
 
    
  CREATE TRIGGER after_insert_family
