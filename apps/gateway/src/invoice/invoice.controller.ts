@@ -4,7 +4,6 @@ import { InvoiceService } from "./invoice.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ImageFileInterceptor } from "../user/interceptor/imageFile.interceptor";
 import * as Tesseract from 'tesseract.js';
-
 import * as fs from 'fs';
 import * as path from 'path';
 import { WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
@@ -17,7 +16,6 @@ import { CreateInvoiceDto } from "./dto/createInvoice.dto";
 import { UpdateInvoiceDto } from "./dto/updateInvoice.dto";
 import { CreateInvoiceItemDto } from "./dto/createInvoiceItem.dto";
 import { UpdateInvoiceItemDto } from "./dto/updateInvoiceItem.dto";
-import { InvoiceImageFileInterceptor } from "../user/interceptor/invoiceImageFile.interceptor";
 
 // @WebSocketGateway({
 //   cors: { origin: '*', },
@@ -70,7 +68,9 @@ export class InvoiceController {
   @ApiParam({name: 'id_family', required: true, type: Number})
   @ApiQuery({name: 'page', required: false, type: Number})
   @ApiQuery({name: 'itemsPerPage', required: false, type: Number})
-  async getInvoices(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Query('page') page: number, @Query('itemsPerPage') itemsPerPage: number){
+  async getInvoices(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Query('page') page: number, @Query('itemsPerPage') itemsPerPage: number) {
+    if (!page) page = 1;
+    if (!itemsPerPage) itemsPerPage = 10;
     return this.invoiceService.getInvoices(currentUser.id_user, id_family, page, itemsPerPage);
   }
 
@@ -257,31 +257,14 @@ export class InvoiceController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Convert image to text (for testing)' })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ schema: { type: 'object', properties: { avatar: { type: 'string', format: 'binary', }, }, }, })
+  @ApiBody({ schema: { type: 'object', properties: { invoiceImg: { type: 'string', format: 'binary', }, }, }, })
   @UseInterceptors(FileInterceptor('invoiceImg', new ImageFileInterceptor().createMulterOptions()))
   @Post('upload')
   async convertImageToText(@UploadedFile() file: Express.Multer.File, @Req() req: any) {
     if (!file) {
       throw new HttpException('File not uploaded', HttpStatus.BAD_REQUEST);
     }
-    const tempDir = path.join(__dirname, 'temp');
-    if (!fs.existsSync(tempDir)) {
-      fs.mkdirSync(tempDir);
-    }
-    const filePath = path.join(tempDir, file.originalname);
-    try {
-      fs.writeFileSync(filePath, file.buffer);
-      const { data: { text } } = await Tesseract.recognize(filePath, 'eng', {
-        logger: info => console.log(`Status ${info.status} in progress ${info.progress * 100}`)// this.server.to(req.socket.id).emit('progress', info.progress)
-      });
-      // this.server.to(req.socket.id).emit('result', { text: text, done: true });
-      return text;
-
-    } catch (error) {
-      console.error('Error:', error);
-      throw new HttpException('Failed to recognize text from image', HttpStatus.INTERNAL_SERVER_ERROR);
-    } finally {
-      fs.unlinkSync(filePath);
-    }
+    const textInput = await this.invoiceService.convertImageToText(file);
+    return await this.invoiceService.convertTextToInvoiceItems(textInput);
   }
 }
