@@ -97,6 +97,59 @@ export class IncomeService {
       });
     }
   }
+  async getIncomeByDay(id_user: string, id_family: number, date: string) {
+    try {
+      const query = 'SELECT * FROM f_get_income_by_date($1, $2, $3)';
+      const params = [id_user, id_family, date];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data,
+        message: 'Get income by date',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async getIncomeByYear(id_user: string, id_family: number, year: number) {
+    try {
+      const query = 'SELECT * FROM f_get_income_by_year($1, $2, $3)';
+      const params = [id_user, id_family, year];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data,
+        message: 'Get income by year',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async getIncomeByMonth(id_user: string, id_family: number,month : number, year: number) {
+    try {
+      const query = 'SELECT * FROM f_get_income_by_month($1, $2, $3, $4)';
+      const params = [id_user, id_family, month, year];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data,
+        message: 'Get income by month',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
 
   async getIncome(id_user: string, id_family: number, page: number, itemsPerPage: number) {
     try {

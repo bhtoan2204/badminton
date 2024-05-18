@@ -14,16 +14,35 @@ export class IncomeController {
   constructor(private readonly incomeService: IncomeService) { }
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get Income' })
+  @ApiOperation({ summary: 'Get Income by day' })
   @ApiParam({ name: 'id_family', required: true })
-  @ApiQuery({ name: 'page', required: false })
-  @ApiQuery({ name: 'itemsPerPage', required: false })
-  @Get('getIncome/:id_family')
-  async getIncome(@CurrentUser() currentUser, @Query('page') page: number, @Query('itemsPerPage') itemsPerPage: number, @Param('id_family') id_family: number) {
-    if (!page) page = 1;
-    if (!itemsPerPage) itemsPerPage = 10;
-    return this.incomeService.getIncome(currentUser.id_user, id_family, page, itemsPerPage);
+  @ApiQuery({ name: 'date', required: false })
+  @Get('getIncomeByDay/:id_family')
+  async getIncomeByDay(@CurrentUser() currentUser,  @Param('id_family') id_family: number, @Query('date') date: string) {
+
+    return this.incomeService.getIncomeByDay(currentUser.id_user, id_family, date);
   }
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get Income by month' })
+  @ApiParam({ name: 'id_family', required: true })
+  @ApiQuery({ name: 'month', required: false })
+  @ApiQuery({ name: 'year', required: false })
+  @Get('getIncomeByMonth/:id_family')
+  async getIncomeByMonth(@CurrentUser() currentUser,  @Param('id_family') id_family: number, @Query('year') year: number, @Query('month') month: number) {
+
+    return this.incomeService.getIncomeByMonth(currentUser.id_user, id_family, month, year);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get Income by year' })
+  @ApiParam({ name: 'id_family', required: true })
+  @ApiQuery({ name: 'year', required: false })
+  @Get('getIncomeByYear/:id_family')
+  async getIncomeByYear(@CurrentUser() currentUser,  @Param('id_family') id_family: number, @Query('year') year: number) {
+
+    return this.incomeService.getIncomeByYear(currentUser.id_user, id_family, year);
+  }
+
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get Income By Id' })
