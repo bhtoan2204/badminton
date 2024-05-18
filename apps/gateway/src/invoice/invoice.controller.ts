@@ -207,11 +207,12 @@ export class InvoiceController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get invoice item detail' })
-  @Get('getInvoiceItemDetail/:id_family/:id_invoice_item')
+  @Get('getInvoiceItemDetail/:id_family/:id_invoice/:id_item')
   @ApiParam({name: 'id_family', required: true, type: Number})
-  @ApiParam({name: 'id_invoice_item', required: true, type: Number})
-  async getInvoiceItemDetail(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice_item') id_invoice_item: number) {
-    return this.invoiceService.getInvoiceItemDetail(currentUser.id_user, id_family, id_invoice_item);
+  @ApiParam({name: 'id_invoice', required: true, type: Number})
+  @ApiParam({name: 'id_item', required: true, type: Number})
+  async getInvoiceItemDetail(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice') id_invoice: number, @Param('id_item') id_item: number) {
+    return this.invoiceService.getInvoiceItemDetail(currentUser.id_user, id_family, id_invoice, id_item);
   }
 
   @HttpCode(HttpStatus.CREATED)
@@ -231,11 +232,12 @@ export class InvoiceController {
 
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete invoice item' })
-  @Delete('deleteInvoiceItem/:id_family/:id_invoice_item')
+  @Delete('deleteInvoiceItem/:id_family/:id_invoice/:id_item')
   @ApiParam({name: 'id_family', required: true, type: Number})
-  @ApiParam({name: 'id_invoice_item', required: true, type: Number})
-  async deleteInvoiceItem(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice_item') id_invoice_item: number) {
-    return this.invoiceService.deleteInvoiceItem(currentUser.id_user, id_family, id_invoice_item);
+  @ApiParam({name: 'id_invoice', required: true, type: Number})
+  @ApiParam({name: 'id_item', required: true, type: Number})
+  async deleteInvoiceItem(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice') id_invoice: number, @Param('id_item') id_item: number) {
+    return this.invoiceService.deleteInvoiceItem(currentUser.id_user, id_family, id_invoice, id_item);
   }
 
   // async onModuleInit() {
