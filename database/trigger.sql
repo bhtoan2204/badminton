@@ -63,3 +63,15 @@ delete
     on
     public.role for each row execute function p_delete_role();
    
+   
+   
+   
+ 
+   
+   
+   
+   
+   
+   
+   
+   

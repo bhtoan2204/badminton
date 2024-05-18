@@ -10,9 +10,44 @@ export class ExpenseditureService {
     @Inject(FINANCE_SERVICE) private financeClient: ClientProxy
   ) { }
 
-  async getExpensediture(id_user: string, id_family: number, page: number, itemsPerPage: number) {
+  async getExpenseByDate(id_user: string, id_family, date: any) {
     try {
-      const response = this.financeClient.send('financeClient/getExpensediture', { id_user, id_family, page, itemsPerPage })
+      const response = this.financeClient.send('financeClient/getExpenseByDate', { id_user, id_family, date})
+        .pipe(
+          timeout(5000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+
+  }
+
+  async getExpenseByMonth(id_user: string, id_family, month, year) {
+    try {
+      const response = this.financeClient.send('financeClient/getExpenseByMonth', { id_user, id_family, month, year})
+        .pipe(
+          timeout(5000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+
+  }
+  async getExpenseByYear(id_user: string, id_family, year) {
+    try {
+      const response = this.financeClient.send('financeClient/getExpenseByYear', { id_user, id_family, year})
         .pipe(
           timeout(5000),
         );

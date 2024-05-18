@@ -10,10 +10,20 @@ export class ExpenseditureController {
     private readonly rmqService: RmqService
   ) { }
 
-  @EventPattern('financeClient/getExpenseditureType')
-  async getExpenseType(@Payload() data: any, @Ctx() context: RmqContext) {
+  @EventPattern('financeClient/getExpenseByDate')
+  async getExpenseByDate(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.expenseService.getExpenseditureType(data.id_user, data.id_family);
+    return this.expenseService.getExpenseByDate(data.id_user, data.id_family, data.date);
+  }
+  @EventPattern('financeClient/getExpenseByMonth')
+  async getExpenseByMonth(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.expenseService.getExpenseByMonth(data.id_user, data.id_family, data.month, data.year);
+  }
+  @EventPattern('financeClient/getExpenseByYear')
+  async getExpenseByYear(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.expenseService.getExpenseByYear(data.id_user,  data.id_family, data.year);
   }
 
   @EventPattern('financeClient/createExpenseditureType')
@@ -34,10 +44,10 @@ export class ExpenseditureController {
     return this.expenseService.deleteExpenseditureType(data.id_user, data.id_family, data.id_expenditure_type);
   }
 
-  @EventPattern('financeClient/getExpensediture')
+  @EventPattern('financeClient/getExpenseditureType')
   async getExpense(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.expenseService.getExpensediture(data.id_user, data.id_family, data.page, data.itemsPerPage);
+    return this.expenseService.getExpenseditureType(data.id_user, data.id_family)
   }
 
   @EventPattern('financeClient/createExpensediture')
@@ -52,11 +62,11 @@ export class ExpenseditureController {
     return this.expenseService.getExpenditureById(data.id_user, data.id_family, data.id_expenditure);
   }
 
-  @EventPattern('financeClient/getStatiscalExpensediture')
-  async getStatiscalExpense(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return this.expenseService.getStatiscalExpensediture(data.id_user, data.id_family);
-  }
+  // @EventPattern('financeClient/getStatiscalExpensediture')
+  // async getStatiscalExpense(@Payload() data: any, @Ctx() context: RmqContext) {
+  //   this.rmqService.ack(context);
+  //   return this.expenseService.getStatiscalExpensediture(data.id_user, data.id_family);
+  // }
 
   @EventPattern('financeClient/updateExpensediture')
   async updateExpense(@Payload() data: any, @Ctx() context: RmqContext) {

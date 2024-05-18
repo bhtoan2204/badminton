@@ -770,5 +770,371 @@ END;
 $function$
 ;
 
+-- DROP FUNCTION public.f_get_finance_expenditure_type(uuid, int4);
 
+CREATE OR REPLACE FUNCTION public.f_get_finance_expenditure_type(p_id_user uuid, p_id_family integer)
+RETURNS SETOF jsonb
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_exists BOOLEAN;
+BEGIN
+    SELECT EXISTS (
+        SELECT 1
+        FROM member_family
+        WHERE id_user = p_id_user AND id_family = p_id_family
+    ) INTO v_exists;
+
+    IF NOT v_exists THEN
+        RAISE EXCEPTION 'User is not a member of the specified family.';
+    END IF;
+
+    RETURN QUERY
+    SELECT expenditure_details
+    FROM finance_expenditure_type
+    WHERE id_family = p_id_family; 
+END;
+$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.f_get_finance_expenditure_type(uuid, int4) OWNER TO avnadmin;
+GRANT ALL ON FUNCTION public.f_get_finance_expenditure_type(uuid, int4) TO avnadmin;
+
+
+CREATE OR REPLACE FUNCTION public.f_create_expenditure_category(p_id_user uuid, p_id_family integer, p_category character varying)
+RETURNS VOID
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_exists BOOLEAN;
+    v_expenditure_details JSONB;
+    v_max_id INTEGER;
+BEGIN
+    -- Kiểm tra sự tồn tại của người dùng trong gia đình
+    SELECT EXISTS (
+        SELECT 1
+        FROM member_family
+        WHERE id_user = p_id_user AND id_family = p_id_family
+    ) INTO v_exists;
+
+    -- Nếu user không thuộc family, raise exception
+    IF NOT v_exists THEN
+        RAISE EXCEPTION 'User is not a member of the specified family.';
+    END IF;
+
+    -- Truy vấn expenditure_details từ bảng finance_expenditure_type
+    SELECT expenditure_details INTO v_expenditure_details
+    FROM finance_expenditure_type
+    WHERE id_family = p_id_family;
+
+    -- Nếu không tìm thấy expenditure_details, tạo một đối tượng JSON mới
+    IF v_expenditure_details IS NULL THEN
+        v_expenditure_details := '[]';
+    END IF;
+
+    -- Tìm id_expense_type lớn nhất trong expenditure_details
+    SELECT MAX((category->>'id_expense_type')::INTEGER) INTO v_max_id FROM jsonb_array_elements(v_expenditure_details) AS category;
+
+    -- Nếu không tìm thấy id_expense_type, gán giá trị 0
+    IF v_max_id IS NULL THEN
+        v_max_id := 0;
+    END IF;
+
+    -- Thêm một loại chi tiêu mới vào JSON với id_expense_type lớn nhất + 1
+    v_expenditure_details := v_expenditure_details || jsonb_build_array(jsonb_build_object('category', p_category, 'id_expense_type', v_max_id + 1));
+
+    -- Cập nhật lại expenditure_details trong bảng finance_expenditure_type
+    UPDATE finance_expenditure_type
+    SET expenditure_details = v_expenditure_details
+    WHERE id_family = p_id_family;
+END;
+$function$;
+
+select * from f_delete_expenditure_type('28905675-858b-4a93-a283-205899779622', 96, 8)
+
+CREATE OR REPLACE FUNCTION public.f_delete_expenditure_type(p_id_user uuid, p_id_family integer, p_id_expenditure_type integer)
+RETURNS VOID
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_exists BOOLEAN;
+    v_expenditure_details JSONB;
+BEGIN
+    -- Kiểm tra sự tồn tại của người dùng trong gia đình
+    SELECT EXISTS (
+        SELECT 1
+        FROM member_family
+        WHERE id_user = p_id_user AND id_family = p_id_family
+    ) INTO v_exists;
+
+    -- Nếu user không thuộc family, raise exception
+    IF NOT v_exists THEN
+        RAISE EXCEPTION 'User is not a member of the specified family.';
+    END IF;
+
+    -- Truy vấn expenditure_details từ bảng finance_expenditure_type
+    SELECT expenditure_details INTO v_expenditure_details
+    FROM finance_expenditure_type
+    WHERE id_family = p_id_family;
+
+    -- Nếu expenditure_details không tồn tại hoặc không chứa id_expenditure_type, không có gì để xóa
+    IF v_expenditure_details IS NULL OR NOT EXISTS (SELECT * FROM jsonb_array_elements(v_expenditure_details) AS category WHERE (category->>'id_expense_type')::INTEGER = p_id_expenditure_type) THEN
+        RAISE EXCEPTION 'Expenditure type with specified ID does not exist.';
+    END IF;
+
+    -- Xóa loại chi tiêu từ expenditure_details
+    v_expenditure_details := (SELECT jsonb_agg(category) FROM jsonb_array_elements(v_expenditure_details) AS category WHERE (category->>'id_expense_type')::INTEGER <> p_id_expenditure_type);
+
+    -- Cập nhật lại expenditure_details trong bảng finance_expenditure_type
+    UPDATE finance_expenditure_type
+    SET expenditure_details = v_expenditure_details
+    WHERE id_family = p_id_family;
+END;
+$function$;
+
+-- DROP FUNCTION public.f_get_expenditure(text, int4, int4, int4);
+
+CREATE OR REPLACE FUNCTION public.f_get_expenditure(p_id_user text, p_id_family integer, p_page integer, p_items_per_page integer)
+ RETURNS TABLE(id_expenditure integer, id_family integer, id_created_by uuid, expense_name character varying, amount numeric, expenditure_date date, description text)
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_offset INTEGER;
+BEGIN
+    v_offset := (p_page - 1) * p_items_per_page;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM member_family
+        WHERE member_family.id_user = p_id_user::uuid AND member_family.id_family = p_id_family
+    ) THEN
+        RAISE EXCEPTION 'User is not a member of the specified family.';
+    END IF;
+
+    RETURN QUERY
+    SELECT e.id_expenditure, e.id_family, e.id_created_by, et.expense_name, e.amount, e.expenditure_date, e.description
+    FROM finance_expenditure e
+    INNER JOIN finance_expenditure_type et ON e.id_expense_type = et.id_expense_type
+    WHERE e.id_family = p_id_family
+    ORDER BY e.expenditure_date DESC, e.id_expenditure
+    LIMIT p_items_per_page OFFSET v_offset;
+END;
+$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.f_get_expenditure(text, int4, int4, int4) OWNER TO avnadmin;
+GRANT ALL ON FUNCTION public.f_get_expenditure(text, int4, int4, int4) TO avnadmin;
+
+
+CREATE OR REPLACE FUNCTION public.f_get_category_name(p_id_family integer, p_id_expense_type integer)
+RETURNS TEXT
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_category_name TEXT;
+BEGIN
+    -- Lấy tên của category dựa trên id_expense_type và id_family
+   SELECT category->>'category' into v_category_name
+	FROM (
+	    SELECT jsonb_array_elements(finance_expenditure_type.expenditure_details) AS category
+	    FROM finance_expenditure_type 
+	    WHERE id_family = p_id_family
+	) AS subquery
+	WHERE (category->>'id_expense_type')::integer = p_id_expense_type;
+
+    -- Kiểm tra xem có tìm thấy category không
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Expense type with specified ID and family does not exist.';
+    END IF;
+
+    RETURN v_category_name;
+END;
+$function$;
+
+
+select * from f_get_category_name(96, 1)
+
+
+
+CREATE OR REPLACE FUNCTION public.f_get_expense_by_date(p_id_user uuid, p_id_family integer, p_expense_date date)
+RETURNS TABLE (
+    id_expense_type integer,
+    expense_category text,
+    expense_amount numeric
+)
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_user_exists BOOLEAN;
+BEGIN
+    SELECT EXISTS (
+        SELECT 1
+        FROM member_family
+        WHERE id_user = p_id_user AND id_family = p_id_family
+    ) INTO v_user_exists;
+
+    IF NOT v_user_exists THEN
+        RAISE EXCEPTION 'User is not a member of the specified family.';
+    END IF;
+
+    RETURN QUERY
+    SELECT 
+        fe.id_expense_type,
+        f_get_category_name(p_id_family, fe.id_expense_type) AS expense_category,
+        fe.amount
+    FROM 
+        finance_expenditure fe
+    WHERE 
+        fe.id_family = p_id_family 
+        AND fe.expenditure_date = p_expense_date;
+END;
+$function$;
+
+
+select * from f_get_expense_by_date('28905675-858b-4a93-a283-205899779622', 96, '2024-05-02')
+
+select * from f_get_expense_by_month('28905675-858b-4a93-a283-205899779622', 96, 5, 2024)
+
+select * from f_get_expense_by_year('28905675-858b-4a93-a283-205899779622', 96,  2024)
+
+
+CREATE OR REPLACE FUNCTION public.f_get_expense_by_month(
+    p_id_user uuid, 
+    p_id_family integer, 
+    p_month integer, 
+    p_year integer
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_user_exists BOOLEAN;
+    v_result jsonb := '[]'::jsonb;
+    v_current_date date;
+    v_total numeric;
+    v_categories jsonb;
+    v_category jsonb;
+BEGIN
+    -- Kiểm tra xem người dùng có thuộc gia đình không
+    SELECT EXISTS (
+        SELECT 1
+        FROM member_family
+        WHERE id_user = p_id_user AND id_family = p_id_family
+    ) INTO v_user_exists;
+
+    IF NOT v_user_exists THEN
+        RAISE EXCEPTION 'User is not a member of the specified family.';
+    END IF;
+
+    -- Lấy các ngày chi tiêu trong tháng/năm
+    FOR v_current_date IN
+        SELECT DISTINCT expenditure_date::date
+        FROM finance_expenditure
+        WHERE id_family = p_id_family 
+          AND EXTRACT(MONTH FROM expenditure_date) = p_month
+          AND EXTRACT(YEAR FROM expenditure_date) = p_year
+    LOOP
+        -- Tính tổng chi tiêu cho ngày hiện tại
+        SELECT COALESCE(SUM(amount), 0)
+        INTO v_total
+        FROM finance_expenditure
+        WHERE id_family = p_id_family 
+          AND expenditure_date::date = v_current_date;
+
+        -- Lấy danh sách các loại chi tiêu cho ngày hiện tại
+        v_categories := '[]'::jsonb;
+        FOR v_category IN
+            SELECT jsonb_build_object(
+                       'name', f_get_category_name(p_id_family, fe.id_expense_type),
+                       'amount', COALESCE(SUM(fe.amount), 0)
+                   ) AS category
+            FROM finance_expenditure fe
+            WHERE fe.id_family = p_id_family 
+              AND fe.expenditure_date::date = v_current_date
+            GROUP BY fe.id_expense_type
+        LOOP
+            v_categories := v_categories || v_category;
+        END LOOP;
+
+        -- Thêm kết quả vào JSON chính
+        v_result := v_result || jsonb_build_object(
+            'date', v_current_date,
+            'total', v_total,
+            'categories', v_categories
+        )::jsonb;
+    END LOOP;
+
+    RETURN v_result;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.f_get_expense_by_year(
+    p_id_user uuid, 
+    p_id_family integer, 
+    p_year integer
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_user_exists BOOLEAN;
+    v_result jsonb := '[]'::jsonb;
+    v_current_month integer;
+    v_total numeric;
+    v_categories jsonb;
+    v_category jsonb;
+BEGIN
+    -- Kiểm tra xem người dùng có thuộc gia đình không
+    SELECT EXISTS (
+        SELECT 1
+        FROM member_family
+        WHERE id_user = p_id_user AND id_family = p_id_family
+    ) INTO v_user_exists;
+
+    IF NOT v_user_exists THEN
+        RAISE EXCEPTION 'User is not a member of the specified family.';
+    END IF;
+
+    -- Duyệt qua các tháng trong năm
+    FOR v_current_month IN 1..12 LOOP
+        -- Tính tổng chi tiêu cho tháng hiện tại
+        SELECT COALESCE(SUM(amount), 0)
+        INTO v_total
+        FROM finance_expenditure
+        WHERE id_family = p_id_family 
+          AND EXTRACT(MONTH FROM expenditure_date) = v_current_month
+          AND EXTRACT(YEAR FROM expenditure_date) = p_year;
+
+        -- Lấy danh sách các loại chi tiêu cho tháng hiện tại
+        v_categories := '[]'::jsonb;
+        FOR v_category IN
+            SELECT jsonb_build_object(
+                       'name', f_get_category_name(p_id_family, fe.id_expense_type),
+                       'amount', COALESCE(SUM(fe.amount), 0)
+                   ) AS category
+            FROM finance_expenditure fe
+            WHERE fe.id_family = p_id_family 
+              AND EXTRACT(MONTH FROM fe.expenditure_date) = v_current_month
+              AND EXTRACT(YEAR FROM fe.expenditure_date) = p_year
+            GROUP BY fe.id_expense_type
+        LOOP
+            v_categories := v_categories || v_category;
+        END LOOP;
+
+        -- Thêm kết quả vào JSON chính nếu có chi tiêu trong tháng
+        IF v_total > 0 THEN
+            v_result := v_result || jsonb_build_object(
+                'month', v_current_month,
+                'total', v_total,
+                'categories', v_categories
+            )::jsonb;
+        END IF;
+    END LOOP;
+
+    RETURN v_result;
+END;
+$function$;
 
