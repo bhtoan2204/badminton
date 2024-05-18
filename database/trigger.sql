@@ -51,7 +51,6 @@ BEGIN
     RETURN NEW;
 END;
 $function$
-
 create trigger tr_insert_role after
 insert
     on
@@ -63,10 +62,36 @@ delete
     on
     public.role for each row execute function p_delete_role();
    
+------------------------------------------
+
+CREATE OR REPLACE FUNCTION insert_income_sources()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO finance_income_source (id_family, income_details)
+    VALUES (
+        NEW.id_family, 
+        '[
+            {"id_income_source": 1, "category": "Salary"},
+            {"id_income_source": 2, "category": "Business"},
+            {"id_income_source": 3, "category": "Investments"},
+            {"id_income_source": 4, "category": "Freelance"},
+            {"id_income_source": 5, "category": "Rental"},
+            {"id_income_source": 6, "category": "Other"}
+        ]'::jsonb
+    );
+
+    RETURN NEW;
+END;
+$$;
+
    
-   
-   
- 
+ CREATE TRIGGER after_insert_family
+AFTER INSERT ON family
+FOR EACH ROW
+EXECUTE FUNCTION insert_income_sources();
+
    
    
    

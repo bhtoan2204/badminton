@@ -26,6 +26,57 @@ export class IncomeService {
     }
   }
 
+  async getIncomeByDay(id_user: string, id_family: number, date: string) {
+    try {
+      const response = this.financeClient.send('financeClient/getIncomeByDay', {id_user, id_family, date})
+        .pipe(
+          timeout(5000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async getIncomeByMonth(id_user: string, id_family: number, month: number, year: number) {
+    try {
+      const response = this.financeClient.send('financeClient/getIncomeByMonth', {id_user, id_family, month, year})
+        .pipe(
+          timeout(5000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async getIncomeByYear(id_user: string, id_family: number, year: number) {
+    try {
+      const response = this.financeClient.send('financeClient/getIncomeByYear', {id_user, id_family, year})
+        .pipe(
+          timeout(5000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
   async getIncomeById(id_user: string, id_family: number, id_income: number) {
     try {
       const response = this.financeClient.send('financeClient/getIncomeById', {id_user, id_family, id_income})
