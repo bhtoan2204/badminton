@@ -220,4 +220,95 @@ export class InvoiceService {
       });
     }
   }
+
+  async createInvoiceItems(id_user: string, dto: any) {
+    try {
+      const { id_family, id_invoice, items } = dto;
+      const query = 'SELECT * FROM f_create_invoice_items($1, $2, $3, $4)';
+      const params = [id_user, id_family, id_invoice, JSON.stringify(items)];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data,
+        message: 'Create invoice items',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message || 'Internal server error',
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async getAllInvoiceItems(id_user: string, id_family: number, id_invoice: number) {
+    try {
+      const query = 'SELECT * FROM f_get_all_invoice_items($1, $2, $3)';
+      const params = [id_user, id_family, id_invoice];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data,
+        message: 'Get all invoice items',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message || 'Internal server error',
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async getInvoiceItemDetail(id_user: string, id_family: number, id_invoice: number, id_invoice_item: number) {
+    try {
+      const query = 'SELECT * FROM f_get_invoice_item_detail($1, $2, $3, $4)';
+      const params = [id_user, id_family, id_invoice, id_invoice_item];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data[0],
+        message: 'Get invoice item detail',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message || 'Internal server error',
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async updateInvoiceItems(id_user: string, dto: any) {
+    try {
+      const { id_family, id_invoice, id_item, item_name, item_description, quantity, unit_price } = dto;
+      const query = 'SELECT * FROM f_update_invoice_items($1, $2, $3, $4, $5, $6, $7, $8)';
+      const params = [id_user, id_family, id_invoice, id_item, item_name, item_description, quantity, unit_price];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data,
+        message: 'Update invoice items',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message || 'Internal server error',
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async deleteInvoiceItem(id_user: string, id_family: number, id_invoice: number, id_item: number) {
+    try {
+      const query = 'SELECT * FROM f_delete_invoice_item($1, $2, $3, $4)';
+      const params = [id_user, id_family, id_invoice, id_item];
+      await this.entityManager.query(query, params);
+      return {
+        message: 'Delete invoice item',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message || 'Internal server error',
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
 }

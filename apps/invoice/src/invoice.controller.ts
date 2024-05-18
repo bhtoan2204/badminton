@@ -63,4 +63,34 @@ export class InvoiceController {
     this.rmqService.ack(context);
     return this.invoiceService.deleteInvoice(data.id_user, data.id_family, data.id_invoice);
   }
+
+  @EventPattern('invoiceClient/createInvoiceItems')
+  async createInvoiceItems(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.invoiceService.createInvoiceItems(data.id_user, data.dto);
+  }
+
+  @EventPattern('invoiceClient/getAllInvoiceItems')
+  async getAllInvoiceItems(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.invoiceService.getAllInvoiceItems(data.id_user, data.id_family ,data.id_invoice);
+  }
+
+  @EventPattern('invoiceClient/getInvoiceItemDetail')
+  async getInvoiceItemDetail(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.invoiceService.getInvoiceItemDetail(data.id_user, data.id_family, data.id_invoice, data.id_invoice_item);
+  }
+
+  @EventPattern('invoiceClient/updateInvoiceItem')
+  async updateInvoiceItems(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.invoiceService.updateInvoiceItems(data.id_user, data.dto);
+  }
+
+  @EventPattern('invoiceClient/deleteInvoiceItem')
+  async deleteInvoiceItem(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.invoiceService.deleteInvoiceItem(data.id_user, data.id_family, data.id_invoice, data.id_item);
+  }
 }
