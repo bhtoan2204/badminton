@@ -2,6 +2,7 @@ import { HttpStatus, Injectable } from "@nestjs/common";
 import { RpcException } from "@nestjs/microservices";
 import { EntityManager } from "typeorm";
 import { validate, version, NIL } from 'uuid';
+import { format } from 'date-fns';
 
 @Injectable()
 export class ExpenseditureService {
@@ -94,14 +95,31 @@ export class ExpenseditureService {
     }
   }
 
-  async getExpensediture(id_user: string, id_family: number, page: number, itemsPerPage: number) {
+  async getExpenseByDate(id_user: string, id_family: string, date: string) {
     try {
-      const query = 'SELECT * FROM f_get_expenditure($1, $2, $3, $4)';
-      const params = [id_user, id_family, page, itemsPerPage];
+      const query = 'SELECT * FROM f_get_expense_by_date($1, $2, $3)';
+      const params = [id_user, id_family, date];
       const data = await this.entityManager.query(query, params);
       return {
         data: data,
-        message: 'Get expenditure',
+        message: 'Get expenditure by day',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getExpenseByMonth(id_user: string, id_family, month, year) {
+    try {
+      const query = 'SELECT * FROM f_get_expense_by_month($1, $2, $3, $4)';
+      const params = [id_user, id_family, month, year];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data,
+        message: 'Get expenditure by month',
       }
     }
     catch (error) {
@@ -111,7 +129,23 @@ export class ExpenseditureService {
       });
     }
   }
-
+  async getExpenseByYear(id_user: string, id_family, year) {
+    try {
+      const query = 'SELECT * FROM f_get_expense_by_year($1, $2, $3)';
+      const params = [id_user, id_family,  year];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data,
+        message: 'Get expenditure by year',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
   async getExpenditureById(id_user: string, id_family: number, id_expenditure: number) {
     try {
       const query = 'SELECT * FROM f_get_expenditure_by_id($1, $2, $3)';
@@ -130,23 +164,7 @@ export class ExpenseditureService {
     }
   }
 
-  async getStatiscalExpensediture(id_user, id_family) {
-    try {
-      const query = 'SELECT * FROM f_get_statiscal_expenditure($1, $2)';
-      const params = [this.convertStringToUUID(id_user), id_family];
-      const data = await this.entityManager.query(query, params);
-      return {
-        data: data,
-        message: 'Get statiscal expenditure',
-      }
-    }
-    catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
-      });
-    }
-  }
+  
 
   async createExpensediture(id_user: string, dto: any) {
     try {
