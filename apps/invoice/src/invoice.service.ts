@@ -3,17 +3,40 @@ import { EntityManager } from 'typeorm';
 import { StorageService } from './storage/storage.service';
 import { RpcException } from '@nestjs/microservices';
 import { UploadFileRequest } from '@app/common';
+import { ConfigService } from '@nestjs/config';
+import * as axios from 'axios';
 
 @Injectable()
 export class InvoiceService {
   constructor(
     private readonly entityManager: EntityManager,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
+    private readonly configService: ConfigService
   ) { }
 
-  async getInvoiceDetail(id_user: any, id_family: any, id_invoice: any) {
-    try {
+  async convertTextToJson(text: string): Promise<any[]> {
+    const items = text
+      .replace('json\\', '')
+      .substring(1, text.length - 1)
+      .split('},\n  {');
+    const parsedItems = items.map((item) => {
+      const cleanItem = item.replace(/"/g, "'");
 
+      return JSON.parse(cleanItem);
+    });
+
+  return parsedItems;
+  }
+
+  async getInvoiceDetail(id_user: string, id_family: any, id_invoice: any) {
+    try {
+      const query = 'SELECT * FROM f_get_invoice_detail($1, $2, $3)';
+      const params = [id_user, id_family, id_invoice];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data[0],
+        message: 'Get invoice detail',
+      }
     }
     catch (error) {
       throw new RpcException({
@@ -23,9 +46,15 @@ export class InvoiceService {
     }
   }
 
-  async getInvoices(id_user: any, id_invoice: any) {
+  async getInvoices(id_user: string, id_family: number, page: number, itemsPerPage: number) {
     try {
-
+      const query = 'SELECT * FROM f_get_invoices($1, $2, $3, $4)';
+      const params = [id_user, id_family, page, itemsPerPage];
+      const data = await this.entityManager.query(query, params);
+      return {
+        data: data,
+        message: 'Get invoices',
+      }
     }
     catch (error) {
       throw new RpcException({
@@ -302,6 +331,32 @@ export class InvoiceService {
       await this.entityManager.query(query, params);
       return {
         message: 'Delete invoice item',
+      }
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message || 'Internal server error',
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async convertTextToInvoiceItems(text: string) {
+    try {
+      const geminiApiUrl = this.configService.get<string>('GOOGLE_API_URL_GEMINI');
+      const geminiApiKey = this.configService.get<string>('GOOGLE_API_KEY_GEMINI');
+      const geminiUrl = `${geminiApiUrl}?key=${geminiApiKey}`;
+      const body = { contents: [ { parts: [{ text: `Convert this text to json to array of items including: item_name, item_description (optional), quantity, unit_price: \n${text}` }] } ] }
+      const response = await axios.default.post(geminiUrl, body);
+      if (response.data.error) {
+        throw new RpcException({
+          message: response.data.error.message,
+          statusCode: response.data.error.code
+        });
+      }
+      return {
+        data: response.data.candidates[0].content.parts[0].text,
+        message: 'Convert text to invoice items',
       }
     }
     catch (error) {
