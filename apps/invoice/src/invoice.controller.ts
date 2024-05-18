@@ -37,7 +37,7 @@ export class InvoiceController {
   @EventPattern('invoiceClient/getInvoices')
   async getInvoice(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.invoiceService.getInvoices(data.id_user, data.id_invoice);
+    return this.invoiceService.getInvoices(data.id_user, data.id_family, data.page, data.itemsPerPage);
   }
 
   @EventPattern('invoiceClient/getInvoiceDetail')
@@ -92,5 +92,11 @@ export class InvoiceController {
   async deleteInvoiceItem(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.invoiceService.deleteInvoiceItem(data.id_user, data.id_family, data.id_invoice, data.id_item);
+  }
+
+  @EventPattern('invoiceClient/convertTextToInvoiceItems')
+  async convertTextToInvoiceItems(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.invoiceService.convertTextToInvoiceItems(data.text);
   }
 }
