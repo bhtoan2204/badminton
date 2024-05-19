@@ -14,18 +14,11 @@ export class InvoiceService {
     private readonly configService: ConfigService
   ) { }
 
-  async convertTextToJson(text: string): Promise<any[]> {
-    const items = text
-      .replace('json\\', '')
-      .substring(1, text.length - 1)
-      .split('},\n  {');
-    const parsedItems = items.map((item) => {
-      const cleanItem = item.replace(/"/g, "'");
-
-      return JSON.parse(cleanItem);
-    });
-
-  return parsedItems;
+  async convertFormattedStringToJson(formattedString) {
+    const cleanedString = formattedString.replace(/^```json\n/, '').replace(/```$/, '');
+    const jsonString = cleanedString.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/`/g, '');
+    const jsonObject = JSON.parse(jsonString);
+    return jsonObject;
   }
 
   async getInvoiceDetail(id_user: string, id_family: any, id_invoice: any) {
@@ -346,7 +339,7 @@ export class InvoiceService {
       const geminiApiUrl = this.configService.get<string>('GOOGLE_API_URL_GEMINI');
       const geminiApiKey = this.configService.get<string>('GOOGLE_API_KEY_GEMINI');
       const geminiUrl = `${geminiApiUrl}?key=${geminiApiKey}`;
-      const body = { contents: [ { parts: [{ text: `Convert this text to json to array of items including: item_name, item_description (optional), quantity, unit_price: \n${text}` }] } ] }
+      const body = { contents: [ { parts: [{ text: `Convert this text to json including: amount (before tax), tax (0 if not provide), and an array of items including: item_name, item_description (optional), quantity (1 if not provide), unit_price: \n${text}` }] } ] }
       const response = await axios.default.post(geminiUrl, body);
       if (response.data.error) {
         throw new RpcException({
@@ -354,8 +347,10 @@ export class InvoiceService {
           statusCode: response.data.error.code
         });
       }
+      const data = await this.convertFormattedStringToJson(response.data.candidates[0].content.parts[0].text);
+      console.log(data)
       return {
-        data: response.data.candidates[0].content.parts[0].text,
+        data: data,
         message: 'Convert text to invoice items',
       }
     }
