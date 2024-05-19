@@ -59,6 +59,10 @@ spec:
           volumeMounts:
             - name: log-volume
               mountPath: /usr/src/app/logs
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
 
         - name: filebeat
           image: docker.elastic.co/beats/filebeat-oss:7.15.0
