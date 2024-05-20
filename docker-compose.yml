@@ -293,3 +293,6 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: "rabbitmq"
       RABBITMQ_DEFAULT_PASS: "Toan123456789"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
