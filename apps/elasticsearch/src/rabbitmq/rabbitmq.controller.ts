@@ -37,6 +37,6 @@ export class RabbitMqController {
   @EventPattern('rabbitMqClient/getLogs')
   async getLogs(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.rabbitMqService.getLogs(data.node, data.logType, data.logLevel, data.logFormat, data.logDate);
+    return this.rabbitMqService.getLogs(data.limit, data.offset);
   }
 }
