@@ -283,10 +283,13 @@ services:
       co.elastic.logs/json.expand_keys: true
 
   rabbitmq:
-    image: rabbitmq
+    image: rabbitmq:management
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 30s
       timeout: 10s
       retries: 5
     restart: on-failure
+    environment:
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "Toan123456789"

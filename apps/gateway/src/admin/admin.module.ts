@@ -2,11 +2,13 @@ import { Module } from "@nestjs/common";
 import { RouterModule } from "@nestjs/core";
 import { SearchModule } from "./search/search.module";
 import { ProxyModule } from "./proxy/proxy.module";
+import { RabbitMqModule } from "./rabbitmq/rabbitmq.module";
 
 @Module({
   imports: [
     SearchModule,
     ProxyModule,
+    RabbitMqModule,
     RouterModule.register([
       {
         path: 'admin',
@@ -25,6 +27,16 @@ import { ProxyModule } from "./proxy/proxy.module";
           {
             path: '',
             module: ProxyModule,
+          }
+        ],
+      },
+      {
+        path: 'admin',
+        module: RabbitMqModule,
+        children: [
+          {
+            path: '',
+            module: RabbitMqModule,
           }
         ],
       }

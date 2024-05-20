@@ -4,6 +4,7 @@ import { SearchService } from './elasticsearch.service';
 import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RmqModule } from '@app/common';
+import { RabbitMqModule } from './rabbitmq/rabbitmq.module';
 import { ProxyModule } from './proxy/proxy.module';
 
 @Module({
@@ -25,6 +26,7 @@ import { ProxyModule } from './proxy/proxy.module';
     }),
     RmqModule,
     forwardRef(() => ProxyModule),
+    forwardRef(() => RabbitMqModule),
   ],
   controllers: [SearchController],
   providers: [SearchService],
