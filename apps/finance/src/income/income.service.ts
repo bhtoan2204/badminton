@@ -22,7 +22,7 @@ export class IncomeService {
       const params = [id_user, id_family];
       const data = await this.entityManager.query(query, params);
       return {
-        data: data,
+        data: data[0]?.f_get_finance_income_source || [], 
         message: 'Get income source',
       }
     }
@@ -103,7 +103,7 @@ export class IncomeService {
       const params = [id_user, id_family, date];
       const data = await this.entityManager.query(query, params);
       return {
-        data: data,
+        data: data[0]?.f_get_income_by_date || [],
         message: 'Get income by date',
       }
     }
@@ -121,7 +121,7 @@ export class IncomeService {
       const params = [id_user, id_family, year];
       const data = await this.entityManager.query(query, params);
       return {
-        data: data,
+        data: data[0]?.f_get_income_by_year || [],
         message: 'Get income by year',
       }
     }
@@ -139,7 +139,7 @@ export class IncomeService {
       const params = [id_user, id_family, month, year];
       const data = await this.entityManager.query(query, params);
       return {
-        data: data,
+        data: data[0]?.f_get_income_by_month || [],
         message: 'Get income by month',
       }
     }
