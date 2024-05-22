@@ -5,9 +5,7 @@ import { ExpenseditureService } from "./expensediture.service";
 import { CurrentUser } from "../../utils";
 import { CreateExpenseDto } from "./dto/createExpense.dto";
 import { UpdateExpenseDto } from "./dto/updateExpense.dto";
-import { GetExpenseByDate } from "./dto/getExpenseByDate.dto";
-import { GetExpenseByMonth } from "./dto/getExpenseByMonth.dto";
-import { GetExpenseByYear } from "./dto/getExpenseByYear.dto";
+
 
 @ApiTags('Expensediture')
 @Controller('finance/expensediture')
