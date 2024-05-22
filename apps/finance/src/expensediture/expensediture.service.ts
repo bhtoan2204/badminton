@@ -2,7 +2,6 @@ import { HttpStatus, Injectable } from "@nestjs/common";
 import { RpcException } from "@nestjs/microservices";
 import { EntityManager } from "typeorm";
 import { validate, version, NIL } from 'uuid';
-import { format } from 'date-fns';
 
 @Injectable()
 export class ExpenseditureService {

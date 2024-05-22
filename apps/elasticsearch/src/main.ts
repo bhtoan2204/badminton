@@ -7,6 +7,6 @@ async function bootstrap() {
   const rmqService = app.get<RmqService>(RmqService);
   app.connectMicroservice(rmqService.getOptions('ELASTICSEARCH'));
   app.startAllMicroservices();
-  await app.init();
+  await app.listen(8096);
 }
 bootstrap();

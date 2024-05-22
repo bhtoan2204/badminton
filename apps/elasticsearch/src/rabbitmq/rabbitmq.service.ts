@@ -86,13 +86,9 @@ export class RabbitMqService {
     }
   }
 
-  async getLogs(limit: number, offset: number) {
+  async healthCheck() {
     try {
-      const response = await firstValueFrom(this.httpService.get(`${this.rabbitMqUrl}/api/logs`, {
-        params: {
-          limit,
-          offset
-        },
+      const response = await firstValueFrom(this.httpService.get(`${this.rabbitMqUrl}/api/healthchecks/node`, {
         auth: {
           username: this.rabbitMqUsername,
           password: this.rabbitMqPassword
