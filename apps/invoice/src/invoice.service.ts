@@ -149,7 +149,7 @@ export class InvoiceService {
       const paramsUpdateInvoice = [id_user, id_invoice, id_family, id_invoice_type, invoice_name, invoice_date, description, fileUrl];
       const data = await this.entityManager.query(queryUpdateInvoice, paramsUpdateInvoice);
       // if (fileUrl && data[0].f_update_invoice) {
-      //   await this.storageService.deleteImageInvoice(old_imgurl[0].f_update_invoice);
+      //   await this.storageService.deleteImageInvoice(data[0].f_update_invoice);
       // }
       return {
         data,

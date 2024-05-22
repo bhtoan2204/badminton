@@ -91,7 +91,20 @@ export class RabbitMqService {
       throw new HttpException(error, error.statusCode);
     }
   }
-  healthCheck(): any {
-    throw new Error("Method not implemented.");
+  async healthCheck(): Promise<any> {
+    try {
+      const response = this.elasticsearchClient.send('rabbitMqClient/healthCheck', {})
+        .pipe(
+          timeout(5000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
+    }
+    catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
   }
 }

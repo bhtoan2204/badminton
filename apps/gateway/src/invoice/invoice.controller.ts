@@ -1,13 +1,8 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, OnModuleInit, Param, Post, Put, Query, Req, Sse, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { InvoiceService } from "./invoice.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ImageFileInterceptor } from "../user/interceptor/imageFile.interceptor";
-import * as Tesseract from 'tesseract.js';
-import * as fs from 'fs';
-import * as path from 'path';
-import { WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Server, Socket } from "socket.io";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { CurrentUser } from "../utils";
 import { CreateInvoiceTypeDto } from "./dto/createInvoiceType.dto";
@@ -17,16 +12,11 @@ import { UpdateInvoiceDto } from "./dto/updateInvoice.dto";
 import { CreateInvoiceItemDto } from "./dto/createInvoiceItem.dto";
 import { UpdateInvoiceItemDto } from "./dto/updateInvoiceItem.dto";
 
-// @WebSocketGateway({
-//   cors: { origin: '*', },
-// })
 @ApiTags('Invoice')
 @Controller('invoice')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class InvoiceController {
-  // @WebSocketServer() server: Server;
-
   constructor(
     private readonly invoiceService: InvoiceService
   ) { }
@@ -239,20 +229,6 @@ export class InvoiceController {
   async deleteInvoiceItem(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice') id_invoice: number, @Param('id_item') id_item: number) {
     return this.invoiceService.deleteInvoiceItem(currentUser.id_user, id_family, id_invoice, id_item);
   }
-
-  // async onModuleInit() {
-  //   this.server.on('connection', async (socket) => {
-  //     try {
-  //       const socketId = socket.id;
-  //       console.log(socketId, 'connected')
-  //       return socketId;
-  //     }
-  //     catch (error) {
-  //       console.error('Error handling connection:', error.message);
-  //       socket.disconnect(true);
-  //     }
-  //   });
-  // }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Convert image to text (for testing)' })

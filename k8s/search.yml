@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-deployment
+  labels:
+    app: search
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: search
+  template:
+    metadata:
+      labels:
+        app: search
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: search
+          image: mjkundta/search:<TAG>
+          command: ["node", "dist/apps/search/src/main"]
+          resources:
+            limits:
+              cpu: "150m"
+              memory: "256Mi"
+          env:
+            - name: NODE_ENV
+              value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: search
+  labels:
+    app: search
+spec:
+  selector:
+    app: search
+  ports:
+    - protocol: TCP
+      port: 8096
+      targetPort: 8096
+  type: ClusterIP

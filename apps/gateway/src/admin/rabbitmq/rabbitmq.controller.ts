@@ -40,16 +40,6 @@ export class RabbitMqController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Get('/logs')
-  @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiQuery({ name: 'offset', required: false, type: Number })
-  async getLogs(@Query('limit') limit: number, @Query('offset') offset: number): Promise<any> {
-    if (!limit) limit = 100;
-    if (!offset) offset = 0;
-    return this.rabbitMQService.getLogs(limit, offset);
-  }
-
-  @HttpCode(HttpStatus.OK)
   @Get('/health')
   async healthCheck(): Promise<any> {
     return this.rabbitMQService.healthCheck();

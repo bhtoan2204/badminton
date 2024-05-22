@@ -1,5 +1,5 @@
-import { Controller, Get, HttpCode, HttpStatus, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
+import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../../auth/guard/jwt-auth.guard";
 import { AdminGuard } from "../../auth/guard/authorize/role.guard";
 import { Admin } from "../../utils";
@@ -17,11 +17,5 @@ export class ProxyController {
   @Get('getZone')
   async getZone() {
     return this.proxyService.getZone();
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @Get('getZoneAnalyticsDashboard')
-  async getServices() {
-    return this.proxyService.getZoneAnalyticsDashboard();
   }
 }
