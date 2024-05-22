@@ -22,7 +22,7 @@ export class ExpenseditureService {
       const params = [id_user, id_family];
       const data = await this.entityManager.query(query, params);
       return {
-        data: data,
+        data: data[0]?.f_get_finance_expenditure_type || [], 
         message: 'Get expenditure type',
       }
     }
@@ -100,7 +100,7 @@ export class ExpenseditureService {
       const params = [id_user, id_family, date];
       const data = await this.entityManager.query(query, params);
       return {
-        data: data,
+        data: data[0]?.f_get_expense_by_date || [],
         message: 'Get expenditure by day',
       };
     } catch (error) {
@@ -117,7 +117,7 @@ export class ExpenseditureService {
       const params = [id_user, id_family, month, year];
       const data = await this.entityManager.query(query, params);
       return {
-        data: data,
+        data: data[0]?.f_get_expense_by_month || [],
         message: 'Get expenditure by month',
       }
     }
@@ -134,7 +134,7 @@ export class ExpenseditureService {
       const params = [id_user, id_family,  year];
       const data = await this.entityManager.query(query, params);
       return {
-        data: data,
+        data: data[0]?.f_get_expense_by_year || [],
         message: 'Get expenditure by year',
       }
     }
