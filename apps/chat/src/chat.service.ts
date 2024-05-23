@@ -50,35 +50,63 @@ export class ChatService {
         { $sort: { "conversations.messages.timestamp": -1 } },
         {
           $group: {
-            _id: {
-              conversationId: "$_id",
-              receiverId: "$conversations.receiverId",
-              senderId: "$conversations.messages.senderId"
-            },
-            lastMessage: { $first: "$conversations.messages" },
-            lastUpdated: { $first: "$conversations.updated_at" }
+            _id: "$conversations._id",
+            receiverId: { $first: "$conversations.receiverId" },
+            created_at: { $first: "$conversations.created_at" },
+            updated_at: { $first: "$conversations.updated_at" },
+            latestMessage: { $first: "$conversations.messages" }
+          }
+        },
+        {
+          $group: {
+            _id: "$userId",
+            conversations: {
+              $push: {
+                _id: "$_id",
+                receiverId: "$receiverId",
+                created_at: "$created_at",
+                updated_at: "$updated_at",
+                messages: ["$latestMessage"]
+              }
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: "userConversations",
+            localField: "_id",
+            foreignField: "userId",
+            as: "userDocument"
+          }
+        },
+        {
+          $replaceRoot: {
+            newRoot: { $mergeObjects: [{ $arrayElemAt: ["$userDocument", 0] }, { conversations: "$conversations" }] }
           }
         },
         { $skip: skipAmount },
         { $limit: limit },
         {
           $project: {
-            _id: "$_id.conversationId",
-            receiverId: "$_id.receiverId",
-            lastMessage: 1,
-            lastUpdated: 1
+            _id: 1,
+            userId: 1,
+            __v: 1,
+            conversations: 1,
+            created_at: 1,
+            updated_at: 1
           }
         }
       ]).exec();
+      const datas = results[0].conversations;
 
-      const userIds = results.map(result => result.receiverId);
+      const userIds = datas.map(result => result.receiverId);
       const usersQuery = 'SELECT * FROM f_get_users_info($1)';
       const usersParams = [userIds];
       const usersInfo = await this.entityManager.query(usersQuery, usersParams);
-      const enrichedResults = results.map(conversation => {
-        const userInfo = usersInfo.find(user => user.id_user === conversation.receiverId);
+      const enrichedResults = datas.map(data => {
+        const userInfo = usersInfo.find(user => user.id_user === data.receiverId);
         return {
-          ...conversation,
+          ...data,
           user: userInfo ? {
             firstname: userInfo.firstname,
             lastname: userInfo.lastname,
