@@ -24,8 +24,7 @@ export class CalendarController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get events for family on date' })
-  @ApiParam({ name: 'id_family', required: true })
-  @Post('getEventOnDate/:id_family')
+  @Post('getEventOnDate')
   async getEventOnDate(@CurrentUser() currentUser, @Body() dto: GetEventDTO) {
     return this.calendarService.getEventOnDate(currentUser.id_user, dto);
   }

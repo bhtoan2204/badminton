@@ -10,5 +10,4 @@ export class GetEventDTO {
   @IsString()
   @ApiProperty({ example: '2024-04-04' })
   date: string;
-
 }
