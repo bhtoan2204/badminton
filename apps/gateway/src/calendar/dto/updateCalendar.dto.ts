@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional } from "class-validator";
+import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional, IsBoolean } from "class-validator";
 
 export class UpdateCalendarDto {
   @IsNotEmpty()
@@ -20,5 +20,20 @@ export class UpdateCalendarDto {
   @IsDateString()
   @IsOptional()
   @ApiProperty({ example: '2021-12-31T18:00:00.000Z' })
-  datetime: string;
+  time_start: string;
+
+  @IsDateString()
+  @IsOptional()
+  @ApiProperty({ example: '2021-12-31T18:00:00.000Z' })
+  time_end: string;
+
+  @ApiProperty({ example: 'red' })
+  @IsString()
+  @IsOptional()
+  color: string;
+
+  @ApiProperty({ example: false })
+  @IsBoolean()
+  @IsOptional()
+  is_all_day: boolean;
 }

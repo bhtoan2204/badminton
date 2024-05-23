@@ -1,23 +1,51 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, IsNumber, IsDateString } from "class-validator";
+import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional, IsBoolean, ValidatorConstraint, ValidatorConstraintInterface, ValidationArguments, Validate } from "class-validator";
+
+@ValidatorConstraint({ name: 'timeStartBeforeEnd', async: false })
+export class TimeStartBeforeEndConstraint implements ValidatorConstraintInterface {
+  validate(timeStart: string, args: ValidationArguments) {
+    const timeEnd = args.object[args.constraints[0]];
+    return new Date(timeStart) <= new Date(timeEnd);
+  }
+
+  defaultMessage(args: ValidationArguments) {
+    return `${args.property} must be before or equal to ${args.constraints[0]}`;
+  }
+}
 
 export class CreateCalendarDto {
+  @ApiProperty({ example: 'Vinh Ha Long trip' })
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ example: 'Vinh Ha Long trip' })
   title: string;
 
-  @IsString()
   @ApiProperty({ example: 'The family\'s off to Ha Long Bay, bonding over its stunning vistas and creating lasting memories' })
+  @IsString()
   description: string;
 
+  @ApiProperty({ example: 28 })
   @IsNotEmpty()
   @IsNumber()
-  @ApiProperty({ example: 28 })
   id_family: number;
 
+  @ApiProperty({ example: '2021-12-31T18:00:00.000Z' })
   @IsNotEmpty()
   @IsDateString()
+  @Validate(TimeStartBeforeEndConstraint, ['time_end'])
+  time_start: string;
+
   @ApiProperty({ example: '2021-12-31T18:00:00.000Z' })
-  datetime: string;
+  @IsNotEmpty()
+  @IsDateString()
+  time_end: string;
+
+  @ApiProperty({ example: 'red' })
+  @IsString()
+  @IsOptional()
+  color: string;
+
+  @ApiProperty({ example: false })
+  @IsBoolean()
+  @IsOptional()
+  is_all_day: boolean;
 }
