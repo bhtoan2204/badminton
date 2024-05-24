@@ -70,15 +70,15 @@ export class CalendarService {
 
   async createCalendar(id_user: string, dto: any) {
     try {
-      const { title, description, id_family, time_start, time_end, color, is_all_day } = dto;
-      const query = 'SELECT * FROM f_create_calendar_event($1, $2, $3, $4, $5, $6, $7, $8)';
-      const params = [id_user, id_family, title, description, time_start, time_end, color, is_all_day];
+      const { title, description, id_family, time_start, time_end, color, is_all_day, category, location, recurrence_exception, recurrence_id, recurrence_rule, start_timezone, end_timezone } = dto;
+      const query = 'SELECT * FROM f_create_calendar_event($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)';
+      const params = [id_user, id_family, title, description, time_start, time_end, color, is_all_day, category, location, recurrence_exception, recurrence_id, recurrence_rule, start_timezone, end_timezone];
       const data = await this.entityManager.query(query, params);
       return {
         message: 'Success',
         data: {
           id_calendar: data[0].f_create_calendar_event,
-          title, description, id_family, time_start, time_end, color, is_all_day
+          title, description, id_family, time_start, time_end, color, is_all_day, category, location, recurrence_exception, recurrence_id, recurrence_rule, start_timezone, end_timezone
         }
       };
     }
@@ -89,12 +89,12 @@ export class CalendarService {
       });
     }
   }
-
+  
   async updateCalendar(id_user: string, dto: any) {
     try {
-      const { id_calendar, title, description, time_start, time_end, color, is_all_day } = dto;
-      const query = 'SELECT * FROM f_update_calendar_event($1, $2, $3, $4, $5, $6, $7, $8)';
-      const params = [id_user, id_calendar, title, description, time_start, time_end, color, is_all_day];
+      const { id_calendar, title, description, time_start, time_end, color, is_all_day, category, location, recurrence_exception, recurrence_id, recurrence_rule, start_timezone, end_timezone } = dto;
+      const query = 'SELECT * FROM f_update_calendar_event($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)';
+      const params = [id_user, id_calendar, title, description, time_start, time_end, color, is_all_day, category, location, recurrence_exception, recurrence_id, recurrence_rule, start_timezone, end_timezone];
       const data = await this.entityManager.query(query, params);
       return {
         message: 'Success',
@@ -108,6 +108,7 @@ export class CalendarService {
       });
     }
   }
+  
 
   async deleteCalendar(id_user: string, id_calendar: number) {
     try {
