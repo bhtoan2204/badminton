@@ -36,4 +36,40 @@ export class UpdateCalendarDto {
   @IsBoolean()
   @IsOptional()
   is_all_day: boolean;
+
+  // Thêm các trường sau đây:
+  @ApiProperty({ example: 1 })
+  @IsNotEmpty()
+  @IsNumber()
+  category: number;
+
+  @ApiProperty({ example: 'Hanoi' })
+  @IsString()
+  @IsOptional()
+  location: string;
+
+  @ApiProperty({ example: '2021-05-24' })
+  @IsString()
+  @IsOptional()
+  recurrence_exception: string;
+
+  @ApiProperty({ example: 1 })
+  @IsNumber()
+  @IsOptional()
+  recurrence_id: number;
+
+  @ApiProperty({ example: 'FREQ=DAILY;COUNT=10' })
+  @IsString()
+  @IsOptional()
+  recurrence_rule: string;
+
+  @ApiProperty({ example: 'Asia/Ho_Chi_Minh' })
+  @IsString()
+  @IsOptional()
+  start_timezone: string;
+
+  @ApiProperty({ example: 'Asia/Ho_Chi_Minh' })
+  @IsString()
+  @IsOptional()
+  end_timezone: string;
 }

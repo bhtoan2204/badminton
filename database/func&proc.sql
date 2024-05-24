@@ -1443,3 +1443,332 @@ BEGIN
     RETURN v_result;
 END;
 $function$;
+
+-- DROP FUNCTION public.f_get_calendar_events(uuid, int4);
+
+
+CREATE OR REPLACE FUNCTION public.f_get_calendar_events(p_id_user uuid, p_id_family integer)
+ RETURNS TABLE(
+    id_calendar integer,
+    title character varying,
+    description character varying,
+    time_start timestamp without time zone,
+    time_end timestamp without time zone,
+    color text,
+    is_all_day boolean,
+    category integer,
+    location character varying,
+    recurrence_exception character varying,
+    recurrence_id integer,
+    recurrence_rule character varying,
+    start_timezone character varying,
+    end_timezone character varying
+ )
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    RETURN QUERY 
+    SELECT
+        c.id_calendar,
+        c.title,
+        c.description,
+        c.time_start,
+        c.time_end,
+        c.color,
+        c.is_all_day,
+        c.category, 
+        c.location, 
+        c.recurrence_exception, 
+        c.recurrence_id, 
+        c.recurrence_rule, 
+        c.start_timezone,
+        c.end_timezone
+    FROM calendar c
+    INNER JOIN member_family mf ON c.id_family = mf.id_family
+    WHERE mf.id_family = p_id_family AND mf.id_user = p_id_user;
+END;
+$function$
+;
+
+
+-- Permissions
+
+ALTER FUNCTION public.f_get_calendar_events(uuid, int4) OWNER TO avnadmin;
+GRANT ALL ON FUNCTION public.f_get_calendar_events(uuid, int4) TO avnadmin;
+
+SELECT public.f_get_calendar_events('28905675-858b-4a93-a283-205899779622', 96);
+
+-- DROP FUNCTION public.f_get_events_for_family(uuid, int4, timestamp, timestamp);
+
+CREATE OR REPLACE FUNCTION public.f_get_events_for_family(p_id_user uuid, p_id_family integer, p_date_start timestamp without time zone, p_date_end timestamp without time zone)
+RETURNS TABLE(
+    id_calendar integer,
+    title character varying,
+    description character varying,
+    time_start timestamp without time zone,
+    time_end timestamp without time zone,
+    color text,
+    is_all_day boolean,
+    category integer,
+    location character varying,
+    recurrence_exception character varying,
+    recurrence_id integer,
+    recurrence_rule character varying,
+    start_timezone character varying,
+    end_timezone character varying
+ ) LANGUAGE plpgsql
+AS $function$
+BEGIN
+    RETURN QUERY
+     SELECT
+        c.id_calendar,
+        c.title,
+        c.description,
+        c.time_start,
+        c.time_end,
+        c.color,
+        c.is_all_day,
+        c.category, 
+        c.location, 
+        c.recurrence_exception, 
+        c.recurrence_id, 
+        c.recurrence_rule, 
+        c.start_timezone,
+        c.end_timezone
+    FROM calendar c
+    INNER JOIN
+        member_family mf ON c.id_family = mf.id_family
+    WHERE
+        mf.id_user = p_id_user
+        AND mf.id_family = p_id_family
+        AND c.time_start <= p_date_end
+        AND c.time_end >= p_date_start;
+END;
+$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.f_get_events_for_family(uuid, int4, timestamp, timestamp) OWNER TO avnadmin;
+GRANT ALL ON FUNCTION public.f_get_events_for_family(uuid, int4, timestamp, timestamp) TO avnadmin;
+
+
+-- DROP FUNCTION public.f_get_calendar_detail(uuid, int4);
+
+CREATE OR REPLACE FUNCTION public.f_get_calendar_detail(p_id_user uuid, p_id_calendar integer)
+ RETURNS TABLE(
+    id_calendar integer,
+    title character varying,
+    description character varying,
+    time_start timestamp without time zone,
+    time_end timestamp without time zone,
+    color text,
+    is_all_day boolean,
+    category integer,
+    location character varying,
+    recurrence_exception character varying,
+    recurrence_id integer,
+    recurrence_rule character varying,
+    start_timezone character varying,
+    end_timezone character varying
+ ) LANGUAGE plpgsql
+AS $function$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM calendar c
+        INNER JOIN member_family mf ON c.id_family = mf.id_family
+        WHERE mf.id_user = p_id_user AND c.id_calendar = p_id_calendar
+    ) THEN
+        RAISE EXCEPTION 'User does not belong to the family or calendar does not belong to the family';
+    END IF;
+
+    RETURN QUERY
+     SELECT
+        c.id_calendar,
+        c.title,
+        c.description,
+        c.time_start,
+        c.time_end,
+        c.color,
+        c.is_all_day,
+        c.category, 
+        c.location, 
+        c.recurrence_exception, 
+        c.recurrence_id, 
+        c.recurrence_rule, 
+        c.start_timezone,
+        c.end_timezone
+    FROM calendar c
+    WHERE
+        c.id_calendar = p_id_calendar;
+END;
+$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.f_get_calendar_detail(uuid, int4) OWNER TO avnadmin;
+GRANT ALL ON FUNCTION public.f_get_calendar_detail(uuid, int4) TO avnadmin;
+-- DROP FUNCTION public.f_create_calendar_event(uuid, int4, varchar, varchar, timestamp, timestamp, text, bool);
+
+CREATE OR REPLACE FUNCTION public.f_create_calendar_event(
+    p_id_user uuid,
+    p_id_family integer,
+    p_title character varying,
+    p_description character varying,
+    p_time_start timestamp without time zone,
+    p_time_end timestamp without time zone,
+    p_color text,
+    p_is_all_day boolean,
+    p_category integer,
+    p_location text,
+    p_recurrence_exception text,
+    p_recurrence_id integer,
+    p_recurrence_rule text,
+    p_start_timezone text,
+    p_end_timezone text
+)
+RETURNS integer
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_id_calendar integer;
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM member_family mb WHERE mb.id_family = p_id_family AND mb.id_user = p_id_user) THEN
+        RAISE EXCEPTION 'Invalid family ID: %', p_id_family;
+    END IF;
+
+    INSERT INTO calendar (
+        time_start,
+        time_end,
+        is_all_day,
+        id_family,
+        created_at,
+        updated_at,
+        description,
+        color,
+        title,
+        category,
+        location,
+        recurrence_exception,
+        recurrence_id,
+        recurrence_rule,
+        start_timezone,
+        end_timezone
+    )
+    VALUES (
+        p_time_start,
+        p_time_end,
+        p_is_all_day,
+        p_id_family,
+        NOW(),
+        NOW(),
+        p_description,
+        p_color,
+        p_title,
+        p_category,
+        p_location,
+        p_recurrence_exception,
+        p_recurrence_id,
+        p_recurrence_rule,
+        p_start_timezone,
+        p_end_timezone
+    )
+    RETURNING id_calendar INTO v_id_calendar;
+
+    RETURN v_id_calendar;
+END;
+$function$;
+
+
+-- Permissions
+
+-- DROP FUNCTION public.f_update_calendar_event(uuid, int4, varchar, varchar, timestamp, timestamp, text, bool);
+
+CREATE OR REPLACE FUNCTION public.f_update_calendar_event(
+    p_id_user uuid,
+    p_id_calendar integer,
+    p_title character varying DEFAULT NULL::character varying,
+    p_description character varying DEFAULT NULL::character varying,
+    p_time_start timestamp without time zone DEFAULT NULL::timestamp without time zone,
+    p_time_end timestamp without time zone DEFAULT NULL::timestamp without time zone,
+    p_color text DEFAULT NULL::text,
+    p_is_all_day boolean DEFAULT NULL::boolean,
+    p_category integer DEFAULT NULL::integer,
+    p_location text DEFAULT NULL::text,
+    p_recurrence_exception text DEFAULT NULL::text,
+    p_recurrence_id integer DEFAULT NULL::integer,
+    p_recurrence_rule text DEFAULT NULL::text,
+    p_start_timezone text DEFAULT NULL::text,
+    p_end_timezone text DEFAULT NULL::text
+)
+ RETURNS TABLE(
+    id_calendar integer,
+    title character varying,
+    description character varying,
+    time_start timestamp without time zone,
+    time_end timestamp without time zone,
+    color text,
+    is_all_day boolean,
+    category integer,
+    location character varying,
+    recurrence_exception character varying,
+    recurrence_id integer,
+    recurrence_rule character varying,
+    start_timezone character varying,
+    end_timezone character varying
+ )
+LANGUAGE plpgsql
+AS $function$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM calendar c
+        INNER JOIN member_family mf ON c.id_family = mf.id_family
+        WHERE mf.id_user = p_id_user AND c.id_calendar = p_id_calendar
+    ) THEN
+        RAISE EXCEPTION 'User does not belong to the family or calendar does not belong to the family';
+    END IF;
+
+    RETURN QUERY
+    UPDATE calendar c
+    SET
+        title = COALESCE(p_title, c.title),
+        description = COALESCE(p_description, c.description),
+        time_start = COALESCE(p_time_start, c.time_start),
+        time_end = COALESCE(p_time_end, c.time_end),
+        color = COALESCE(p_color, c.color),
+        is_all_day = COALESCE(p_is_all_day, c.is_all_day),
+        category = COALESCE(p_category, c.category),
+        location = COALESCE(p_location, c.location),
+        recurrence_exception = COALESCE(p_recurrence_exception, c.recurrence_exception),
+        recurrence_id = COALESCE(p_recurrence_id, c.recurrence_id),
+        recurrence_rule = COALESCE(p_recurrence_rule, c.recurrence_rule),
+        start_timezone = COALESCE(p_start_timezone, c.start_timezone),
+        end_timezone = COALESCE(p_end_timezone, c.end_timezone),
+        updated_at = NOW()
+    WHERE c.id_calendar = p_id_calendar
+    RETURNING 
+        c.id_calendar,
+        c.title,
+        c.description,
+        c.time_start,
+        c.time_end,
+        c.color,
+        c.is_all_day,
+        c.category, 
+        c.location, 
+        c.recurrence_exception, 
+        c.recurrence_id, 
+        c.recurrence_rule, 
+        c.start_timezone,
+        c.end_timezone;
+END;
+$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.f_update_calendar_event(uuid, int4, varchar, varchar, timestamp, timestamp, text, bool) OWNER TO avnadmin;
+GRANT ALL ON FUNCTION public.f_update_calendar_event(uuid, int4, varchar, varchar, timestamp, timestamp, text, bool) TO avnadmin;
