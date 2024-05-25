@@ -1091,7 +1091,7 @@ select * from f_get_income_name(101, 1)
 
 
 
-CREATE OR REPLACE FUNCTION public.f_get_expense_by_date(p_id_user uuid, p_id_family integer, p_expense_date date)
+CREATE OR REPLACE FUNCTION public.f_get_expense_by_date(p_id_user uuid, p_id_family integer, p_expense_date varchar)
 RETURNS TABLE (
     id_expense_type integer,
     expense_category text,
@@ -1102,6 +1102,7 @@ AS $function$
 DECLARE
     v_user_exists BOOLEAN;
 BEGIN
+    -- Check if the user is a member of the specified family
     SELECT EXISTS (
         SELECT 1
         FROM member_family
@@ -1112,6 +1113,7 @@ BEGIN
         RAISE EXCEPTION 'User is not a member of the specified family.';
     END IF;
 
+    -- Return the query results
     RETURN QUERY
     SELECT 
         fe.id_expense_type,
@@ -1121,12 +1123,13 @@ BEGIN
         finance_expenditure fe
     WHERE 
         fe.id_family = p_id_family 
-        AND fe.expenditure_date = p_expense_date;
+        AND fe.expenditure_date = p_expense_date::date; -- Cast p_expense_date to date
 END;
 $function$;
 
+
 ------------------------------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION public.f_get_income_by_date(p_id_user uuid, p_id_family integer, p_income_date date)
+CREATE OR REPLACE FUNCTION public.f_get_income_by_date(p_id_user uuid, p_id_family integer, p_income_date varchar)
 RETURNS TABLE (
     id_income_source integer,
     income_category text,
@@ -1156,7 +1159,7 @@ BEGIN
         finance_income fi 
     WHERE 
         fi.id_family = p_id_family 
-        AND fi.income_date = p_income_date;
+        AND fi.income_date = p_income_date::date;
 END;
 $function$;
 

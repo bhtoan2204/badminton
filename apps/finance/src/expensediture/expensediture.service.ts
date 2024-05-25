@@ -94,13 +94,13 @@ export class ExpenseditureService {
     }
   }
 
-  async getExpenseByDate(id_user: string, id_family: string, date: string) {
+  async getExpenseByDate(id_user: string, id_family: number, date: string) {
     try {
       const query = 'SELECT * FROM f_get_expense_by_date($1, $2, $3)';
       const params = [id_user, id_family, date];
       const data = await this.entityManager.query(query, params);
       return {
-        data: data[0]?.f_get_expense_by_date || [],
+        data: data,
         message: 'Get expenditure by day',
       };
     } catch (error) {
