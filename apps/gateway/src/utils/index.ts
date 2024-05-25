@@ -11,5 +11,4 @@ export * from './decorator/ws-current-user.decorator';
 export * from './decorator/role.decorator';
 export * from './decorator/current-user.decorator';
 
-export * from './interceptor/logging.interceptor';
 export * from './middleware/logging.middleware';
