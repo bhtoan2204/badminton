@@ -26,9 +26,9 @@ export class IncomeService {
     }
   }
 
-  async getIncomeByDay(id_user: string, id_family: number, date: string) {
+  async getIncomeByDate(id_user: string, id_family: number, date: string) {
     try {
-      const response = this.financeClient.send('financeClient/getIncomeByDay', {id_user, id_family, date})
+      const response = this.financeClient.send('financeClient/getIncomeByDate', {id_user, id_family, date})
         .pipe(
           timeout(5000),
         );
