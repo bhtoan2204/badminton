@@ -11,8 +11,20 @@ export class SearchController {
   ) { }
 
   @EventPattern('elasticsearchClient/getLogsCount')
-  async getLogs(@Payload() data: any, @Ctx() context: RmqContext) {
+  async getLogsCount(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return await this.elasticsearchService.getLogsCount();
+  }
+
+  @EventPattern('elasticsearchClient/getLogs')
+  async getLogs(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.elasticsearchService.getLogs(data);
+  }
+
+  @EventPattern('elasticsearchClient/getLogsCountByTimeRange')
+  async getLogsCountByTimeRange(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.elasticsearchService.getLogsCountByTimeRange(data);
   }
 }
