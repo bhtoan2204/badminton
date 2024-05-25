@@ -20,7 +20,7 @@ filebeat.inputs:
       overwrite_keys: true
 
 output.elasticsearch:
-  hosts: ["http://35.220.223.228:9200"]
+  hosts: ["https://kibana.rancher.io.vn/elasticsearch"]
   index: "famfund-app"
   username: "elastic"
   password: "Toan123456789"
