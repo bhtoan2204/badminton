@@ -8,7 +8,8 @@ export class FirebaseService {
   constructor() {
     const serviceAccount = require('../famfund-def53-firebase-adminsdk-dgnjy-044c4a7040.json');
     this.firebaseAdmin = admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL: 'https://famfund-def53-default-rtdb.asia-southeast1.firebasedatabase.app',
     });
   }
 
