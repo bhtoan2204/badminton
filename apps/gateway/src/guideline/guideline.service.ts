@@ -180,9 +180,9 @@ export class GuidelineService {
     }
   }
 
-  async getSharedGuideline(id_user: string, page: number, itemsPerPage: number, text: string) {
+  async getSharedGuideline(page: number, itemsPerPage: number, text: string, sort: string) {
     try {
-      const response = this.guidelineClient.send('guidelineClient/getSharedGuideline', { id_user })
+      const response = this.guidelineClient.send('guidelineClient/getSharedGuideline', { page, itemsPerPage, text, sort })
         .pipe(
           timeout(5000),
         );

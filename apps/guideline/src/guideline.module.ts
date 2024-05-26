@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { GuidelineController } from './guideline.controller';
 import { GuidelineService } from './guideline.service';
 import { DatabaseModule, RmqModule } from '@app/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { StorageModule } from './storage/storage.module';
+import { ElasticsearchModule } from '@nestjs/elasticsearch';
 
 @Module({
   imports: [
@@ -21,7 +22,18 @@ import { StorageModule } from './storage/storage.module';
     }),
     RmqModule,
     DatabaseModule,
-    StorageModule
+    StorageModule,
+    ElasticsearchModule.registerAsync({
+      imports : [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        node: configService.get<string>('ELASTICSEARCH_NODE'),
+        auth: {
+          username: configService.get<string>('ELASTICSEARCH_USERNAME'),
+          password: configService.get<string>('ELASTICSEARCH_PASSWORD'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [GuidelineController],
   providers: [GuidelineService],

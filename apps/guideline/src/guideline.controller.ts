@@ -75,4 +75,10 @@ export class GuidelineController {
     this.rmqService.ack(context);
     return await this.guidelineService.markShared(data.id_user, data.id_family, data.id_guideline);
   }
+
+  @EventPattern('guidelineClient/getSharedGuideline')
+  async getSharedGuideline(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.guidelineService.getSharedGuideline(data.text, data.page, data.itemsPerPage, data.sort);
+  }
 }

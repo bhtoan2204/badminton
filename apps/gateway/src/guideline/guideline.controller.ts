@@ -230,7 +230,8 @@ export class GuidelineController {
   @ApiQuery({ name: 'page', required: false, type: String })
   @ApiQuery({ name: 'itemsPerPage', required: false, type: String })
   @ApiQuery({ name: 'text', required: false, type: String })
-  async getSharedGuideline(@CurrentUser() currentUser, @Query('page') page: number, @Query('itemsPerPage') itemsPerPage: number, @Query('text') text: string) {
-    return this.guidelineService.getSharedGuideline(currentUser.id_user, page, itemsPerPage, text);
+  @ApiQuery({ name: 'sort', required: false, type: String, enum: ['asc', 'desc', 'none'], description: 'asc: ascending, desc: descending, none: no sort'})
+  async getSharedGuideline(@Query('page') page: number, @Query('itemsPerPage') itemsPerPage: number, @Query('text') text: string, @Query('sort') sort: 'asc' | 'desc' | 'none' = 'none') {
+    return this.guidelineService.getSharedGuideline(page, itemsPerPage, text, sort);
   }
 }
