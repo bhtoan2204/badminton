@@ -57,8 +57,6 @@ export class SearchService {
     try {
       const { logLevel, ip, url, method, message, page, itemsPerPage, sortBy, sortDirection, statusCode } = dto;
 
-      console.log(dto)
-
       const query: any = {
         bool: {
           must: [],

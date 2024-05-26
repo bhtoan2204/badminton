@@ -3,12 +3,14 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { EntityManager } from 'typeorm';
 import { StorageService } from './storage/storage.service';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
 
 @Injectable()
 export class GuidelineService {
   constructor(
     private readonly entityManager: EntityManager,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
+    private readonly elasticsearchService: ElasticsearchService
   ) { }
 
   async getAllGuideline(id_user: string, id_family: number, inputPage: number, inputItemsPerPage: number) {
@@ -280,6 +282,46 @@ export class GuidelineService {
       return {
         message: "Success",
         data: data[0].f_mark_guideline_shared
+      };
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
+  async getSharedGuideline(text: string, page: number, itemsPerPage: number, sort: 'asc' | 'desc' | 'none') {
+    try {
+      const sortOption = sort !== 'none' ? [{ updated_at: { order: sort } }] : [];
+      const query = text
+        ? {
+            multi_match: {
+              query: text,
+              fields: ['name', 'description'],
+              fuzziness: 'AUTO',
+            },
+          }
+        : { match_all: {} };
+      const body = await this.elasticsearchService.search({
+        index: 'guideline',
+        from: (page - 1) * itemsPerPage,
+        size: itemsPerPage,
+        body: {
+          query: query,
+          sort: sortOption,
+        },
+      });
+
+      const results = body.hits.hits.map(hit => hit._source);
+      const total = body.hits.total;
+
+      return {
+        results,
+        total,
+        page,
+        itemsPerPage
       };
     }
     catch (error) {
