@@ -3,13 +3,11 @@ import { Module } from "@nestjs/common";
 import { ELASTICSEARCH_SERVICE } from "../../utils";
 import { ProxyController } from "./proxy.controller";
 import { ProxyService } from "./proxy.service";
+import { GraphQLModule } from "@nestjs/graphql";
 
 @Module({
   imports: [
     RmqModule.register({ name: ELASTICSEARCH_SERVICE }),
-    // GraphQLModule.forRoot({
-    //   autoSchemaFile: true,
-    // }),
   ],
   controllers: [ProxyController],
   providers: [ProxyService],
