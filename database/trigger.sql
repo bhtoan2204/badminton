@@ -98,7 +98,27 @@ EXECUTE FUNCTION insert_income_sources();
 
    
    
-   
+-- Step 1: Create the function
+CREATE OR REPLACE FUNCTION add_default_categories()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Insert the default categories 'Business' and 'Personal' for the new family
+    INSERT INTO category_event (title, color, id_family)
+    VALUES 
+        ('Business', '#FF0000', NEW.id_family),
+        ('Other', 'white', NEW.id_family);
+    
+    -- Return the new row in the family table
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Step 2: Create the trigger
+CREATE TRIGGER after_family_insert
+AFTER INSERT ON family
+FOR EACH ROW
+EXECUTE FUNCTION add_default_categories();
+
    
    
    
