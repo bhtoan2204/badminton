@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@apollo/server": "^4.10.4",
+    "@apollo/subgraph": "^2.7.8",
     "@as-integrations/fastify": "^2.1.1",
     "@cin12211/nestjs-cloudflare": "^1.1.7",
     "@elastic/ecs-winston-format": "^1.5.3",

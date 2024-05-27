@@ -54,7 +54,7 @@ export class AuthApiController {
       sameSite: 'strict',
     });
 
-    return response.redirect(this.configService.get('FRONTEND_URL'));
+    return response.redirect(`${this.configService.get('FRONTEND_URL')}/setup`);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -84,7 +84,7 @@ export class AuthApiController {
       sameSite: 'strict',
     });
 
-    return response.redirect(this.configService.get('FRONTEND_URL'));
+    return response.redirect(`${this.configService.get('FRONTEND_URL')}/setup`);
   }
 
   @HttpCode(HttpStatus.OK)
