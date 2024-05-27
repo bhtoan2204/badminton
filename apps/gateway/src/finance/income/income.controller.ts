@@ -17,11 +17,12 @@ export class IncomeController {
   @ApiOperation({ summary: 'Get Income by day' })
   @ApiParam({ name: 'id_family', required: true })
   @ApiQuery({ name: 'date', required: false })
-  @Get('getIncomeByDay/:id_family')
+  @Get('getIncomeByDate/:id_family')
   async getIncomeByDate(@CurrentUser() currentUser,  @Param('id_family') id_family: number, @Query('date') date: string) {
 
     return this.incomeService.getIncomeByDate(currentUser.id_user, id_family, date);
   }
+  
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get Income by month' })
   @ApiParam({ name: 'id_family', required: true })
