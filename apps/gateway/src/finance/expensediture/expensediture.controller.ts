@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../../auth/guard/jwt-auth.guard";
 import { ExpenseditureService } from "./expensediture.service";
 import { CurrentUser } from "../../utils";
@@ -16,22 +16,29 @@ export class ExpenseditureController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get expenseditures by day' })
-  @Get('getExpenseByDate/:id_family/:date')
-  async getExpenseByDate(@CurrentUser() currentUser,  @Param('id_family') id_family: number,  @Param('date') date: string ) {
+  @ApiParam({ name: 'id_family', required: true })
+  @ApiQuery({ name: 'date', required: false })
+  @Get('getExpenseByDate/:id_family')
+  async getExpenseByDate(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Query('date') date: string ) {
   return this.expenseService.getExpenseByDate(currentUser.id_user, id_family, date);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get expenseditures by month' })
-  @Get('getExpenseByMonth/:id_family/:month/:year')
-  async getExpenseByMonth(@CurrentUser() currentUser,  @Param('id_family') id_family: number,  @Param('month') month: number,  @Param('year') year: number)  {
+  @ApiParam({ name: 'id_family', required: true })
+  @ApiQuery({ name: 'month', required: false })
+  @ApiQuery({ name: 'year', required: false })
+  @Get('getExpenseByMonth/:id_family')
+  async getExpenseByMonth(@CurrentUser() currentUser,   @Param('id_family') id_family: number, @Query('year') year: number, @Query('month') month: number)  {
   return this.expenseService.getExpenseByMonth(currentUser.id_user, id_family, month, year);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get expenseditures by year' })
-  @Get('getExpenseByYear/:id_family/:year')
-  async getExpenseByYear(@CurrentUser() currentUser, @Param('id_family') id_family: number,  @Param('year') year: number) {
+  @ApiParam({ name: 'id_family', required: true })
+  @ApiQuery({ name: 'year', required: false })
+  @Get('getExpenseByYear/:id_family')
+  async getExpenseByYear(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Query('year') year: number) {
   return this.expenseService.getExpenseByYear(currentUser.id_user, id_family, year);
   }
   // @HttpCode(HttpStatus.OK)
