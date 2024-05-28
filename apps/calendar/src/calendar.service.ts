@@ -55,13 +55,15 @@ export class CalendarService {
       });
     }
   };
-  async deleteCategoryEvent(id_user: string, id_category_event: number) {
+  async deleteCategoryEvent(id_user: string, id_family: number, id_category_event: number) {
     try {
-      const query = 'SELECT * FROM delete_category_event($1, $2)';
-      const params = [id_category_event, id_user];
+      const query = 'SELECT * FROM delete_category_event($1, $2, $3)';
+      const params = [id_category_event, id_family,  id_user];
       const data = await this.entityManager.query(query, params);
-      return data;
-    }
+      return {
+        message: 'Success',
+        data: data.delete_category_event
+      };    }
     catch (error) {
       throw new RpcException({
         message: error.message,

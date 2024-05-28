@@ -61,9 +61,9 @@ export class CalendarService {
       throw new HttpException(error, error.statusCode);
     }
   }
-  async deleteCategoryEvent(id_user: string, id_category_event: number) {
+  async deleteCategoryEvent(id_user: string, id_family: number, id_category_event: number) {
     try {
-      const response = this.calendarClient.send('calendarClient/deleteCategoryEvent', { id_user, id_category_event })
+      const response = this.calendarClient.send('calendarClient/deleteCategoryEvent', { id_user, id_family,  id_category_event })
         .pipe(
           timeout(5000),
         );
