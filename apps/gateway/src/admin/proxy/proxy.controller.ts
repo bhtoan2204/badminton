@@ -1,8 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../../auth/guard/jwt-auth.guard";
-import { AdminGuard } from "../../auth/guard/authorize/role.guard";
-import { Admin } from "../../utils";
+import { Admin, AdminGuard, JwtAuthGuard } from "../../utils";
 import { ProxyService } from "./proxy.service";
 import { GetAnalyticsDto } from "./dto/getAnalytics.dto";
 

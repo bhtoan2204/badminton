@@ -3,8 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, 
 import { InvoiceService } from "./invoice.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ImageFileInterceptor } from "../user/interceptor/imageFile.interceptor";
-import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
-import { CurrentUser } from "../utils";
+import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from "../utils";
 import { CreateInvoiceTypeDto } from "./dto/createInvoiceType.dto";
 import { UpdateInvoiceTypeDto } from "./dto/updateInvoiceType.dto";
 import { CreateInvoiceDto } from "./dto/createInvoice.dto";
@@ -15,7 +14,7 @@ import { UpdateInvoiceItemDto } from "./dto/updateInvoiceItem.dto";
 @ApiTags('Invoice')
 @Controller('invoice')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, MemberFamilyGuard)
 export class InvoiceController {
   constructor(
     private readonly invoiceService: InvoiceService
@@ -24,7 +23,7 @@ export class InvoiceController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get invoice types' })
   @Get('getInvoiceTypes/:id_family')
-  @ApiParam({name: 'id_family', required: true, type: Number})
+  @ApiParam({ name: 'id_family', required: true, type: Number })
   async getInvoiceTypes(@CurrentUser() currentUser, @Param('id_family') id_family: number) {
     return this.invoiceService.getInvoiceTypes(currentUser.id_user, id_family);
   }
@@ -46,8 +45,8 @@ export class InvoiceController {
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete invoice type' })
   @Delete('deleteInvoiceType/:id_family/:id_invoice_type')
-  @ApiParam({name: 'id_family', required: true, type: Number})
-  @ApiParam({name: 'id_invoice_type', required: true, type: Number})
+  @ApiParam({ name: 'id_family', required: true, type: Number })
+  @ApiParam({ name: 'id_invoice_type', required: true, type: Number })
   async deleteInvoiceType(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice_type') id_invoice_type: number) {
     return this.invoiceService.deleteInvoiceType(currentUser.id_user, id_family, id_invoice_type);
   }
@@ -55,9 +54,9 @@ export class InvoiceController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get invoices' })
   @Get('getInvoices/:id_family')
-  @ApiParam({name: 'id_family', required: true, type: Number})
-  @ApiQuery({name: 'page', required: false, type: Number})
-  @ApiQuery({name: 'itemsPerPage', required: false, type: Number})
+  @ApiParam({ name: 'id_family', required: true, type: Number })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'itemsPerPage', required: false, type: Number })
   async getInvoices(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Query('page') page: number, @Query('itemsPerPage') itemsPerPage: number) {
     if (!page) page = 1;
     if (!itemsPerPage) itemsPerPage = 10;
@@ -67,9 +66,9 @@ export class InvoiceController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get invoice detail' })
   @Get('getInvoiceDetail/:id_family/:id_invoice')
-  @ApiParam({name: 'id_family', required: true, type: Number})
-  @ApiParam({name: 'id_invoice', required: true, type: Number})
-  async getInvoiceDetail(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice') id_invoice: number){
+  @ApiParam({ name: 'id_family', required: true, type: Number })
+  @ApiParam({ name: 'id_invoice', required: true, type: Number })
+  async getInvoiceDetail(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice') id_invoice: number) {
     return this.invoiceService.getInvoiceDetail(currentUser.id_user, id_family, id_invoice);
   }
 
@@ -111,8 +110,8 @@ export class InvoiceController {
   })
   @UseInterceptors(FileInterceptor('invoiceImg', new ImageFileInterceptor().createMulterOptions()))
   @Post('createInvoice')
-  async createInvoice(@CurrentUser() currentUser, @Body() body: any, @UploadedFile() file: Express.Multer.File){
-    const dto : CreateInvoiceDto = {
+  async createInvoice(@CurrentUser() currentUser, @Body() body: any, @UploadedFile() file: Express.Multer.File) {
+    const dto: CreateInvoiceDto = {
       id_family: parseInt(body.id_family),
       invoice_name: body.invoice_name,
       id_invoice_type: parseInt(body.id_invoice_type),
@@ -165,7 +164,7 @@ export class InvoiceController {
   @UseInterceptors(FileInterceptor('invoiceImg', new ImageFileInterceptor().createMulterOptions()))
   @Put('updateInvoice')
   async updateInvoice(@CurrentUser() currentUser, @Body() data: any, @UploadedFile() file: Express.Multer.File) {
-    const dto : UpdateInvoiceDto = {
+    const dto: UpdateInvoiceDto = {
       id_invoice: parseInt(data.id_invoice),
       id_family: parseInt(data.id_family),
       id_invoice_type: parseInt(data.id_invoice_type) || null,
@@ -180,17 +179,17 @@ export class InvoiceController {
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete invoice' })
   @Delete('deleteInvoice/:id_family/:id_invoice')
-  @ApiParam({name: 'id_family', required: true, type: Number})
-  @ApiParam({name: 'id_invoice', required: true, type: Number})
-  async deleteInvoice(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice') id_invoice: number){
+  @ApiParam({ name: 'id_family', required: true, type: Number })
+  @ApiParam({ name: 'id_invoice', required: true, type: Number })
+  async deleteInvoice(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice') id_invoice: number) {
     return this.invoiceService.deleteInvoice(currentUser.id_user, id_family, id_invoice);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all invoices items' })
   @Get('getAllInvoiceItems/:id_family/:id_invoice')
-  @ApiParam({name: 'id_family', required: true, type: Number})
-  @ApiParam({name: 'id_invoice', required: true, type: Number})
+  @ApiParam({ name: 'id_family', required: true, type: Number })
+  @ApiParam({ name: 'id_invoice', required: true, type: Number })
   async getAllInvoiceItems(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice') id_invoice: number) {
     return this.invoiceService.getAllInvoiceItems(currentUser.id_user, id_family, id_invoice);
   }
@@ -198,9 +197,9 @@ export class InvoiceController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get invoice item detail' })
   @Get('getInvoiceItemDetail/:id_family/:id_invoice/:id_item')
-  @ApiParam({name: 'id_family', required: true, type: Number})
-  @ApiParam({name: 'id_invoice', required: true, type: Number})
-  @ApiParam({name: 'id_item', required: true, type: Number})
+  @ApiParam({ name: 'id_family', required: true, type: Number })
+  @ApiParam({ name: 'id_invoice', required: true, type: Number })
+  @ApiParam({ name: 'id_item', required: true, type: Number })
   async getInvoiceItemDetail(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice') id_invoice: number, @Param('id_item') id_item: number) {
     return this.invoiceService.getInvoiceItemDetail(currentUser.id_user, id_family, id_invoice, id_item);
   }
@@ -223,9 +222,9 @@ export class InvoiceController {
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete invoice item' })
   @Delete('deleteInvoiceItem/:id_family/:id_invoice/:id_item')
-  @ApiParam({name: 'id_family', required: true, type: Number})
-  @ApiParam({name: 'id_invoice', required: true, type: Number})
-  @ApiParam({name: 'id_item', required: true, type: Number})
+  @ApiParam({ name: 'id_family', required: true, type: Number })
+  @ApiParam({ name: 'id_invoice', required: true, type: Number })
+  @ApiParam({ name: 'id_item', required: true, type: Number })
   async deleteInvoiceItem(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_invoice') id_invoice: number, @Param('id_item') id_item: number) {
     return this.invoiceService.deleteInvoiceItem(currentUser.id_user, id_family, id_invoice, id_item);
   }

@@ -1,13 +1,12 @@
 import { Controller, Get, HttpCode, HttpStatus, Param, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
-import { CurrentUser } from "../utils";
+import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from "../utils";
 import { ChatService } from "./chat.service";
 
 @ApiTags('Chat')
 @Controller('chat')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, MemberFamilyGuard)
 export class ChatController {
   constructor(
     private readonly chatService: ChatService

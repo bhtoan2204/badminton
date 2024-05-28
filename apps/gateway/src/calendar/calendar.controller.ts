@@ -1,8 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
-import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { CalendarService } from "./calendar.service";
-import { CurrentUser } from "../utils";
+import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from "../utils";
 import { CreateCalendarDto } from "./dto/createCalendar.dto";
 import { UpdateCalendarDto } from "./dto/updateCalendar.dto";
 import { GetEventDTO } from "./dto/getEvent.dto";
@@ -12,7 +11,7 @@ import { UpdateCategoryEventDto } from "./dto/updateCategoryEvent.dto";
 @ApiTags('Calendar')
 @Controller('calendar')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, MemberFamilyGuard)
 export class CalendarController {
   constructor(private readonly calendarService: CalendarService) { }
 

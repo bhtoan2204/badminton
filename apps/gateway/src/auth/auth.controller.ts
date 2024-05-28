@@ -2,12 +2,9 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards 
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AuthApiService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
-import { LocalAuthGuard } from "./guard/local-auth.guard";
-import { JwtRefreshGuard } from "./guard/refresh-auth.guard";
-import { GoogleAuthGuard } from "./guard/oauth.guard/google.guard";
-import { FacebookAuthGuard } from "./guard/oauth.guard/facebook.guard";
 import { ConfigService } from "@nestjs/config";
 import { Response } from "express";
+import { FacebookAuthGuard, GoogleAuthGuard, JwtRefreshGuard, LocalAuthGuard } from "../utils";
 
 @ApiTags('Authentication')
 @Controller('auth')

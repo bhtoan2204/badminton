@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
-import { CurrentUser } from "../utils";
+import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from "../utils";
 import { EducationService } from "./education.service";
 import { CreateEducationDto } from "./dto/createEducation.dto";
 import { UpdateEducationDto } from "./dto/updateEducation.dto";
@@ -9,7 +8,7 @@ import { UpdateEducationDto } from "./dto/updateEducation.dto";
 @ApiTags('Education')
 @Controller('education')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, MemberFamilyGuard)
 export class EducationController {
   constructor(
     private readonly educationService: EducationService

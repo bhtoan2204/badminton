@@ -6,6 +6,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
+RUN npm install -g npm@10.8.0
 RUN npm install --ignore-scripts
 
 COPY libs ./libs

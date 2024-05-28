@@ -1,8 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { FamilyService } from "./family.service";
-import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
-import { CurrentUser } from "../utils";
+import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from "../utils";
 import { CreateFamilyDto } from "./dto/createFamily.dto";
 import { MemberFamilyDto } from "./dto/memberFamily.dto";
 import { DeleteMemberDTO } from "./dto/deleteFamily.dto";
@@ -13,7 +12,7 @@ import { ImageFileInterceptor } from "../user/interceptor/imageFile.interceptor"
 @ApiTags('Family')
 @Controller('family')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, MemberFamilyGuard)
 export class FamilyController {
   constructor(private readonly familyService: FamilyService) { }
 
@@ -62,7 +61,6 @@ export class FamilyController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get information of specified member' })
   @Get('getMember')
-  @UseGuards(JwtAuthGuard)
   async getMember(@Query('id_user') id_user: string) {
     return this.familyService.getMember(id_user);
   }
@@ -83,7 +81,6 @@ export class FamilyController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Change Avatar' })
-  @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {

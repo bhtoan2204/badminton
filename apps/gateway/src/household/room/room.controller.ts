@@ -1,15 +1,14 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../../auth/guard/jwt-auth.guard";
 import { RoomService } from "./room.service";
-import { CurrentUser } from "../../utils";
+import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from "../../utils";
 import { CreateRoomDto } from "./dto/createRoom.dto";
 import { UpdateRoomDto } from "./dto/updateRoom.dto";
 
 @ApiTags('Room')
 @Controller('room')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, MemberFamilyGuard)
 export class RoomController {
   constructor(
     private readonly roomService: RoomService

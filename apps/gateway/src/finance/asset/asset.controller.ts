@@ -1,15 +1,14 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../../auth/guard/jwt-auth.guard";
 import { AssetService } from "./asset.service";
-import { CurrentUser } from "../../utils";
+import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from "../../utils";
 import { CreateAssetDto } from "./dto/createAsset.dto";
 import { UpdateAssetDto } from "./dto/updateAsset.dto";
 
 @ApiTags('Asset')
 @Controller('finance/asset')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, MemberFamilyGuard)
 export class AssetController {
   constructor(private readonly expenseService: AssetService ) { }
 

@@ -1,8 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { GuidelineService } from "./guideline.service";
-import { CurrentUser } from "../utils";
+import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from "../utils";
 import { CreateGuidelineDto } from "./dto/createGuideline.dto";
 import { UpdateGuidelineDto } from "./dto/updateGuideline.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -11,7 +10,7 @@ import { ImageFileInterceptor } from "../user/interceptor/imageFile.interceptor"
 @ApiTags('Guideline')
 @Controller('guideline')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, MemberFamilyGuard)
 export class GuidelineController {
   constructor(private readonly guidelineService: GuidelineService) { }
 

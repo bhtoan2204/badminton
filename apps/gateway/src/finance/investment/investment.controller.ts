@@ -1,8 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../../auth/guard/jwt-auth.guard";
 import { InvestmentService } from "./investment.service";
-import { CurrentUser } from "../../utils";
+import { CurrentUser, JwtAuthGuard } from "../../utils";
 import { CreateInvestmentDto } from "./dto/createInvestment.dto";
 
 @ApiTags('Investment')

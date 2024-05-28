@@ -9,6 +9,12 @@ export class FamilyController {
     private readonly familyService: FamilyService,
     private readonly rmqService: RmqService) { }
 
+  @EventPattern('familyClient/checkIsMember')
+  async checkIsMember(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.familyService.checkIsMember(data.id_user, data.id_family);
+  }
+
   @EventPattern('family/get_Family')
   async getFamily(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);

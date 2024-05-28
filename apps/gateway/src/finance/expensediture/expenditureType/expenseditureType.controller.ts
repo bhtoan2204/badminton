@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../../../auth/guard/jwt-auth.guard";
+import { JwtAuthGuard } from "../../../utils";
 import { ExpenseditureTypeService } from "./expenseditureType.service";
 import { CurrentUser } from "apps/gateway/src/utils";
 import { CreateExpenseditureTypeDto } from "./dto/createExpenseditureType.dto";

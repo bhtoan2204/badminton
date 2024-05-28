@@ -13,6 +13,21 @@ export class FamilyService {
     private readonly storageService: StorageService,
   ) { }
 
+  async checkIsMember(id_user: string, id_family: number): Promise<boolean> {
+    try {
+      const q2 = 'select * from f_is_user_member_of_family($1, $2)';
+      const param = [id_user, id_family];
+      const data = await this.entityManager.query(q2, param);
+      return data[0].f_is_user_member_of_family;
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message || 'Internal server error',
+        statusCode: error.statusCode ||  HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  }
+
   async getFamily(id_user: string, id_family: any) {
     try {
       const q2 = 'select * from f_getfamily($1, $2)';

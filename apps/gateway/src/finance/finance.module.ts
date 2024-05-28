@@ -1,6 +1,6 @@
 import { RmqModule } from "@app/common";
 import { Module, forwardRef } from "@nestjs/common";
-import { FINANCE_SERVICE } from "../utils";
+import { FAMILY_SERVICE, FINANCE_SERVICE } from "../utils";
 import { FinanceService } from "./finance.service";
 import { FinanceController } from "./finance.controller";
 import { ExpenseditureModule } from "./expensediture/expensediture.module";
@@ -10,6 +10,7 @@ import { AssetModule } from "./asset/asset.module";
 @Module({
   imports: [
     RmqModule.register({ name: FINANCE_SERVICE }),
+    RmqModule.register({ name: FAMILY_SERVICE }),
     forwardRef(() => ExpenseditureModule),
     forwardRef(() => IncomeModule),
     forwardRef(() => AssetModule)
