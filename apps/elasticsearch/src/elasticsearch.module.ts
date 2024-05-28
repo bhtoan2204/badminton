@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RmqModule } from '@app/common';
 import { RabbitMqModule } from './rabbitmq/rabbitmq.module';
 import { ProxyModule } from './proxy/proxy.module';
+import { DataStatsModule } from './postgresql/datastats.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ProxyModule } from './proxy/proxy.module';
     RmqModule,
     forwardRef(() => ProxyModule),
     forwardRef(() => RabbitMqModule),
+    forwardRef(() => DataStatsModule)
   ],
   controllers: [SearchController],
   providers: [SearchService],
