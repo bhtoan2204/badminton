@@ -53,7 +53,7 @@ export class ProxyService {
   async getAnalytics(dto: any) {
     try {
       const { date_geq, date_leq, limit } = dto;
-      const query = generateGraphQLQuery(this.cloudflare_zone_id, date_geq, date_leq, limit) as string;
+      const query = generateGraphQLQuery(this.cloudflare_zone_id, date_geq, date_leq, limit);
       const data = await this.graphQLClient.request(query);
       return data;
     } catch (error) {
