@@ -41,20 +41,10 @@ export class AuthApiController {
   async googleLoginCallback(@Req() request: any, @Res({ passthrough: true }) response: Response) {
     const { accessToken, refreshToken } = await this.authService.localLogin(request.user);
 
-    response.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      path: '/',
-      sameSite: 'strict',
-    });
-    response.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      path: '/',
-      sameSite: 'strict',
-    });
+    response.setHeader('accessToken', accessToken);
+    response.setHeader('refreshToken', refreshToken);
 
-    return response.redirect(`${this.configService.get('FRONTEND_URL')}/setup`);
+    return response.redirect(`${this.configService.get('FRONTEND_URL')}/setup&login=google`);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -71,20 +61,11 @@ export class AuthApiController {
   @Get('facebook/callback')
   async facebookLoginCallback(@Req() request: any, @Res({ passthrough: true }) response: Response) {
     const { accessToken, refreshToken } = await this.authService.localLogin(request.user);
-    response.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      path: '/',
-      sameSite: 'strict',
-    });
-    response.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      path: '/',
-      sameSite: 'strict',
-    });
 
-    return response.redirect(`${this.configService.get('FRONTEND_URL')}/setup`);
+    response.setHeader('accessToken', accessToken);
+    response.setHeader('refreshToken', refreshToken);
+
+    return response.redirect(`${this.configService.get('FRONTEND_URL')}/setup&login=facebook`);
   }
 
   @HttpCode(HttpStatus.OK)
