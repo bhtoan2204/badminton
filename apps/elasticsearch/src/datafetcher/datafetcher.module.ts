@@ -1,17 +1,13 @@
-import { ApolloFederationDriver, ApolloFederationDriverConfig } from "@nestjs/apollo";
-import { Module } from "@nestjs/common";
-import { GraphQLModule } from "@nestjs/graphql";
+import { Module, forwardRef } from "@nestjs/common";
 import { DatafetcherController } from "./datafetcher.controller";
 import { DatafetcherService } from "./datafetcher.service";
+import { SearchModule } from "../elasticsearch.module";
+import { ConfigModule } from "@nestjs/config";
 
 @Module({
   imports: [
-    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
-      driver: ApolloFederationDriver,
-      autoSchemaFile: {
-        
-      }
-    }),
+    ConfigModule,
+    forwardRef(() => SearchModule)
   ],
   controllers: [DatafetcherController],
   providers: [DatafetcherService],
