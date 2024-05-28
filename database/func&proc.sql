@@ -1090,18 +1090,41 @@ $function$;
 select * from f_get_income_name(101, 1)
 
 
+CREATE OR REPLACE FUNCTION public.f_find_user(p_id_user uuid) 
+RETURNS TEXT
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    first_name TEXT;
+    last_name TEXT;
+BEGIN
+    -- Sử dụng câu lệnh SELECT để truy vấn first name và last name của user từ bảng users dựa trên id_user
+    SELECT users.firstname, users.lastname INTO first_name, last_name FROM users WHERE id_user = p_id_user;
+    
+    -- Kiểm tra xem có tìm thấy thông tin của user không
+    IF first_name IS NOT NULL AND last_name IS NOT NULL THEN
+        RETURN first_name || ' ' || last_name; -- Trả về first name và last name của user nếu tìm thấy
+    ELSE
+        RETURN 'User not found'; -- Trả về thông báo nếu không tìm thấy user
+    END IF;
+END;
+$function$;
 
-CREATE OR REPLACE FUNCTION public.f_get_expense_by_date(p_id_user uuid, p_id_family integer, p_expense_date date)
+
+CREATE OR REPLACE FUNCTION public.f_get_expense_by_date(p_id_user uuid, p_id_family integer, p_expense_date varchar)
 RETURNS TABLE (
     id_expense_type integer,
     expense_category text,
-    expense_amount numeric
+    expense_amount numeric,
+    description text, 
+    name text
 )
 LANGUAGE plpgsql
 AS $function$
 DECLARE
     v_user_exists BOOLEAN;
 BEGIN
+    -- Check if the user is a member of the specified family
     SELECT EXISTS (
         SELECT 1
         FROM member_family
@@ -1116,21 +1139,26 @@ BEGIN
     SELECT 
         fe.id_expense_type,
         f_get_category_name(p_id_family, fe.id_expense_type) AS expense_category,
-        fe.amount
+        fe.amount,
+        fe.description,
+        f_find_user(fe.id_created_by)
     FROM 
         finance_expenditure fe
     WHERE 
         fe.id_family = p_id_family 
-        AND fe.expenditure_date = p_expense_date;
+        AND fe.expenditure_date = p_expense_date::date; 
 END;
 $function$;
 
+
 ------------------------------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION public.f_get_income_by_date(p_id_user uuid, p_id_family integer, p_income_date date)
+CREATE OR REPLACE FUNCTION public.f_get_income_by_date(p_id_user uuid, p_id_family integer, p_income_date varchar)
 RETURNS TABLE (
     id_income_source integer,
     income_category text,
-    income_amount numeric
+    income_amount numeric,
+    description text, 
+    name text
 )
 LANGUAGE plpgsql
 AS $function$
@@ -1151,12 +1179,14 @@ BEGIN
     SELECT 
         fi.id_income_source,
         f_get_income_name(p_id_family, fi.id_income_source),
-        fi.amount
+        fi.amount,
+        fi.description,
+        f_find_user(fi.id_created_by)
     FROM 
         finance_income fi 
     WHERE 
         fi.id_family = p_id_family 
-        AND fi.income_date = p_income_date;
+        AND fi.income_date = p_income_date::date;
 END;
 $function$;
 
@@ -1434,8 +1464,8 @@ BEGIN
         IF v_total_income > 0 THEN
             v_result := v_result || jsonb_build_object(
                 'month', v_current_month,
-                'total_income', v_total_income,
-                'income_sources', v_income_sources
+                'total', v_total_income,
+                'categories', v_income_sources
             )::jsonb;
         END IF;
     END LOOP;
@@ -1772,3 +1802,95 @@ $function$
 
 ALTER FUNCTION public.f_update_calendar_event(uuid, int4, varchar, varchar, timestamp, timestamp, text, bool) OWNER TO avnadmin;
 GRANT ALL ON FUNCTION public.f_update_calendar_event(uuid, int4, varchar, varchar, timestamp, timestamp, text, bool) TO avnadmin;
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+-- Create
+CREATE OR REPLACE FUNCTION create_category_event(
+    _title VARCHAR,
+    _color VARCHAR,
+    _id_family INT,
+    _id_user uuid
+) RETURNS VOID AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = p_id_family AND f.id_user = p_id_user) THEN
+        INSERT INTO category_event (title, color, id_family)
+        VALUES (_title, _color, _id_family);
+    ELSE
+        RAISE EXCEPTION 'User does not belong to the specified family';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Read All
+select * from get_all_category_events(96,'bd94ba3a-b046-4a05-a260-890913e09df9')
+
+CREATE OR REPLACE FUNCTION get_all_category_events(p_id_family int, p_id_user uuid)
+RETURNS TABLE (
+    id_category_event INT,
+    title VARCHAR,
+    color VARCHAR,
+    id_family INT
+) AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = p_id_family AND f.id_user = p_id_user) THEN
+        RETURN QUERY
+        SELECT * FROM category_event WHERE category_event.id_family = p_id_family;
+    ELSE
+        RAISE EXCEPTION 'User does not belong to the specified family';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- Read by ID
+CREATE OR REPLACE FUNCTION get_category_event_by_id(_id_category_event INT, _id_user uuid)
+RETURNS TABLE (
+    id_category_event INT,
+    title VARCHAR,
+    color VARCHAR,
+    id_family INT
+) AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = p_id_family AND f.id_user = p_id_user) THEN
+        RETURN QUERY
+        SELECT * FROM category_event WHERE id_category_event = _id_category_event;
+    ELSE
+        RAISE EXCEPTION 'User does not belong to the specified family';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Update
+CREATE OR REPLACE FUNCTION update_category_event(
+    _id_category_event INT,
+    _title VARCHAR,
+    _color VARCHAR,
+    _id_family INT,
+    _id_user uuid
+) RETURNS VOID AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = p_id_family AND f.id_user = p_id_user) THEN
+        UPDATE category_event
+        SET title = _title, color = _color
+        WHERE id_category_event = _id_category_event AND id_family = _id_family;
+    ELSE
+        RAISE EXCEPTION 'User does not belong to the specified family';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Delete
+CREATE OR REPLACE FUNCTION delete_category_event(_id_category_event INT, _id_user uuid)
+RETURNS VOID AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = p_id_family AND f.id_user = p_id_user) THEN
+        DELETE FROM category_event WHERE id_category_event = _id_category_event;
+    ELSE
+        RAISE EXCEPTION 'User does not belong to the specified family';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
