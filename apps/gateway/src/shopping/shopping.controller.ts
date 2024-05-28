@@ -1,8 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { ShoppingService } from "./shopping.service";
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
-import { CurrentUser } from "../utils";
+import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from "../utils";
 import { CreateShoppingListDto } from "./dto/createShoppingList.dto";
 import { CreateShoppingItemDto } from "./dto/createShoppingItem.dto";
 import { UpdateShoppingListDto } from "./dto/updateShoppingList.dto";
@@ -11,7 +10,7 @@ import { UpdateShoppingItemDto } from "./dto/updateShoppingItem.dto";
 @ApiTags('Shopping')
 @Controller('shopping')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, MemberFamilyGuard)
 export class ShoppingController {
   constructor(
     private readonly shoppingService: ShoppingService

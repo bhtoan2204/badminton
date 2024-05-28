@@ -1,8 +1,6 @@
 import { Controller, UseGuards, Get, HttpCode, HttpStatus } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { Admin } from "../../utils";
-import { JwtAuthGuard } from "../../auth/guard/jwt-auth.guard";
-import { AdminGuard } from "../../auth/guard/authorize/role.guard";
+import { Admin, AdminGuard, JwtAuthGuard } from "../../utils";
 import { PostgresqlService } from "./datastats.service";
 
 @ApiTags('Admin Database')

@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../../auth/guard/jwt-auth.guard";
-import { CurrentUser } from "../../utils";
+import { CurrentUser, JwtAuthGuard } from "../../utils";
 import { CreateSubjectDto } from "./dto/createSubject.dto";
 import { SubjectService } from "./subject.service";
 import { UpdateSubjectDto } from "./dto/updateSubject.dto";

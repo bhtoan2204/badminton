@@ -1,8 +1,6 @@
-import { HttpService } from "@nestjs/axios";
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { RpcException } from "@nestjs/microservices";
-import { firstValueFrom } from "rxjs";
 import { generateGraphQLQuery } from "../utils/generateGql";
 import { GraphQLClient } from 'graphql-request';
 

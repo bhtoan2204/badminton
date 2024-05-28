@@ -7,7 +7,7 @@ import { TimeoutError, lastValueFrom, timeout } from "rxjs";
 export class RoomService {
   constructor(
     @Inject(HOUSEHOLD_SERVICE) private householdClient: ClientProxy
-  ) {}
+  ) { }
 
   async getRooms(id_user: string, id_family: number) {
     try {

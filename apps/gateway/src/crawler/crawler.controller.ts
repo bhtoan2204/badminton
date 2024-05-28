@@ -1,7 +1,7 @@
 import { Controller, Get, HttpCode, HttpStatus, Query, UseGuards } from "@nestjs/common";
-import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { CrawlerService } from "./crawler.service";
+import { JwtAuthGuard } from "../utils";
 
 @ApiTags('RSS and Crawler')
 @Controller('crawler')

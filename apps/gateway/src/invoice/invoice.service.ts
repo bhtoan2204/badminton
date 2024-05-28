@@ -12,7 +12,6 @@ export class InvoiceService {
     @Inject(INVOICE_SERVICE) private readonly invoiceClient: ClientProxy
   ) { }
   
-
   async getInvoiceTypes(id_user: string, id_family: number) {
     try {
       const response = this.invoiceClient.send('invoiceClient/getInvoiceTypes', { id_user, id_family }).pipe(timeout(5000));
