@@ -1811,16 +1811,28 @@ CREATE OR REPLACE FUNCTION create_category_event(
     _color VARCHAR,
     _id_family INT,
     _id_user uuid
-) RETURNS VOID AS $$
+) RETURNS TABLE (
+    id_category_event INT,
+    title VARCHAR,
+    color VARCHAR,
+    id_family INT
+) AS $$
 BEGIN
-    IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = p_id_family AND f.id_user = p_id_user) THEN
-        INSERT INTO category_event (title, color, id_family)
-        VALUES (_title, _color, _id_family);
+    IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = _id_family AND f.id_user = _id_user) THEN
+        IF NOT EXISTS (SELECT 1 FROM category_event ce WHERE ce.title = _title AND ce.id_family = _id_family) THEN
+            RETURN QUERY
+            INSERT INTO category_event (title, color, id_family, created_at, updated_at)
+            VALUES (_title, _color, _id_family, now(), now() )
+            RETURNING category_event.id_category_event, category_event.title, category_event.color, category_event.id_family;
+        ELSE
+            RAISE EXCEPTION 'Title already exists in the specified family';
+        END IF;
     ELSE
         RAISE EXCEPTION 'User does not belong to the specified family';
     END IF;
 END;
 $$ LANGUAGE plpgsql;
+
 
 -- Read All
 select * from get_all_category_events(96,'bd94ba3a-b046-4a05-a260-890913e09df9')
@@ -1872,7 +1884,7 @@ CREATE OR REPLACE FUNCTION update_category_event(
 BEGIN
     IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = p_id_family AND f.id_user = p_id_user) THEN
         UPDATE category_event
-        SET title = _title, color = _color
+        SET title = _title, color = _color, updated_at = now()
         WHERE id_category_event = _id_category_event AND id_family = _id_family;
     ELSE
         RAISE EXCEPTION 'User does not belong to the specified family';
@@ -1881,10 +1893,10 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Delete
-CREATE OR REPLACE FUNCTION delete_category_event(_id_category_event INT, _id_user uuid)
+CREATE OR REPLACE FUNCTION delete_category_event(_id_category_event INT, _id_family int,  _id_user uuid)
 RETURNS VOID AS $$
 BEGIN
-    IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = p_id_family AND f.id_user = p_id_user) THEN
+    IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = _id_family AND f.id_user = p_id_user) THEN
         DELETE FROM category_event WHERE id_category_event = _id_category_event;
     ELSE
         RAISE EXCEPTION 'User does not belong to the specified family';

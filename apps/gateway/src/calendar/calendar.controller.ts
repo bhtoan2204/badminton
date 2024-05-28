@@ -39,9 +39,10 @@ export class CalendarController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete category event of family' })
-  @Delete('deleteCategoryEvent')
-  async deleteCategoryEvent(@CurrentUser() currentUser, @Query('id_category_event') id_category_event: number) {
-    return this.calendarService.deleteCategoryEvent(currentUser.id_user, id_category_event);
+  @ApiParam({ name: 'id_family', required: true })
+  @Delete('deleteCategoryEvent/:id_family')
+  async deleteCategoryEvent(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Query('id_category_event') id_category_event: number) {
+    return this.calendarService.deleteCategoryEvent(currentUser.id_user, id_family, id_category_event);
   }
 
   @HttpCode(HttpStatus.OK)

@@ -31,7 +31,7 @@ export class CalendarController {
   @EventPattern('calendarClient/deleteCategoryEvent')
   async deleteCategoryEvent(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.calendarService.deleteCategoryEvent(data.id_user, data.id_category_event);
+    return this.calendarService.deleteCategoryEvent(data.id_user, data.id_family, data.id_category_event);
   }
 
 
