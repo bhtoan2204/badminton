@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { CalendarService } from "./calendar.service";
@@ -19,28 +19,28 @@ export class CalendarController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all category event of family' })
   @Get('getAllCategoryEvent')
-  async getAllCategoryEvent(@CurrentUser() currentUser, @Param('id_family') id_family: number) {
+  async getAllCategoryEvent(@CurrentUser() currentUser, @Query('id_family') id_family: number) {
     return this.calendarService.getAllCategoryEvent(currentUser.id_user, id_family);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Create category event of family' })
-  @Get('createCategoryEvent')
+  @Post('createCategoryEvent')
   async createCategoryEvent(@CurrentUser() currentUser, @Body() dto: CreateCategoryEventDto) {
     return this.calendarService.createCategoryEvent(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update category event of family' })
-  @Get('updateCategoryEvent')
+  @Put('updateCategoryEvent')
   async updateCategoryEvent(@CurrentUser() currentUser, @Body() dto: UpdateCategoryEventDto) {
     return this.calendarService.updateCategoryEvent(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete category event of family' })
-  @Get('deleteCategoryEvent')
-  async deleteCategoryEvent(@CurrentUser() currentUser, @Param('id_category_event') id_category_event: number) {
+  @Delete('deleteCategoryEvent')
+  async deleteCategoryEvent(@CurrentUser() currentUser, @Query('id_category_event') id_category_event: number) {
     return this.calendarService.deleteCategoryEvent(currentUser.id_user, id_category_event);
   }
 
