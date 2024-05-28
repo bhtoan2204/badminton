@@ -9,6 +9,32 @@ export class CalendarController {
     private readonly rmqService: RmqService,
     private readonly calendarService: CalendarService) { }
 
+
+  @EventPattern('calendarClient/getAllCategoryEvent')
+  async getAllCategoryEvent(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.calendarService.getAllCategoryEvent(data.id_user, data.id_family);
+  }
+
+  @EventPattern('calendarClient/createCategoryEvent')
+  async createCategoryEvent(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.calendarService.createCategoryEvent(data.id_user, data.dto);
+  }
+
+  @EventPattern('calendarClient/updateCategoryEvent')
+  async updateCategoryEvent(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.calendarService.updateCategoryEvent(data.id_user, data.dto);
+  }
+
+  @EventPattern('calendarClient/deleteCategoryEvent')
+  async deleteCategoryEvent(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.calendarService.deleteCategoryEvent(data.id_user, data.id_family, data.id_category_event);
+  }
+
+
   @EventPattern('calendarClient/getAllCalendar')
   async getAllCalendar(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);

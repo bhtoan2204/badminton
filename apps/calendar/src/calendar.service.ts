@@ -9,6 +9,71 @@ export class CalendarService {
     private readonly configService: ConfigService,
     private readonly entityManager: EntityManager
   ) { }
+  async getAllCategoryEvent(id_user: string, id_family: number) {
+    try {
+      const query = 'SELECT * FROM get_all_category_events($1, $2)';
+      const params = [id_family, id_user];
+      const data = await this.entityManager.query(query, params);
+      return data;
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  };
+
+  async createCategoryEvent(id_user: string, dto: any) {
+    try {
+      const { title, color, id_family } = dto 
+      const query = 'SELECT * FROM create_category_event($1, $2, $3, $4)';
+      const params = [title, color, id_family, id_user];
+      const data = await this.entityManager.query(query, params);
+      return data;
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  };
+  async updateCategoryEvent(id_user: string, dto: any) {
+    try {
+      const {id_category_event, title, color, id_family } = dto 
+
+      const query = 'SELECT * FROM update_category_event($1, $2, $3, $4, $5)';
+      const params = [id_category_event, title, color, id_family, id_user];
+      const data = await this.entityManager.query(query, params);
+      return data;
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  };
+  async deleteCategoryEvent(id_user: string, id_family: number, id_category_event: number) {
+    try {
+      const query = 'SELECT * FROM delete_category_event($1, $2, $3)';
+      const params = [id_category_event, id_family,  id_user];
+      const data = await this.entityManager.query(query, params);
+      return {
+        message: 'Success',
+        data: data.delete_category_event
+      };    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+      });
+    }
+  };
+
+
+
 
   async getAllCalendar(id_user: string, id_family: number) {
     try {
