@@ -78,7 +78,7 @@ export class GetLogsFilterDto {
   })
   @IsOptional()
   @IsString()
-  @IsIn(['@timestamp', 'responseTimeMs', 'contentLength'])
+  @IsIn(['@timestamp'])
   sortBy?: string = '@timestamp';
 
   @ApiPropertyOptional({

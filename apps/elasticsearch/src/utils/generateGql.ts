@@ -34,17 +34,9 @@ export function generateGraphQLQuery(zoneTag: string, date_geq: string, date_leq
             }
             encryptedBytes
             encryptedRequests
-            ipClassMap {
-              ipType
-              requests
-            }
             responseStatusMap {
               edgeResponseStatus
               requests
-            }
-            threatPathingMap {
-              requests
-              threatPathingName
             }
           }
           uniq {
