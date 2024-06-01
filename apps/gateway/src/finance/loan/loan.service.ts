@@ -13,7 +13,7 @@ export class LoanService {
     try {
       const response = this.financeClient.send('financeClient/getLoanCreditorType', {})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;

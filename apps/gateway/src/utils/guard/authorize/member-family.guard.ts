@@ -18,7 +18,7 @@ export class MemberFamilyGuard implements CanActivate {
     const id_user = request.user.id_user;
     const familyRequest$ = this.familyClient.send('familyClient/checkIsMember', { id_family, id_user })
       .pipe(
-        timeout(5000),
+        timeout(15000),
       );
     const familyCheck = await lastValueFrom(familyRequest$);
     return familyCheck;

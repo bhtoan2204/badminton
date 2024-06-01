@@ -12,7 +12,7 @@ export class NotificationService {
 
   async getNotifications(id_user: string, index: number) {
     try {
-      const response = this.notificationClient.send('notificationClient/getNotifications', { id_user, index }).pipe(timeout(5000));
+      const response = this.notificationClient.send('notificationClient/getNotifications', { id_user, index }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -25,7 +25,7 @@ export class NotificationService {
 
   async createNotification(id_user: string, dto: any, listReceiverId: string[]) {
     try {
-      const response = this.notificationClient.send('notificationClient/createNotification', { id_user, dto, listReceiverId }).pipe(timeout(5000));
+      const response = this.notificationClient.send('notificationClient/createNotification', { id_user, dto, listReceiverId }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -38,7 +38,7 @@ export class NotificationService {
 
   async markRead(id_user: string, id_notification: string) {
     try {
-      const response = this.notificationClient.send('notificationClient/markRead', { id_user, id_notification }).pipe(timeout(5000));
+      const response = this.notificationClient.send('notificationClient/markRead', { id_user, id_notification }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {

@@ -14,7 +14,7 @@ export class InvestmentService {
     try {
       const response = this.financeClient.send('financeClient/getInvestmentType', {})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -31,7 +31,7 @@ export class InvestmentService {
     try {
       const response = this.financeClient.send('financeClient/getInvestmentRiskLevel', {})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -52,7 +52,7 @@ export class InvestmentService {
     try {
       const response = this.financeClient.send('financeClient/createInvestment', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;

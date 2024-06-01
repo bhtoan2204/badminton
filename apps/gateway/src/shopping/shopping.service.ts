@@ -13,7 +13,7 @@ export class ShoppingService {
     try {
       const response = this.shoppingClient.send('shoppingClient/getShoppingItemType', {})
       .pipe(
-        timeout(5000),
+        timeout(15000),
       );
       return await lastValueFrom(response);
     }
@@ -29,7 +29,7 @@ export class ShoppingService {
     try {
       const response = this.shoppingClient.send('shoppingClient/getShoppingList', { id_user, id_family, page, itemsPerPage})
       .pipe(
-        timeout(5000),
+        timeout(15000),
       );
       return await lastValueFrom(response);
     }
@@ -45,7 +45,7 @@ export class ShoppingService {
     try {
       const response = this.shoppingClient.send('shoppingClient/getShoppingItem', { id_user, id_list, page, itemsPerPage })
       .pipe(
-        timeout(5000),
+        timeout(15000),
       );
       return await lastValueFrom(response);
     }
@@ -61,7 +61,7 @@ export class ShoppingService {
     try {
       const response = this.shoppingClient.send('shoppingClient/createShoppingList', { id_user, dto })
       .pipe(
-        timeout(5000),
+        timeout(15000),
       );
       return await lastValueFrom(response);
     }
@@ -77,7 +77,7 @@ export class ShoppingService {
     try {
       const response = this.shoppingClient.send('shoppingClient/createShoppingItem', { id_user, dto })
       .pipe(
-        timeout(5000),
+        timeout(15000),
       );
       return await lastValueFrom(response);
     }
@@ -93,7 +93,7 @@ export class ShoppingService {
     try {
       const response = this.shoppingClient.send('shoppingClient/updateShoppingList', { id_user, dto })
       .pipe(
-        timeout(5000),
+        timeout(15000),
       );
       return await lastValueFrom(response);
     }
@@ -109,7 +109,7 @@ export class ShoppingService {
     try {
       const response = this.shoppingClient.send('shoppingClient/updateShoppingItem', { id_user, dto })
       .pipe(
-        timeout(5000),
+        timeout(15000),
       );
       return await lastValueFrom(response);
     }
@@ -125,7 +125,7 @@ export class ShoppingService {
     try {
       const response = this.shoppingClient.send('shoppingClient/deleteShoppingList', { id_user, id_family, id_list })
       .pipe(
-        timeout(5000),
+        timeout(15000),
       );
       return await lastValueFrom(response);
     }
@@ -141,7 +141,7 @@ export class ShoppingService {
     try {
       const response = this.shoppingClient.send('shoppingClient/deleteShoppingItem', { id_user, id_list, id_item, id_family })
       .pipe(
-        timeout(5000),
+        timeout(15000),
       );
       return await lastValueFrom(response);
     }

@@ -13,7 +13,7 @@ export class PostgresqlService {
     try {
       const response = this.elasticsearchClient.send('datastatsClient/getPostgresqlStat', {})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -29,7 +29,7 @@ export class PostgresqlService {
     try {
       const response = this.elasticsearchClient.send('datastatsClient/getMongooseStat', {})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;

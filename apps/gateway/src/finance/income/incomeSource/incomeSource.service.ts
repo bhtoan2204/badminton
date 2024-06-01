@@ -13,7 +13,7 @@ export class IncomeSourceService {
     try {
       const response = this.financeClient.send('financeClient/getIncomeSource', { id_user, id_family })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -30,7 +30,7 @@ export class IncomeSourceService {
     try {
       const response = this.financeClient.send('financeClient/createIncomeSource', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -47,7 +47,7 @@ export class IncomeSourceService {
     try {
       const response = this.financeClient.send('financeClient/updateIncomeSource', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -64,7 +64,7 @@ export class IncomeSourceService {
     try {
       const response = this.financeClient.send('financeClient/deleteIncomeSource', { id_user, id_family, id_income_source })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;

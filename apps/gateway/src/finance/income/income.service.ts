@@ -13,7 +13,7 @@ export class IncomeService {
     try {
       const response = this.financeClient.send('financeClient/getIncome', {id_user, id_family, page, itemsPerPage})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -30,7 +30,7 @@ export class IncomeService {
     try {
       const response = this.financeClient.send('financeClient/getIncomeByDate', {id_user, id_family, date})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -47,7 +47,7 @@ export class IncomeService {
     try {
       const response = this.financeClient.send('financeClient/getIncomeByMonth', {id_user, id_family, month, year})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -64,7 +64,7 @@ export class IncomeService {
     try {
       const response = this.financeClient.send('financeClient/getIncomeByYear', {id_user, id_family, year})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -81,7 +81,7 @@ export class IncomeService {
     try {
       const response = this.financeClient.send('financeClient/getIncomeById', {id_user, id_family, id_income})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -98,7 +98,7 @@ export class IncomeService {
     try {
       const response = this.financeClient.send('financeClient/getStatiscalIncome', {id_user, id_family})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -115,7 +115,7 @@ export class IncomeService {
     try {
       const response = this.financeClient.send('financeClient/createIncome', {id_user, dto})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -132,7 +132,7 @@ export class IncomeService {
     try {
       const response = this.financeClient.send('financeClient/updateIncome', {id_user, dto})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -149,7 +149,7 @@ export class IncomeService {
     try {
       const response = this.financeClient.send('financeClient/deleteIncome', {id_user, id_family, id_income})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;

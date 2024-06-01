@@ -14,7 +14,7 @@ export class ExpenseditureService {
     try {
       const response = this.financeClient.send('financeClient/getExpenseByDate', { id_user, id_family, date})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -32,7 +32,7 @@ export class ExpenseditureService {
     try {
       const response = this.financeClient.send('financeClient/getExpenseByMonth', { id_user, id_family, month, year})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -49,7 +49,7 @@ export class ExpenseditureService {
     try {
       const response = this.financeClient.send('financeClient/getExpenseByYear', { id_user, id_family, year})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -67,7 +67,7 @@ export class ExpenseditureService {
     try {
       const response = this.financeClient.send('financeClient/getExpenseditureById', { id_user, id_family, id_expenditure })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -84,7 +84,7 @@ export class ExpenseditureService {
     try {
       const response = this.financeClient.send('financeClient/getStatiscalExpensediture', { id_user, id_family })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -101,7 +101,7 @@ export class ExpenseditureService {
     try {
       const response = this.financeClient.send('financeClient/createExpensediture', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -118,7 +118,7 @@ export class ExpenseditureService {
     try {
       const response = this.financeClient.send('financeClient/updateExpensediture', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -135,7 +135,7 @@ export class ExpenseditureService {
     try {
       const response = this.financeClient.send('financeClient/deleteExpensediture', { id_user, id_family, id_expenditure })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;

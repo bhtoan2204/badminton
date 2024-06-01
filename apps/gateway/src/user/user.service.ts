@@ -14,7 +14,7 @@ export class UserService {
   async createAccount(createAccountDto: CreateAccountDto) {
     try {
       const source = this.userClient.send('userClient/create_account', { createAccountDto }).pipe(
-        timeout(5000),
+        timeout(15000),
       );
       const data = await lastValueFrom(source);
       return data;
@@ -30,7 +30,7 @@ export class UserService {
   async checkPhone(phone: string) {
     try {
       const source = this.userClient.send('userClient/check_phone', { phone }).pipe(
-        timeout(5000),
+        timeout(15000),
       );
       const data = await lastValueFrom(source);
       return data;
@@ -46,7 +46,7 @@ export class UserService {
   async changePassword(currentUser, data: ChangePasswordDto) {
     try {
       const source = this.userClient.send('userClient/change_password', { currentUser, data }).pipe(
-        timeout(5000),
+        timeout(15000),
       );
       const result = await lastValueFrom(source);
       return result;
@@ -71,7 +71,7 @@ export class UserService {
         });
       }
       const source = this.userClient.send('userClient/update_profile', { user, data }).pipe(
-        timeout(5000),
+        timeout(15000),
       );
       const result = await lastValueFrom(source);
       return result;
@@ -106,7 +106,7 @@ export class UserService {
   async validateEmail(currentUser, data) {
     try {
       const source = this.userClient.send('userClient/validate_email', { currentUser, data }).pipe(
-        timeout(5000),
+        timeout(15000),
       );
       const result = await lastValueFrom(source);
       return result;
@@ -122,7 +122,7 @@ export class UserService {
   async getAllUser() {
     try {
       const source = this.userClient.send('userClient/get_all_user', {}).pipe(
-        timeout(5000),
+        timeout(15000),
       );
       const result = await lastValueFrom(source);
       return result;

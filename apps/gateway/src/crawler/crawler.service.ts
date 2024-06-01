@@ -13,7 +13,7 @@ export class CrawlerService {
     try {
       const response = this.crawlerClient.send('crawlerClient/getNews', { type, page, itemsPerPage })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {

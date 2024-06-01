@@ -16,7 +16,7 @@ export class GuidelineService {
     try {
       const response = this.guidelineClient.send('guidelineClient/get_all_guideline', { id_user, id_family, page, itemsPerPage })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -31,7 +31,7 @@ export class GuidelineService {
     try {
       const response = this.guidelineClient.send('guidelineClient/get_guideline', { id_user, id_family, id_guideline })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -46,7 +46,7 @@ export class GuidelineService {
     try {
       const response = this.guidelineClient.send('guidelineClient/create_guideline', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -62,7 +62,7 @@ export class GuidelineService {
     try {
       const response = this.guidelineClient.send('guidelineClient/update_guideline', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -77,7 +77,7 @@ export class GuidelineService {
     try {
       const response = this.guidelineClient.send('guidelineClient/delete_guideline', { id_user, id_family, id_guideline })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -92,7 +92,7 @@ export class GuidelineService {
     try {
       const response = this.guidelineClient.send('guidelineClient/get_step', { id_user, id_family, id_guideline })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -139,7 +139,7 @@ export class GuidelineService {
     try {
       const response = this.guidelineClient.send('guidelineClient/update_step', { id_user, dto, file })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -154,7 +154,7 @@ export class GuidelineService {
     try {
       const response = this.guidelineClient.send('guidelineClient/delete_step', { id_user, id_family, id_guideline, index })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -169,7 +169,7 @@ export class GuidelineService {
     try {
       const response = this.guidelineClient.send('guidelineClient/mark_shared', { id_user, id_family, id_guideline })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -184,7 +184,7 @@ export class GuidelineService {
     try {
       const response = this.guidelineClient.send('guidelineClient/getSharedGuideline', { page, itemsPerPage, text, sort })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {

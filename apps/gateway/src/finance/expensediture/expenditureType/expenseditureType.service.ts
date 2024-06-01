@@ -13,7 +13,7 @@ export class ExpenseditureTypeService {
     try {
       const response = this.financeClient.send('financeClient/getExpenseditureType', { id_user, id_family })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -30,7 +30,7 @@ export class ExpenseditureTypeService {
     try {
       const response = this.financeClient.send('financeClient/createExpenseditureType', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -47,7 +47,7 @@ export class ExpenseditureTypeService {
     try {
       const response = this.financeClient.send('financeClient/updateExpenseditureType', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -64,7 +64,7 @@ export class ExpenseditureTypeService {
     try {
       const response = this.financeClient.send('financeClient/deleteExpenseditureType', { id_user, id_family, id_expenditure_type })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;

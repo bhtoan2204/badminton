@@ -14,7 +14,7 @@ export class InvoiceService {
   
   async getInvoiceTypes(id_user: string, id_family: number) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/getInvoiceTypes', { id_user, id_family }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/getInvoiceTypes', { id_user, id_family }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -27,7 +27,7 @@ export class InvoiceService {
 
   async createInvoiceType(id_user: string, dto: any) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/createInvoiceType', { id_user, dto }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/createInvoiceType', { id_user, dto }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -40,7 +40,7 @@ export class InvoiceService {
 
   async updateInvoiceType(id_user: string, dto: any) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/updateInvoiceType', { id_user, dto }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/updateInvoiceType', { id_user, dto }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -53,7 +53,7 @@ export class InvoiceService {
 
   async deleteInvoiceType(id_user: string, id_family: number, id_invoice_type: number) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/deleteInvoiceType', { id_user, id_family, id_invoice_type }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/deleteInvoiceType', { id_user, id_family, id_invoice_type }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -66,7 +66,7 @@ export class InvoiceService {
 
   async getInvoices(id_user: string, id_family: number, page: number, itemsPerPage: number) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/getInvoices', { id_user, id_family, page, itemsPerPage }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/getInvoices', { id_user, id_family, page, itemsPerPage }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -79,7 +79,7 @@ export class InvoiceService {
 
   async getInvoiceDetail(id_user: string, id_family:number, id_invoice: number) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/getInvoiceDetail', { id_user, id_family, id_invoice }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/getInvoiceDetail', { id_user, id_family, id_invoice }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -92,7 +92,7 @@ export class InvoiceService {
 
   async createInvoice(id_user: string, dto: any, file: any) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/createInvoice', { id_user, dto, file }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/createInvoice', { id_user, dto, file }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -105,7 +105,7 @@ export class InvoiceService {
 
   async updateInvoice(id_user: string, dto: any, file: any) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/updateInvoice', { id_user, dto, file }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/updateInvoice', { id_user, dto, file }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -118,7 +118,7 @@ export class InvoiceService {
 
   async deleteInvoice(id_user: string, id_family: number, id_invoice: number) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/deleteInvoice', { id_user, id_family, id_invoice }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/deleteInvoice', { id_user, id_family, id_invoice }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -131,7 +131,7 @@ export class InvoiceService {
 
   async updateInvoiceItem(id_user: string, dto: any) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/updateInvoiceItem', { id_user, dto }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/updateInvoiceItem', { id_user, dto }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -144,7 +144,7 @@ export class InvoiceService {
 
   async createInvoiceItems(id_user: string, dto: any) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/createInvoiceItems', { id_user, dto }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/createInvoiceItems', { id_user, dto }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -157,7 +157,7 @@ export class InvoiceService {
 
   async getInvoiceItemDetail(id_user: string, id_family: number, id_invoice: number, id_invoice_item: number) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/getInvoiceItemDetail', { id_user, id_family, id_invoice, id_invoice_item }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/getInvoiceItemDetail', { id_user, id_family, id_invoice, id_invoice_item }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -170,7 +170,7 @@ export class InvoiceService {
 
   async getAllInvoiceItems(id_user: string, id_family: number, id_invoice: number) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/getAllInvoiceItems', { id_user, id_family, id_invoice }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/getAllInvoiceItems', { id_user, id_family, id_invoice }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
@@ -183,7 +183,7 @@ export class InvoiceService {
   
   async deleteInvoiceItem(id_user: string, id_family: number, id_invoice: number, id_item: number) {
     try {
-      const response = this.invoiceClient.send('invoiceClient/deleteInvoiceItem', { id_user, id_family, id_invoice, id_item }).pipe(timeout(5000));
+      const response = this.invoiceClient.send('invoiceClient/deleteInvoiceItem', { id_user, id_family, id_invoice, id_item }).pipe(timeout(15000));
       return await lastValueFrom(response);
     }
     catch (error) {
