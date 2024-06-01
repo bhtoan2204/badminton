@@ -12,7 +12,7 @@ export class AuthApiService {
   async localLogin(currentUser) {
     try {
       const source = this.authClient.send('authClient/local/login', currentUser).pipe(
-        timeout(5000)
+        timeout(15000)
       );
       const data = await lastValueFrom(source);
       return data;
@@ -28,7 +28,7 @@ export class AuthApiService {
   async refreshToken(currentUser, refreshToken) {
     try {
       const source = this.authClient.send('authClient/refresh_token', { currentUser, refreshToken }).pipe(
-        timeout(5000)
+        timeout(15000)
       );
       const data = await lastValueFrom(source);
       return data;
@@ -44,7 +44,7 @@ export class AuthApiService {
   async logout(refreshToken) {
     try {
       const source = this.authClient.send('authClient/logout', refreshToken).pipe(
-        timeout(5000)
+        timeout(15000)
       );
       const data = await lastValueFrom(source);
       return data;

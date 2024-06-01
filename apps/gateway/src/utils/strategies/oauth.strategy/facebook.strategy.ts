@@ -29,7 +29,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, "facebook") {
   ): Promise<any> {
     try {
       const source = this.authClient.send('authClient/facebook_login', { accessToken, profile }).pipe(
-        timeout(5000)
+        timeout(15000)
       );
       return await lastValueFrom(source);
     }

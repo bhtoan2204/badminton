@@ -24,7 +24,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   private async validateUser(email: string, password: string) {
     try {
       const userValidation$ = this.authClient.send('authClient/validate_user', { email, password }).pipe(
-        timeout(5000)
+        timeout(15000)
       );
       return await lastValueFrom(userValidation$);
     }

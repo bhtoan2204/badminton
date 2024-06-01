@@ -13,7 +13,7 @@ export class RoomService {
     try {
       const response = this.householdClient.send('householdClient/getRooms', { id_user, id_family })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -29,7 +29,7 @@ export class RoomService {
     try {
       const response = this.householdClient.send('householdClient/createRoom', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -45,7 +45,7 @@ export class RoomService {
     try {
       const response = this.householdClient.send('householdClient/updateRoom', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -61,7 +61,7 @@ export class RoomService {
     try {
       const response = this.householdClient.send('householdClient/deleteRoom', { id_user, id_family, id_room })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }

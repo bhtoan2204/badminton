@@ -23,7 +23,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   async validate(accessToken: string, refreshToken: string, profile: Profile): Promise<any> {
     try {
       const source = this.authClient.send('authClient/google_login', { accessToken, profile }).pipe(
-        timeout(5000)
+        timeout(15000)
       );
       return await lastValueFrom(source);
     }

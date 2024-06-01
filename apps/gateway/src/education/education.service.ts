@@ -14,7 +14,7 @@ export class EducationService {
     try {
       const response = this.educationClient.send('educationClient/createEducationProgress', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -32,7 +32,7 @@ export class EducationService {
     try {
       const response = this.educationClient.send('educationClient/getAllEducationProgress', { id_user, pageNumber, itemsPerPage, id_family })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -51,7 +51,7 @@ export class EducationService {
     try {
       const response = this.educationClient.send('educationClient/getDetailEducationProgress', { id_user, id_family, id_education_progress })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -67,7 +67,7 @@ export class EducationService {
     try {
       const response = this.educationClient.send('educationClient/updateDetailEducationProgress', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -84,7 +84,7 @@ export class EducationService {
     try {
       const response = this.educationClient.send('educationClient/deleteEducationProgress', { id_user, id_family, id_education_progress })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }

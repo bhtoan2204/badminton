@@ -15,7 +15,7 @@ export class CalendarService {
     try {
       const response = this.calendarClient.send('calendarClient/getAllCategoryEvent', { id_user, id_family })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -32,7 +32,7 @@ export class CalendarService {
     try {
       const response = this.calendarClient.send('calendarClient/createCategoryEvent', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -49,7 +49,7 @@ export class CalendarService {
     try {
       const response = this.calendarClient.send('calendarClient/updateCategoryEvent', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -66,7 +66,7 @@ export class CalendarService {
     try {
       const response = this.calendarClient.send('calendarClient/deleteCategoryEvent', { id_user, id_family, id_category_event })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -83,7 +83,7 @@ export class CalendarService {
     try {
       const response = this.calendarClient.send('calendarClient/getAllCalendar', { id_user, id_family })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -100,7 +100,7 @@ export class CalendarService {
     try {
       const response = this.calendarClient.send('calendarClient/getEventOnDate', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -117,7 +117,7 @@ export class CalendarService {
     try {
       const response = this.calendarClient.send('calendarClient/getCalendarDetail', { id_user, id_calendar })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -134,7 +134,7 @@ export class CalendarService {
     try {
       const response = this.calendarClient.send('calendarClient/createCalendar', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -151,7 +151,7 @@ export class CalendarService {
     try {
       const response = this.calendarClient.send('calendarClient/updateCalendar', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -167,7 +167,7 @@ export class CalendarService {
   async deleteCalendar(id_user: string, id_calendar: number) {
     try {
       const response = this.calendarClient.send('calendarClient/deleteCalendar', { id_user, id_calendar })
-        .pipe(timeout(5000));
+        .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
     }

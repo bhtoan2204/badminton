@@ -17,7 +17,7 @@ export class FamilyService {
     try {
       const response = this.familyClient.send('family/get_Family', { id_user, id_family })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -33,7 +33,7 @@ export class FamilyService {
     try {
       const response = this.familyClient.send('family/get_Member', { id_user })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -49,7 +49,7 @@ export class FamilyService {
     try {
       const response = this.familyClient.send('family/get_all_Member', { id_user, id_family })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -65,7 +65,7 @@ export class FamilyService {
     try {
       const response = this.familyClient.send('family/get_all_Family', id_user)
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -82,7 +82,7 @@ export class FamilyService {
     try {
       const response = this.familyClient.send('family/add_Member', { id_user, memberFamilyDto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -98,7 +98,7 @@ export class FamilyService {
     try {
       const response = this.familyClient.send('family/delete_Member', { id_user, deleteMemberDTO })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -113,7 +113,7 @@ export class FamilyService {
   async createFamily(id_user, createFamilyDto: CreateFamilyDto) {
     try {
       const source = this.familyClient.send('family/create_Family', { id_user, createFamilyDto }).pipe(
-        timeout(5000)
+        timeout(15000)
       );
       const data = await lastValueFrom(source);
       return data;
@@ -128,7 +128,7 @@ export class FamilyService {
   async updateFamily(id_user: string, updateFamilyDTO: UpdateFamilyDTO) {
     try {
       const source = this.familyClient.send('family/update_Family', { id_user, updateFamilyDTO }).pipe(
-        timeout(5000)
+        timeout(15000)
       );
       const data = await lastValueFrom(source);
       return data;
@@ -143,7 +143,7 @@ export class FamilyService {
   async deleteFamily(id_user: string, id_family) {
     try {
       const source = this.familyClient.send('family/delete_Family', { id_user, id_family }).pipe(
-        timeout(5000)
+        timeout(15000)
       );
       const data = await lastValueFrom(source);
       return data;
@@ -158,7 +158,7 @@ export class FamilyService {
   async changeAvatar(id_user: string, id_family: number, file: Express.Multer.File) {
     try {
       const source = this.familyClient.send('family/change_avatar', { id_user, id_family, file }).pipe(
-        timeout(5000)
+        timeout(15000)
       );
       const data = await lastValueFrom(source);
       return data;

@@ -15,7 +15,7 @@ export class HouseholdService {
     try {
       const response = this.householdClient.send('householdClient/getCategory', { })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -31,7 +31,7 @@ export class HouseholdService {
     try {
       const response = this.householdClient.send('householdClient/getItem', { id_user, id_family, page, itemsPerPage })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -47,7 +47,7 @@ export class HouseholdService {
     try {
       const response = this.householdClient.send('householdClient/getItemDetail', { id_user, id_family, id_item })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -63,7 +63,7 @@ export class HouseholdService {
     try {
       const response = this.householdClient.send('householdClient/createItem', { id_user, dto, file })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -79,7 +79,7 @@ export class HouseholdService {
     try {
       const response = this.householdClient.send('householdClient/updateItem', { id_user, dto, file })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -95,7 +95,7 @@ export class HouseholdService {
     try {
       const response = this.householdClient.send('householdClient/inputDurableItem', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -111,7 +111,7 @@ export class HouseholdService {
     try {
       const response = this.householdClient.send('householdClient/inputConsumableItem', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -127,7 +127,7 @@ export class HouseholdService {
     try {
       const response = this.householdClient.send('householdClient/deleteItem', { id_user, id_family, id_item })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }

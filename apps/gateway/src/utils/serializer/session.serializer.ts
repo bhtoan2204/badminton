@@ -18,7 +18,7 @@ export class SessionSerializer extends PassportSerializer {
 
   async deserializeUser(payload: any, done: Function) {
     const source = this.clientProxy.send('authClient/validate_user_id', { id_user: payload.id_user }).pipe(
-      timeout(5000)
+      timeout(15000)
     );
     const user = await lastValueFrom(source);
     return user ? done(null, user) : done(null, null);

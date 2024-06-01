@@ -19,7 +19,7 @@ export class SubjectService {
     try {
       const response = this.educationClient.send('educationClient/createSubject', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -34,7 +34,7 @@ export class SubjectService {
     try {
       const response = this.educationClient.send('educationClient/getDetailSubject', { id_user, id_family, id_education_progress, id_subject })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -50,7 +50,7 @@ export class SubjectService {
     try {
       const response = this.educationClient.send('educationClient/updateDetailSubject', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -65,7 +65,7 @@ export class SubjectService {
     try {
       const response = this.educationClient.send('educationClient/deleteSubject', { id_user, id_family, id_education_progress, id_subject })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -80,7 +80,7 @@ export class SubjectService {
     try {
       const response = this.educationClient.send('educationClient/addComponentScore', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -95,7 +95,7 @@ export class SubjectService {
     try {
       const response = this.educationClient.send('educationClient/insertComponentScore', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -110,7 +110,7 @@ export class SubjectService {
     try {
       const response = this.educationClient.send('educationClient/updateComponentScore', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -125,7 +125,7 @@ export class SubjectService {
     try {
       const response = this.educationClient.send('educationClient/deleteComponentScore', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -140,7 +140,7 @@ export class SubjectService {
     try {
       const response = this.educationClient.send('educationClient/modifyScore', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -155,7 +155,7 @@ export class SubjectService {
     try {
       const response = this.educationClient.send('educationClient/removeScore', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {
@@ -170,7 +170,7 @@ export class SubjectService {
     try {
       const response = this.educationClient.send('educationClient/changeStatus', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     } catch (error) {

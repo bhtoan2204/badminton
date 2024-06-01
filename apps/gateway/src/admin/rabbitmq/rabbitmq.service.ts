@@ -13,7 +13,7 @@ export class RabbitMqService {
     try {
       const response = this.elasticsearchClient.send('rabbitMqClient/getQueues', {})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -29,7 +29,7 @@ export class RabbitMqService {
     try {
       const response = this.elasticsearchClient.send('rabbitMqClient/getQueueDetail', { queueName })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -46,7 +46,7 @@ export class RabbitMqService {
     try {
       const response = this.elasticsearchClient.send('rabbitMqClient/getNode', {})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -63,7 +63,7 @@ export class RabbitMqService {
     try {
       const response = this.elasticsearchClient.send('rabbitMqClient/getNodeStatistics', { nodeName })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -79,7 +79,7 @@ export class RabbitMqService {
     try {
       const response = this.elasticsearchClient.send('rabbitMqClient/getLogs', { limit, offset })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -95,7 +95,7 @@ export class RabbitMqService {
     try {
       const response = this.elasticsearchClient.send('rabbitMqClient/healthCheck', {})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;

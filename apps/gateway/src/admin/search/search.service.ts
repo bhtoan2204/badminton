@@ -13,7 +13,7 @@ export class SearchService {
     try {
       const response = this.elasticsearchClient.send('elasticsearchClient/getLogsCount', {})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -29,7 +29,7 @@ export class SearchService {
     try {
       const response = this.elasticsearchClient.send('elasticsearchClient/getLogs', dto)
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -45,7 +45,7 @@ export class SearchService {
     try {
       const response = this.elasticsearchClient.send('elasticsearchClient/getLogsCountByTimeRange', dto)
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;

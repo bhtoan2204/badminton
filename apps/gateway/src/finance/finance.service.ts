@@ -13,7 +13,7 @@ export class FinanceService {
     try {
       const response = this.financeClient.send('financeClient/getFinanceSummary', { id_user, id_family })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
         return await lastValueFrom(response);
     }

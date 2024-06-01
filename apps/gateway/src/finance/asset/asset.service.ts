@@ -15,7 +15,7 @@ export class AssetService {
     try {
       const response = this.financeClient.send('financeClient/getAsset', { id_user, id_family, page, itemsPerPage })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -31,7 +31,7 @@ export class AssetService {
     try {
       const response = this.financeClient.send('financeClient/createAsset', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -47,7 +47,7 @@ export class AssetService {
     try {
       const response = this.financeClient.send('financeClient/updateAsset', { id_user, dto })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }
@@ -63,7 +63,7 @@ export class AssetService {
     try {
       const response = this.financeClient.send('financeClient/deleteAsset', { id_user, id_family, id_asset })
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       return await lastValueFrom(response);
     }

@@ -13,7 +13,7 @@ export class ProxyService {
     try {
       const response = this.elasticsearchClient.send('proxyClient/getZone', {})
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
@@ -29,7 +29,7 @@ export class ProxyService {
     try {
       const response = this.elasticsearchClient.send('proxyClient/analytics', dto )
         .pipe(
-          timeout(5000),
+          timeout(15000),
         );
       const data = await lastValueFrom(response);
       return data;
