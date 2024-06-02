@@ -52,4 +52,16 @@ export class AuthController {
     const { email, password } = data;
     return await this.authService.validateLocalUser(email, password);
   }
+
+  @EventPattern('authClient/saveFCMToken')
+  async handleSaveFCMToken(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.authService.saveFCMToken(data.userId, data.fcmToken);
+  }
+
+  @EventPattern('authClient/deleteFCMToken')
+  async handleDeleteFCMToken(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.authService.deleteFCMToken(data.userId, data.fcmToken);
+  }
 }
