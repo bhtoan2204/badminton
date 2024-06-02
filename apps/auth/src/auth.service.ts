@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { LoginType, Users } from "@app/common";
+import { FirebaseService, LoginType, Users } from "@app/common";
 import { RpcException } from "@nestjs/microservices";
 import { EntityManager, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -13,7 +13,8 @@ export class AuthService {
     @InjectRepository(Users) private userRepository: Repository<Users>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
-    private readonly entityManager: EntityManager
+    private readonly entityManager: EntityManager,
+    private readonly firebaseService: FirebaseService
   ) { }
 
   async validateGoogleUser(accessToken: string, profile: any) {
@@ -283,5 +284,29 @@ export class AuthService {
 
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
+  }
+
+  async saveFCMToken(userId: string, fcmToken: string) {
+    try {
+      return await this.firebaseService.saveFCMToken(userId, fcmToken);
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: 404
+      });
+    }
+  }
+
+  async deleteFCMToken(userId: string, fcmToken: string) {
+    try {
+      return await this.firebaseService.deleteFCMToken(userId, fcmToken);
+    }
+    catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: 404
+      });
+    }
   }
 }

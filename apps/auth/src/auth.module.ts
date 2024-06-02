@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { GlobalJwtModule, RmqModule, Users } from '@app/common';
+import { FirebaseService, GlobalJwtModule, RmqModule, Users } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from '@app/common/database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -24,6 +24,6 @@ import * as Joi from 'joi';
     GlobalJwtModule
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, FirebaseService],
 })
 export class AuthModule { }
