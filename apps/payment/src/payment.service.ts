@@ -2,7 +2,7 @@ import { Injectable, HttpStatus } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { RpcException } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
-import { sortObject } from '../utils';
+import { sortObject } from './utils';
 import * as moment from 'moment';
 import * as crypto from "crypto";
 import * as qs from "qs";
