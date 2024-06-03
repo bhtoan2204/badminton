@@ -18,4 +18,16 @@ export class DatafetcherController {
   async getIpData(@Param('ip') ip: string) {
     return this.datafetcherService.getIpData(ip);
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('summary')
+  async getSummary() {
+    return this.datafetcherService.getSummary();
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('revenueLast6Months')
+  async getRevenueLast6Months() {
+    return this.datafetcherService.getRevenueLast6Months();
+  }
 }

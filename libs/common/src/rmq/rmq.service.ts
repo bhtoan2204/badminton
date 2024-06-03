@@ -29,4 +29,10 @@ export class RmqService {
         const originalMessage = context.getMessage();
         channel.nack(originalMessage);
     }
+
+    reject(context: RmqContext) {
+        const channel = context.getChannelRef();
+        const originalMessage = context.getMessage();
+        channel.reject(originalMessage, false);
+    }
 }
