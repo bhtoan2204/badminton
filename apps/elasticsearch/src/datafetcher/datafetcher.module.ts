@@ -4,12 +4,14 @@ import { DatafetcherService } from "./datafetcher.service";
 import { SearchModule } from "../elasticsearch.module";
 import { ConfigModule } from "@nestjs/config";
 import { HttpModule } from "@nestjs/axios";
+import { DatabaseModule } from "@app/common";
 
 @Module({
   imports: [
     ConfigModule,
     HttpModule,
-    forwardRef(() => SearchModule)
+    DatabaseModule,
+    forwardRef(() => SearchModule),
   ],
   controllers: [DatafetcherController],
   providers: [DatafetcherService],

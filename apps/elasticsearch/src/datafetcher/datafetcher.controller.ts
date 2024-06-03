@@ -15,4 +15,16 @@ export class DatafetcherController {
     this.rmqService.ack(context);
     return this.datafetcherService.getIpData(data.ip);
   }
+
+  @EventPattern('datafetcherClient/getSummary')
+  async getSummary(@Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.datafetcherService.getSummary();
+  }
+
+  @EventPattern('datafetcherClient/getRevenueLast6Months')
+  async getRevenueLast6Months(@Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.datafetcherService.getRevenueLast6Months();
+  }
 }
