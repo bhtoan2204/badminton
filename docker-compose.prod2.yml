@@ -32,25 +32,3 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
-
-  education:
-    image: mjkundta/education:${TAG}
-    build:
-      context: .
-      dockerfile: ./apps/education/Dockerfile
-      target: production
-    command: node dist/apps/education/src/main
-    restart: on-failure
-    environment:
-      - NODE_ENV=production
-
-  search:
-    image: mjkundta/search:${TAG}
-    build:
-      context: .
-      dockerfile: ./apps/elasticsearch/Dockerfile
-      target: production
-    command: node dist/apps/elasticsearch/src/main
-    restart: on-failure
-    environment:
-      - NODE_ENV=production

@@ -34,26 +34,4 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
-  
-  payment:
-    image: mjkundta/payment:${TAG}
-    build:
-      context: .
-      dockerfile: ./apps/payment/Dockerfile
-      target: production
-    command: node dist/apps/payment/src/main
-    restart: on-failure
-    environment:
-      - NODE_ENV=production
-  
-  family:
-    image: mjkundta/family:${TAG}
-    build:
-      context: .
-      dockerfile: ./apps/family/Dockerfile
-      target: production
-    command: node dist/apps/family/src/main
-    restart: on-failure
-    environment:
-      - NODE_ENV=production
     

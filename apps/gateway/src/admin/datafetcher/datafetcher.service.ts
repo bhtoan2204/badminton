@@ -56,4 +56,20 @@ export class DatafetcherService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async getListOrders(dto: any) {
+    try {
+      const response = this.elasticsearchClient.send('datafetcherClient/getListOrders', {dto})
+        .pipe(
+          timeout(15000),
+        );
+      const data = await lastValueFrom(response);
+      return data;
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }

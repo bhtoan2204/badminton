@@ -27,4 +27,10 @@ export class DatafetcherController {
     this.rmqService.ack(context);
     return this.datafetcherService.getRevenueLast6Months();
   }
+
+  @EventPattern('datafetcherClient/getListOrders')
+  async getListOrders(@Ctx() context: RmqContext, @Payload() payload: {page: number, itemsPerPage: number, search: string, sort: string, packageId: number}) {
+    this.rmqService.ack(context);
+    return this.datafetcherService.getListOrders(payload.page, payload.itemsPerPage, payload.search, payload.sort, payload.packageId);
+  }
 }

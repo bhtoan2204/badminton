@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  crawler:
+    image: mjkundta/crawler:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/crawler/Dockerfile
+      target: production
+    command: node dist/apps/crawler/src/main
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
+
+  education:
+    image: mjkundta/education:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/education/Dockerfile
+      target: production
+    command: node dist/apps/education/src/main
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
+
+  payment:
+    image: mjkundta/payment:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/payment/Dockerfile
+      target: production
+    command: node dist/apps/payment/src/main
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
