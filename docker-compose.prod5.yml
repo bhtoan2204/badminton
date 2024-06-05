@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  household:
+    image: mjkundta/household:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/household/Dockerfile
+      target: production
+    command: node dist/apps/household/src/main
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
+
+  search:
+    image: mjkundta/search:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/elasticsearch/Dockerfile
+      target: production
+    command: node dist/apps/elasticsearch/src/main
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
+
+  family:
+    image: mjkundta/family:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/family/Dockerfile
+      target: production
+    command: node dist/apps/family/src/main
+    restart: on-failure
+    environment:
+      - NODE_ENV=production
