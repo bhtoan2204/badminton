@@ -1,8 +1,21 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional, IsBoolean, ValidatorConstraint, ValidatorConstraintInterface, ValidationArguments, Validate } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsDateString,
+  IsOptional,
+  IsBoolean,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+  ValidationArguments,
+  Validate,
+} from 'class-validator';
 
 @ValidatorConstraint({ name: 'timeStartBeforeEnd', async: false })
-export class TimeStartBeforeEndConstraint implements ValidatorConstraintInterface {
+export class TimeStartBeforeEndConstraint
+  implements ValidatorConstraintInterface
+{
   validate(timeStart: string, args: ValidationArguments) {
     const timeEnd = args.object[args.constraints[0]];
     return new Date(timeStart) <= new Date(timeEnd);
@@ -19,7 +32,10 @@ export class CreateCalendarDto {
   @IsString()
   title: string;
 
-  @ApiProperty({ example: 'The family\'s off to Ha Long Bay, bonding over its stunning vistas and creating lasting memories' })
+  @ApiProperty({
+    example:
+      "The family's off to Ha Long Bay, bonding over its stunning vistas and creating lasting memories",
+  })
   @IsString()
   description: string;
 

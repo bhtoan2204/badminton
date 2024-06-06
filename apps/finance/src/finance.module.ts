@@ -19,7 +19,10 @@ import * as Joi from 'joi';
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_FINANCE_QUEUE: Joi.string().required(),
       }),
-      envFilePath: process.env.NODE_ENV === 'production' ? './apps/finance/.env.production' : './apps/finance/.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './apps/finance/.env.production'
+          : './apps/finance/.env',
     }),
     RmqModule,
     DatabaseModule,
@@ -28,10 +31,10 @@ import * as Joi from 'joi';
     forwardRef(() => IncomeModule),
     forwardRef(() => InvestmentModule),
     forwardRef(() => LoanModule),
-    forwardRef(() => SavingModule)
+    forwardRef(() => SavingModule),
   ],
   controllers: [FinanceController],
   providers: [FinanceService],
-  exports: [RmqModule, DatabaseModule]
+  exports: [RmqModule, DatabaseModule],
 })
 export class FinanceModule {}

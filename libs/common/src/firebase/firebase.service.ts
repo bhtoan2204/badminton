@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import * as admin from 'firebase-admin';
 
 @Injectable()
@@ -9,7 +9,8 @@ export class FirebaseService {
     const serviceAccount = require('./famfund-def53-firebase-adminsdk-dgnjy-044c4a7040.json');
     this.firebaseAdmin = admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
-      databaseURL: 'https://famfund-def53-default-rtdb.asia-southeast1.firebasedatabase.app',
+      databaseURL:
+        'https://famfund-def53-default-rtdb.asia-southeast1.firebasedatabase.app',
     });
   }
 
@@ -37,7 +38,9 @@ export class FirebaseService {
     }
 
     try {
-      const tokensRef = this.firebaseAdmin.database().ref(`fcmTokens/${userId}`);
+      const tokensRef = this.firebaseAdmin
+        .database()
+        .ref(`fcmTokens/${userId}`);
       const snapshot = await tokensRef.once('value');
       let tokens = snapshot.val();
 
@@ -63,17 +66,22 @@ export class FirebaseService {
     }
 
     try {
-      const tokensRef = this.firebaseAdmin.database().ref(`fcmTokens/${userId}`);
+      const tokensRef = this.firebaseAdmin
+        .database()
+        .ref(`fcmTokens/${userId}`);
       const snapshot = await tokensRef.once('value');
 
       if (!snapshot.exists()) {
-        return { success: false, message: 'FCM token does not exist for this user' };
+        return {
+          success: false,
+          message: 'FCM token does not exist for this user',
+        };
       }
 
       let tokens = snapshot.val();
 
       if (tokens.includes(fcmToken)) {
-        tokens = tokens.filter(token => token !== fcmToken);
+        tokens = tokens.filter((token) => token !== fcmToken);
         await tokensRef.set(tokens);
       }
 
@@ -84,7 +92,11 @@ export class FirebaseService {
     }
   }
 
-  public async sendNotificationToUser(fcmToken: string, title: string, body: string) {
+  public async sendNotificationToUser(
+    fcmToken: string,
+    title: string,
+    body: string,
+  ) {
     if (!this.isValidFCMToken(fcmToken)) {
       throw new Error('Invalid FCM token');
     }
@@ -99,16 +111,26 @@ export class FirebaseService {
 
     try {
       const response = await this.firebaseAdmin.messaging().send(message);
-      return { success: true, message: 'Notification sent successfully', response };
+      return {
+        success: true,
+        message: 'Notification sent successfully',
+        response,
+      };
     } catch (error) {
       console.error('Error sending notification:', error);
       throw new Error('Error sending notification');
     }
   }
 
-  public async sendNotificationByUserId(userId: string, title: string, body: string) {
+  public async sendNotificationByUserId(
+    userId: string,
+    title: string,
+    body: string,
+  ) {
     try {
-      const tokensRef = this.firebaseAdmin.database().ref(`fcmTokens/${userId}`);
+      const tokensRef = this.firebaseAdmin
+        .database()
+        .ref(`fcmTokens/${userId}`);
       const snapshot = await tokensRef.once('value');
 
       if (!snapshot.exists()) {
@@ -120,7 +142,11 @@ export class FirebaseService {
 
       for (const fcmToken of fcmTokens) {
         if (this.isValidFCMToken(fcmToken)) {
-          const result = await this.sendNotificationToUser(fcmToken, title, body);
+          const result = await this.sendNotificationToUser(
+            fcmToken,
+            title,
+            body,
+          );
           results.push(result);
         }
       }

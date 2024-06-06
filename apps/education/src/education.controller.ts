@@ -7,37 +7,71 @@ import { RmqService } from '@app/common';
 export class EducationController {
   constructor(
     private readonly educationService: EducationService,
-    private readonly rmqService: RmqService
-  ) { }
+    private readonly rmqService: RmqService,
+  ) {}
 
   @EventPattern('educationClient/createEducationProgress')
-  async createEducationProgress(@Payload() data: any, @Ctx() context: RmqContext) {
+  async createEducationProgress(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     this.rmqService.ack(context);
-    return this.educationService.createEducationProgress(data.id_user, data.dto);
+    return this.educationService.createEducationProgress(
+      data.id_user,
+      data.dto,
+    );
   }
 
   @EventPattern('educationClient/getAllEducationProgress')
-  async getAllEducationProgress(@Payload() data: any, @Ctx() context: RmqContext) {
+  async getAllEducationProgress(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     this.rmqService.ack(context);
-    return this.educationService.getAllEducationProgress(data.id_user, data.pageNumber, data.itemsPerPage, data.id_family);
+    return this.educationService.getAllEducationProgress(
+      data.id_user,
+      data.pageNumber,
+      data.itemsPerPage,
+      data.id_family,
+    );
   }
 
   @EventPattern('educationClient/getDetailEducationProgress')
-  async getDetailEducationProgress(@Payload() data: any, @Ctx() context: RmqContext) {
+  async getDetailEducationProgress(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     this.rmqService.ack(context);
-    return this.educationService.getDetailEducationProgress(data.id_user, data.id_family, data.id_education_progress);
+    return this.educationService.getDetailEducationProgress(
+      data.id_user,
+      data.id_family,
+      data.id_education_progress,
+    );
   }
 
   @EventPattern('educationClient/updateDetailEducationProgress')
-  async updateDetailEducationProgress(@Payload() data: any, @Ctx() context: RmqContext) {
+  async updateDetailEducationProgress(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     this.rmqService.ack(context);
-    return this.educationService.updateDetailEducationProgress(data.id_user, data.dto);
+    return this.educationService.updateDetailEducationProgress(
+      data.id_user,
+      data.dto,
+    );
   }
 
   @EventPattern('educationClient/deleteEducationProgress')
-  async deleteEducationProgress(@Payload() data: any, @Ctx() context: RmqContext) {
+  async deleteEducationProgress(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     this.rmqService.ack(context);
-    return this.educationService.deleteEducationProgress(data.id_user, data.id_family, data.id_education_progress);
+    return this.educationService.deleteEducationProgress(
+      data.id_user,
+      data.id_family,
+      data.id_education_progress,
+    );
   }
 
   @EventPattern('educationClient/createSubject')
@@ -49,7 +83,12 @@ export class EducationController {
   @EventPattern('educationClient/getDetailSubject')
   async getDetailSubject(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.educationService.getDetailSubject(data.id_user, data.id_family, data.id_education_progress, data.id_subject);
+    return this.educationService.getDetailSubject(
+      data.id_user,
+      data.id_family,
+      data.id_education_progress,
+      data.id_subject,
+    );
   }
 
   @EventPattern('educationClient/updateDetailSubject')
@@ -61,7 +100,12 @@ export class EducationController {
   @EventPattern('educationClient/deleteSubject')
   async deleteSubject(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.educationService.deleteSubject(data.id_user, data.id_family, data.id_education_progress, data.id_subject);
+    return this.educationService.deleteSubject(
+      data.id_user,
+      data.id_family,
+      data.id_education_progress,
+      data.id_subject,
+    );
   }
 
   @EventPattern('educationClient/addComponentScore')

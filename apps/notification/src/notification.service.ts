@@ -9,31 +9,41 @@ const limit = 20;
 @Injectable()
 export class NotificationService {
   constructor(
-    @InjectModel(NotificationData.name) private readonly notificationRepository
-  ) { }
+    @InjectModel(NotificationData.name) private readonly notificationRepository,
+  ) {}
 
   async getNotification(id_user: string, index: number) {
     try {
-      const notification = await this.notificationRepository.aggregate([
-        { $match: { id_user: id_user } },
-        { $unwind: '$notificationArr' },
-        { $sort: { 'notificationArr._id': -1 } },
-        { $skip: index * limit },
-        { $limit: limit },
-        { $group: { _id: '$_id', notificationArr: { $push: '$notificationArr' } } }
-      ]).exec();
+      const notification = await this.notificationRepository
+        .aggregate([
+          { $match: { id_user: id_user } },
+          { $unwind: '$notificationArr' },
+          { $sort: { 'notificationArr._id': -1 } },
+          { $skip: index * limit },
+          { $limit: limit },
+          {
+            $group: {
+              _id: '$_id',
+              notificationArr: { $push: '$notificationArr' },
+            },
+          },
+        ])
+        .exec();
 
       return notification[0]?.notificationArr || [];
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
-        message: error.message
-      })
+        message: error.message,
+      });
     }
   }
 
-  async createNotification(id_user: string, dto: any, listReceiverId: string[]) {
+  async createNotification(
+    id_user: string,
+    dto: any,
+    listReceiverId: string[],
+  ) {
     try {
       const { title, content, type, data } = dto;
 
@@ -43,16 +53,22 @@ export class NotificationService {
         content,
         type,
         data,
-        isRead: false
+        isRead: false,
       }));
 
-      await Promise.all(newNotifications.map((newNotification, index) =>
-        this.notificationRepository.updateOne(
-          { id_user: listReceiverId[index] },
-          { $push: { notificationArr: { $each: [newNotification], $position: 0 } } },
-          { upsert: true }
-        )
-      ));
+      await Promise.all(
+        newNotifications.map((newNotification, index) =>
+          this.notificationRepository.updateOne(
+            { id_user: listReceiverId[index] },
+            {
+              $push: {
+                notificationArr: { $each: [newNotification], $position: 0 },
+              },
+            },
+            { upsert: true },
+          ),
+        ),
+      );
 
       return newNotifications.map((notification, index) => ({
         _id: notification._id,
@@ -61,36 +77,39 @@ export class NotificationService {
         content,
         type,
         data,
-        isRead: false
+        isRead: false,
       }));
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
-        message: error.message
-      })
+        message: error.message,
+      });
     }
   }
 
   async markRead(id_user: string, id_notification: string) {
     try {
-      const notification = await this.notificationRepository.findOneAndUpdate(
-        { id_user: id_user, "notificationArr._id": new Types.ObjectId(id_notification) },
-        { $set: { "notificationArr.$.isRead": true } }
-      ).exec();
+      const notification = await this.notificationRepository
+        .findOneAndUpdate(
+          {
+            id_user: id_user,
+            'notificationArr._id': new Types.ObjectId(id_notification),
+          },
+          { $set: { 'notificationArr.$.isRead': true } },
+        )
+        .exec();
       if (!notification) {
         throw new RpcException({
           statusCode: HttpStatus.NOT_FOUND,
-          message: 'Notification not found'
+          message: 'Notification not found',
         });
       }
       return { message: 'Notification marked as read' };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         statusCode: HttpStatus.NOT_FOUND,
-        message: error.message
-      })
+        message: error.message,
+      });
     }
   }
 }

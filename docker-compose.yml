@@ -8,13 +8,13 @@ services:
       target: development
     command: npm run start:dev gateway
     ports:
-      - "8080:8080"
+      - '8080:8080'
     depends_on:
       - rabbitmq
     restart: on-failure
     volumes:
       - .:/usr/src/app
-  
+
   auth:
     image: mjkundta/auth:latest
     build:
@@ -27,7 +27,7 @@ services:
     restart: on-failure
     volumes:
       - .:/usr/src/app
-  
+
   user:
     image: mjkundta/user:latest
     build:
@@ -40,7 +40,7 @@ services:
     restart: on-failure
     volumes:
       - .:/usr/src/app
-  
+
   payment:
     image: mjkundta/payment:latest
     build:
@@ -66,7 +66,7 @@ services:
     restart: on-failure
     volumes:
       - .:/usr/src/app
-    
+
   storage:
     image: mjkundta/storage:latest
     build:
@@ -197,8 +197,8 @@ services:
     volumes:
       - .:/usr/src/app
     ports:
-      - "8081:8081"
-  
+      - '8081:8081'
+
   household:
     image: mjkundta/household:latest
     build:
@@ -237,7 +237,7 @@ services:
     restart: on-failure
     volumes:
       - .:/usr/src/app
-  
+
   invoice:
     image: mjkundta/invoice:latest
     build:
@@ -263,10 +263,9 @@ services:
     volumes:
       - .:/usr/src/app
     ports:
-      - "8000:8000"
+      - '8000:8000'
     environment:
       - DJANGO_SETTINGS_MODULE=utilities.settings
-
 
   filebeat:
     image: mjkundta/filebeat:latest
@@ -278,37 +277,37 @@ services:
     volumes:
       - ./logs:/src/logs
     labels:
-      co.elastic.logs/json.overwrite_keys: true 
-      co.elastic.logs/json.add_error_key: true 
+      co.elastic.logs/json.overwrite_keys: true
+      co.elastic.logs/json.add_error_key: true
       co.elastic.logs/json.expand_keys: true
 
   jaeger:
     image: jaegertracing/all-in-one:1.30
     container_name: jaeger
     ports:
-      - "5775:5775/udp"
-      - "6831:6831/udp"
-      - "6832:6832/udp"
-      - "5778:5778"
-      - "16686:16686"
-      - "14250:14250"
-      - "14268:14268"
-      - "14269:14269"
-      - "9411:9411"
+      - '5775:5775/udp'
+      - '6831:6831/udp'
+      - '6832:6832/udp'
+      - '5778:5778'
+      - '16686:16686'
+      - '14250:14250'
+      - '14268:14268'
+      - '14269:14269'
+      - '9411:9411'
     environment:
       COLLECTOR_ZIPKIN_HTTP_PORT: 9411
 
   rabbitmq:
     image: rabbitmq:management
     healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
+      test: ['CMD', 'rabbitmqctl', 'status']
       interval: 30s
       timeout: 10s
       retries: 5
     restart: on-failure
     environment:
-      RABBITMQ_DEFAULT_USER: "rabbitmq"
-      RABBITMQ_DEFAULT_PASS: "Toan123456789"
+      RABBITMQ_DEFAULT_USER: 'rabbitmq'
+      RABBITMQ_DEFAULT_PASS: 'Toan123456789'
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - '5672:5672'
+      - '15672:15672'

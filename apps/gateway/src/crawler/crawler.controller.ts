@@ -1,17 +1,32 @@
-import { Controller, Get, HttpCode, HttpStatus, Query, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { CrawlerService } from "./crawler.service";
-import { JwtAuthGuard } from "../utils";
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import { CrawlerService } from './crawler.service';
+import { JwtAuthGuard } from '../utils';
 
 @ApiTags('RSS and Crawler')
 @Controller('crawler')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class CrawlerController {
-  constructor(private readonly crawlerService: CrawlerService) { }
+  constructor(private readonly crawlerService: CrawlerService) {}
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'home, health, world, life, news, business, startup, entertainment, sports, law, education, newest, featured, travel, science, digital, car, opinion, confide, funny, mostviewed' })
+  @ApiOperation({
+    summary:
+      'home, health, world, life, news, business, startup, entertainment, sports, law, education, newest, featured, travel, science, digital, car, opinion, confide, funny, mostviewed',
+  })
   @ApiQuery({ name: 'type', required: true, type: String })
   @ApiQuery({ name: 'page', required: false, type: String })
   @ApiQuery({ name: 'itemsPerPage', required: false, type: String })
@@ -19,7 +34,7 @@ export class CrawlerController {
   async getNews(
     @Query('type') type: string,
     @Query('page') page: string,
-    @Query('itemsPerPage') itemsPerPage: string
+    @Query('itemsPerPage') itemsPerPage: string,
   ) {
     const pageNumber = parseInt(page, 10) || 1;
     const itemsPerPageNumber = parseInt(itemsPerPage, 10) || 10;

@@ -17,11 +17,14 @@ import { StorageModule } from './storage/storage.module';
         GRPC_STORAGE_PROTO_PATH: Joi.string().required(),
         GRPC_STORAGE_URL: Joi.string().required(),
       }),
-      envFilePath: process.env.NODE_ENV === 'production' ? './apps/invoice/.env.production' : './apps/invoice/.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './apps/invoice/.env.production'
+          : './apps/invoice/.env',
     }),
     RmqModule,
     DatabaseModule,
-    StorageModule
+    StorageModule,
   ],
   controllers: [InvoiceController],
   providers: [InvoiceService],

@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 
 export type NotificationDocument = NotificationData & Document;
 
@@ -20,7 +20,7 @@ class NotificationDetail {
   @Prop({ required: true })
   content: string;
 
-  @Prop({ required: true})
+  @Prop({ required: true })
   type: string;
 
   @Prop({ required: true })
@@ -33,13 +33,14 @@ class NotificationDetail {
   timestamp: Date;
 }
 
-export const NotificationDetailSchema = SchemaFactory.createForClass(NotificationDetail);
+export const NotificationDetailSchema =
+  SchemaFactory.createForClass(NotificationDetail);
 
 @Schema({
   toJSON: {
     getters: true,
     virtuals: true,
-  }
+  },
 })
 export class NotificationData {
   _id: Types.ObjectId;
@@ -47,8 +48,9 @@ export class NotificationData {
   @Prop({ required: true, unique: true })
   id_user: string;
 
-  @Prop({ type: [NotificationDetailSchema], default: []})
+  @Prop({ type: [NotificationDetailSchema], default: [] })
   notificationArr: NotificationDetail[];
 }
 
-export const NotificationDataSchema = SchemaFactory.createForClass(NotificationData);
+export const NotificationDataSchema =
+  SchemaFactory.createForClass(NotificationData);

@@ -1,11 +1,17 @@
-import { OnModuleInit, UnauthorizedException, UseGuards } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { NotificationService } from "./notification.service";
-import { Server, Socket } from "socket.io";
-import { WsCurrentUser, WsJwtAuthGuard } from "../utils";
-import { NewNotificationDto } from "./dto/newNotification.dto";
+import { OnModuleInit, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import {
+  ConnectedSocket,
+  MessageBody,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
+import { NotificationService } from './notification.service';
+import { Server, Socket } from 'socket.io';
+import { WsCurrentUser, WsJwtAuthGuard } from '../utils';
+import { NewNotificationDto } from './dto/newNotification.dto';
 
 interface TokenPayload {
   id_user: string;
@@ -13,7 +19,7 @@ interface TokenPayload {
 
 @WebSocketGateway({
   namespace: 'notification',
-  cors: { origin: '*', },
+  cors: { origin: '*' },
 })
 export class NotificationGateway implements OnModuleInit {
   @WebSocketServer() server: Server;
@@ -22,29 +28,34 @@ export class NotificationGateway implements OnModuleInit {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly notificationService: NotificationService
-  ) { }
+    private readonly notificationService: NotificationService,
+  ) {}
 
   async onModuleInit() {
     this.server.on('connection', async (socket) => {
       try {
         const token = socket.handshake.headers.authorization.split(' ')[1];
         if (!token) throw new UnauthorizedException('Token not found');
-        const payload = await this.jwtService.verify(token, { secret: this.configService.get<string>("JWT_SECRET") }) as TokenPayload;
+        const payload = (await this.jwtService.verify(token, {
+          secret: this.configService.get<string>('JWT_SECRET'),
+        })) as TokenPayload;
         if (!payload) throw new UnauthorizedException('Token not found');
         const socketId = socket.id;
         if (this.socketMap.has(payload.id_user)) {
           const socketIds = this.socketMap.get(payload.id_user);
           socketIds.push(socketId);
           this.socketMap.set(payload.id_user, socketIds);
-        }
-        else {
+        } else {
           this.socketMap.set(payload.id_user, [socketId]);
         }
-        console.log('User ', payload.id_user, 'connected with socketId: ', socketId);
+        console.log(
+          'User ',
+          payload.id_user,
+          'connected with socketId: ',
+          socketId,
+        );
         return socketId;
-      }
-      catch (error) {
+      } catch (error) {
         console.error('Error handling connection:', error.message);
         socket.disconnect(true);
       }
@@ -64,7 +75,9 @@ export class NotificationGateway implements OnModuleInit {
         }
       }
       if (userId) {
-        const updatedSocketIds = this.socketMap.get(userId).filter(socketId => socketId !== client.id);
+        const updatedSocketIds = this.socketMap
+          .get(userId)
+          .filter((socketId) => socketId !== client.id);
         if (updatedSocketIds.length > 0) {
           this.socketMap.set(userId, updatedSocketIds);
         } else {
@@ -80,29 +93,41 @@ export class NotificationGateway implements OnModuleInit {
 
   @SubscribeMessage('newNotificationFamily')
   @UseGuards(WsJwtAuthGuard)
-  async newNotification(@ConnectedSocket() client: Socket, @WsCurrentUser() user, @MessageBody() dto: NewNotificationDto) {
+  async newNotification(
+    @ConnectedSocket() client: Socket,
+    @WsCurrentUser() user,
+    @MessageBody() dto: NewNotificationDto,
+  ) {
     try {
-      const listReceiverId = await this.notificationService.getListReceiverId(user.id_user, dto.family_id);
-      const notifications = await this.notificationService.createNotification(user.id_user, dto, listReceiverId);
+      const listReceiverId = await this.notificationService.getListReceiverId(
+        user.id_user,
+        dto.family_id,
+      );
+      const notifications = await this.notificationService.createNotification(
+        user.id_user,
+        dto,
+        listReceiverId,
+      );
 
-      const emitPromises = notifications.flatMap(notification => {
-        const receiverSocketIds = this.socketMap.get(notification.id_user) || [];
-        return receiverSocketIds.map(socketId => 
-          new Promise(() => {
-            client.to(socketId).emit('onNewNotificationFamily', {
-              _id: notification._id,
-              title: notification.title,
-              content: notification.content,
-              type: notification.type,
-              data: notification.data,
-              isRead: notification.isRead
-            });
-          })
+      const emitPromises = notifications.flatMap((notification) => {
+        const receiverSocketIds =
+          this.socketMap.get(notification.id_user) || [];
+        return receiverSocketIds.map(
+          (socketId) =>
+            new Promise(() => {
+              client.to(socketId).emit('onNewNotificationFamily', {
+                _id: notification._id,
+                title: notification.title,
+                content: notification.content,
+                type: notification.type,
+                data: notification.data,
+                isRead: notification.isRead,
+              });
+            }),
         );
       });
 
       await Promise.all(emitPromises);
-
     } catch (error) {
       console.error('Error handling newNotification:', error.message);
     }
@@ -110,7 +135,9 @@ export class NotificationGateway implements OnModuleInit {
 
   private async setupScheduledNotification() {
     setInterval(() => {
-      this.emitToAllUsers("This is a scheduled notification to all connected users!");
+      this.emitToAllUsers(
+        'This is a scheduled notification to all connected users!',
+      );
     }, 10000);
   }
 

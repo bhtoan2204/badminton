@@ -9,6 +9,6 @@ async function bootstrap() {
   app.connectMicroservice(rmqService.getOptions('AUTH'));
   app.startAllMicroservices();
   EventEmitter.defaultMaxListeners = 30;
-await app.init();
+  await app.init();
 }
 bootstrap();

@@ -52,7 +52,10 @@ import { InvoiceModule } from './invoice/invoice.module';
         JWT_SECRET: Joi.string().required(),
         JWT_SECRET_REFRESH: Joi.string().required(),
       }),
-      envFilePath: process.env.NODE_ENV === 'production' ? './apps/gateway/.env.production' : './apps/gateway/.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './apps/gateway/.env.production'
+          : './apps/gateway/.env',
     }),
     AuthApiModule,
     UserModule,
@@ -69,7 +72,7 @@ import { InvoiceModule } from './invoice/invoice.module';
     FinanceModule,
     ShoppingModule,
     InvoiceModule,
-    AdminModule
+    AdminModule,
   ],
   providers: [],
 })

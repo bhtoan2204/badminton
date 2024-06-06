@@ -1,4 +1,14 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Get, UseGuards, Ip, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Get,
+  UseGuards,
+  Ip,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import { OrderDTO } from './dto/order.dto';
@@ -10,7 +20,7 @@ import { OrderReturnDTO } from './dto/OrderReturn.dto';
 @UseGuards(JwtAuthGuard)
 @Controller('payment')
 export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) { }
+  constructor(private readonly paymentService: PaymentService) {}
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all package' })
@@ -36,7 +46,11 @@ export class PaymentController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create VNPAY payment URL' })
   @Post('createOrderVNPAY')
-  async create_payment_url(@CurrentUser() user, @Body() order: OrderDTO, @Ip() ip) {
+  async create_payment_url(
+    @CurrentUser() user,
+    @Body() order: OrderDTO,
+    @Ip() ip,
+  ) {
     const id_user = user.id_user;
     return this.paymentService.generateVnpay(id_user, order, ip);
   }
@@ -44,7 +58,10 @@ export class PaymentController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Check order' })
   @Post('checkOrder')
-  async check_order_return(@CurrentUser() user, @Body() orderReturn: OrderReturnDTO) {
+  async check_order_return(
+    @CurrentUser() user,
+    @Body() orderReturn: OrderReturnDTO,
+  ) {
     const id_user = user.id_user;
     return this.paymentService.check_order_return(id_user, orderReturn);
   }
@@ -56,5 +73,4 @@ export class PaymentController {
     const id_user = user.id_user;
     return this.paymentService.get_order(id_user);
   }
-
 }

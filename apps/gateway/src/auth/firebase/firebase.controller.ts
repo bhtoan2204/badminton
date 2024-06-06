@@ -1,16 +1,22 @@
-import { Body, Controller, Delete, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { FirebaseService } from "./firebase.service";
-import { CurrentUser, JwtAuthGuard } from "../../utils";
+import {
+  Body,
+  Controller,
+  Delete,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { FirebaseService } from './firebase.service';
+import { CurrentUser, JwtAuthGuard } from '../../utils';
 
 @ApiTags('Firebase Authentication')
 @Controller('auth/firebase')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class FirebaseController {
-  constructor(
-    private readonly firebaseService: FirebaseService
-  ) {}
+  constructor(private readonly firebaseService: FirebaseService) {}
 
   @ApiOperation({ summary: 'Save FCM Token' })
   @HttpCode(HttpStatus.OK)

@@ -1,7 +1,7 @@
-import { Module } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { parse } from "pg-connection-string";
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { parse } from 'pg-connection-string';
 import * as Joi from 'joi';
 
 @Module({
@@ -9,9 +9,9 @@ import * as Joi from 'joi';
     ConfigModule.forRoot({
       isGlobal: false,
       validationSchema: Joi.object({
-        DATABASE_URL: Joi.string().required()
+        DATABASE_URL: Joi.string().required(),
       }),
-      envFilePath: './libs/.env'
+      envFilePath: './libs/.env',
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -28,12 +28,12 @@ import * as Joi from 'joi';
           synchronize: true,
           autoLoadEntities: true,
           ssl: {
-            rejectUnauthorized: false
-          }
-        }
+            rejectUnauthorized: false,
+          },
+        };
       },
-      inject: [ConfigService]
+      inject: [ConfigService],
     }),
   ],
 })
-export class DatabaseModule { }
+export class DatabaseModule {}

@@ -13,10 +13,13 @@ import { DatafetcherModule } from './datafetcher/datafetcher.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'production' ? './apps/elasticsearch/.env.production' : './apps/elasticsearch/.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './apps/elasticsearch/.env.production'
+          : './apps/elasticsearch/.env',
     }),
     ElasticsearchModule.registerAsync({
-      imports : [ConfigModule],
+      imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         node: configService.get<string>('ELASTICSEARCH_NODE'),
         auth: {
@@ -36,4 +39,4 @@ import { DatafetcherModule } from './datafetcher/datafetcher.module';
   providers: [SearchService],
   exports: [RmqModule],
 })
-export class SearchModule { }
+export class SearchModule {}

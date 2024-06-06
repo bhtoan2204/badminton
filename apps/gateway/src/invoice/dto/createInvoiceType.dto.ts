@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateInvoiceTypeDto {
   @ApiProperty({ required: true, type: Number })
@@ -10,5 +10,5 @@ export class CreateInvoiceTypeDto {
   @ApiProperty({ required: true, type: String })
   @IsNotEmpty()
   @IsString()
-  type_name: string
+  type_name: string;
 }

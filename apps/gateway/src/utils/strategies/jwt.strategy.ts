@@ -10,12 +10,12 @@ import { AUTH_SERVICE } from '../../utils';
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     @Inject(AUTH_SERVICE) private authClient: ClientProxy,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET')
+      secretOrKey: configService.get<string>('JWT_SECRET'),
     });
   }
 
@@ -25,12 +25,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   private async validateUser(payload: any) {
     try {
-      const userRequest$ = this.authClient.send('authClient/validate_user_id', payload.id_user).pipe(
-        timeout(15000)
-      );
+      const userRequest$ = this.authClient
+        .send('authClient/validate_user_id', payload.id_user)
+        .pipe(timeout(15000));
       return await lastValueFrom(userRequest$);
-    }
-    catch (err) {
+    } catch (err) {
       throw new UnauthorizedException(err.message);
     }
   }

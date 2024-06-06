@@ -22,18 +22,18 @@ spec:
       containers:
         - name: crawler
           image: mjkundta/crawler:<TAG>
-          command: ["node", "dist/apps/crawler/src/main"]
+          command: ['node', 'dist/apps/crawler/src/main']
           resources:
             limits:
-              cpu: "140m"
-              memory: "512Mi"
+              cpu: '140m'
+              memory: '512Mi'
           env:
             - name: NODE_ENV
-              value: "production"
+              value: 'production'
             - name: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
-              value: "true"
+              value: 'true'
             - name: PUPPETEER_EXECUTABLE_PATH
-              value: "/usr/bin/chromium-browser"
+              value: '/usr/bin/chromium-browser'
 
 ---
 apiVersion: v1

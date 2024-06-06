@@ -1,12 +1,11 @@
 export interface SwaggerDocumentOptions {
+  include?: Function[];
 
-    include?: Function[];
+  extraModels?: Function[];
 
-    extraModels?: Function[];
+  ignoreGlobalPrefix?: boolean;
 
-    ignoreGlobalPrefix?: boolean;
+  deepScanRoutes?: boolean;
 
-    deepScanRoutes?: boolean;
-
-    operationIdFactory?: (controllerKey: string, methodKey: string) => string;
+  operationIdFactory?: (controllerKey: string, methodKey: string) => string;
 }

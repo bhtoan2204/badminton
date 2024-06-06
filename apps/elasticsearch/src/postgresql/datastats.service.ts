@@ -8,19 +8,23 @@ import { EntityManager } from 'typeorm';
 export class DataStatsService {
   constructor(
     private readonly entityManager: EntityManager,
-    @InjectConnection() private readonly connection: Connection
+    @InjectConnection() private readonly connection: Connection,
   ) {}
 
   async getPostgresqlStat() {
     try {
       const [table_size, active_sessions] = await Promise.all([
-        this.entityManager.query(`SELECT * FROM analyze_and_query_table_sizes()`),
-        this.entityManager.query('SELECT * FROM get_active_sessions_defaultdb()')
+        this.entityManager.query(
+          `SELECT * FROM analyze_and_query_table_sizes()`,
+        ),
+        this.entityManager.query(
+          'SELECT * FROM get_active_sessions_defaultdb()',
+        ),
       ]);
 
       return {
         table_size: table_size,
-        active_sessions: active_sessions
+        active_sessions: active_sessions,
       };
     } catch (error) {
       throw new RpcException({
@@ -39,7 +43,7 @@ export class DataStatsService {
         const stats = await db.command({
           collStats: collectionInfo.collectionName,
           scale: 1,
-          verbose: false
+          verbose: false,
         });
         delete stats.indexDetails;
         collectionStats.push(stats);

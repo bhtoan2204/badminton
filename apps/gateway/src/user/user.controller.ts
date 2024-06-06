@@ -1,19 +1,36 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { FileInterceptor } from "@nestjs/platform-express";
-import { ImageFileInterceptor } from "./interceptor/imageFile.interceptor";
-import { CurrentUser, JwtAuthGuard } from "../utils";
-import { ValidateEmailDto } from "./dto/validateEmail.dto";
-import { UpdateProfileDto } from "./dto/updateProfile.dto";
-import { ChangePasswordDto } from "./dto/changePassword.dto";
-import { CreateAccountDto } from "./dto/createAccount.dto";
-import { UserService } from "./user.service";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Put,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageFileInterceptor } from './interceptor/imageFile.interceptor';
+import { CurrentUser, JwtAuthGuard } from '../utils';
+import { ValidateEmailDto } from './dto/validateEmail.dto';
+import { UpdateProfileDto } from './dto/updateProfile.dto';
+import { ChangePasswordDto } from './dto/changePassword.dto';
+import { CreateAccountDto } from './dto/createAccount.dto';
+import { UserService } from './user.service';
 
 @ApiTags('User')
 @Controller('user')
 @ApiBearerAuth()
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Demo Create account' })
@@ -57,10 +74,20 @@ export class UserController {
   @ApiOperation({ summary: 'Change Avatar' })
   @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ schema: { type: 'object', properties: { avatar: { type: 'string', format: 'binary', }, }, }, })
-  @UseInterceptors(FileInterceptor('avatar', new ImageFileInterceptor().createMulterOptions()))
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { avatar: { type: 'string', format: 'binary' } },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('avatar', new ImageFileInterceptor().createMulterOptions()),
+  )
   @Put('changeAvatar')
-  async changeAvatar(@CurrentUser() user, @UploadedFile() file: Express.Multer.File) {
+  async changeAvatar(
+    @CurrentUser() user,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     return this.userService.changeAvatar(user, file);
   }
 

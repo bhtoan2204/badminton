@@ -1,13 +1,13 @@
-import { Controller } from "@nestjs/common";
+import { Controller } from '@nestjs/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { RmqService } from '@app/common';
-import { RabbitMqService } from "../rabbitmq/rabbitmq.service";
+import { RabbitMqService } from '../rabbitmq/rabbitmq.service';
 
 @Controller()
 export class RabbitMqController {
   constructor(
     private readonly rabbitMqService: RabbitMqService,
-    private readonly rmqService: RmqService
+    private readonly rmqService: RmqService,
   ) {}
 
   @EventPattern('rabbitMqClient/getQueues')
@@ -17,7 +17,7 @@ export class RabbitMqController {
   }
 
   @EventPattern('rabbitMqClient/getQueueDetail')
-  async getQueueDetail(@Payload() data: any, @Ctx() context: RmqContext, ) {
+  async getQueueDetail(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.rabbitMqService.getQueueDetail(data.queueName);
   }

@@ -1,12 +1,10 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
-import { RpcException } from "@nestjs/microservices";
-import { EntityManager } from "typeorm";
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class InvestmentService {
-  constructor(
-    private readonly entityManager: EntityManager,
-  ) { }
+  constructor(private readonly entityManager: EntityManager) {}
 
   async getInvestmentType() {
     try {
@@ -15,12 +13,11 @@ export class InvestmentService {
       return {
         data: data,
         message: 'Get investment type',
-      }
-    }
-    catch (error) {
+      };
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -32,12 +29,11 @@ export class InvestmentService {
       return {
         data: data,
         message: 'Get investment risk level',
-      }
-    }
-    catch (error) {
+      };
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -48,19 +44,36 @@ export class InvestmentService {
 
   async createInvestment(id_user: string, dto: any) {
     try {
-      const { id_family, id_risk_level, id_investment_type, amount, purchase_date, maturity_date, notes } = dto;
-      const query = 'SELECT * FROM f_create_investment($1, $2, $3, $4, $5, $6, $7, $8)';
-      const params = [id_user, id_family, id_risk_level, id_investment_type, amount, purchase_date, maturity_date, notes];
+      const {
+        id_family,
+        id_risk_level,
+        id_investment_type,
+        amount,
+        purchase_date,
+        maturity_date,
+        notes,
+      } = dto;
+      const query =
+        'SELECT * FROM f_create_investment($1, $2, $3, $4, $5, $6, $7, $8)';
+      const params = [
+        id_user,
+        id_family,
+        id_risk_level,
+        id_investment_type,
+        amount,
+        purchase_date,
+        maturity_date,
+        notes,
+      ];
       const data = await this.entityManager.query(query, params);
       return {
         data: data,
         message: 'Create investment',
-      }
-    }
-    catch (error) {
+      };
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }

@@ -4,10 +4,11 @@ import * as cheerio from 'cheerio';
 
 @Injectable()
 export class CrawlerService {
-
   async fetchProducts(keyword: string): Promise<any[]> {
     try {
-      const response = await axios.get(`https://shopee.vn/search?keyword=${encodeURIComponent(keyword)}`);
+      const response = await axios.get(
+        `https://shopee.vn/search?keyword=${encodeURIComponent(keyword)}`,
+      );
       const $ = cheerio.load(response.data);
       const products = [];
       $('ul.row.shopee-search-item-result__items > li').each((i, el) => {

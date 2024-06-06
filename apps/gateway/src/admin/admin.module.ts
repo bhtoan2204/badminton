@@ -1,9 +1,9 @@
-import { Module } from "@nestjs/common";
-import { SearchModule } from "./search/search.module";
-import { ProxyModule } from "./proxy/proxy.module";
-import { RabbitMqModule } from "./rabbitmq/rabbitmq.module";
-import { PostgresqlModule } from "./postgresql/datastats.module";
-import { DatafetcherModule } from "./datafetcher/datafetcher.module";
+import { Module } from '@nestjs/common';
+import { SearchModule } from './search/search.module';
+import { ProxyModule } from './proxy/proxy.module';
+import { RabbitMqModule } from './rabbitmq/rabbitmq.module';
+import { PostgresqlModule } from './postgresql/datastats.module';
+import { DatafetcherModule } from './datafetcher/datafetcher.module';
 
 @Module({
   imports: [
@@ -11,7 +11,7 @@ import { DatafetcherModule } from "./datafetcher/datafetcher.module";
     ProxyModule,
     RabbitMqModule,
     PostgresqlModule,
-    DatafetcherModule
+    DatafetcherModule,
   ],
 })
-export class AdminModule { }
+export class AdminModule {}

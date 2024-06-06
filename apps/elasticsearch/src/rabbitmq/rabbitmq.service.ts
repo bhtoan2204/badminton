@@ -1,6 +1,6 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { RpcException } from "@nestjs/microservices";
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { RpcException } from '@nestjs/microservices';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
@@ -11,21 +11,29 @@ export class RabbitMqService {
   private readonly rabbitMqPassword: string = null;
   constructor(
     private readonly configService: ConfigService,
-    private readonly httpService: HttpService
+    private readonly httpService: HttpService,
   ) {
-    this.rabbitMqUrl = this.configService.get<string>('RABBIT_MQ_MANAGEMENT_URI');
-    this.rabbitMqUsername = this.configService.get<string>('RABBIT_MQ_MANAGEMENT_USERNAME');
-    this.rabbitMqPassword = this.configService.get<string>('RABBIT_MQ_MANAGEMENT_PASSWORD');
+    this.rabbitMqUrl = this.configService.get<string>(
+      'RABBIT_MQ_MANAGEMENT_URI',
+    );
+    this.rabbitMqUsername = this.configService.get<string>(
+      'RABBIT_MQ_MANAGEMENT_USERNAME',
+    );
+    this.rabbitMqPassword = this.configService.get<string>(
+      'RABBIT_MQ_MANAGEMENT_PASSWORD',
+    );
   }
-  
+
   async getQueues() {
     try {
-      const response = await firstValueFrom(this.httpService.get(`${this.rabbitMqUrl}/api/queues`, {
-        auth: {
-          username: this.rabbitMqUsername,
-          password: this.rabbitMqPassword
-        }
-      }));
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.rabbitMqUrl}/api/queues`, {
+          auth: {
+            username: this.rabbitMqUsername,
+            password: this.rabbitMqPassword,
+          },
+        }),
+      );
       return response.data;
     } catch (error) {
       throw new RpcException({
@@ -37,12 +45,17 @@ export class RabbitMqService {
 
   async getQueueDetail(queueName: string) {
     try {
-      const response = await firstValueFrom(this.httpService.get(`${this.rabbitMqUrl}/api/queues/%2F/${queueName}`, {
-        auth: {
-          username: this.rabbitMqUsername,
-          password: this.rabbitMqPassword
-        }
-      }));
+      const response = await firstValueFrom(
+        this.httpService.get(
+          `${this.rabbitMqUrl}/api/queues/%2F/${queueName}`,
+          {
+            auth: {
+              username: this.rabbitMqUsername,
+              password: this.rabbitMqPassword,
+            },
+          },
+        ),
+      );
       return response.data;
     } catch (error) {
       throw new RpcException({
@@ -54,12 +67,14 @@ export class RabbitMqService {
 
   async getNode() {
     try {
-      const response = await firstValueFrom(this.httpService.get(`${this.rabbitMqUrl}/api/nodes`, {
-        auth: {
-          username: this.rabbitMqUsername,
-          password: this.rabbitMqPassword
-        }
-      }));
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.rabbitMqUrl}/api/nodes`, {
+          auth: {
+            username: this.rabbitMqUsername,
+            password: this.rabbitMqPassword,
+          },
+        }),
+      );
       return response.data;
     } catch (error) {
       throw new RpcException({
@@ -71,12 +86,14 @@ export class RabbitMqService {
 
   async getNodeStatistics(nodeName: string) {
     try {
-      const response = await firstValueFrom(this.httpService.get(`${this.rabbitMqUrl}/api/nodes/${nodeName}`, {
-        auth: {
-          username: this.rabbitMqUsername,
-          password: this.rabbitMqPassword
-        }
-      }));
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.rabbitMqUrl}/api/nodes/${nodeName}`, {
+          auth: {
+            username: this.rabbitMqUsername,
+            password: this.rabbitMqPassword,
+          },
+        }),
+      );
       return response.data;
     } catch (error) {
       throw new RpcException({
@@ -88,12 +105,14 @@ export class RabbitMqService {
 
   async healthCheck() {
     try {
-      const response = await firstValueFrom(this.httpService.get(`${this.rabbitMqUrl}/api/healthchecks/node`, {
-        auth: {
-          username: this.rabbitMqUsername,
-          password: this.rabbitMqPassword
-        }
-      }));
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.rabbitMqUrl}/api/healthchecks/node`, {
+          auth: {
+            username: this.rabbitMqUsername,
+            password: this.rabbitMqPassword,
+          },
+        }),
+      );
       return response.data;
     } catch (error) {
       throw new RpcException({

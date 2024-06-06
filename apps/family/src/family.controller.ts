@@ -7,7 +7,8 @@ import { RmqService } from '@app/common';
 export class FamilyController {
   constructor(
     private readonly familyService: FamilyService,
-    private readonly rmqService: RmqService) { }
+    private readonly rmqService: RmqService,
+  ) {}
 
   @EventPattern('familyClient/checkIsMember')
   async checkIsMember(@Payload() data: any, @Ctx() context: RmqContext) {
@@ -32,13 +33,19 @@ export class FamilyController {
   }
 
   @EventPattern('family/get_all_Member')
-  async getAllMember(@Payload() data: { id_user, id_family }, @Ctx() context: RmqContext) {
+  async getAllMember(
+    @Payload() data: { id_user; id_family },
+    @Ctx() context: RmqContext,
+  ) {
     this.rmqService.ack(context);
     return this.familyService.getAllMember(data.id_user, data.id_family);
   }
 
   @EventPattern('family/create_Family')
-  async createFamily(@Payload() data: { id_user, createFamilyDto }, @Ctx() context: RmqContext) {
+  async createFamily(
+    @Payload() data: { id_user; createFamilyDto },
+    @Ctx() context: RmqContext,
+  ) {
     this.rmqService.ack(context);
     return this.familyService.createFamily(data.id_user, data.createFamilyDto);
   }
@@ -51,13 +58,15 @@ export class FamilyController {
 
   @EventPattern('family/delete_Member')
   async deleteMember(@Payload() data: any, @Ctx() context: RmqContext) {
-
     this.rmqService.ack(context);
     return this.familyService.deleteMember(data.id_user, data.DeleteMemberDTO);
   }
 
   @EventPattern('family/update_Family')
-  async updateFamily(@Payload() data: { id_user, updateFamilyDTO }, @Ctx() context: RmqContext) {
+  async updateFamily(
+    @Payload() data: { id_user; updateFamilyDTO },
+    @Ctx() context: RmqContext,
+  ) {
     this.rmqService.ack(context);
     return this.familyService.updateFamily(data.id_user, data.updateFamilyDTO);
   }
@@ -77,6 +86,10 @@ export class FamilyController {
   @EventPattern('family/change_avatar')
   async changeAvatar(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.familyService.changeAvatar(data.id_user, data.id_family, data.file);
+    return this.familyService.changeAvatar(
+      data.id_user,
+      data.id_family,
+      data.file,
+    );
   }
 }

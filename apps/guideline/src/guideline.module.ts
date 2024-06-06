@@ -18,13 +18,16 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch';
         GRPC_STORAGE_PROTO_PATH: Joi.string().required(),
         GRPC_STORAGE_URL: Joi.string().required(),
       }),
-      envFilePath: process.env.NODE_ENV === 'production' ? './apps/guideline/.env.production' : './apps/guideline/.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './apps/guideline/.env.production'
+          : './apps/guideline/.env',
     }),
     RmqModule,
     DatabaseModule,
     StorageModule,
     ElasticsearchModule.registerAsync({
-      imports : [ConfigModule],
+      imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         node: configService.get<string>('ELASTICSEARCH_NODE'),
         auth: {
@@ -38,4 +41,4 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch';
   controllers: [GuidelineController],
   providers: [GuidelineService],
 })
-export class GuidelineModule { }
+export class GuidelineModule {}

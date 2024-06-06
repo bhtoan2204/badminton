@@ -29,13 +29,13 @@ spec:
               name: management
           env:
             - name: RABBITMQ_DEFAULT_USER
-              value: "rabbitmq"
+              value: 'rabbitmq'
             - name: RABBITMQ_DEFAULT_PASS
-              value: "Toan123456789"
+              value: 'Toan123456789'
           resources:
             limits:
-              cpu: "250m"
-              memory: "1024Mi"
+              cpu: '250m'
+              memory: '1024Mi'
 
 ---
 apiVersion: v1

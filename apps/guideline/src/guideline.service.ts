@@ -10,10 +10,15 @@ export class GuidelineService {
   constructor(
     private readonly entityManager: EntityManager,
     private readonly storageService: StorageService,
-    private readonly elasticsearchService: ElasticsearchService
-  ) { }
+    private readonly elasticsearchService: ElasticsearchService,
+  ) {}
 
-  async getAllGuideline(id_user: string, id_family: number, inputPage: number, inputItemsPerPage: number) {
+  async getAllGuideline(
+    id_user: string,
+    id_family: number,
+    inputPage: number,
+    inputItemsPerPage: number,
+  ) {
     try {
       const page = inputPage || 1;
       const itemsPerPage = inputItemsPerPage || 10;
@@ -21,14 +26,13 @@ export class GuidelineService {
       const parameters = [id_user, id_family, page, itemsPerPage];
       const data = await this.entityManager.query(query, parameters);
       return {
-        message: "Success",
-        data: data[0].f_get_guidelines
+        message: 'Success',
+        data: data[0].f_get_guidelines,
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -39,14 +43,13 @@ export class GuidelineService {
       const parameters = [id_user, id_family, id_guideline];
       const data = await this.entityManager.query(query, parameters);
       return {
-        message: "Success",
-        data: data
+        message: 'Success',
+        data: data,
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -57,14 +60,13 @@ export class GuidelineService {
       const parameters = [id_user, id_family, name, description];
       const data = await this.entityManager.query(query, parameters);
       return {
-        message: "Success",
-        data: data[0]
+        message: 'Success',
+        data: data[0],
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -72,35 +74,43 @@ export class GuidelineService {
   async updateGuideline(id_user: any, dto: any) {
     try {
       const query = 'SELECT * FROM f_update_guideline($1, $2, $3, $4, $5)';
-      const parameters = [id_user, dto.id_family, dto.id_guideline, dto.name, dto.description];
+      const parameters = [
+        id_user,
+        dto.id_family,
+        dto.id_guideline,
+        dto.name,
+        dto.description,
+      ];
       const data = await this.entityManager.query(query, parameters);
       return {
-        message: "Success",
-        data: data[0].f_update_guideline
+        message: 'Success',
+        data: data[0].f_update_guideline,
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
 
-  async deleteGuideline(id_user: string, id_family: number, id_guideline: number) {
+  async deleteGuideline(
+    id_user: string,
+    id_family: number,
+    id_guideline: number,
+  ) {
     try {
       const query = 'SELECT * FROM f_delete_guideline($1, $2, $3)';
       const parameters = [id_user, id_family, id_guideline];
       const data = await this.entityManager.query(query, parameters);
       return {
-        message: "Success",
-        data: data[0].f_delete_guideline
+        message: 'Success',
+        data: data[0].f_delete_guideline,
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -111,148 +121,217 @@ export class GuidelineService {
       const parameters = [id_user, id_family, id_guideline];
       const data = await this.entityManager.query(query, parameters);
       return {
-        message: "Success",
-        data: data[0].f_get_guideline_step
+        message: 'Success',
+        data: data[0].f_get_guideline_step,
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
 
-  async addStep(id_user: string, { id_family, id_guideline, name, description }, file: any) {
+  async addStep(
+    id_user: string,
+    { id_family, id_guideline, name, description },
+    file: any,
+  ) {
     try {
       const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
       const parameters = [id_user, id_family];
-      const isUserMemberOfFamily = await this.entityManager.query(query, parameters);
+      const isUserMemberOfFamily = await this.entityManager.query(
+        query,
+        parameters,
+      );
       if (isUserMemberOfFamily[0].f_is_user_member_of_family === false) {
         throw new RpcException({
           message: 'You are not a member of this family',
-          statusCode: HttpStatus.UNAUTHORIZED
+          statusCode: HttpStatus.UNAUTHORIZED,
         });
       }
       let fileUrl = null;
       if (file) {
-        const filename = 'step_' + id_user + '_' + Date.now() + '_' + file.originalname;
+        const filename =
+          'step_' + id_user + '_' + Date.now() + '_' + file.originalname;
         const params: UploadFileRequest = {
           fileName: filename,
-          file: new Uint8Array(file.buffer.data)
-        }
-        const uploadImageData = await this.storageService.uploadImageStep(params);
+          file: new Uint8Array(file.buffer.data),
+        };
+        const uploadImageData =
+          await this.storageService.uploadImageStep(params);
         fileUrl = uploadImageData.fileUrl;
       }
-      const addStepQuery = 'SELECT * FROM f_add_guideline_step($1, $2, $3, $4, $5, $6)';
-      const addStepParameters = [id_user, id_family, id_guideline, name, description, fileUrl];
-      const data = await this.entityManager.query(addStepQuery, addStepParameters);
+      const addStepQuery =
+        'SELECT * FROM f_add_guideline_step($1, $2, $3, $4, $5, $6)';
+      const addStepParameters = [
+        id_user,
+        id_family,
+        id_guideline,
+        name,
+        description,
+        fileUrl,
+      ];
+      const data = await this.entityManager.query(
+        addStepQuery,
+        addStepParameters,
+      );
 
       return {
-        message: "Success",
-        data: data[0].f_add_guideline_step
+        message: 'Success',
+        data: data[0].f_add_guideline_step,
       };
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof RpcException) {
         throw error;
       }
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
 
-  async insertStep(id_user: string, { id_family, id_guideline, name, description, index }, file: any) {
+  async insertStep(
+    id_user: string,
+    { id_family, id_guideline, name, description, index },
+    file: any,
+  ) {
     try {
       const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
       const parameters = [id_user, id_family];
-      const isUserMemberOfFamily = await this.entityManager.query(query, parameters);
+      const isUserMemberOfFamily = await this.entityManager.query(
+        query,
+        parameters,
+      );
       if (isUserMemberOfFamily[0].f_is_user_member_of_family === false) {
         throw new RpcException({
           message: 'You are not a member of this family',
-          statusCode: HttpStatus.UNAUTHORIZED
+          statusCode: HttpStatus.UNAUTHORIZED,
         });
       }
       let fileUrl = null;
       if (file) {
-        const filename = 'step_' + id_user + '_' + Date.now() + '_' + file.originalname;
+        const filename =
+          'step_' + id_user + '_' + Date.now() + '_' + file.originalname;
         const params: UploadFileRequest = {
           fileName: filename,
-          file: new Uint8Array(file.buffer.data)
-        }
-        const uploadImageData = await this.storageService.uploadImageStep(params);
+          file: new Uint8Array(file.buffer.data),
+        };
+        const uploadImageData =
+          await this.storageService.uploadImageStep(params);
         fileUrl = uploadImageData.fileUrl;
       }
-      const addStepQuery = 'SELECT * FROM f_insert_guideline_step($1, $2, $3, $4, $5, $6, $7)';
-      const addStepParameters = [id_user, id_family, id_guideline, name, description, fileUrl, index];
-      const data = await this.entityManager.query(addStepQuery, addStepParameters);
+      const addStepQuery =
+        'SELECT * FROM f_insert_guideline_step($1, $2, $3, $4, $5, $6, $7)';
+      const addStepParameters = [
+        id_user,
+        id_family,
+        id_guideline,
+        name,
+        description,
+        fileUrl,
+        index,
+      ];
+      const data = await this.entityManager.query(
+        addStepQuery,
+        addStepParameters,
+      );
 
       return {
-        message: "Success",
-        data: data[0].f_insert_guideline_step
+        message: 'Success',
+        data: data[0].f_insert_guideline_step,
       };
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof RpcException) {
         throw error;
       }
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
 
-  async updateStep(id_user: string, { id_family, id_guideline, name, description, index }, file: any) {
+  async updateStep(
+    id_user: string,
+    { id_family, id_guideline, name, description, index },
+    file: any,
+  ) {
     try {
       const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
       const parameters = [id_user, id_family];
-      const isUserMemberOfFamily = await this.entityManager.query(query, parameters);
+      const isUserMemberOfFamily = await this.entityManager.query(
+        query,
+        parameters,
+      );
       if (isUserMemberOfFamily[0].f_is_user_member_of_family === false) {
         throw new RpcException({
           message: 'You are not a member of this family',
-          statusCode: HttpStatus.UNAUTHORIZED
+          statusCode: HttpStatus.UNAUTHORIZED,
         });
       }
       let fileUrl = null;
       if (file) {
-        const oldImageUriQuery = 'SELECT * FROM f_get_step_image_url($1, $2, $3, $4)';
+        const oldImageUriQuery =
+          'SELECT * FROM f_get_step_image_url($1, $2, $3, $4)';
         const oldImageUriParameters = [id_user, id_family, id_guideline, index];
-        const oldImageUri = await this.entityManager.query(oldImageUriQuery, oldImageUriParameters);
+        const oldImageUri = await this.entityManager.query(
+          oldImageUriQuery,
+          oldImageUriParameters,
+        );
         if (oldImageUri[0].f_get_step_image_url !== null) {
-          await this.storageService.deleteImageStep(oldImageUri[0].f_get_step_image_url);
+          await this.storageService.deleteImageStep(
+            oldImageUri[0].f_get_step_image_url,
+          );
         }
-        const filename = 'step_' + id_user + '_' + Date.now() + '_' + file.originalname;
+        const filename =
+          'step_' + id_user + '_' + Date.now() + '_' + file.originalname;
         const params: UploadFileRequest = {
           fileName: filename,
-          file: new Uint8Array(file.buffer.data)
-        }
-        const uploadImageData = await this.storageService.uploadImageStep(params);
+          file: new Uint8Array(file.buffer.data),
+        };
+        const uploadImageData =
+          await this.storageService.uploadImageStep(params);
         fileUrl = uploadImageData.fileUrl;
       }
-      const updateStepQuery = 'SELECT * FROM f_update_guideline_step($1, $2, $3, $4, $5, $6, $7)';
-      const updateStepParameters = [id_user, id_family, id_guideline, index, name, description, fileUrl];
-      const data = await this.entityManager.query(updateStepQuery, updateStepParameters);
+      const updateStepQuery =
+        'SELECT * FROM f_update_guideline_step($1, $2, $3, $4, $5, $6, $7)';
+      const updateStepParameters = [
+        id_user,
+        id_family,
+        id_guideline,
+        index,
+        name,
+        description,
+        fileUrl,
+      ];
+      const data = await this.entityManager.query(
+        updateStepQuery,
+        updateStepParameters,
+      );
 
       return {
-        message: "Success",
-        data: data[0].f_update_guideline_step
+        message: 'Success',
+        data: data[0].f_update_guideline_step,
       };
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof RpcException) {
         throw error;
       }
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
 
-  async deleteStep(id_user: string, id_family: number, id_guideline: number, index: number) {
+  async deleteStep(
+    id_user: string,
+    id_family: number,
+    id_guideline: number,
+    index: number,
+  ) {
     try {
       const query = 'SELECT * FROM f_delete_guideline_step($1, $2, $3, $4)';
       const parameters = [id_user, id_family, id_guideline, index];
@@ -262,14 +341,13 @@ export class GuidelineService {
         await this.storageService.deleteImageStep(filename);
       }
       return {
-        message: "Success",
-        data: "Delete step successfully"
+        message: 'Success',
+        data: 'Delete step successfully',
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -280,21 +358,26 @@ export class GuidelineService {
       const parameters = [id_user, id_family, id_guideline];
       const data = await this.entityManager.query(query, parameters);
       return {
-        message: "Success",
-        data: data[0].f_mark_guideline_shared
+        message: 'Success',
+        data: data[0].f_mark_guideline_shared,
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
 
-  async getSharedGuideline(text: string, page: number, itemsPerPage: number, sort: 'asc' | 'desc' | 'none') {
+  async getSharedGuideline(
+    text: string,
+    page: number,
+    itemsPerPage: number,
+    sort: 'asc' | 'desc' | 'none',
+  ) {
     try {
-      const sortOption = sort !== 'none' ? [{ updated_at: { order: sort } }] : [];
+      const sortOption =
+        sort !== 'none' ? [{ updated_at: { order: sort } }] : [];
       const query = text
         ? {
             multi_match: {
@@ -314,20 +397,19 @@ export class GuidelineService {
         },
       });
 
-      const results = body.hits.hits.map(hit => hit._source);
+      const results = body.hits.hits.map((hit) => hit._source);
       const total = body.hits.total;
 
       return {
         results,
         total,
         page,
-        itemsPerPage
+        itemsPerPage,
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }

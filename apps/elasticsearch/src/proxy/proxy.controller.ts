@@ -1,13 +1,13 @@
-import { Controller } from "@nestjs/common";
+import { Controller } from '@nestjs/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { RmqService } from '@app/common';
-import { ProxyService } from "../proxy/proxy.service";
+import { ProxyService } from '../proxy/proxy.service';
 
 @Controller()
 export class ProxyController {
   constructor(
     private readonly proxyService: ProxyService,
-    private readonly rmqService: RmqService
+    private readonly rmqService: RmqService,
   ) {}
 
   @EventPattern('proxyClient/getZone')

@@ -15,15 +15,18 @@ import { RoomModule } from './room/room.module';
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_HOUSEHOLD_QUEUE: Joi.string().required(),
       }),
-      envFilePath: process.env.NODE_ENV === 'production' ? './apps/household/.env.production' : './apps/household/.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './apps/household/.env.production'
+          : './apps/household/.env',
     }),
     RmqModule,
     DatabaseModule,
     StorageModule,
-    forwardRef(() => RoomModule)
+    forwardRef(() => RoomModule),
   ],
   controllers: [HouseholdController],
   providers: [HouseholdService],
-  exports: [RmqModule]
+  exports: [RmqModule],
 })
 export class HouseholdModule {}

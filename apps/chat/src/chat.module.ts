@@ -2,10 +2,14 @@ import { Module } from '@nestjs/common';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
 import {
-  MgDatabaseModule, RmqModule, GrpcModule,
-  UserConversationsSchema, UserConversations,
-  DatabaseModule, FamilyConversations,
-  FamilyConversationsSchema
+  MgDatabaseModule,
+  RmqModule,
+  GrpcModule,
+  UserConversationsSchema,
+  UserConversations,
+  DatabaseModule,
+  FamilyConversations,
+  FamilyConversationsSchema,
 } from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
@@ -20,13 +24,16 @@ import * as Joi from 'joi';
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_CHAT_QUEUE: Joi.string().required(),
       }),
-      envFilePath: process.env.NODE_ENV === 'production' ? './apps/chat/.env.production' : './apps/chat/.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './apps/chat/.env.production'
+          : './apps/chat/.env',
     }),
     MgDatabaseModule,
     RmqModule,
     MongooseModule.forFeature([
       { name: UserConversations.name, schema: UserConversationsSchema },
-      { name: FamilyConversations.name, schema: FamilyConversationsSchema }
+      { name: FamilyConversations.name, schema: FamilyConversationsSchema },
     ]),
     DatabaseModule,
     StorageModule,
@@ -35,4 +42,4 @@ import * as Joi from 'joi';
   controllers: [ChatController],
   providers: [ChatService],
 })
-export class ChatModule { }
+export class ChatModule {}

@@ -1,25 +1,28 @@
-import { ConflictException, HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { lastValueFrom, timeout } from "rxjs";
-import { ChangePasswordDto } from "./dto/changePassword.dto";
-import { CreateAccountDto } from "./dto/createAccount.dto";
-import { ClientProxy } from "@nestjs/microservices";
-import { USER_SERVICE } from "../utils";
+import {
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { lastValueFrom, timeout } from 'rxjs';
+import { ChangePasswordDto } from './dto/changePassword.dto';
+import { CreateAccountDto } from './dto/createAccount.dto';
+import { ClientProxy } from '@nestjs/microservices';
+import { USER_SERVICE } from '../utils';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @Inject(USER_SERVICE) private userClient: ClientProxy
-  ) { }
+  constructor(@Inject(USER_SERVICE) private userClient: ClientProxy) {}
 
   async createAccount(createAccountDto: CreateAccountDto) {
     try {
-      const source = this.userClient.send('userClient/create_account', { createAccountDto }).pipe(
-        timeout(15000),
-      );
+      const source = this.userClient
+        .send('userClient/create_account', { createAccountDto })
+        .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -29,13 +32,12 @@ export class UserService {
 
   async checkPhone(phone: string) {
     try {
-      const source = this.userClient.send('userClient/check_phone', { phone }).pipe(
-        timeout(15000),
-      );
+      const source = this.userClient
+        .send('userClient/check_phone', { phone })
+        .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -45,13 +47,12 @@ export class UserService {
 
   async changePassword(currentUser, data: ChangePasswordDto) {
     try {
-      const source = this.userClient.send('userClient/change_password', { currentUser, data }).pipe(
-        timeout(15000),
-      );
+      const source = this.userClient
+        .send('userClient/change_password', { currentUser, data })
+        .pipe(timeout(15000));
       const result = await lastValueFrom(source);
       return result;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -62,21 +63,22 @@ export class UserService {
   async updateProfile(user, data) {
     try {
       const { firstname, lastname } = data;
-      if ((firstname && user.firstname === firstname)
-        || (lastname && user.lastname === lastname)
-        || (!firstname && !lastname)) {
+      if (
+        (firstname && user.firstname === firstname) ||
+        (lastname && user.lastname === lastname) ||
+        (!firstname && !lastname)
+      ) {
         throw new ConflictException({
           message: 'No changes detected',
-          statusCode: HttpStatus.BAD_REQUEST
+          statusCode: HttpStatus.BAD_REQUEST,
         });
       }
-      const source = this.userClient.send('userClient/update_profile', { user, data }).pipe(
-        timeout(15000),
-      );
+      const source = this.userClient
+        .send('userClient/update_profile', { user, data })
+        .pipe(timeout(15000));
       const result = await lastValueFrom(source);
       return result;
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof ConflictException) {
         throw error;
       }
@@ -89,13 +91,12 @@ export class UserService {
 
   async changeAvatar(currentUser, file: Express.Multer.File) {
     try {
-      const source = this.userClient.send('userClient/change_avatar', { currentUser, file }).pipe(
-        timeout(10000),
-      );
+      const source = this.userClient
+        .send('userClient/change_avatar', { currentUser, file })
+        .pipe(timeout(10000));
       const result = await lastValueFrom(source);
       return result;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -105,13 +106,12 @@ export class UserService {
 
   async validateEmail(currentUser, data) {
     try {
-      const source = this.userClient.send('userClient/validate_email', { currentUser, data }).pipe(
-        timeout(15000),
-      );
+      const source = this.userClient
+        .send('userClient/validate_email', { currentUser, data })
+        .pipe(timeout(15000));
       const result = await lastValueFrom(source);
       return result;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -121,13 +121,12 @@ export class UserService {
 
   async getAllUser() {
     try {
-      const source = this.userClient.send('userClient/get_all_user', {}).pipe(
-        timeout(15000),
-      );
+      const source = this.userClient
+        .send('userClient/get_all_user', {})
+        .pipe(timeout(15000));
       const result = await lastValueFrom(source);
       return result;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }

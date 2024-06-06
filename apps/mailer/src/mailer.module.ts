@@ -19,7 +19,10 @@ import { join } from 'path';
         MAIL_PASSWORD: Joi.string().required(),
         MAIL_SENDER: Joi.string().required(),
       }),
-      envFilePath: process.env.NODE_ENV === 'production' ? './apps/mailer/.env.production' : './apps/mailer/.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './apps/mailer/.env.production'
+          : './apps/mailer/.env',
     }),
     MailerModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
@@ -46,9 +49,9 @@ import { join } from 'path';
       inject: [ConfigService],
     }),
     RmqModule,
-    DatabaseModule
+    DatabaseModule,
   ],
   controllers: [MailController],
   providers: [MailService],
 })
-export class MailModule { }
+export class MailModule {}

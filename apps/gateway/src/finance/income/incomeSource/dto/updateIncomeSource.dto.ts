@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class UpdateIncomeSourceDto {
   @ApiProperty({ description: 'id of income source' })
@@ -12,7 +12,7 @@ export class UpdateIncomeSourceDto {
   @IsNumber()
   id_family: number;
 
-  @ApiProperty({ example: "Robbery" })
+  @ApiProperty({ example: 'Robbery' })
   @IsString()
   @IsNotEmpty()
   name: string;

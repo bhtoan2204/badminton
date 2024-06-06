@@ -22,14 +22,14 @@ spec:
       containers:
         - name: search
           image: mjkundta/search:<TAG>
-          command: ["node", "dist/apps/elasticsearch/src/main"]
+          command: ['node', 'dist/apps/elasticsearch/src/main']
           resources:
             limits:
-              cpu: "140m"
-              memory: "512Mi"
+              cpu: '140m'
+              memory: '512Mi'
           env:
             - name: NODE_ENV
-              value: "production"
+              value: 'production'
 ---
 apiVersion: v1
 kind: Service

@@ -1,8 +1,16 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { Admin, AdminGuard, JwtAuthGuard } from "../../utils";
-import { ProxyService } from "./proxy.service";
-import { GetAnalyticsDto } from "./dto/getAnalytics.dto";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Admin, AdminGuard, JwtAuthGuard } from '../../utils';
+import { ProxyService } from './proxy.service';
+import { GetAnalyticsDto } from './dto/getAnalytics.dto';
 
 @ApiTags('Admin Proxy')
 @Controller('proxy')
@@ -10,7 +18,7 @@ import { GetAnalyticsDto } from "./dto/getAnalytics.dto";
 @UseGuards(JwtAuthGuard, AdminGuard)
 @Admin(true)
 export class ProxyController {
-  constructor(private readonly proxyService: ProxyService) { }
+  constructor(private readonly proxyService: ProxyService) {}
 
   @HttpCode(HttpStatus.OK)
   @Get('getZone')

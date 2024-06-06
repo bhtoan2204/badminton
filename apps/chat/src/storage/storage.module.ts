@@ -1,14 +1,10 @@
-import { GrpcModule } from "@app/common";
-import { Module } from "@nestjs/common";
-import { StorageService } from "./storage.service";
+import { GrpcModule } from '@app/common';
+import { Module } from '@nestjs/common';
+import { StorageService } from './storage.service';
 
 @Module({
-  imports: [
-    GrpcModule.register({ name: 'STORAGE' }),
-  ],
+  imports: [GrpcModule.register({ name: 'STORAGE' })],
   providers: [StorageService],
-  exports: [
-    StorageService
-  ]
+  exports: [StorageService],
 })
-export class StorageModule { }
+export class StorageModule {}

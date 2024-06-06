@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, Matches } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class CreateAccountDto {
   @IsNotEmpty()
@@ -15,7 +15,8 @@ export class CreateAccountDto {
   @IsNotEmpty()
   @IsString()
   @Matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[a-z]).{8,}$/, {
-    message: 'newPassword must be at least 8 characters, include at least one uppercase letter, one lowercase letter, and one number.'
+    message:
+      'newPassword must be at least 8 characters, include at least one uppercase letter, one lowercase letter, and one number.',
   })
   @ApiProperty({ example: 'Password123' })
   password: string;
@@ -29,5 +30,4 @@ export class CreateAccountDto {
   @IsString()
   @ApiProperty({ example: 'Toàn' })
   lastname: string;
-
 }

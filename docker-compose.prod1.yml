@@ -8,18 +8,18 @@ services:
       target: production
     command: node dist/apps/gateway/src/main
     ports:
-      - "8080:8080"
+      - '8080:8080'
     restart: on-failure
     environment:
       - NODE_ENV=production
-  
+
   auth:
     image: mjkundta/auth:${TAG}
     build:
       context: .
       dockerfile: ./apps/auth/Dockerfile
       target: production
-    command: node dist/apps/auth/src/main 
+    command: node dist/apps/auth/src/main
     restart: on-failure
     environment:
       - NODE_ENV=production
@@ -34,4 +34,3 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
-    

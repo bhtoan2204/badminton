@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateGuidelineDto {
   @ApiProperty({ example: 93 })
@@ -17,7 +17,9 @@ export class UpdateGuidelineDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ example: 'Updated guideline - This guide show you how to use your TV' })
+  @ApiProperty({
+    example: 'Updated guideline - This guide show you how to use your TV',
+  })
   @IsOptional()
   @IsString()
   description: string;

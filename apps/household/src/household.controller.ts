@@ -7,7 +7,8 @@ import { RmqService } from '@app/common';
 export class HouseholdController {
   constructor(
     private readonly householdService: HouseholdService,
-    private readonly rmqService: RmqService) {}
+    private readonly rmqService: RmqService,
+  ) {}
 
   @EventPattern('householdClient/getCategory')
   async getHouseholdCategory(@Payload() data: any, @Ctx() context: RmqContext) {
@@ -18,25 +19,42 @@ export class HouseholdController {
   @EventPattern('householdClient/getItem')
   async getItem(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.householdService.getItem(data.id_user, data.id_family, data.page, data.itemsPerPage);
+    return await this.householdService.getItem(
+      data.id_user,
+      data.id_family,
+      data.page,
+      data.itemsPerPage,
+    );
   }
 
   @EventPattern('householdClient/getItemDetail')
   async getItemDetail(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.householdService.getItemDetail(data.id_user, data.id_family, data.id_item);
+    return await this.householdService.getItemDetail(
+      data.id_user,
+      data.id_family,
+      data.id_item,
+    );
   }
 
   @EventPattern('householdClient/createItem')
   async createItem(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.householdService.createItem(data.id_user, data.dto, data.file);
+    return await this.householdService.createItem(
+      data.id_user,
+      data.dto,
+      data.file,
+    );
   }
 
   @EventPattern('householdClient/updateItem')
   async updateItem(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.householdService.updateItem(data.id_user, data.dto, data.file);
+    return await this.householdService.updateItem(
+      data.id_user,
+      data.dto,
+      data.file,
+    );
   }
 
   @EventPattern('householdClient/inputDurableItem')
@@ -48,12 +66,19 @@ export class HouseholdController {
   @EventPattern('householdClient/inputConsumableItem')
   async inputConsumableItem(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.householdService.inputConsumableItem(data.id_user, data.dto);
+    return await this.householdService.inputConsumableItem(
+      data.id_user,
+      data.dto,
+    );
   }
 
   @EventPattern('householdClient/deleteItem')
   async deleteItem(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.householdService.deleteItem(data.id_user, data.id_family, data.id_item);
+    return await this.householdService.deleteItem(
+      data.id_user,
+      data.id_family,
+      data.id_item,
+    );
   }
 }

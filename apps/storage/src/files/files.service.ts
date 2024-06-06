@@ -1,7 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Storage } from "@google-cloud/storage";
+import { Storage } from '@google-cloud/storage';
 import { ConfigService } from '@nestjs/config';
-import { DeleteFileRequest, DeleteFileResponse, ReadFileRequest, ReadFileResponse, UploadFileRequest, UploadFileResponse } from '@app/common';
+import {
+  DeleteFileRequest,
+  DeleteFileResponse,
+  ReadFileRequest,
+  ReadFileResponse,
+  UploadFileRequest,
+  UploadFileResponse,
+} from '@app/common';
 import { Buffer } from 'buffer';
 
 @Injectable()
@@ -10,16 +17,21 @@ export class FilesService {
 
   constructor(
     private readonly configService: ConfigService,
-    @Inject('STORAGE') private readonly storage: Storage
+    @Inject('STORAGE') private readonly storage: Storage,
   ) {
     this.bucket = this.configService.get<string>('GOOGLE_MEDIA_BUCKET');
   }
 
-  async uploadFile({ fileName, file }: UploadFileRequest, uploadType: string): Promise<UploadFileResponse> {
+  async uploadFile(
+    { fileName, file }: UploadFileRequest,
+    uploadType: string,
+  ): Promise<UploadFileResponse> {
     try {
       const path = `${uploadType}/${fileName}`;
       const fileRef = this.storage.bucket(this.bucket).file(path);
-      const contentType = fileName.endsWith('.png') ? 'image/png' : 'image/jpeg';
+      const contentType = fileName.endsWith('.png')
+        ? 'image/png'
+        : 'image/jpeg';
 
       return new Promise<UploadFileResponse>((resolve, reject) => {
         const stream = fileRef.createWriteStream({
@@ -37,11 +49,13 @@ export class FilesService {
           resolve({
             fileName: fileName,
             fileUrl: publicUrl,
-            message: "File uploaded successfully",
+            message: 'File uploaded successfully',
           });
         });
 
-        const buffer = Buffer.from(file instanceof Uint8Array ? file : new Uint8Array([]));
+        const buffer = Buffer.from(
+          file instanceof Uint8Array ? file : new Uint8Array([]),
+        );
         stream.end(buffer);
       });
     } catch (e) {
@@ -49,7 +63,6 @@ export class FilesService {
       throw e;
     }
   }
-
 
   async readFile(request: ReadFileRequest): Promise<ReadFileResponse> {
     const { fileName, filePath } = request;
@@ -63,12 +76,15 @@ export class FilesService {
     return {
       fileName,
       fileContent: base64Image,
-      message: "File read successfully",
-      mimeType
+      message: 'File read successfully',
+      mimeType,
     };
   }
 
-  async deleteFile({ fileName }: DeleteFileRequest, uploadType: string): Promise<DeleteFileResponse> {
+  async deleteFile(
+    { fileName }: DeleteFileRequest,
+    uploadType: string,
+  ): Promise<DeleteFileResponse> {
     try {
       const path = `${uploadType}/${fileName}`;
       const fileRef = this.storage.bucket(this.bucket).file(path);
@@ -76,18 +92,17 @@ export class FilesService {
       if (!exists) {
         return {
           fileName: fileName,
-          message: "File does not exist, nothing to delete",
+          message: 'File does not exist, nothing to delete',
         };
       }
       await fileRef.delete();
       return {
         fileName: fileName,
-        message: "File deleted successfully",
+        message: 'File deleted successfully',
       };
     } catch (e) {
       console.log(e.message);
       throw e;
     }
   }
-
 }

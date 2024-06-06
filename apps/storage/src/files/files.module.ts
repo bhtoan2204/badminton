@@ -17,12 +17,14 @@ import { Storage } from '@google-cloud/storage';
           projectId: configService.get<string>('GOOGLE_PROJECT_ID'),
           credentials: {
             client_email: configService.get<string>('GOOGLE_CLIENT_EMAIL'),
-            private_key: configService.get<string>('GOOGLE_PRIVATE_KEY').replace(/\\n/g, '\n'),
+            private_key: configService
+              .get<string>('GOOGLE_PRIVATE_KEY')
+              .replace(/\\n/g, '\n'),
           },
         });
       },
       inject: [ConfigService],
-    }
+    },
   ],
 })
-export class FilesModule { }
+export class FilesModule {}

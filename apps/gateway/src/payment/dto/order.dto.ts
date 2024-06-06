@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNumber, IsNotEmpty } from 'class-validator';
 
 export class OrderDTO {
@@ -28,6 +28,4 @@ export class OrderDTO {
   @IsNotEmpty()
   @ApiProperty({ example: 'vnpay' })
   method: string;
-
-
 }

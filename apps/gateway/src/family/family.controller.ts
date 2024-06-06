@@ -1,20 +1,39 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { FamilyService } from "./family.service";
-import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from "../utils";
-import { CreateFamilyDto } from "./dto/createFamily.dto";
-import { MemberFamilyDto } from "./dto/memberFamily.dto";
-import { DeleteMemberDTO } from "./dto/deleteFamily.dto";
-import { UpdateFamilyDTO } from "./dto/updateFamily.dto";
-import { FileInterceptor } from "@nestjs/platform-express";
-import { ImageFileInterceptor } from "../user/interceptor/imageFile.interceptor";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Put,
+  Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { FamilyService } from './family.service';
+import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../utils';
+import { CreateFamilyDto } from './dto/createFamily.dto';
+import { MemberFamilyDto } from './dto/memberFamily.dto';
+import { DeleteMemberDTO } from './dto/deleteFamily.dto';
+import { UpdateFamilyDTO } from './dto/updateFamily.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageFileInterceptor } from '../user/interceptor/imageFile.interceptor';
 
 @ApiTags('Family')
 @Controller('family')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, MemberFamilyGuard)
 export class FamilyController {
-  constructor(private readonly familyService: FamilyService) { }
+  constructor(private readonly familyService: FamilyService) {}
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all family' })
@@ -26,35 +45,56 @@ export class FamilyController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get family detail' })
   @Get('getFamily')
-  async getFamily(@Query('id_family') id_family: number, @CurrentUser() currentUser) {
+  async getFamily(
+    @Query('id_family') id_family: number,
+    @CurrentUser() currentUser,
+  ) {
     return this.familyService.getFamily(currentUser.id_user, id_family);
   }
 
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a family' })
   @Post('createFamily')
-  async createFamily(@CurrentUser() currentUser, @Body() createFamilyDto: CreateFamilyDto) {
-    return this.familyService.createFamily(currentUser.id_user, createFamilyDto);
+  async createFamily(
+    @CurrentUser() currentUser,
+    @Body() createFamilyDto: CreateFamilyDto,
+  ) {
+    return this.familyService.createFamily(
+      currentUser.id_user,
+      createFamilyDto,
+    );
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update a family' })
   @Put('updateFamily')
-  async updateFamily(@CurrentUser() currentUser, @Body() UpdateFamilyDTO: UpdateFamilyDTO) {
-    return this.familyService.updateFamily(currentUser.id_user, UpdateFamilyDTO);
+  async updateFamily(
+    @CurrentUser() currentUser,
+    @Body() UpdateFamilyDTO: UpdateFamilyDTO,
+  ) {
+    return this.familyService.updateFamily(
+      currentUser.id_user,
+      UpdateFamilyDTO,
+    );
   }
 
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete a family' })
   @Delete('deleteFamily')
-  async deleteFamily(@Query('id_family') id_family: number, @CurrentUser() currentUser) {
+  async deleteFamily(
+    @Query('id_family') id_family: number,
+    @CurrentUser() currentUser,
+  ) {
     return this.familyService.deleteFamily(currentUser.id_user, id_family);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all member infomation of specified family' })
   @Get('getAllMember')
-  async getAllMember(@Query('id_family') id_family: number, @CurrentUser() currentUser) {
+  async getAllMember(
+    @Query('id_family') id_family: number,
+    @CurrentUser() currentUser,
+  ) {
     return this.familyService.getAllMember(currentUser.id_user, id_family);
   }
 
@@ -75,7 +115,10 @@ export class FamilyController {
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete member' })
   @Delete('deleteMember')
-  async deleteMember(@CurrentUser() currentUser, @Body() member: DeleteMemberDTO) {
+  async deleteMember(
+    @CurrentUser() currentUser,
+    @Body() member: DeleteMemberDTO,
+  ) {
     return this.familyService.deleteMember(currentUser.id_user, member);
   }
 
@@ -87,13 +130,23 @@ export class FamilyController {
       type: 'object',
       properties: {
         avatar: { type: 'string', format: 'binary' },
-        id_family: { type: 'integer' }
+        id_family: { type: 'integer' },
       },
     },
   })
-  @UseInterceptors(FileInterceptor('avatar', new ImageFileInterceptor().createMulterOptions()))
+  @UseInterceptors(
+    FileInterceptor('avatar', new ImageFileInterceptor().createMulterOptions()),
+  )
   @Put('changeAvatar')
-  async changeAvatar(@CurrentUser() currentUser, @UploadedFile() file: Express.Multer.File, @Body('id_family') id_family: number) {
-    return this.familyService.changeAvatar(currentUser.id_user, id_family, file);
+  async changeAvatar(
+    @CurrentUser() currentUser,
+    @UploadedFile() file: Express.Multer.File,
+    @Body('id_family') id_family: number,
+  ) {
+    return this.familyService.changeAvatar(
+      currentUser.id_user,
+      id_family,
+      file,
+    );
   }
 }

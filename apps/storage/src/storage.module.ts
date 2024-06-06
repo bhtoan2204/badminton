@@ -11,11 +11,14 @@ import * as Joi from 'joi';
         GRPC_STORAGE_PACKAGE: Joi.string().required(),
         GRPC_STORAGE_PROTO_PATH: Joi.string().required(),
       }),
-      envFilePath: process.env.NODE_ENV === 'production' ? './apps/storage/.env.production' : './apps/storage/.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './apps/storage/.env.production'
+          : './apps/storage/.env',
     }),
     FilesModule,
   ],
   controllers: [],
   providers: [],
 })
-export class StorageModule { }
+export class StorageModule {}

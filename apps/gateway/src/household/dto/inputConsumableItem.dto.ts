@@ -1,5 +1,10 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsDateString, IsNotEmpty, IsNumber, IsOptional } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+} from 'class-validator';
 
 export class InputConsumableItemDto {
   @ApiProperty({ example: 96, description: 'The ID of the family' })
@@ -22,7 +27,10 @@ export class InputConsumableItemDto {
   @IsOptional()
   threshold: number;
 
-  @ApiProperty({ example: '2022-12-31', description: 'The expiry date of the item' })
+  @ApiProperty({
+    example: '2022-12-31',
+    description: 'The expiry date of the item',
+  })
   @IsDateString()
   @IsOptional()
   expired_date: Date;

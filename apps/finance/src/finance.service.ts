@@ -4,9 +4,7 @@ import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class FinanceService {
-  constructor(
-    private readonly entityManager: EntityManager,
-  ) { }
+  constructor(private readonly entityManager: EntityManager) {}
 
   async getFinanceSummary(id_user: string, id_family: number) {
     try {
@@ -16,12 +14,11 @@ export class FinanceService {
       return {
         data: data[0],
         message: 'Get finance summary',
-      }
-    }
-    catch (error) {
+      };
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }

@@ -6,9 +6,7 @@ import { lastValueFrom, timeout } from 'rxjs';
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
-  constructor(
-    @Inject(AUTH_SERVICE) private readonly clientProxy: ClientProxy,
-  ) {
+  constructor(@Inject(AUTH_SERVICE) private readonly clientProxy: ClientProxy) {
     super();
   }
 
@@ -17,9 +15,9 @@ export class SessionSerializer extends PassportSerializer {
   }
 
   async deserializeUser(payload: any, done: Function) {
-    const source = this.clientProxy.send('authClient/validate_user_id', { id_user: payload.id_user }).pipe(
-      timeout(15000)
-    );
+    const source = this.clientProxy
+      .send('authClient/validate_user_id', { id_user: payload.id_user })
+      .pipe(timeout(15000));
     const user = await lastValueFrom(source);
     return user ? done(null, user) : done(null, null);
   }

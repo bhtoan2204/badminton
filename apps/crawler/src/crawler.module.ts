@@ -15,7 +15,10 @@ import * as Joi from 'joi';
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_CRAWLER_QUEUE: Joi.string().required(),
       }),
-      envFilePath: process.env.NODE_ENV === 'production' ? './apps/crawler/.env.production' : './apps/crawler/.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './apps/crawler/.env.production'
+          : './apps/crawler/.env',
     }),
     forwardRef(() => RssModule),
     forwardRef(() => BankModule),
@@ -23,6 +26,6 @@ import * as Joi from 'joi';
   ],
   controllers: [CrawlerController],
   providers: [CrawlerService],
-  exports: [RmqModule]
+  exports: [RmqModule],
 })
-export class CrawlerModule { }
+export class CrawlerModule {}

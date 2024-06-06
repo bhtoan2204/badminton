@@ -1,8 +1,8 @@
 /* eslint-disable */
-import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { Observable } from "rxjs";
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
 
-export const protobufPackage = "storage";
+export const protobufPackage = 'storage';
 
 export interface UploadFileRequest {
   fileName: string;
@@ -36,7 +36,7 @@ export interface DeleteFileResponse {
   message: string;
 }
 
-export const STORAGE_PACKAGE_NAME = "storage";
+export const STORAGE_PACKAGE_NAME = 'storage';
 
 export interface StorageServiceClient {
   uploadFile(request: UploadFileRequest): Observable<UploadFileResponse>;
@@ -51,70 +51,113 @@ export interface StorageServiceClient {
 
   deleteImageStep(request: DeleteFileRequest): Observable<DeleteFileResponse>;
 
-  uploadImageHousehold(request: UploadFileRequest): Observable<UploadFileResponse>;
-
-  deleteImageHousehold(request: DeleteFileRequest): Observable<DeleteFileResponse>;
-
-  uploadImageInvoice(request: UploadFileRequest): Observable<UploadFileResponse>;
-
-  deleteImageInvoice(request: DeleteFileRequest): Observable<DeleteFileResponse>;
-}
-
-type UploadFileResult = Promise<UploadFileResponse> | Observable<UploadFileResponse> | UploadFileResponse;
-
-export interface StorageServiceController {
-  uploadFile(
-    request: UploadFileRequest,
-  ): UploadFileResult;
-
-  readFile(request: ReadFileRequest): Promise<ReadFileResponse> | Observable<ReadFileResponse> | ReadFileResponse;
-
-  deleteFile(
-    request: DeleteFileRequest,
-  ): Promise<DeleteFileResponse> | Observable<DeleteFileResponse> | DeleteFileResponse;
-
-  uploadImageChat(
-    request: UploadFileRequest,
-  ): UploadFileResult;
-
-  uploadImageStep(
-    request: UploadFileRequest,
-  ): UploadFileResult;
-
-  deleteImageStep(
-    request: DeleteFileRequest,
-  ): Promise<DeleteFileResponse> | Observable<DeleteFileResponse> | DeleteFileResponse;
-
   uploadImageHousehold(
     request: UploadFileRequest,
-  ): UploadFileResult;
+  ): Observable<UploadFileResponse>;
 
   deleteImageHousehold(
     request: DeleteFileRequest,
-  ): Promise<DeleteFileResponse> | Observable<DeleteFileResponse> | DeleteFileResponse;
+  ): Observable<DeleteFileResponse>;
 
   uploadImageInvoice(
     request: UploadFileRequest,
-  ): UploadFileResult;
+  ): Observable<UploadFileResponse>;
 
   deleteImageInvoice(
     request: DeleteFileRequest,
-  ): Promise<DeleteFileResponse> | Observable<DeleteFileResponse> | DeleteFileResponse;
+  ): Observable<DeleteFileResponse>;
+}
+
+type UploadFileResult =
+  | Promise<UploadFileResponse>
+  | Observable<UploadFileResponse>
+  | UploadFileResponse;
+
+export interface StorageServiceController {
+  uploadFile(request: UploadFileRequest): UploadFileResult;
+
+  readFile(
+    request: ReadFileRequest,
+  ):
+    | Promise<ReadFileResponse>
+    | Observable<ReadFileResponse>
+    | ReadFileResponse;
+
+  deleteFile(
+    request: DeleteFileRequest,
+  ):
+    | Promise<DeleteFileResponse>
+    | Observable<DeleteFileResponse>
+    | DeleteFileResponse;
+
+  uploadImageChat(request: UploadFileRequest): UploadFileResult;
+
+  uploadImageStep(request: UploadFileRequest): UploadFileResult;
+
+  deleteImageStep(
+    request: DeleteFileRequest,
+  ):
+    | Promise<DeleteFileResponse>
+    | Observable<DeleteFileResponse>
+    | DeleteFileResponse;
+
+  uploadImageHousehold(request: UploadFileRequest): UploadFileResult;
+
+  deleteImageHousehold(
+    request: DeleteFileRequest,
+  ):
+    | Promise<DeleteFileResponse>
+    | Observable<DeleteFileResponse>
+    | DeleteFileResponse;
+
+  uploadImageInvoice(request: UploadFileRequest): UploadFileResult;
+
+  deleteImageInvoice(
+    request: DeleteFileRequest,
+  ):
+    | Promise<DeleteFileResponse>
+    | Observable<DeleteFileResponse>
+    | DeleteFileResponse;
 }
 
 export function StorageServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["uploadFile", "readFile", "deleteFile", "uploadImageChat", "uploadImageStep", "deleteImageStep", "uploadImageHousehold", "deleteImageHousehold", "uploadImageInvoice", "deleteImageInvoice"];
+    const grpcMethods: string[] = [
+      'uploadFile',
+      'readFile',
+      'deleteFile',
+      'uploadImageChat',
+      'uploadImageStep',
+      'deleteImageStep',
+      'uploadImageHousehold',
+      'deleteImageHousehold',
+      'uploadImageInvoice',
+      'deleteImageInvoice',
+    ];
     for (const method of grpcMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod("StorageService", method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcMethod('StorageService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod("StorageService", method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcStreamMethod('StorageService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
   };
 }
 
-export const STORAGE_SERVICE_NAME = "StorageService";
+export const STORAGE_SERVICE_NAME = 'StorageService';

@@ -22,14 +22,14 @@ spec:
       containers:
         - name: mailer
           image: mjkundta/mailer:<TAG>
-          command: ["node", "dist/apps/mailer/src/main"]
+          command: ['node', 'dist/apps/mailer/src/main']
           resources:
             limits:
-              cpu: "140m"
-              memory: "512Mi"
+              cpu: '140m'
+              memory: '512Mi'
           env:
             - name: NODE_ENV
-              value: "production"
+              value: 'production'
 
 ---
 apiVersion: v1

@@ -1,7 +1,14 @@
-import { Controller, UseGuards, Get, Param, HttpStatus, HttpCode } from "@nestjs/common";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { Admin, AdminGuard, JwtAuthGuard } from "../../utils";
-import { RabbitMqService } from "./rabbitmq.service";
+import {
+  Controller,
+  UseGuards,
+  Get,
+  Param,
+  HttpStatus,
+  HttpCode,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Admin, AdminGuard, JwtAuthGuard } from '../../utils';
+import { RabbitMqService } from './rabbitmq.service';
 
 @ApiTags('Admin Message Broker')
 @Controller('rabbitmq')
@@ -9,9 +16,7 @@ import { RabbitMqService } from "./rabbitmq.service";
 @UseGuards(JwtAuthGuard, AdminGuard)
 @Admin(true)
 export class RabbitMqController {
-  constructor(
-    private readonly rabbitMQService: RabbitMqService
-  ) { }
+  constructor(private readonly rabbitMQService: RabbitMqService) {}
 
   @HttpCode(HttpStatus.OK)
   @Get('/queues')
