@@ -251,6 +251,23 @@ services:
     volumes:
       - .:/usr/src/app
 
+  utilities:
+    image: mjkundta/utilities:latest
+    build:
+      context: .
+      dockerfile: ./apps/utilities/Dockerfile
+      target: development
+    # command: python manage.py runserver 0.0.0.0:8000
+    command: tail -f /dev/null
+    restart: on-failure
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=utilities.settings
+
+
   filebeat:
     image: mjkundta/filebeat:latest
     build:
