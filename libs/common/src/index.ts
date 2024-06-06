@@ -41,5 +41,3 @@ export * from './mongoose/entity/notification.schema';
 export * from './logger/logger';
 
 export * from './firebase/firebase.service';
-
-export * from './utils/jaeger';
