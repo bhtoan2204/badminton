@@ -7,15 +7,18 @@ import { EntityManager } from 'typeorm';
 export class MailService {
   constructor(
     private readonly mailerService: MailerService,
-    private readonly entityManager: EntityManager
-  ) { }
+    private readonly entityManager: EntityManager,
+  ) {}
 
   async sendUserConfirmation(dto) {
     const { userInfo, email } = dto;
     try {
       const generateOtpQuery = 'SELECT * FROM f_generate_otp($1, $2)';
       const generateOtpParams = [userInfo.id_user, email];
-      const code = await this.entityManager.query(generateOtpQuery, generateOtpParams);
+      const code = await this.entityManager.query(
+        generateOtpQuery,
+        generateOtpParams,
+      );
 
       const sendConfirmation = await this.mailerService.sendMail({
         to: email,
@@ -24,19 +27,18 @@ export class MailService {
         template: 'verifyAccount',
         context: {
           name: userInfo.firstname + ' ' + userInfo.lastname,
-          otp: code[0].f_generate_otp
-        }
+          otp: code[0].f_generate_otp,
+        },
       });
 
       return {
         message: 'OTP has been sent to your email',
-        data: sendConfirmation
+        data: sendConfirmation,
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -56,17 +58,13 @@ export class MailService {
             Please use the following link to join Famfund: ${inviteLink}
         `;
       return emailContent;
-
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
 
-  async sendResetPassword(dto) {
-
-  }
+  async sendResetPassword(dto) {}
 }

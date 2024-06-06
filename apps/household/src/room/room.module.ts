@@ -5,11 +5,7 @@ import { RoomService } from './room.service';
 import { HouseholdModule } from '../household.module';
 
 @Module({
-  imports: [
-    RmqModule,
-    DatabaseModule,
-    forwardRef(() => HouseholdModule)
-  ],
+  imports: [RmqModule, DatabaseModule, forwardRef(() => HouseholdModule)],
   controllers: [RoomController],
   providers: [RoomService],
 })

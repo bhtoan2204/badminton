@@ -1,13 +1,13 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum, IsNotEmpty, IsNumber } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
 
 enum ItemCondition {
-  New = "new",
-  Good = "good",
-  Fair = "fair",
-  Poor = "poor",
-  Refurbished = "refurbished",
-  Worn = "worn"
+  New = 'new',
+  Good = 'good',
+  Fair = 'fair',
+  Poor = 'poor',
+  Refurbished = 'refurbished',
+  Worn = 'worn',
 }
 
 export class InputDurableItemDto {
@@ -20,7 +20,7 @@ export class InputDurableItemDto {
   @IsNotEmpty()
   @IsNumber()
   id_item: number;
-  
+
   @ApiProperty({ example: 'good', description: 'The condition of the item' })
   @IsNotEmpty()
   @IsEnum(ItemCondition)

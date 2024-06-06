@@ -1,18 +1,30 @@
-import { DeleteFileRequest, DeleteFileResponse, ReadFileRequest, ReadFileResponse, STORAGE_SERVICE_NAME, StorageServiceClient, UploadFileRequest, UploadFileResponse } from "@app/common";
-import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
-import { ClientGrpc } from "@nestjs/microservices";
+import {
+  DeleteFileRequest,
+  DeleteFileResponse,
+  ReadFileRequest,
+  ReadFileResponse,
+  STORAGE_SERVICE_NAME,
+  StorageServiceClient,
+  UploadFileRequest,
+  UploadFileResponse,
+} from '@app/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { ClientGrpc } from '@nestjs/microservices';
 
 @Injectable()
 export class StorageService implements OnModuleInit {
   private storageService: StorageServiceClient;
 
-  constructor(@Inject('STORAGE') private storageClient: ClientGrpc) { }
+  constructor(@Inject('STORAGE') private storageClient: ClientGrpc) {}
 
   onModuleInit() {
-    this.storageService = this.storageClient.getService<StorageServiceClient>(STORAGE_SERVICE_NAME);
+    this.storageService =
+      this.storageClient.getService<StorageServiceClient>(STORAGE_SERVICE_NAME);
   }
 
-  async uploadImageStep(request: UploadFileRequest): Promise<UploadFileResponse> {
+  async uploadImageStep(
+    request: UploadFileRequest,
+  ): Promise<UploadFileResponse> {
     return this.storageService.uploadImageStep(request).toPromise();
   }
 
@@ -20,7 +32,9 @@ export class StorageService implements OnModuleInit {
     return this.storageService.readFile(request).toPromise();
   }
 
-  async deleteImageStep(request: DeleteFileRequest): Promise<DeleteFileResponse> {
+  async deleteImageStep(
+    request: DeleteFileRequest,
+  ): Promise<DeleteFileResponse> {
     return this.storageService.deleteImageStep(request).toPromise();
   }
 }

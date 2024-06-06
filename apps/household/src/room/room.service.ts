@@ -1,12 +1,10 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
-import { RpcException } from "@nestjs/microservices";
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class RoomService {
-  constructor(
-    private readonly entityManager: EntityManager,
-  ) {}
+  constructor(private readonly entityManager: EntityManager) {}
 
   async getRooms(id_user: string, id_family: number) {
     try {
@@ -15,13 +13,12 @@ export class RoomService {
       const data = await this.entityManager.query(query, params);
       return {
         data: data,
-        message: 'Rooms retrieved successfully'
+        message: 'Rooms retrieved successfully',
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -34,13 +31,12 @@ export class RoomService {
       const data = await this.entityManager.query(query, params);
       return {
         data: data[0],
-        message: 'Room created successfully'
+        message: 'Room created successfully',
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -52,11 +48,10 @@ export class RoomService {
       const params = [id_user, id_family, id_room, room_name];
       const data = await this.entityManager.query(query, params);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -68,13 +63,12 @@ export class RoomService {
       const data = await this.entityManager.query(query, params);
       return {
         data: data[0].f_delete_room,
-        message: 'Room deleted successfully'
+        message: 'Room deleted successfully',
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }

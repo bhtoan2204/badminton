@@ -1,9 +1,17 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { Admin, AdminGuard, JwtAuthGuard } from "../../utils";
-import { SearchService } from "./search.service";
-import { GetLogsFilterDto } from "./dto/getLogFilter.dto";
-import { GetCountLogsByTimeRangeDto } from "./dto/getCountLogsByTimeRange.dto";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Admin, AdminGuard, JwtAuthGuard } from '../../utils';
+import { SearchService } from './search.service';
+import { GetLogsFilterDto } from './dto/getLogFilter.dto';
+import { GetCountLogsByTimeRangeDto } from './dto/getCountLogsByTimeRange.dto';
 
 @ApiTags('Admin Logs')
 @Controller('logs')
@@ -11,7 +19,7 @@ import { GetCountLogsByTimeRangeDto } from "./dto/getCountLogsByTimeRange.dto";
 @UseGuards(JwtAuthGuard, AdminGuard)
 @Admin(true)
 export class SearchController {
-  constructor(private readonly searchService: SearchService) { }
+  constructor(private readonly searchService: SearchService) {}
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get logs count' })

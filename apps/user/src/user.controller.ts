@@ -1,14 +1,14 @@
-import { Controller } from "@nestjs/common";
-import { Ctx, EventPattern, Payload, RmqContext } from "@nestjs/microservices";
-import { RmqService } from "@app/common";
-import { UserService } from "./user.service";
+import { Controller } from '@nestjs/common';
+import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
+import { RmqService } from '@app/common';
+import { UserService } from './user.service';
 
 @Controller()
 export class UserController {
   constructor(
     private readonly rmqService: RmqService,
-    private readonly userService: UserService
-  ) { }
+    private readonly userService: UserService,
+  ) {}
 
   @EventPattern('userClient/create_account')
   async handleUserCreated(@Payload() data: any, @Ctx() context: RmqContext) {

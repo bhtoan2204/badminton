@@ -15,19 +15,23 @@ async function bootstrap() {
 
   setupSwagger(app);
 
-  app.use(cors({
-    origin: true,
-    methods: 'GET, POST, PUT, DELETE, PATCH',
-    allowedHeaders: 'Content-Type, Authorization',
-    credentials: true,
-  }));
+  app.use(
+    cors({
+      origin: true,
+      methods: 'GET, POST, PUT, DELETE, PATCH',
+      allowedHeaders: 'Content-Type, Authorization',
+      credentials: true,
+    }),
+  );
 
-  app.use(session({
-    secret: configService.get<string>('SESSION_SECRET'),
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: true }
-  }));
+  app.use(
+    session({
+      secret: configService.get<string>('SESSION_SECRET'),
+      resave: false,
+      saveUninitialized: false,
+      cookie: { secure: true },
+    }),
+  );
 
   await app.listen(configService.get<number>('PORT'));
 }

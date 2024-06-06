@@ -1,11 +1,11 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 
 @Schema()
 class Conversation {
   @Prop({ required: true })
   senderId: string;
-  
+
   @Prop({ required: true, enum: ['text', 'photo', 'video'] })
   type: string;
 
@@ -43,4 +43,5 @@ export class FamilyConversations {
   conversations: Conversation[];
 }
 
-export const FamilyConversationsSchema = SchemaFactory.createForClass(FamilyConversations);
+export const FamilyConversationsSchema =
+  SchemaFactory.createForClass(FamilyConversations);

@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+  JoinColumn,
+} from 'typeorm';
 import { Family } from './family.entity';
 import { CategoryIncome } from './category_income.entity';
 import { WalletFamily } from './wallet_family.entity';
@@ -32,5 +40,3 @@ export class IncomeFamily {
   @UpdateDateColumn()
   updated_at: Date;
 }
-
-

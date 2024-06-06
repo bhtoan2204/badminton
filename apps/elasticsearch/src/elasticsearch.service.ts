@@ -6,7 +6,7 @@ import * as moment from 'moment';
 @Injectable()
 export class SearchService {
   private readonly index = 'famfund-app-production';
-  constructor(private readonly elasticsearchService: ElasticsearchService) { }
+  constructor(private readonly elasticsearchService: ElasticsearchService) {}
 
   async getLogsCount() {
     try {
@@ -14,48 +14,62 @@ export class SearchService {
         index: this.index,
         body: {
           query: {
-            match_all: {}
-          }
-        }
+            match_all: {},
+          },
+        },
       });
 
       const infoPromise = this.elasticsearchService.count({
         index: this.index,
         body: {
           query: {
-            match: { "log.level": "info" }
-          }
-        }
+            match: { 'log.level': 'info' },
+          },
+        },
       });
 
       const errorPromise = this.elasticsearchService.count({
         index: this.index,
         body: {
           query: {
-            match: { "log.level": "error" }
-          }
-        }
+            match: { 'log.level': 'error' },
+          },
+        },
       });
 
-      const [response, logInfoResponse, logErrorResponse] = await Promise.all([totalPromise, infoPromise, errorPromise]);
+      const [response, logInfoResponse, logErrorResponse] = await Promise.all([
+        totalPromise,
+        infoPromise,
+        errorPromise,
+      ]);
 
       return {
         total: response.count,
         info: logInfoResponse.count,
-        error: logErrorResponse.count
+        error: logErrorResponse.count,
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
 
   async getLogs(dto: any) {
     try {
-      const { logLevel, ip, url, method, message, page, itemsPerPage, sortBy, sortDirection, statusCode } = dto;
+      const {
+        logLevel,
+        ip,
+        url,
+        method,
+        message,
+        page,
+        itemsPerPage,
+        sortBy,
+        sortDirection,
+        statusCode,
+      } = dto;
 
       const query: any = {
         bool: {
@@ -66,19 +80,19 @@ export class SearchService {
         query.bool.must.push({ match: { 'log.level': logLevel } });
       }
       if (ip) {
-        query.bool.must.push({ match_phrase_prefix: { 'ip': ip } });
+        query.bool.must.push({ match_phrase_prefix: { ip: ip } });
       }
       if (url) {
-        query.bool.must.push({ match_phrase_prefix: { 'url': url } });
+        query.bool.must.push({ match_phrase_prefix: { url: url } });
       }
       if (method) {
-        query.bool.must.push({ match: { 'method': method } });
+        query.bool.must.push({ match: { method: method } });
       }
       if (message) {
-        query.bool.must.push({ match_phrase_prefix: { 'message': message } });
+        query.bool.must.push({ match_phrase_prefix: { message: message } });
       }
       if (statusCode) {
-        query.bool.must.push({ match: { 'statusCode': statusCode } });
+        query.bool.must.push({ match: { statusCode: statusCode } });
       }
 
       const sort = [{ [sortBy]: { order: sortDirection } }];
@@ -100,16 +114,17 @@ export class SearchService {
         page,
         itemsPerPage,
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
 
-  async getLogsCountByTimeRange(dto: any): Promise<{ time: string; count: number }[]> {
+  async getLogsCountByTimeRange(
+    dto: any,
+  ): Promise<{ time: string; count: number }[]> {
     try {
       const { timeStart, timeEnd } = dto;
       const timeDifference = moment(timeEnd).diff(moment(timeStart), 'minutes');

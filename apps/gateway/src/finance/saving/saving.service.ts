@@ -1,12 +1,10 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { FINANCE_SERVICE } from "../../utils";
-import { ClientProxy } from "@nestjs/microservices";
+import { Inject, Injectable } from '@nestjs/common';
+import { FINANCE_SERVICE } from '../../utils';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class SavingService {
-  constructor(
-    @Inject(FINANCE_SERVICE) private financeClient: ClientProxy
-  ) {}
+  constructor(@Inject(FINANCE_SERVICE) private financeClient: ClientProxy) {}
 
   async getSaving() {
     return 'Saving';

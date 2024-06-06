@@ -13,12 +13,15 @@ import * as Joi from 'joi';
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_EDUCATION_QUEUE: Joi.string().required(),
       }),
-      envFilePath: process.env.NODE_ENV === 'production' ? './apps/education/.env.production' : './apps/education/.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './apps/education/.env.production'
+          : './apps/education/.env',
     }),
     RmqModule,
-    DatabaseModule
+    DatabaseModule,
   ],
   controllers: [EducationController],
   providers: [EducationService],
 })
-export class EducationModule { }
+export class EducationModule {}

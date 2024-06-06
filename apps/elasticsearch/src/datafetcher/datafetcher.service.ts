@@ -1,9 +1,9 @@
-import { HttpService } from "@nestjs/axios";
-import { HttpStatus, Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { RpcException } from "@nestjs/microservices";
-import { firstValueFrom } from "rxjs";
-import { EntityManager } from "typeorm";
+import { HttpService } from '@nestjs/axios';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { RpcException } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class DatafetcherService {
@@ -11,14 +11,16 @@ export class DatafetcherService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    private readonly entityManager: EntityManager
+    private readonly entityManager: EntityManager,
   ) {
     this.ip_api_url = this.configService.get<string>('IP_API_URL');
   }
 
   async getIpData(ip: string) {
     try {
-      const response = await firstValueFrom(this.httpService.get(`${this.ip_api_url}${ip}`));
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.ip_api_url}${ip}`),
+      );
       return response.data;
     } catch (error) {
       throw new RpcException({
@@ -36,8 +38,7 @@ export class DatafetcherService {
         data: response,
         message: 'Summary fetched successfully',
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
         message: error.message || 'Internal server error',
@@ -53,8 +54,7 @@ export class DatafetcherService {
         data: response,
         message: 'Get revenue last 6 months successfully',
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
         message: error.message || 'Internal server error',
@@ -62,7 +62,13 @@ export class DatafetcherService {
     }
   }
 
-  async getListOrders(page: number, itemsPerPage: number, search: string, sort: string, packageId: number) {
+  async getListOrders(
+    page: number,
+    itemsPerPage: number,
+    search: string,
+    sort: string,
+    packageId: number,
+  ) {
     try {
       const baseQuery = `
         SELECT u.id_user, u.email, u.phone, u.firstname, u.lastname, u.avatar,
@@ -87,7 +93,8 @@ export class DatafetcherService {
       }
 
       if (packageId) {
-        whereClause += (whereClause ? ' AND' : ' WHERE') + ` o.id_package = ${packageId}`;
+        whereClause +=
+          (whereClause ? ' AND' : ' WHERE') + ` o.id_package = ${packageId}`;
       }
 
       if (sort) {
@@ -100,7 +107,7 @@ export class DatafetcherService {
       if (itemsPerPage > 0) {
         limitClause = ` LIMIT ${itemsPerPage}`;
       }
-  
+
       if (page > 0) {
         const offset = (page - 1) * itemsPerPage;
         offsetClause = ` OFFSET ${offset}`;
@@ -118,8 +125,7 @@ export class DatafetcherService {
         data: response,
         message: 'List orders fetched successfully',
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
         message: error.message || 'Internal server error',

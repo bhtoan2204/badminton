@@ -7,13 +7,11 @@ import { AUTH_SERVICE } from '../../utils';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
-  constructor(
-    @Inject(AUTH_SERVICE) private authClient: ClientProxy
-  ) {
+  constructor(@Inject(AUTH_SERVICE) private authClient: ClientProxy) {
     super({
       usernameField: 'email',
       passwordField: 'password',
-      passReqToCallback: true
+      passReqToCallback: true,
     });
   }
 
@@ -23,12 +21,11 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
 
   private async validateUser(email: string, password: string) {
     try {
-      const userValidation$ = this.authClient.send('authClient/validate_user', { email, password }).pipe(
-        timeout(15000)
-      );
+      const userValidation$ = this.authClient
+        .send('authClient/validate_user', { email, password })
+        .pipe(timeout(15000));
       return await lastValueFrom(userValidation$);
-    }
-    catch (err) {
+    } catch (err) {
       throw new UnauthorizedException(err.message);
     }
   }

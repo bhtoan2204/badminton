@@ -22,14 +22,14 @@ spec:
       containers:
         - name: calendar
           image: mjkundta/calendar:<TAG>
-          command: ["node", "dist/apps/calendar/src/main"]
+          command: ['node', 'dist/apps/calendar/src/main']
           resources:
             limits:
-              cpu: "140m"
-              memory: "512Mi"
+              cpu: '140m'
+              memory: '512Mi'
           env:
             - name: NODE_ENV
-              value: "production"
+              value: 'production'
 
 ---
 apiVersion: v1

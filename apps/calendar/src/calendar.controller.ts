@@ -7,13 +7,16 @@ import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 export class CalendarController {
   constructor(
     private readonly rmqService: RmqService,
-    private readonly calendarService: CalendarService) { }
-
+    private readonly calendarService: CalendarService,
+  ) {}
 
   @EventPattern('calendarClient/getAllCategoryEvent')
   async getAllCategoryEvent(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.calendarService.getAllCategoryEvent(data.id_user, data.id_family);
+    return this.calendarService.getAllCategoryEvent(
+      data.id_user,
+      data.id_family,
+    );
   }
 
   @EventPattern('calendarClient/createCategoryEvent')
@@ -31,9 +34,12 @@ export class CalendarController {
   @EventPattern('calendarClient/deleteCategoryEvent')
   async deleteCategoryEvent(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.calendarService.deleteCategoryEvent(data.id_user, data.id_family, data.id_category_event);
+    return this.calendarService.deleteCategoryEvent(
+      data.id_user,
+      data.id_family,
+      data.id_category_event,
+    );
   }
-
 
   @EventPattern('calendarClient/getAllCalendar')
   async getAllCalendar(@Payload() data: any, @Ctx() context: RmqContext) {
@@ -50,7 +56,10 @@ export class CalendarController {
   @EventPattern('calendarClient/getCalendarDetail')
   async getCalendarDetail(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.calendarService.getCalendarDetail(data.id_user, data.id_calendar);
+    return this.calendarService.getCalendarDetail(
+      data.id_user,
+      data.id_calendar,
+    );
   }
 
   @EventPattern('calendarClient/createCalendar')

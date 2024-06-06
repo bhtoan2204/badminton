@@ -1,14 +1,20 @@
-import { OnModuleInit, UnauthorizedException, UseGuards } from "@nestjs/common";
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Server, Socket } from "socket.io";
-import { JwtService } from "@nestjs/jwt";
-import { WsCurrentUser, WsJwtAuthGuard } from "../utils";
-import { ConfigService } from "@nestjs/config";
-import { ChatService } from "./chat.service";
-import { NewMessageDto } from "./dto/newMessage.dto";
-import { NewFamilyMessageDto } from "./dto/newFamilyMessage.dto";
-import { NewImageMessageDto } from "./dto/newImageMessage.dto";
-import { NewFamilyImageMessageDto } from "./dto/newFamilyImageMessage.dto";
+import { OnModuleInit, UnauthorizedException, UseGuards } from '@nestjs/common';
+import {
+  ConnectedSocket,
+  MessageBody,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
+import { WsCurrentUser, WsJwtAuthGuard } from '../utils';
+import { ConfigService } from '@nestjs/config';
+import { ChatService } from './chat.service';
+import { NewMessageDto } from './dto/newMessage.dto';
+import { NewFamilyMessageDto } from './dto/newFamilyMessage.dto';
+import { NewImageMessageDto } from './dto/newImageMessage.dto';
+import { NewFamilyImageMessageDto } from './dto/newFamilyImageMessage.dto';
 
 interface TokenPayload {
   id_user: string;
@@ -16,7 +22,7 @@ interface TokenPayload {
 
 @WebSocketGateway({
   namespace: 'chat',
-  cors: { origin: '*', },
+  cors: { origin: '*' },
 })
 export class ChatGateway implements OnModuleInit {
   @WebSocketServer() server: Server;
@@ -25,29 +31,34 @@ export class ChatGateway implements OnModuleInit {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly chatService: ChatService
-  ) { }
+    private readonly chatService: ChatService,
+  ) {}
 
   async onModuleInit() {
     this.server.on('connection', async (socket) => {
       try {
         const token = socket.handshake.headers.authorization.split(' ')[1];
         if (!token) throw new UnauthorizedException('Token not found');
-        const payload = await this.jwtService.verify(token, { secret: this.configService.get<string>("JWT_SECRET") }) as TokenPayload;
+        const payload = (await this.jwtService.verify(token, {
+          secret: this.configService.get<string>('JWT_SECRET'),
+        })) as TokenPayload;
         if (!payload) throw new UnauthorizedException('Token not found');
         const socketId = socket.id;
         if (this.socketMap.has(payload.id_user)) {
           const socketIds = this.socketMap.get(payload.id_user);
           socketIds.push(socketId);
           this.socketMap.set(payload.id_user, socketIds);
-        }
-        else {
+        } else {
           this.socketMap.set(payload.id_user, [socketId]);
         }
-        console.log('User ', payload.id_user, 'connected with socketId: ', socketId);
+        console.log(
+          'User ',
+          payload.id_user,
+          'connected with socketId: ',
+          socketId,
+        );
         return socketId;
-      }
-      catch (error) {
+      } catch (error) {
         console.error('Error handling connection:', error.message);
         socket.disconnect(true);
       }
@@ -64,7 +75,9 @@ export class ChatGateway implements OnModuleInit {
         }
       }
       if (userId) {
-        const updatedSocketIds = this.socketMap.get(userId).filter(socketId => socketId !== client.id);
+        const updatedSocketIds = this.socketMap
+          .get(userId)
+          .filter((socketId) => socketId !== client.id);
         if (updatedSocketIds.length > 0) {
           this.socketMap.set(userId, updatedSocketIds);
         } else {
@@ -80,16 +93,23 @@ export class ChatGateway implements OnModuleInit {
 
   @SubscribeMessage('newMessage')
   @UseGuards(WsJwtAuthGuard)
-  async emitMessage(@ConnectedSocket() client: Socket, @WsCurrentUser() user, @MessageBody() message: NewMessageDto) {
+  async emitMessage(
+    @ConnectedSocket() client: Socket,
+    @WsCurrentUser() user,
+    @MessageBody() message: NewMessageDto,
+  ) {
     try {
-      const receiverMessage = await this.chatService.saveMessage(user.id_user, message);
+      const receiverMessage = await this.chatService.saveMessage(
+        user.id_user,
+        message,
+      );
       const receiverSocketIds = this.socketMap.get(message.receiverId);
       if (receiverSocketIds) {
         for (const socketId of receiverSocketIds) {
           client.to(socketId).emit('onNewMessage', receiverMessage);
         }
       }
-      return "Message sent";
+      return 'Message sent';
     } catch (error) {
       console.error('Error emitting message:', error.message);
     }
@@ -97,16 +117,31 @@ export class ChatGateway implements OnModuleInit {
 
   @SubscribeMessage('newFamilyMessage')
   @UseGuards(WsJwtAuthGuard)
-  async emitFamilyMessage(@ConnectedSocket() client: Socket, @WsCurrentUser() user, @MessageBody() message: NewFamilyMessageDto) {
+  async emitFamilyMessage(
+    @ConnectedSocket() client: Socket,
+    @WsCurrentUser() user,
+    @MessageBody() message: NewFamilyMessageDto,
+  ) {
     try {
-      const receiverMessage = await this.chatService.saveFamilyMessage(user.id_user, message);
-      const listReceiverId = await this.chatService.getListReceiverId(user.id_user, message.familyId);
-      await Promise.all(listReceiverId.map(async (receiverId) => {
-        const receiverSocketIds = this.socketMap.get(receiverId) || [];
-        receiverSocketIds.forEach(socketId => {
-          client.to(socketId).emit('onNewFamilyMessage', { ...receiverMessage, familyId: message.familyId});
-        });
-      }));
+      const receiverMessage = await this.chatService.saveFamilyMessage(
+        user.id_user,
+        message,
+      );
+      const listReceiverId = await this.chatService.getListReceiverId(
+        user.id_user,
+        message.familyId,
+      );
+      await Promise.all(
+        listReceiverId.map(async (receiverId) => {
+          const receiverSocketIds = this.socketMap.get(receiverId) || [];
+          receiverSocketIds.forEach((socketId) => {
+            client.to(socketId).emit('onNewFamilyMessage', {
+              ...receiverMessage,
+              familyId: message.familyId,
+            });
+          });
+        }),
+      );
     } catch (error) {
       console.error('Error emitting message:', error.message);
     }
@@ -114,36 +149,56 @@ export class ChatGateway implements OnModuleInit {
 
   @SubscribeMessage('newFamilyImageMessage')
   @UseGuards(WsJwtAuthGuard)
-  async emitFamilyImageMessage(@ConnectedSocket() client: Socket, @WsCurrentUser() user, @MessageBody() message: NewFamilyImageMessageDto) {
+  async emitFamilyImageMessage(
+    @ConnectedSocket() client: Socket,
+    @WsCurrentUser() user,
+    @MessageBody() message: NewFamilyImageMessageDto,
+  ) {
     try {
-      const receiverMessage = await this.chatService.saveFamilyImageMessage(user.id_user, message);
-      const listReceiverId = await this.chatService.getListReceiverId(user.id_user, message.familyId);
-      await Promise.all(listReceiverId.map(async (receiverId) => {
-        const receiverSocketIds = this.socketMap.get(receiverId) || [];
-        receiverSocketIds.forEach(socketId => {
-          client.to(socketId).emit('onNewFamilyImageMessage', { ...receiverMessage, familyId: message.familyId});
-        });
-      }));
-    }
-    catch (error) {
+      const receiverMessage = await this.chatService.saveFamilyImageMessage(
+        user.id_user,
+        message,
+      );
+      const listReceiverId = await this.chatService.getListReceiverId(
+        user.id_user,
+        message.familyId,
+      );
+      await Promise.all(
+        listReceiverId.map(async (receiverId) => {
+          const receiverSocketIds = this.socketMap.get(receiverId) || [];
+          receiverSocketIds.forEach((socketId) => {
+            client.to(socketId).emit('onNewFamilyImageMessage', {
+              ...receiverMessage,
+              familyId: message.familyId,
+            });
+          });
+        }),
+      );
+    } catch (error) {
       console.error('Error emitting message:', error.message);
     }
   }
 
   @SubscribeMessage('newImageMessage')
   @UseGuards(WsJwtAuthGuard)
-  async emitImageMessage(@ConnectedSocket() client: Socket, @WsCurrentUser() user, @MessageBody() message: NewImageMessageDto) {
+  async emitImageMessage(
+    @ConnectedSocket() client: Socket,
+    @WsCurrentUser() user,
+    @MessageBody() message: NewImageMessageDto,
+  ) {
     try {
-      const receiverMessage = await this.chatService.saveImageMessage(user.id_user, message);
+      const receiverMessage = await this.chatService.saveImageMessage(
+        user.id_user,
+        message,
+      );
       const receiverSocketIds = this.socketMap.get(message.receiverId);
       if (receiverSocketIds) {
         for (const socketId of receiverSocketIds) {
           client.to(socketId).emit('onNewImageMessage', receiverMessage);
         }
       }
-      return "Message sent";
-    }
-    catch (error) {
+      return 'Message sent';
+    } catch (error) {
       console.error('Error emitting message:', error.message);
     }
   }

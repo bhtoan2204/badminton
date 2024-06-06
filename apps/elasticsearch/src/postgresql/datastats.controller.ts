@@ -1,13 +1,13 @@
-import { Controller } from "@nestjs/common";
-import { Ctx, EventPattern, RmqContext } from "@nestjs/microservices";
-import { RmqService } from "@app/common";
-import { DataStatsService } from "./datastats.service";
+import { Controller } from '@nestjs/common';
+import { Ctx, EventPattern, RmqContext } from '@nestjs/microservices';
+import { RmqService } from '@app/common';
+import { DataStatsService } from './datastats.service';
 
 @Controller()
 export class DataStatsController {
   constructor(
     private readonly datastatsService: DataStatsService,
-    private readonly rmqService: RmqService
+    private readonly rmqService: RmqService,
   ) {}
 
   @EventPattern('datastatsClient/getPostgresqlStat')

@@ -1,14 +1,23 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, UseGuards } from "@nestjs/common";
-import { SavingService } from "./saving.service";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../../utils";
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
+import { SavingService } from './saving.service';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../utils';
 
 @ApiTags('Saving')
 @Controller('finance/saving')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class SavingController {
-  constructor( private readonly savingService: SavingService ) { }
+  constructor(private readonly savingService: SavingService) {}
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get savings' })

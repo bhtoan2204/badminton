@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+  JoinColumn,
+} from 'typeorm';
 import { Users } from './users.entity';
 import { CategoryIncome } from './category_income.entity';
 import { WalletUser } from './wallet_user.entity';
@@ -32,4 +40,3 @@ export class IncomeUser {
   @UpdateDateColumn()
   updated_at: Date;
 }
-

@@ -7,7 +7,8 @@ import { RmqService } from '@app/common';
 export class PaymentController {
   constructor(
     private readonly paymentService: PaymentService,
-    private readonly rmqService: RmqService) { }
+    private readonly rmqService: RmqService,
+  ) {}
 
   @EventPattern('payment/get_package')
   async get_package(@Payload() data: any, @Ctx() context: RmqContext) {

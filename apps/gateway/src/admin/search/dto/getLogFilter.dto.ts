@@ -72,7 +72,8 @@ export class GetLogsFilterDto {
   itemsPerPage?: number = 10;
 
   @ApiPropertyOptional({
-    description: 'Field to sort by (e.g., @timestamp, responseTimeMs, contentLength)',
+    description:
+      'Field to sort by (e.g., @timestamp, responseTimeMs, contentLength)',
     enum: ['@timestamp', 'responseTimeMs', 'contentLength'],
     example: '@timestamp',
   })

@@ -1,23 +1,20 @@
-import { HttpException, Inject, Injectable } from "@nestjs/common";
-import { ClientProxy } from "@nestjs/microservices";
-import { lastValueFrom, timeout } from "rxjs";
-import { AUTH_SERVICE } from "../utils";
+import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { lastValueFrom, timeout } from 'rxjs';
+import { AUTH_SERVICE } from '../utils';
 
 @Injectable()
 export class AuthApiService {
-  constructor(
-    @Inject(AUTH_SERVICE) private authClient: ClientProxy
-  ) { }
+  constructor(@Inject(AUTH_SERVICE) private authClient: ClientProxy) {}
 
   async localLogin(currentUser) {
     try {
-      const source = this.authClient.send('authClient/local/login', currentUser).pipe(
-        timeout(15000)
-      );
+      const source = this.authClient
+        .send('authClient/local/login', currentUser)
+        .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -27,13 +24,12 @@ export class AuthApiService {
 
   async refreshToken(currentUser, refreshToken) {
     try {
-      const source = this.authClient.send('authClient/refresh_token', { currentUser, refreshToken }).pipe(
-        timeout(15000)
-      );
+      const source = this.authClient
+        .send('authClient/refresh_token', { currentUser, refreshToken })
+        .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -43,13 +39,12 @@ export class AuthApiService {
 
   async logout(refreshToken) {
     try {
-      const source = this.authClient.send('authClient/logout', refreshToken).pipe(
-        timeout(15000)
-      );
+      const source = this.authClient
+        .send('authClient/logout', refreshToken)
+        .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }

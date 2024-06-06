@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 class CreateInvoiceItem {
   @ApiProperty({ required: true, type: String })
@@ -36,5 +36,5 @@ export class CreateInvoiceItemDto {
 
   @ApiProperty({ required: true, type: [CreateInvoiceItem] })
   @IsNotEmpty()
-  items: CreateInvoiceItem[]; 
+  items: CreateInvoiceItem[];
 }

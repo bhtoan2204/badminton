@@ -7,8 +7,8 @@ import { RmqService } from '@app/common';
 export class SearchController {
   constructor(
     private readonly elasticsearchService: SearchService,
-    private readonly rmqService: RmqService
-  ) { }
+    private readonly rmqService: RmqService,
+  ) {}
 
   @EventPattern('elasticsearchClient/getLogsCount')
   async getLogsCount(@Payload() data: any, @Ctx() context: RmqContext) {
@@ -23,7 +23,10 @@ export class SearchController {
   }
 
   @EventPattern('elasticsearchClient/getLogsCountByTimeRange')
-  async getLogsCountByTimeRange(@Payload() data: any, @Ctx() context: RmqContext) {
+  async getLogsCountByTimeRange(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     this.rmqService.ack(context);
     return await this.elasticsearchService.getLogsCountByTimeRange(data);
   }

@@ -1,7 +1,7 @@
-import { Module, forwardRef } from "@nestjs/common";
-import { SavingController } from "./saving.controller";
-import { SavingService } from "./saving.service";
-import { FinanceModule } from "../finance.module";
+import { Module, forwardRef } from '@nestjs/common';
+import { SavingController } from './saving.controller';
+import { SavingService } from './saving.service';
+import { FinanceModule } from '../finance.module';
 
 @Module({
   imports: [forwardRef(() => FinanceModule)],

@@ -7,6 +7,6 @@ async function bootstrap() {
   const rmqService = app.get<RmqService>(RmqService);
   app.connectMicroservice(rmqService.getOptions('MAILER'));
   app.startAllMicroservices();
-  await app.init()
+  await app.init();
 }
 bootstrap();

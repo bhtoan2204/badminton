@@ -1,14 +1,23 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { LoanService } from "./loan.service";
-import { JwtAuthGuard } from "../../utils";
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { LoanService } from './loan.service';
+import { JwtAuthGuard } from '../../utils';
 
 @ApiTags('Loan')
 @Controller('finance/loan')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class LoanController {
-  constructor(private readonly loanService: LoanService) { }
+  constructor(private readonly loanService: LoanService) {}
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get Loan Type' })

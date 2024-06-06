@@ -1,24 +1,26 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
-import { RpcException } from "@nestjs/microservices";
-import { EntityManager } from "typeorm";
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class AssetService {
-  constructor(
-    private readonly entityManager: EntityManager,
-  ) {}
+  constructor(private readonly entityManager: EntityManager) {}
 
-  async getAsset(id_user: string, id_family: number, page: number, itemsPerPage: number) {
+  async getAsset(
+    id_user: string,
+    id_family: number,
+    page: number,
+    itemsPerPage: number,
+  ) {
     try {
       const query = 'SELECT * FROM f_get_asset($1, $2, $3, $4)';
       const param = [id_user, id_family, page, itemsPerPage];
       const data = await this.entityManager.query(query, param);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -27,36 +29,50 @@ export class AssetService {
     const { id_family, name, description, value, purchase_date } = dto;
     try {
       const query = 'SELECT * FROM f_create_asset($1, $2, $3, $4, $5, $6)';
-      const param = [id_user, id_family, name, description, value, purchase_date];
+      const param = [
+        id_user,
+        id_family,
+        name,
+        description,
+        value,
+        purchase_date,
+      ];
       const data = await this.entityManager.query(query, param);
       return {
         data: data[0],
         message: 'Asset created',
-      }
-    }
-    catch (error) {
+      };
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
 
   async updateAsset(id_user: string, dto: any) {
-    const { id_asset, id_family, name, description, value, purchase_date } = dto
+    const { id_asset, id_family, name, description, value, purchase_date } =
+      dto;
     try {
       const query = 'SELECT * FROM f_update_asset($1, $2, $3, $4, $5, $6, $7)';
-      const param = [id_user, id_asset, id_family, name, description, value, purchase_date];
+      const param = [
+        id_user,
+        id_asset,
+        id_family,
+        name,
+        description,
+        value,
+        purchase_date,
+      ];
       const data = await this.entityManager.query(query, param);
       return {
         data: data[0],
         message: 'Asset updated',
-      }
-    }
-    catch (error) {
+      };
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -69,12 +85,11 @@ export class AssetService {
       return {
         data: data[0].f_delete_asset,
         message: 'Asset deleted',
-      }
-    }
-    catch (error) {
+      };
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }

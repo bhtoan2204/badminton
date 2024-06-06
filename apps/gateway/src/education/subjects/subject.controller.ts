@@ -1,29 +1,48 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { CurrentUser, JwtAuthGuard } from "../../utils";
-import { CreateSubjectDto } from "./dto/createSubject.dto";
-import { SubjectService } from "./subject.service";
-import { UpdateSubjectDto } from "./dto/updateSubject.dto";
-import { AddComponentScoreDto } from "./dto/addComponentScore.dto";
-import { UpdateComponentScoreDto } from "./dto/updateComponentScore.dto";
-import { DeleteComponentScoreDto } from "./dto/deleteComponentScore.dto";
-import { ModifyScoreDto } from "./dto/modifyScore.dto";
-import { RemoveScoreDto } from "./dto/removeScore.dto";
-import { ChangeStatusSubjectDto } from "./dto/changeStatusSubject.dto";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import { CurrentUser, JwtAuthGuard } from '../../utils';
+import { CreateSubjectDto } from './dto/createSubject.dto';
+import { SubjectService } from './subject.service';
+import { UpdateSubjectDto } from './dto/updateSubject.dto';
+import { AddComponentScoreDto } from './dto/addComponentScore.dto';
+import { UpdateComponentScoreDto } from './dto/updateComponentScore.dto';
+import { DeleteComponentScoreDto } from './dto/deleteComponentScore.dto';
+import { ModifyScoreDto } from './dto/modifyScore.dto';
+import { RemoveScoreDto } from './dto/removeScore.dto';
+import { ChangeStatusSubjectDto } from './dto/changeStatusSubject.dto';
 
 @ApiTags('Subject')
 @Controller('subject')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class SubjectController {
-  constructor(
-    private readonly subjectService: SubjectService
-  ) { }
+  constructor(private readonly subjectService: SubjectService) {}
 
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new subject' })
   @Post('create')
-  async createSubject(@CurrentUser() currentUser, @Body() dto: CreateSubjectDto) {
+  async createSubject(
+    @CurrentUser() currentUser,
+    @Body() dto: CreateSubjectDto,
+  ) {
     return this.subjectService.createSubject(currentUser.id_user, dto);
   }
 
@@ -33,14 +52,27 @@ export class SubjectController {
   @ApiQuery({ name: 'id_education_progress', required: true, type: String })
   @ApiQuery({ name: 'id_subject', required: true, type: String })
   @Get('getDetail')
-  async getDetailSubject(@CurrentUser() currentUser, @Query('id_family') id_family, @Query('id_education_progress') id_education_progress, @Query('id_subject') id_subject) {
-    return this.subjectService.getDetailSubject(currentUser.id_user, id_family, id_education_progress, id_subject);
+  async getDetailSubject(
+    @CurrentUser() currentUser,
+    @Query('id_family') id_family,
+    @Query('id_education_progress') id_education_progress,
+    @Query('id_subject') id_subject,
+  ) {
+    return this.subjectService.getDetailSubject(
+      currentUser.id_user,
+      id_family,
+      id_education_progress,
+      id_subject,
+    );
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update subject' })
   @Put('update')
-  async updateDetailSubject(@CurrentUser() currentUser, @Body() dto: UpdateSubjectDto) {
+  async updateDetailSubject(
+    @CurrentUser() currentUser,
+    @Body() dto: UpdateSubjectDto,
+  ) {
     return this.subjectService.updateDetailSubject(currentUser.id_user, dto);
   }
 
@@ -50,14 +82,27 @@ export class SubjectController {
   @ApiParam({ name: 'id_family', required: true, type: Number })
   @ApiParam({ name: 'id_education_progress', required: true, type: Number })
   @ApiParam({ name: 'id_subject', required: true, type: Number })
-  async deleteSubject(@CurrentUser() user, @Param('id_family') id_family, @Param('id_education_progress') id_education_progress, @Param('id_subject') id_subject) {
-    return this.subjectService.deleteSubject(user.id_user, id_family, id_education_progress, id_subject);
+  async deleteSubject(
+    @CurrentUser() user,
+    @Param('id_family') id_family,
+    @Param('id_education_progress') id_education_progress,
+    @Param('id_subject') id_subject,
+  ) {
+    return this.subjectService.deleteSubject(
+      user.id_user,
+      id_family,
+      id_education_progress,
+      id_subject,
+    );
   }
 
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Add component score' })
   @Post('addComponentScore')
-  async addComponentScore(@CurrentUser() currentUser, @Body() dto: AddComponentScoreDto) {
+  async addComponentScore(
+    @CurrentUser() currentUser,
+    @Body() dto: AddComponentScoreDto,
+  ) {
     return this.subjectService.addComponentScore(currentUser.id_user, dto);
   }
 
@@ -65,22 +110,32 @@ export class SubjectController {
   @ApiOperation({ summary: 'Insert component score' })
   @Post('insertComponentScore/:index')
   @ApiParam({ name: 'index', required: true, type: Number })
-  async insertComponentScore(@CurrentUser() currentUser, @Body() preDto: AddComponentScoreDto, @Param('index') index: number) {
-    const dto = { ...preDto, index }
+  async insertComponentScore(
+    @CurrentUser() currentUser,
+    @Body() preDto: AddComponentScoreDto,
+    @Param('index') index: number,
+  ) {
+    const dto = { ...preDto, index };
     return this.subjectService.insertComponentScore(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update component score' })
   @Put('updateComponentScore')
-  async updateComponentScore(@CurrentUser() currentUser, @Body() dto: UpdateComponentScoreDto) {
+  async updateComponentScore(
+    @CurrentUser() currentUser,
+    @Body() dto: UpdateComponentScoreDto,
+  ) {
     return this.subjectService.updateComponentScore(currentUser.id_user, dto);
   }
 
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete component score' })
   @Delete('deleteComponentScore')
-  async deleteComponentScore(@CurrentUser() currentUser, @Body() dto: DeleteComponentScoreDto) {
+  async deleteComponentScore(
+    @CurrentUser() currentUser,
+    @Body() dto: DeleteComponentScoreDto,
+  ) {
     return this.subjectService.deleteComponentScore(currentUser.id_user, dto);
   }
 
@@ -101,7 +156,10 @@ export class SubjectController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Change status' })
   @Put('changeStatus')
-  async changeStatus(@CurrentUser() currentUser, @Body() dto: ChangeStatusSubjectDto) {
+  async changeStatus(
+    @CurrentUser() currentUser,
+    @Body() dto: ChangeStatusSubjectDto,
+  ) {
     return this.subjectService.changeStatus(currentUser.id_user, dto);
   }
 }

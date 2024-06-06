@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { EntityManager } from "typeorm";
-import { ConfigService } from "@nestjs/config";
+import { EntityManager } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
 import { StorageService } from './storage/storage.service';
 import { DeleteFileRequest, UploadFileRequest } from '@app/common';
@@ -11,7 +11,7 @@ export class FamilyService {
     private readonly configService: ConfigService,
     private readonly entityManager: EntityManager,
     private readonly storageService: StorageService,
-  ) { }
+  ) {}
 
   async checkIsMember(id_user: string, id_family: number): Promise<boolean> {
     try {
@@ -19,11 +19,10 @@ export class FamilyService {
       const param = [id_user, id_family];
       const data = await this.entityManager.query(q2, param);
       return data[0].f_is_user_member_of_family;
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message || 'Internal server error',
-        statusCode: error.statusCode ||  HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -34,11 +33,10 @@ export class FamilyService {
       const param = [id_user, id_family];
       const data = await this.entityManager.query(q2, param);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -49,11 +47,10 @@ export class FamilyService {
       const param = [id_user];
       const data = await this.entityManager.query(q2, param);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -64,11 +61,10 @@ export class FamilyService {
       const param = [id_user, id_family];
       const data = await this.entityManager.query(q2, param);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -79,11 +75,10 @@ export class FamilyService {
       const param = [id_user];
       const data = await this.entityManager.query(q2, param);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -96,13 +91,12 @@ export class FamilyService {
       const data = await this.entityManager.query(q2, param);
       return {
         data: data[0]['f_add_member'],
-        message: 'Member added'
+        message: 'Member added',
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -113,14 +107,14 @@ export class FamilyService {
       const Query = 'SELECT * FROM f_create_family($1, $2, $3, $4)';
       const params = [id_user, description, name, id_order];
       const data = await this.entityManager.query(Query, params);
-      return { 
-        data: data[0]['f_create_family'] ,
-        message: 'Family created'
+      return {
+        data: data[0]['f_create_family'],
+        message: 'Family created',
       };
     } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -132,11 +126,10 @@ export class FamilyService {
       const param = [id_user, id_family, name, description];
       const data = await this.entityManager.query(Query, param);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -148,14 +141,12 @@ export class FamilyService {
       const data = await this.entityManager.query(Query, param);
       return {
         data: data[0]['f_delete_family'],
-        message: 'Family deleted'
+        message: 'Family deleted',
       };
-    }
-
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -169,14 +160,12 @@ export class FamilyService {
       const data = await this.entityManager.query(Query, param);
       return {
         data: data[0]['f_delete_member'],
-        message: 'Member deleted'
-      }
-    }
-
-    catch (error) {
+        message: 'Member deleted',
+      };
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -186,13 +175,12 @@ export class FamilyService {
       const Query = 'select * from f_get_ids_member($1, $2)';
       const param = [id_user, id_family];
       const data = await this.entityManager.query(Query, param);
-      const ids = data.map(row => row.f_get_ids_member);
+      const ids = data.map((row) => row.f_get_ids_member);
       return ids;
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -206,37 +194,40 @@ export class FamilyService {
       if (!isMember) {
         throw new RpcException({
           message: 'User is not a member of the family',
-          statusCode: HttpStatus.FORBIDDEN
+          statusCode: HttpStatus.FORBIDDEN,
         });
       }
-      const filename = 'avatar_family_' + id_user + '_' + Date.now() + '_' + file.originalname;
+      const filename =
+        'avatar_family_' + id_user + '_' + Date.now() + '_' + file.originalname;
       const params: UploadFileRequest = {
         fileName: filename,
-        file: new Uint8Array(file.buffer.data)
-      }
+        file: new Uint8Array(file.buffer.data),
+      };
       const uploadImageData = await this.storageService.uploadFile(params);
       const fileUrl = uploadImageData.fileUrl;
 
       const changeAvtQuery = 'SELECT * FROM f_update_family_avatar($1, $2, $3)';
       const changeAvtParam = [id_user, id_family, fileUrl];
-      const result = await this.entityManager.query(changeAvtQuery, changeAvtParam);
+      const result = await this.entityManager.query(
+        changeAvtQuery,
+        changeAvtParam,
+      );
       const oldUrl = result[0]['f_update_family_avatar'];
       if (oldUrl) {
         const deleteParams: DeleteFileRequest = {
-          fileName: (oldUrl).split('/').pop()
-        }
+          fileName: oldUrl.split('/').pop(),
+        };
         await this.storageService.deleteFile(deleteParams);
       }
 
       return {
         message: file.size + ' bytes uploaded successfully',
-        data: fileUrl
+        data: fileUrl,
       };
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }

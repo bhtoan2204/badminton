@@ -1,20 +1,40 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { HouseholdService } from "./household.service";
-import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from "../utils";
-import { FileInterceptor } from "@nestjs/platform-express";
-import { ImageFileInterceptor } from "../user/interceptor/imageFile.interceptor";
-import { InputDurableItemDto } from "./dto/inputDurableItem.dto";
-import { InputConsumableItemDto } from "./dto/inputConsumableItem.dto";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import { HouseholdService } from './household.service';
+import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../utils';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageFileInterceptor } from '../user/interceptor/imageFile.interceptor';
+import { InputDurableItemDto } from './dto/inputDurableItem.dto';
+import { InputConsumableItemDto } from './dto/inputConsumableItem.dto';
 
 @ApiTags('Household')
 @Controller('household')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, MemberFamilyGuard)
 export class HouseholdController {
-  constructor(
-    private readonly householdService: HouseholdService
-  ) { }
+  constructor(private readonly householdService: HouseholdService) {}
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get household category' })
@@ -28,18 +48,48 @@ export class HouseholdController {
   @Get('getHouseholdItem/:id_family')
   @ApiQuery({ name: 'page', required: false, type: String })
   @ApiQuery({ name: 'itemsPerPage', required: false, type: String })
-  @ApiParam({ name: 'id_family', required: true, description: 'The ID of the family' })
-  async getHouseholdItem(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Query('page') page: number, @Query('itemsPerPage') itemsPerPage: number) {
-    return this.householdService.getItem(currentUser.id_user, id_family, page, itemsPerPage);
+  @ApiParam({
+    name: 'id_family',
+    required: true,
+    description: 'The ID of the family',
+  })
+  async getHouseholdItem(
+    @CurrentUser() currentUser,
+    @Param('id_family') id_family: number,
+    @Query('page') page: number,
+    @Query('itemsPerPage') itemsPerPage: number,
+  ) {
+    return this.householdService.getItem(
+      currentUser.id_user,
+      id_family,
+      page,
+      itemsPerPage,
+    );
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get household item detail' })
   @Get('getHouseholdItemDetail/:id_family/:id_item')
-  @ApiParam({ name: 'id_family', required: true, description: 'The ID of the family' })
-  @ApiParam({ name: 'id_item', required: true, description: 'The ID of the item' })
-  async getHouseholdItemDetail(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_item') id_item: number) {
-    return this.householdService.getItemDetail(currentUser.id_user, id_family, id_item);
+  @ApiParam({
+    name: 'id_family',
+    required: true,
+    description: 'The ID of the family',
+  })
+  @ApiParam({
+    name: 'id_item',
+    required: true,
+    description: 'The ID of the item',
+  })
+  async getHouseholdItemDetail(
+    @CurrentUser() currentUser,
+    @Param('id_family') id_family: number,
+    @Param('id_item') id_item: number,
+  ) {
+    return this.householdService.getItemDetail(
+      currentUser.id_user,
+      id_family,
+      id_item,
+    );
   }
 
   @HttpCode(HttpStatus.CREATED)
@@ -71,21 +121,37 @@ export class HouseholdController {
           description: 'The description of the household item (optional)',
         },
         item_type: {
-          type: "string",
-          enum: ["consumable", "durable"],
-          description: "The type of the item, whether it is consumable or durable"
+          type: 'string',
+          enum: ['consumable', 'durable'],
+          description:
+            'The type of the item, whether it is consumable or durable',
         },
         id_room: {
-          type: "string",
-          description: "The ID of the room where the item is placed (optional)"
-        }
+          type: 'string',
+          description: 'The ID of the room where the item is placed (optional)',
+        },
       },
-      required: ["id_family", "item_name", "id_category", "item_type", "id_room"],
+      required: [
+        'id_family',
+        'item_name',
+        'id_category',
+        'item_type',
+        'id_room',
+      ],
     },
   })
-  @UseInterceptors(FileInterceptor('item_image', new ImageFileInterceptor().createMulterOptions()))
+  @UseInterceptors(
+    FileInterceptor(
+      'item_image',
+      new ImageFileInterceptor().createMulterOptions(),
+    ),
+  )
   @Post('createHouseholdItem')
-  async createHouseholdItem(@CurrentUser() currentUser, @Body() dto: any, @UploadedFile() file: Express.Multer.File) {
+  async createHouseholdItem(
+    @CurrentUser() currentUser,
+    @Body() dto: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     dto.id_family = parseInt(dto.id_family);
     dto.id_category = parseInt(dto.id_category);
     dto.id_room = parseInt(dto.id_room);
@@ -126,16 +192,25 @@ export class HouseholdController {
           description: 'The description of the household item',
         },
         id_room: {
-          type: "string",
-          description: "The ID of the room where the item is placed (optional)"
-        }
+          type: 'string',
+          description: 'The ID of the room where the item is placed (optional)',
+        },
       },
-      required: ["id_family", "id_item"],
+      required: ['id_family', 'id_item'],
     },
   })
-  @UseInterceptors(FileInterceptor('item_image', new ImageFileInterceptor().createMulterOptions()))
+  @UseInterceptors(
+    FileInterceptor(
+      'item_image',
+      new ImageFileInterceptor().createMulterOptions(),
+    ),
+  )
   @Put('updateHouseholdItem')
-  async updateHouseholdItem(@CurrentUser() currentUser, @Body() dto: any, @UploadedFile() file: Express.Multer.File) {
+  async updateHouseholdItem(
+    @CurrentUser() currentUser,
+    @Body() dto: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     dto.id_family = parseInt(dto.id_family);
     dto.id_item = parseInt(dto.id_item);
     dto.id_category = parseInt(dto.id_category);
@@ -150,23 +225,45 @@ export class HouseholdController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Input household durable item' })
   @Put('inputHouseholdDurableItem')
-  async inputHouseholdDurableItem(@CurrentUser() currentUser, @Body() dto: InputDurableItemDto) {
+  async inputHouseholdDurableItem(
+    @CurrentUser() currentUser,
+    @Body() dto: InputDurableItemDto,
+  ) {
     return this.householdService.inputDurableItem(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Input household consumable item' })
   @Put('inputHouseholdConsumableItem')
-  async inputHouseholdConsumableItem(@CurrentUser() currentUser, @Body() dto: InputConsumableItemDto) {
+  async inputHouseholdConsumableItem(
+    @CurrentUser() currentUser,
+    @Body() dto: InputConsumableItemDto,
+  ) {
     return this.householdService.inputConsumableItem(currentUser.id_user, dto);
   }
 
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete household item' })
-  @ApiParam({ name: 'id_family', required: true, description: 'The ID of the family' })
-  @ApiParam({ name: 'id_item', required: true, description: 'The ID of the item' })
+  @ApiParam({
+    name: 'id_family',
+    required: true,
+    description: 'The ID of the family',
+  })
+  @ApiParam({
+    name: 'id_item',
+    required: true,
+    description: 'The ID of the item',
+  })
   @Delete('deleteHouseholdItem/:id_family/:id_item')
-  async deleteHouseholdItem(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_item') id_item: number) {
-    return this.householdService.deleteItem(currentUser.id_user, id_family, id_item);
+  async deleteHouseholdItem(
+    @CurrentUser() currentUser,
+    @Param('id_family') id_family: number,
+    @Param('id_item') id_item: number,
+  ) {
+    return this.householdService.deleteItem(
+      currentUser.id_user,
+      id_family,
+      id_item,
+    );
   }
 }

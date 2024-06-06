@@ -1,8 +1,17 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from "@nestjs/common";
-import { DatafetcherService } from "./datafetcher.service";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { Admin, AdminGuard, JwtAuthGuard } from "../../utils";
-import { GetListOrdersDto } from "./dto/getListOrders.dto";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { DatafetcherService } from './datafetcher.service';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Admin, AdminGuard, JwtAuthGuard } from '../../utils';
+import { GetListOrdersDto } from './dto/getListOrders.dto';
 
 @ApiTags('Admin Datafetcher')
 @Controller()
@@ -10,9 +19,7 @@ import { GetListOrdersDto } from "./dto/getListOrders.dto";
 @UseGuards(JwtAuthGuard, AdminGuard)
 @Admin(true)
 export class DatafetcherController {
-  constructor(
-    private readonly datafetcherService: DatafetcherService
-  ) { }
+  constructor(private readonly datafetcherService: DatafetcherService) {}
 
   @ApiOperation({ summary: 'Get IP data' })
   @HttpCode(HttpStatus.OK)

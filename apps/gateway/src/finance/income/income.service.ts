@@ -1,24 +1,30 @@
-import { HttpException, Inject, Injectable } from "@nestjs/common";
-import { FINANCE_SERVICE } from "../../utils";
-import { ClientProxy } from "@nestjs/microservices";
-import { lastValueFrom, timeout } from "rxjs";
+import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { FINANCE_SERVICE } from '../../utils';
+import { ClientProxy } from '@nestjs/microservices';
+import { lastValueFrom, timeout } from 'rxjs';
 
 @Injectable()
 export class IncomeService {
-  constructor(
-    @Inject(FINANCE_SERVICE) private financeClient: ClientProxy
-  ) {}
+  constructor(@Inject(FINANCE_SERVICE) private financeClient: ClientProxy) {}
 
-  async getIncome(id_user: string, id_family: number, page: number, itemsPerPage: number) {
+  async getIncome(
+    id_user: string,
+    id_family: number,
+    page: number,
+    itemsPerPage: number,
+  ) {
     try {
-      const response = this.financeClient.send('financeClient/getIncome', {id_user, id_family, page, itemsPerPage})
-        .pipe(
-          timeout(15000),
-        );
+      const response = this.financeClient
+        .send('financeClient/getIncome', {
+          id_user,
+          id_family,
+          page,
+          itemsPerPage,
+        })
+        .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -28,14 +34,12 @@ export class IncomeService {
 
   async getIncomeByDate(id_user: string, id_family: number, date: string) {
     try {
-      const response = this.financeClient.send('financeClient/getIncomeByDate', {id_user, id_family, date})
-        .pipe(
-          timeout(15000),
-        );
+      const response = this.financeClient
+        .send('financeClient/getIncomeByDate', { id_user, id_family, date })
+        .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -43,16 +47,24 @@ export class IncomeService {
     }
   }
 
-  async getIncomeByMonth(id_user: string, id_family: number, month: number, year: number) {
+  async getIncomeByMonth(
+    id_user: string,
+    id_family: number,
+    month: number,
+    year: number,
+  ) {
     try {
-      const response = this.financeClient.send('financeClient/getIncomeByMonth', {id_user, id_family, month, year})
-        .pipe(
-          timeout(15000),
-        );
+      const response = this.financeClient
+        .send('financeClient/getIncomeByMonth', {
+          id_user,
+          id_family,
+          month,
+          year,
+        })
+        .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -62,14 +74,12 @@ export class IncomeService {
 
   async getIncomeByYear(id_user: string, id_family: number, year: number) {
     try {
-      const response = this.financeClient.send('financeClient/getIncomeByYear', {id_user, id_family, year})
-        .pipe(
-          timeout(15000),
-        );
+      const response = this.financeClient
+        .send('financeClient/getIncomeByYear', { id_user, id_family, year })
+        .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -79,14 +89,12 @@ export class IncomeService {
 
   async getIncomeById(id_user: string, id_family: number, id_income: number) {
     try {
-      const response = this.financeClient.send('financeClient/getIncomeById', {id_user, id_family, id_income})
-        .pipe(
-          timeout(15000),
-        );
+      const response = this.financeClient
+        .send('financeClient/getIncomeById', { id_user, id_family, id_income })
+        .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -96,14 +104,12 @@ export class IncomeService {
 
   async getStasticalIncome(id_user: string, id_family: number) {
     try {
-      const response = this.financeClient.send('financeClient/getStatiscalIncome', {id_user, id_family})
-        .pipe(
-          timeout(15000),
-        );
+      const response = this.financeClient
+        .send('financeClient/getStatiscalIncome', { id_user, id_family })
+        .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -113,14 +119,12 @@ export class IncomeService {
 
   async createIncome(id_user: string, dto: any) {
     try {
-      const response = this.financeClient.send('financeClient/createIncome', {id_user, dto})
-        .pipe(
-          timeout(15000),
-        );
+      const response = this.financeClient
+        .send('financeClient/createIncome', { id_user, dto })
+        .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -130,14 +134,12 @@ export class IncomeService {
 
   async updateIncome(id_user: string, dto) {
     try {
-      const response = this.financeClient.send('financeClient/updateIncome', {id_user, dto})
-        .pipe(
-          timeout(15000),
-        );
+      const response = this.financeClient
+        .send('financeClient/updateIncome', { id_user, dto })
+        .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
@@ -147,19 +149,16 @@ export class IncomeService {
 
   async deleteIncome(id_user: string, id_family: number, id_income: number) {
     try {
-      const response = this.financeClient.send('financeClient/deleteIncome', {id_user, id_family, id_income})
-        .pipe(
-          timeout(15000),
-        );
+      const response = this.financeClient
+        .send('financeClient/deleteIncome', { id_user, id_family, id_income })
+        .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
-    }
-    catch (error) {
+    } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
       }
       throw new HttpException(error, error.statusCode);
     }
   }
-  
 }

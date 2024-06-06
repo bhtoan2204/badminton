@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { MulterModuleOptions, MulterOptionsFactory } from '@nestjs/platform-express';
+import {
+  MulterModuleOptions,
+  MulterOptionsFactory,
+} from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 
 @Injectable()
@@ -18,7 +21,7 @@ export class ImageFileInterceptor implements MulterOptionsFactory {
         }
         callback(null, true);
       },
-      storage: memoryStorage()
+      storage: memoryStorage(),
     };
   }
 }

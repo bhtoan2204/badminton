@@ -13,10 +13,13 @@ import * as Joi from 'joi';
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_SHOPPING_QUEUE: Joi.string().required(),
       }),
-      envFilePath: process.env.NODE_ENV === 'production' ? './apps/shopping/.env.production' : './apps/shopping/.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './apps/shopping/.env.production'
+          : './apps/shopping/.env',
     }),
     RmqModule,
-    DatabaseModule
+    DatabaseModule,
   ],
   controllers: [ShoppingController],
   providers: [ShoppingService],

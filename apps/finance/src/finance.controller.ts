@@ -7,7 +7,7 @@ import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 export class FinanceController {
   constructor(
     private readonly financeService: FinanceService,
-    private readonly rmqService: RmqService
+    private readonly rmqService: RmqService,
   ) {}
 
   @EventPattern('financeClient/getFinanceSummary')

@@ -1,9 +1,14 @@
-import { GlobalJwtModule, RmqModule } from "@app/common";
-import { Module } from "@nestjs/common";
-import { AUTH_SERVICE, CHAT_SERVICE, FAMILY_SERVICE, WsJwtStrategy } from "../utils";
-import { ChatGateway } from "./chat.gateway";
-import { ChatController } from "./chat.controller";
-import { ChatService } from "./chat.service";
+import { GlobalJwtModule, RmqModule } from '@app/common';
+import { Module } from '@nestjs/common';
+import {
+  AUTH_SERVICE,
+  CHAT_SERVICE,
+  FAMILY_SERVICE,
+  WsJwtStrategy,
+} from '../utils';
+import { ChatGateway } from './chat.gateway';
+import { ChatController } from './chat.controller';
+import { ChatService } from './chat.service';
 
 @Module({
   imports: [
@@ -15,4 +20,4 @@ import { ChatService } from "./chat.service";
   controllers: [ChatController],
   providers: [ChatGateway, WsJwtStrategy, ChatService],
 })
-export class ChatModule { }
+export class ChatModule {}

@@ -1,5 +1,11 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class UpdateShoppingItemDto {
   @ApiProperty({ description: 'id of item' })
@@ -32,7 +38,10 @@ export class UpdateShoppingItemDto {
   @IsNumber()
   priority_level: number;
 
-  @ApiProperty({ description: 'reminder date of shopping item', example: '2024-06-01T00:00:00.000Z'})
+  @ApiProperty({
+    description: 'reminder date of shopping item',
+    example: '2024-06-01T00:00:00.000Z',
+  })
   @IsOptional()
   @IsString()
   reminder_date: Date;

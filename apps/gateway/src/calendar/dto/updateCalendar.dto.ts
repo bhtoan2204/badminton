@@ -1,5 +1,12 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional, IsBoolean } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsDateString,
+  IsOptional,
+  IsBoolean,
+} from 'class-validator';
 
 export class UpdateCalendarDto {
   @IsNotEmpty()
@@ -14,7 +21,10 @@ export class UpdateCalendarDto {
 
   @IsString()
   @IsOptional()
-  @ApiProperty({ example: 'The family\'s off to Ha Long Bay, bonding over its stunning vistas and creating lasting memories' })
+  @ApiProperty({
+    example:
+      "The family's off to Ha Long Bay, bonding over its stunning vistas and creating lasting memories",
+  })
   description: string;
 
   @IsDateString()

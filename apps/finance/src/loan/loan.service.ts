@@ -1,12 +1,10 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
-import { RpcException } from "@nestjs/microservices";
-import { EntityManager } from "typeorm";
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class LoanService {
-  constructor(
-    private readonly entityManager: EntityManager,
-  ) { }
+  constructor(private readonly entityManager: EntityManager) {}
 
   async getLoanCreditorType() {
     try {
@@ -15,12 +13,11 @@ export class LoanService {
       return {
         data: data,
         message: 'Get loan creditor type',
-      }
-    }
-    catch (error) {
+      };
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }

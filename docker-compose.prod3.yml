@@ -10,7 +10,7 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
-  
+
   mailer:
     image: mjkundta/mailer:${TAG}
     build:
@@ -32,4 +32,3 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
-      

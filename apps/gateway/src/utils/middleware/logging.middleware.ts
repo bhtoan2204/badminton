@@ -5,7 +5,8 @@ import { logger } from '@app/common';
 @Injectable()
 export class AppLoggerMiddleware implements NestMiddleware {
   use(request: Request, response: Response, next: NextFunction): void {
-    const ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+    const ip =
+      request.headers['x-forwarded-for'] || request.connection.remoteAddress;
     const { method, originalUrl: url } = request;
     const start = process.hrtime();
 
@@ -15,7 +16,8 @@ export class AppLoggerMiddleware implements NestMiddleware {
         const contentLength = response.get('content-length') || '0';
         const [sec, nanosec] = process.hrtime(start);
         const responseTime = (sec * 1000 + nanosec / 1e6).toFixed(0);
-        const errorMessage = response.statusMessage || 'No error message provided';
+        const errorMessage =
+          response.statusMessage || 'No error message provided';
         const logEntry = {
           ip: ip,
           method: method,
@@ -23,7 +25,7 @@ export class AppLoggerMiddleware implements NestMiddleware {
           statusCode: statusCode,
           contentLength: contentLength,
           responseTimeMs: responseTime,
-          message: `${statusCode >= 400 ? errorMessage : 'Successful'}`
+          message: `${statusCode >= 400 ? errorMessage : 'Successful'}`,
         };
 
         if (statusCode >= 400) {
@@ -31,8 +33,7 @@ export class AppLoggerMiddleware implements NestMiddleware {
         } else {
           logger.info(logEntry);
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.log('Error in logging middleware', error);
       }
     });

@@ -1,6 +1,6 @@
-import { Module } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { MongooseModule } from "@nestjs/mongoose";
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
 import * as Joi from 'joi';
 
 @Module({
@@ -8,9 +8,9 @@ import * as Joi from 'joi';
     ConfigModule.forRoot({
       isGlobal: false,
       validationSchema: Joi.object({
-        MONGOOSE_URL: Joi.string().required()
+        MONGOOSE_URL: Joi.string().required(),
       }),
-      envFilePath: './libs/.env'
+      envFilePath: './libs/.env',
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -20,6 +20,6 @@ import * as Joi from 'joi';
       inject: [ConfigService],
     }),
   ],
-  exports: [MgDatabaseModule]
+  exports: [MgDatabaseModule],
 })
-export class MgDatabaseModule { }
+export class MgDatabaseModule {}

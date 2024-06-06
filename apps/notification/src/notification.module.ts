@@ -3,7 +3,12 @@ import { NotificationController } from './notification.controller';
 import { NotificationService } from './notification.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { MgDatabaseModule, RmqModule, NotificationData, NotificationDataSchema } from '@app/common';
+import {
+  MgDatabaseModule,
+  RmqModule,
+  NotificationData,
+  NotificationDataSchema,
+} from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
@@ -14,15 +19,18 @@ import { MongooseModule } from '@nestjs/mongoose';
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_NOTIFICATION_QUEUE: Joi.string().required(),
       }),
-      envFilePath: process.env.NODE_ENV === 'production' ? './apps/notification/.env.production' : './apps/notification/.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './apps/notification/.env.production'
+          : './apps/notification/.env',
     }),
     RmqModule,
     MgDatabaseModule,
     MongooseModule.forFeature([
-      { name: NotificationData.name, schema: NotificationDataSchema }
-    ])
+      { name: NotificationData.name, schema: NotificationDataSchema },
+    ]),
   ],
   controllers: [NotificationController],
   providers: [NotificationService],
 })
-export class NotificationModule { }
+export class NotificationModule {}

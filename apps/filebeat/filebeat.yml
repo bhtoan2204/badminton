@@ -1,4 +1,4 @@
-name: "gateway-filebeat"
+name: 'gateway-filebeat'
 logging.metrics.enabled: false
 xpack.security.enabled: false
 xpack.monitoring.enabled: false
@@ -16,11 +16,11 @@ filebeat.inputs:
     fields_under_root: true
     json:
       keys_under_root: true
-      message_key: "message"
+      message_key: 'message'
       overwrite_keys: true
 
 output.elasticsearch:
-  hosts: ["https://elasticsearch.rancher.io.vn"]
-  index: "famfund-app"
-  username: "elastic"
-  password: "Toan123456789"
+  hosts: ['https://elasticsearch.rancher.io.vn']
+  index: 'famfund-app'
+  username: 'elastic'
+  password: 'Toan123456789'

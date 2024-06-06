@@ -1,11 +1,11 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
-import { FirebaseService, LoginType, Users } from "@app/common";
-import { RpcException } from "@nestjs/microservices";
-import { EntityManager, Repository } from "typeorm";
-import { InjectRepository } from "@nestjs/typeorm";
-import { TokenPayload } from "./interface/tokenPayload.interface";
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { FirebaseService, LoginType, Users } from '@app/common';
+import { RpcException } from '@nestjs/microservices';
+import { EntityManager, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TokenPayload } from './interface/tokenPayload.interface';
 
 @Injectable()
 export class AuthService {
@@ -14,43 +14,47 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly entityManager: EntityManager,
-    private readonly firebaseService: FirebaseService
-  ) { }
+    private readonly firebaseService: FirebaseService,
+  ) {}
 
   async validateGoogleUser(accessToken: string, profile: any) {
     try {
       const user = await this.userRepository.findOne({
-        where:
-        {
+        where: {
           email: profile.emails[0].value,
-          login_type: LoginType.GOOGLE
-        }
+          login_type: LoginType.GOOGLE,
+        },
       });
       if (!user) {
-        const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7, $8)';
-        const parameters = [profile.emails[0].value, null, '',
-        profile.name.givenName, profile.name.familyName,
-          null, LoginType.GOOGLE, profile.photos[0].value];
+        const query =
+          'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7, $8)';
+        const parameters = [
+          profile.emails[0].value,
+          null,
+          '',
+          profile.name.givenName,
+          profile.name.familyName,
+          null,
+          LoginType.GOOGLE,
+          profile.photos[0].value,
+        ];
 
         const data = await this.entityManager.query(query, parameters);
 
         return await this.userRepository.findOne({
-          where:
-          {
+          where: {
             id_user: data[0].id_user,
-            login_type: LoginType.GOOGLE
-          }
+            login_type: LoginType.GOOGLE,
+          },
         });
-      }
-      else {
+      } else {
         const { password, ...userWithoutPassword } = user;
         return userWithoutPassword;
       }
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: 404
+        statusCode: 404,
       });
     }
   }
@@ -58,34 +62,40 @@ export class AuthService {
   async validateFacebookUser(accessToken: string, profile: any) {
     try {
       const user = await this.userRepository.findOne({
-        where:
-        {
+        where: {
           email: profile.emails[0].value,
-          login_type: LoginType.FACEBOOK
-        }
+          login_type: LoginType.FACEBOOK,
+        },
       });
       if (!user) {
-        const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7, $8)';
-        const parameters = [profile._json.email, null, '', profile.name.givenName, profile.name.familyName, '', LoginType.FACEBOOK, profile.photos[0].value];
+        const query =
+          'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7, $8)';
+        const parameters = [
+          profile._json.email,
+          null,
+          '',
+          profile.name.givenName,
+          profile.name.familyName,
+          '',
+          LoginType.FACEBOOK,
+          profile.photos[0].value,
+        ];
         const data = await this.entityManager.query(query, parameters);
 
         return await this.userRepository.findOne({
-          where:
-          {
+          where: {
             id_user: data[0].id_user,
-            login_type: LoginType.FACEBOOK
-          }
+            login_type: LoginType.FACEBOOK,
+          },
         });
-      }
-      else {
+      } else {
         const { password, ...userWithoutPassword } = user;
         return userWithoutPassword;
       }
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: 404
+        statusCode: 404,
       });
     }
   }
@@ -95,9 +105,9 @@ export class AuthService {
       email: payload.email,
       id_user: payload.id_user,
       phone: payload.phone,
-      isadmin: payload.isadmin
+      isadmin: payload.isadmin,
     };
-    
+
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>('JWT_SECRET'),
@@ -106,135 +116,145 @@ export class AuthService {
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>('JWT_SECRET_REFRESH'),
         expiresIn: '3d',
-      })
+      }),
     ]);
 
     const currentTime = Math.floor(Date.now() / 1000);
-    const accessTokenExpiresIn = currentTime + parseInt(this.configService.get<string>('JWT_EXPIRATION'), 10);
-    const refreshTokenExpiresIn = currentTime + parseInt(this.configService.get<string>('JWT_REFRESH_EXPIRATION'), 10);
+    const accessTokenExpiresIn =
+      currentTime +
+      parseInt(this.configService.get<string>('JWT_EXPIRATION'), 10);
+    const refreshTokenExpiresIn =
+      currentTime +
+      parseInt(this.configService.get<string>('JWT_REFRESH_EXPIRATION'), 10);
     return {
       accessToken,
       refreshToken,
       accessTokenExpiresIn,
-      refreshTokenExpiresIn
+      refreshTokenExpiresIn,
     };
   }
 
   async localLogin(payload: Users) {
-    const { 
-      accessToken, refreshToken, 
-      accessTokenExpiresIn, refreshTokenExpiresIn
-     } = await this.getTokens(payload);
+    const {
+      accessToken,
+      refreshToken,
+      accessTokenExpiresIn,
+      refreshTokenExpiresIn,
+    } = await this.getTokens(payload);
     try {
-      const query = "SELECT * FROM f_generate_refresh_token ($1, $2)";
+      const query = 'SELECT * FROM f_generate_refresh_token ($1, $2)';
       const parameters = [payload.id_user, refreshToken];
       await this.entityManager.query(query, parameters);
-    }
-    catch (err) {
+    } catch (err) {
       throw new RpcException({
         message: err.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
     return {
       accessToken,
       refreshToken,
       accessTokenExpiresIn,
-      refreshTokenExpiresIn
+      refreshTokenExpiresIn,
     };
   }
 
   async googleValidate(google_accessToken: string, profile: any) {
     const user = await this.validateGoogleUser(google_accessToken, profile);
-    const { 
-      accessToken, refreshToken,
-      accessTokenExpiresIn, refreshTokenExpiresIn
-     } = await this.getTokens(user);
+    const {
+      accessToken,
+      refreshToken,
+      accessTokenExpiresIn,
+      refreshTokenExpiresIn,
+    } = await this.getTokens(user);
     try {
-      const query = "SELECT * FROM f_generate_refresh_token ($1, $2)";
+      const query = 'SELECT * FROM f_generate_refresh_token ($1, $2)';
       const parameters = [user.id_user, refreshToken];
       await this.entityManager.query(query, parameters);
-    }
-    catch (err) {
+    } catch (err) {
       throw new RpcException({
         message: err.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
     return {
       accessToken,
       refreshToken,
-      accessTokenExpiresIn, 
-      refreshTokenExpiresIn
+      accessTokenExpiresIn,
+      refreshTokenExpiresIn,
     };
   }
 
   async facebookValidate(facebook_accessToken: string, profile: any) {
     const user = await this.validateFacebookUser(facebook_accessToken, profile);
-    const { 
-      accessToken, refreshToken,
-      accessTokenExpiresIn, refreshTokenExpiresIn
-     } = await this.getTokens(user);
+    const {
+      accessToken,
+      refreshToken,
+      accessTokenExpiresIn,
+      refreshTokenExpiresIn,
+    } = await this.getTokens(user);
     try {
-      const query = "SELECT * FROM f_generate_refresh_token ($1, $2)";
+      const query = 'SELECT * FROM f_generate_refresh_token ($1, $2)';
       const parameters = [user.id_user, refreshToken];
       await this.entityManager.query(query, parameters);
-    }
-    catch (err) {
+    } catch (err) {
       throw new RpcException({
         message: err.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
     return {
       accessToken,
       refreshToken,
-      accessTokenExpiresIn, 
-      refreshTokenExpiresIn
+      accessTokenExpiresIn,
+      refreshTokenExpiresIn,
     };
   }
 
   async refreshToken(payload: Users, deletedRefreshToken: string) {
-    const { accessToken, refreshToken, accessTokenExpiresIn, refreshTokenExpiresIn } = await this.getTokens(payload);
+    const {
+      accessToken,
+      refreshToken,
+      accessTokenExpiresIn,
+      refreshTokenExpiresIn,
+    } = await this.getTokens(payload);
     try {
-      const genereateQuery = "SELECT * FROM f_generate_refresh_token ($1, $2)";
+      const genereateQuery = 'SELECT * FROM f_generate_refresh_token ($1, $2)';
       const generateTokenParameters = [payload.id_user, refreshToken];
-      const deleteQuery = "SELECT * FROM f_delete_refresh_token ($1)";
+      const deleteQuery = 'SELECT * FROM f_delete_refresh_token ($1)';
       const deleteTokenParameters = [deletedRefreshToken];
 
       const promises = [
         this.entityManager.query(genereateQuery, generateTokenParameters),
-        this.entityManager.query(deleteQuery, deleteTokenParameters)
+        this.entityManager.query(deleteQuery, deleteTokenParameters),
       ];
       await Promise.all(promises);
-    }
-    catch (err) {
+    } catch (err) {
       throw new RpcException({
         message: err.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
     return {
       accessToken,
       refreshToken,
-      accessTokenExpiresIn, 
-      refreshTokenExpiresIn
+      accessTokenExpiresIn,
+      refreshTokenExpiresIn,
     };
   }
 
   async logout(refreshToken) {
     try {
-      const query = "SELECT * FROM f_delete_refresh_token ($1)";
+      const query = 'SELECT * FROM f_delete_refresh_token ($1)';
       const parameters = [refreshToken];
       await this.entityManager.query(query, parameters);
       return {
-        message: 'Logout successfully'
+        message: 'Logout successfully',
       };
-    }
-    catch (err) {
+    } catch (err) {
       throw new RpcException({
         message: err.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -244,9 +264,9 @@ export class AuthService {
     if (!user) {
       throw new RpcException({
         message: 'User not found',
-        statusCode: 404
+        statusCode: 404,
       });
-    };
+    }
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
@@ -254,7 +274,9 @@ export class AuthService {
   async validateLocalUser(email: string, inputPassword: string) {
     let user;
     try {
-      user = await this.userRepository.findOne({ where: { email, login_type: LoginType.LOCAL } });
+      user = await this.userRepository.findOne({
+        where: { email, login_type: LoginType.LOCAL },
+      });
     } catch (error) {
       throw new RpcException({
         message: 'An error occurred while retrieving user information',
@@ -289,11 +311,10 @@ export class AuthService {
   async saveFCMToken(userId: string, fcmToken: string) {
     try {
       return await this.firebaseService.saveFCMToken(userId, fcmToken);
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: 404
+        statusCode: 404,
       });
     }
   }
@@ -301,11 +322,10 @@ export class AuthService {
   async deleteFCMToken(userId: string, fcmToken: string) {
     try {
       return await this.firebaseService.deleteFCMToken(userId, fcmToken);
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException({
         message: error.message,
-        statusCode: 404
+        statusCode: 404,
       });
     }
   }

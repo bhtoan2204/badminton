@@ -66,4 +66,5 @@ export class UserConversations {
   conversations: Conversation[];
 }
 
-export const UserConversationsSchema = SchemaFactory.createForClass(UserConversations);
+export const UserConversationsSchema =
+  SchemaFactory.createForClass(UserConversations);

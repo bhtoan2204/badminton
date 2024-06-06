@@ -1,7 +1,13 @@
-import { Controller, UseGuards, Get, HttpCode, HttpStatus } from "@nestjs/common";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { Admin, AdminGuard, JwtAuthGuard } from "../../utils";
-import { PostgresqlService } from "./datastats.service";
+import {
+  Controller,
+  UseGuards,
+  Get,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Admin, AdminGuard, JwtAuthGuard } from '../../utils';
+import { PostgresqlService } from './datastats.service';
 
 @ApiTags('Admin Database')
 @Controller('database-stat')
@@ -9,9 +15,7 @@ import { PostgresqlService } from "./datastats.service";
 @UseGuards(JwtAuthGuard, AdminGuard)
 @Admin(true)
 export class PostgresqlController {
-  constructor(
-    private readonly postgresqlService: PostgresqlService
-  ) { }
+  constructor(private readonly postgresqlService: PostgresqlService) {}
 
   @HttpCode(HttpStatus.OK)
   @Get('posgresql')

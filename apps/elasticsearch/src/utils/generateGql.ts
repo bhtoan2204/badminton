@@ -1,4 +1,9 @@
-export function generateGraphQLQuery(zoneTag: string, date_geq: string, date_leq: string, limit: number): string {
+export function generateGraphQLQuery(
+  zoneTag: string,
+  date_geq: string,
+  date_leq: string,
+  limit: number,
+): string {
   return `{
     viewer {
       zones(filter: { zoneTag: "${zoneTag}" }) {

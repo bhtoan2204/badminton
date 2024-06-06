@@ -8,7 +8,7 @@ export class MailController {
   constructor(
     private readonly mailerService: MailService,
     private readonly rmqService: RmqService,
-  ) { }
+  ) {}
 
   @EventPattern('mailClient/sendUserConfirmation')
   async sendUserConfirmation(@Payload() dto: any, @Ctx() context: RmqContext) {

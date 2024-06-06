@@ -20,14 +20,17 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, profile: Profile): Promise<any> {
+  async validate(
+    accessToken: string,
+    refreshToken: string,
+    profile: Profile,
+  ): Promise<any> {
     try {
-      const source = this.authClient.send('authClient/google_login', { accessToken, profile }).pipe(
-        timeout(15000)
-      );
+      const source = this.authClient
+        .send('authClient/google_login', { accessToken, profile })
+        .pipe(timeout(15000));
       return await lastValueFrom(source);
-    }
-    catch (error) {
+    } catch (error) {
       throw new UnauthorizedException(error.message);
     }
   }
