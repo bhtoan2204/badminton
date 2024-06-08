@@ -19,12 +19,10 @@ export class AuthService {
 
   async validateGoogleUser(accessToken: string, profile: any) {
     try {
-      const user = await this.userRepository.findOne({
-        where: {
-          email: profile.emails[0].value,
-          login_type: LoginType.GOOGLE,
-        },
-      });
+      const getUserQuery = 'SELECT * FROM users where email = $1 and login_type = $2';
+      const getUserParams = [profile.emails[0].value, LoginType.GOOGLE];
+      const userResult = await this.entityManager.query(getUserQuery, getUserParams);
+      const user = userResult[0];
       if (!user) {
         const query =
           'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7, $8)';
@@ -61,12 +59,10 @@ export class AuthService {
 
   async validateFacebookUser(accessToken: string, profile: any) {
     try {
-      const user = await this.userRepository.findOne({
-        where: {
-          email: profile.emails[0].value,
-          login_type: LoginType.FACEBOOK,
-        },
-      });
+      const getUserQuery = 'SELECT * FROM users where email = $1 and login_type = $2';
+      const getUserParams = [profile.emails[0].value, LoginType.FACEBOOK];
+      const userResult = await this.entityManager.query(getUserQuery, getUserParams);
+      const user = userResult[0];
       if (!user) {
         const query =
           'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7, $8)';
@@ -168,7 +164,7 @@ export class AuthService {
       refreshTokenExpiresIn,
     } = await this.getTokens(user);
     try {
-      const query = 'SELECT * FROM f_generate_refresh_token ($1, $2)';
+      const query = 'SELECT * FROM f_generate_refresh_token($1, $2)';
       const parameters = [user.id_user, refreshToken];
       await this.entityManager.query(query, parameters);
     } catch (err) {

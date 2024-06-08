@@ -80,18 +80,18 @@ services:
     volumes:
       - .:/usr/src/app
 
-  mailer:
-    image: mjkundta/mailer:latest
-    build:
-      context: .
-      dockerfile: ./apps/mailer/Dockerfile
-      target: development
-    command: npm run start:dev mailer
-    depends_on:
-      - auth
-    restart: on-failure
-    volumes:
-      - .:/usr/src/app
+  # mailer:
+  #   image: mjkundta/mailer:latest
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/mailer/Dockerfile
+  #     target: development
+  #   command: npm run start:dev mailer
+  #   depends_on:
+  #     - auth
+  #   restart: on-failure
+  #   volumes:
+  #     - .:/usr/src/app
 
   chat:
     image: mjkundta/chat:latest
