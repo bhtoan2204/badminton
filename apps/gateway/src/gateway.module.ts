@@ -4,7 +4,6 @@ import { AuthApiModule } from './auth/auth.module';
 import { PaymentModule } from './payment/payment.module';
 import { FamilyModule } from './family/family.module';
 import { AdminModule } from './admin/admin.module';
-import { MailModule } from './mailer/mailer.module';
 import { ChatModule } from './chat/chat.module';
 import { CrawlerModule } from './crawler/crawler.module';
 import { CalendarModule } from './calendar/calendar.module';
@@ -16,9 +15,9 @@ import { EducationModule } from './education/education.module';
 import { HouseholdModule } from './household/household.module';
 import { FinanceModule } from './finance/finance.module';
 import { ShoppingModule } from './shopping/shopping.module';
-import * as Joi from 'joi';
 import { InvoiceModule } from './invoice/invoice.module';
-
+import { MailModule } from './mailer/mailer.module';
+import * as Joi from 'joi';
 @Module({
   imports: [
     ConfigModule.forRoot({

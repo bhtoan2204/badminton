@@ -11,16 +11,16 @@ services:
     environment:
       - NODE_ENV=production
 
-  mailer:
-    image: mjkundta/mailer:${TAG}
-    build:
-      context: .
-      dockerfile: ./apps/mailer/Dockerfile
-      target: production
-    command: node dist/apps/mailer/src/main
-    restart: on-failure
-    environment:
-      - NODE_ENV=production
+  # mailer:
+  #   image: mjkundta/mailer:${TAG}
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/mailer/Dockerfile
+  #     target: production
+  #   command: node dist/apps/mailer/src/main
+  #   restart: on-failure
+  #   environment:
+  #     - NODE_ENV=production
 
   chat:
     image: mjkundta/chat:${TAG}

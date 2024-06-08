@@ -45,4 +45,22 @@ export class UserController {
     this.rmqService.ack(context);
     return await this.userService.getAllUser();
   }
+
+  @EventPattern('mailClient/sendUserConfirmation')
+  async sendUserConfirmation(@Payload() dto: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.userService.sendUserConfirmation(dto);
+  }
+
+  @EventPattern('mailClient/sendInvitation')
+  async sendInvite(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.userService.sendInvite(data.id_user, data.id_family);
+  }
+
+  @EventPattern('mailClient/sendResetPassword')
+  async sendResetPassword(@Payload() dto: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.userService.sendResetPassword(dto);
+  }
 }
