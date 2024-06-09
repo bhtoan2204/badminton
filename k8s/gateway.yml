@@ -18,10 +18,11 @@ metadata:
     app: gateway
 spec:
   strategy:
+    type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 1
-  replicas: 1
+      maxUnavailable: 0
+  replicas: 2
   selector:
     matchLabels:
       app: gateway
