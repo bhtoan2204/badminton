@@ -11,15 +11,21 @@ export class UserController {
   ) {}
 
   @EventPattern('userClient/create_account')
-  async handleUserCreated(@Payload() data: any, @Ctx() context: RmqContext) {
+  async handleUserCreated(@Payload() dto: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.userService.createAccount(data.createAccountDto);
+    return await this.userService.createAccount(dto);
   }
 
   @EventPattern('userClient/change_password')
   async handleChangePassword(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return await this.userService.changePassword(data.currentUser, data.data);
+  }
+
+  @EventPattern('userClient/forgot_password')
+  async handleForgotPassword(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.userService.forgotPassword(data);
   }
 
   @EventPattern('userClient/update_profile')
@@ -58,9 +64,15 @@ export class UserController {
     return await this.userService.sendInvite(data.id_user, data.id_family);
   }
 
-  @EventPattern('mailClient/sendResetPassword')
-  async sendResetPassword(@Payload() dto: any, @Ctx() context: RmqContext) {
+  @EventPattern('userClient/check_otp')
+  async handleCheckOTP(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.userService.sendResetPassword(dto);
+    return await this.userService.checkOTP(data);
+  }
+
+  @EventPattern('userClient/reset_password')
+  async handleResetPassword(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.userService.resetPassword(data);
   }
 }

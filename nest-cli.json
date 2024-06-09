@@ -102,11 +102,13 @@
       "type": "application",
       "root": "apps/user",
       "entryFile": "src/main",
-      "sourceRoot": "./",
+      "sourceRoot": "apps/user",
       "compilerOptions": {
         "tsConfigPath": "apps/user/tsconfig.app.json",
         "assets": [
-          "proto/*.proto",
+          {
+            "include": "*.proto"
+          },
           {
             "include": "templates/*.hbs"
           }

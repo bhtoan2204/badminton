@@ -25,6 +25,10 @@ import { UpdateProfileDto } from './dto/updateProfile.dto';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 import { CreateAccountDto } from './dto/createAccount.dto';
 import { UserService } from './user.service';
+import { ForgotPasswordDto } from './dto/forgotPassword.dto';
+import { ResetPasswordDto } from './dto/resetPassword.dto';
+import { CheckOTPDto } from './dto/checkOtp.dto';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @ApiTags('User')
 @Controller('user')
@@ -33,10 +37,17 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Demo Create account' })
-  @Post('register/createAccountForTest')
+  @ApiOperation({ summary: 'Create account' })
+  @Post('register/createAccount')
   async createAccountForTest(@Body() createAccountDto: CreateAccountDto) {
     return this.userService.createAccount(createAccountDto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify account' })
+  @Post('register/verifyAccount')
+  async verifyAccount(@Body() data: any) {
+    // return this.userService.verifyAccount(data);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -58,8 +69,24 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Forgot Password' })
   @Post('forgotPassword')
-  async forgotPassword(@Body() data: any) {
-    return { message: 'forgot password', data: data };
+  @UseGuards(ThrottlerGuard)
+  @Throttle(5, 30 * 60)
+  async forgotPassword(@Body() data: ForgotPasswordDto) {
+    return this.userService.forgotPassword(data);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Check OTP forgot password' })
+  @Post('checkOTPForgotPassword')
+  async checkOTP(@Body() data: CheckOTPDto) {
+    return this.userService.checkOTP(data);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset Password' })
+  @Post('resetPassword')
+  async resetPassword(@Body() data: ResetPasswordDto) {
+    return this.userService.resetPassword(data);
   }
 
   @HttpCode(HttpStatus.OK)

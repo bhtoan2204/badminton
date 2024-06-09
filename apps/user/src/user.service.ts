@@ -1,7 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager } from 'typeorm';
-import { CreateAccountDto } from './dto/createAccount.dto';
 import { DeleteFileRequest, UploadFileRequest, Users } from '@app/common';
 import { RpcException } from '@nestjs/microservices';
 import { StorageService } from './storage/storage.service';
@@ -14,14 +13,23 @@ export class UserService {
     private readonly entityManager: EntityManager,
     private readonly storageService: StorageService,
     private readonly mailerService: MailerService,
-  ) { }
+  ) {}
 
-  async createAccount(createAccountDto: CreateAccountDto) {
+  async createAccount(createAccountDto: any) {
     try {
-      const { email, phone, password, firstname, lastname } = createAccountDto;
+      const { email, phone, password, firstname, lastname, genre, birthdate } =
+        createAccountDto;
 
-      const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6)';
-      const parameters = [email, phone, password, firstname, lastname, null];
+      const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7)';
+      const parameters = [
+        email,
+        phone,
+        password,
+        firstname,
+        lastname,
+        genre,
+        birthdate,
+      ];
 
       const data = await this.entityManager.query(query, parameters);
 
@@ -73,8 +81,11 @@ export class UserService {
       }
       const query = 'SELECT * FROM f_change_password($1, $2)';
       const parameters = [user.id_user, newPassword];
-      const data = await this.entityManager.query(query, parameters);
-      return data;
+      await this.entityManager.query(query, parameters);
+      return {
+        message: 'Password has been changed',
+        data: true,
+      };
     } catch (error) {
       if (error instanceof RpcException) {
         throw error;
@@ -84,6 +95,51 @@ export class UserService {
           statusCode: HttpStatus.UNAUTHORIZED,
         });
       }
+    }
+  }
+
+  async forgotPassword(data: any) {
+    const { email, phone } = data;
+    try {
+      if (!email) {
+        const query = 'SELECT * FROM f_handle_forgot_password_by_phone($1)';
+        const parameters = [phone];
+        const result = await this.entityManager.query(query, parameters);
+        const code = result[0].f_handle_forgot_password_by_phone;
+        // TODO: send code to phone number
+        return {
+          message: 'OTP has been sent to your phone',
+          data: code,
+        };
+      } else if (!phone) {
+        const query = 'SELECT * FROM f_handle_forgot_password_by_email($1)';
+        const parameters = [email];
+        const result = await this.entityManager.query(query, parameters);
+        const code = result[0].f_handle_forgot_password_by_email;
+        const sendEmail = await this.mailerService.sendMail({
+          to: email,
+          from: '"Famfund" <famfund@famfund.com>',
+          subject: `Your OTP for Famfund Account Reset password is ${code}`,
+          template: 'forgotPassword',
+          context: {
+            otp: code,
+          },
+        });
+        return {
+          message: 'OTP has been sent to your email',
+          data: sendEmail,
+        };
+      } else {
+        throw new RpcException({
+          message: 'Either email or phone must be provided, but not both.',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
     }
   }
 
@@ -249,5 +305,101 @@ export class UserService {
     }
   }
 
-  async sendResetPassword(dto) { }
+  async checkOTP(data) {
+    const { email, phone, code } = data;
+    try {
+      if (!email) {
+        const query = 'SELECT * FROM f_check_otp_by_phone($1, $2)';
+        const parameters = [phone, code];
+        console.log('phone', phone);
+        console.log('otp', code);
+        const result = await this.entityManager.query(query, parameters);
+        const isValid = result[0].f_check_otp_by_phone;
+        return isValid
+          ? { message: 'OTP is valid', data: isValid }
+          : { message: 'OTP is not valid', data: isValid };
+      } else if (!phone) {
+        const query = 'SELECT * FROM f_check_otp_by_email($1, $2)';
+        const parameters = [email, code];
+        const result = await this.entityManager.query(query, parameters);
+        const isValid = result[0].f_check_otp_by_email;
+        return isValid
+          ? { message: 'OTP is valid', data: isValid }
+          : { message: 'OTP is not valid', data: isValid };
+      } else {
+        throw new RpcException({
+          message: 'Either email or phone must be provided, but not both.',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async resetPassword(data) {
+    const { email, phone, password, code } = data;
+    try {
+      if (!email) {
+        const query = 'SELECT * FROM f_check_otp_by_phone($1, $2)';
+        const parameters = [phone, code];
+        const result = await this.entityManager.query(query, parameters);
+        const isReset = result[0].f_check_otp_by_phone;
+        console.log('isReset', isReset);
+        if (isReset) {
+          const resetQuery = 'SELECT * FROM f_reset_password_by_phone($1, $2)';
+          const resetParams = [phone, password];
+          await this.entityManager.query(resetQuery, resetParams);
+          const deleteOtpQuery = 'SELECT * FROM f_delete_otp_by_phone($1)';
+          const deleteOtpParams = [phone];
+          await this.entityManager.query(deleteOtpQuery, deleteOtpParams);
+          return {
+            message: 'Password has been reset',
+            data: true,
+          };
+        } else {
+          throw new RpcException({
+            message: 'Password has not been reset',
+            statusCode: HttpStatus.BAD_REQUEST,
+          });
+        }
+      } else if (!phone) {
+        const query = 'SELECT * FROM f_check_otp_by_email($1, $2)';
+        const parameters = [email, code];
+        const result = await this.entityManager.query(query, parameters);
+        const isReset = result[0].f_check_otp_by_email;
+        if (isReset) {
+          const resetQuery = 'SELECT * FROM f_reset_password_by_email($1, $2)';
+          const resetParams = [email, password];
+          const data = await this.entityManager.query(resetQuery, resetParams);
+          console.log(data);
+          const deleteOtpQuery = 'SELECT * FROM f_delete_otp_by_email($1)';
+          const deleteOtpParams = [phone];
+          await this.entityManager.query(deleteOtpQuery, deleteOtpParams);
+          return {
+            message: 'Password has been reset',
+            data: true,
+          };
+        } else {
+          throw new RpcException({
+            message: 'Password has not been reset',
+            statusCode: HttpStatus.BAD_REQUEST,
+          });
+        }
+      } else {
+        throw new RpcException({
+          message: 'Either email or phone must be provided, but not both.',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
 }
