@@ -25,6 +25,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
+RUN npm install -g pm2
 RUN npm install --only=production --ignore-scripts
 RUN npm install @css-inline/css-inline-linux-x64-musl
 
@@ -37,4 +38,4 @@ COPY --from=development /usr/src/app/dist ./dist
 COPY --from=development /usr/src/app/libs ./libs
 COPY --from=development /usr/src/app/proto ./proto
 
-CMD [ "node", "dist/apps/gateway/src/main" ]
+CMD ["pm2-runtime", "dist/apps/gateway/src/main.js" ]
