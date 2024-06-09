@@ -69,8 +69,8 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Forgot Password' })
   @Post('forgotPassword')
-  @UseGuards(ThrottlerGuard)
-  @Throttle(5, 30 * 60)
+  // @UseGuards(ThrottlerGuard)
+  // @Throttle(5, 900)
   async forgotPassword(@Body() data: ForgotPasswordDto) {
     return this.userService.forgotPassword(data);
   }
