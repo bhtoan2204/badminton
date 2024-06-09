@@ -70,11 +70,11 @@ export class FamilyController {
   @Put('updateFamily')
   async updateFamily(
     @CurrentUser() currentUser,
-    @Body() UpdateFamilyDTO: UpdateFamilyDTO,
+    @Body() updateFamilyDTO: UpdateFamilyDTO,
   ) {
     return this.familyService.updateFamily(
       currentUser.id_user,
-      UpdateFamilyDTO,
+      updateFamilyDTO,
     );
   }
 
