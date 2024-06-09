@@ -66,4 +66,6 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
   providers: [UserService],
   exports: [UserService, RmqModule],
 })
-export class UserModule { }
+export class UserModule {}
+
+console.log(join(__dirname, '..', 'templates/'));
