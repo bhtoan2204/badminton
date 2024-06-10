@@ -23,7 +23,7 @@ spec:
       containers:
         - name: invoice
           image: mjkundta/invoice:<TAG>
-          command: ['node', 'dist/apps/invoice/src/main']
+          command: ['pm2-runtime', 'dist/apps/invoice/src/main.js']
           resources:
             limits:
               cpu: '140m'

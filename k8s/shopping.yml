@@ -23,7 +23,7 @@ spec:
       containers:
         - name: shopping
           image: mjkundta/shopping:<TAG>
-          command: ['node', 'dist/apps/shopping/src/main']
+          command: ['pm2-runtime', 'dist/apps/shopping/src/main.js']
           resources:
             limits:
               cpu: '140m'
