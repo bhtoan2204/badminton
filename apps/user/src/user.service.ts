@@ -42,6 +42,22 @@ export class UserService {
     }
   }
 
+  async getProfile(user: any) {
+    try {
+      const query = 'SELECT * FROM users where id_user = $1';
+      const parameters = [user.id_user];
+      const data = await this.entityManager.query(query, parameters);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...userWithoutPassword } = data[0];
+      return userWithoutPassword;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
   async check_phone(phone) {
     try {
       const query = 'SELECT * FROM check_phone_number_exists($1)';
@@ -145,26 +161,18 @@ export class UserService {
 
   async updateProfile(user: any, data: any) {
     try {
-      const { firstname, lastname } = data;
+      const { firstname, lastname, genre, birthdate } = data;
       if (user.firstname === firstname && user.lastname === lastname) {
         throw new RpcException({
           message: 'No changes detected',
           statusCode: HttpStatus.BAD_REQUEST,
         });
       }
-      let query, parameters;
-      if (firstname && !lastname) {
-        query = 'SELECT * FROM f_change_firstname($1, $2)';
-        parameters = [user.id_user, firstname];
-      } else if (!firstname && lastname) {
-        query = 'SELECT * FROM f_change_lastname($1, $2)';
-        parameters = [user.id_user, lastname];
-      } else {
-        query = 'SELECT * FROM f_change_firstname_lastname($1, $2, $3)';
-        parameters = [user.id_user, firstname, lastname];
-      }
+      const query = 'SELECT * FROM f_update_user_profile($1, $2, $3, $4, $5)';
+      const parameters = [user.id_user, firstname, lastname, genre, birthdate];
       const result = await this.entityManager.query(query, parameters);
-      return result;
+      const { password, ...userWithoutPassword } = result;
+      return userWithoutPassword;
     } catch (error) {
       throw new RpcException({
         message: error.message,
