@@ -59,7 +59,7 @@ export class InvestmentController {
     return this.InvestmentService.updateInvestment();
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete investment' })
   @Delete('deleteInvestment')
   async deleteInvestment() {

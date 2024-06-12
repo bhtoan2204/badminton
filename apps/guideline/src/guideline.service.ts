@@ -138,18 +138,6 @@ export class GuidelineService {
     file: any,
   ) {
     try {
-      const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
-      const parameters = [id_user, id_family];
-      const isUserMemberOfFamily = await this.entityManager.query(
-        query,
-        parameters,
-      );
-      if (isUserMemberOfFamily[0].f_is_user_member_of_family === false) {
-        throw new RpcException({
-          message: 'You are not a member of this family',
-          statusCode: HttpStatus.UNAUTHORIZED,
-        });
-      }
       let fileUrl = null;
       if (file) {
         const filename =
@@ -198,18 +186,6 @@ export class GuidelineService {
     file: any,
   ) {
     try {
-      const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
-      const parameters = [id_user, id_family];
-      const isUserMemberOfFamily = await this.entityManager.query(
-        query,
-        parameters,
-      );
-      if (isUserMemberOfFamily[0].f_is_user_member_of_family === false) {
-        throw new RpcException({
-          message: 'You are not a member of this family',
-          statusCode: HttpStatus.UNAUTHORIZED,
-        });
-      }
       let fileUrl = null;
       if (file) {
         const filename =
@@ -259,18 +235,6 @@ export class GuidelineService {
     file: any,
   ) {
     try {
-      const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
-      const parameters = [id_user, id_family];
-      const isUserMemberOfFamily = await this.entityManager.query(
-        query,
-        parameters,
-      );
-      if (isUserMemberOfFamily[0].f_is_user_member_of_family === false) {
-        throw new RpcException({
-          message: 'You are not a member of this family',
-          statusCode: HttpStatus.UNAUTHORIZED,
-        });
-      }
       let fileUrl = null;
       if (file) {
         const oldImageUriQuery =

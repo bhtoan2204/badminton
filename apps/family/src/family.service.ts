@@ -187,16 +187,6 @@ export class FamilyService {
 
   async changeAvatar(id_user: string, id_family: number, file: any) {
     try {
-      const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
-      const checkParams = [id_user, id_family];
-      const results = await this.entityManager.query(query, checkParams);
-      const isMember = results[0].f_is_user_member_of_family;
-      if (!isMember) {
-        throw new RpcException({
-          message: 'User is not a member of the family',
-          statusCode: HttpStatus.FORBIDDEN,
-        });
-      }
       const filename =
         'avatar_family_' + id_user + '_' + Date.now() + '_' + file.originalname;
       const params: UploadFileRequest = {

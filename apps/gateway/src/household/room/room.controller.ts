@@ -47,7 +47,7 @@ export class RoomController {
     return this.roomService.updateRoom(currentUser.id_user, body);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete room' })
   @Delete('deleteRoom/:id_family/:id_room')
   async deleteRoom(

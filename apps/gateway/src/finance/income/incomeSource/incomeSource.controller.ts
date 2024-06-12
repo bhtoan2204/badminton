@@ -54,7 +54,7 @@ export class IncomeSourceController {
     return this.incomeService.updateIncomeSource(currentUser.id_user, dto);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete Income Source' })
   @Delete('deleteIncomeSource/:id_family/:id_income_source')
   async deleteIncomeSource(

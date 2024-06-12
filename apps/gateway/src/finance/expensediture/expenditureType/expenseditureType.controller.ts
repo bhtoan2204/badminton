@@ -63,7 +63,7 @@ export class ExpenseditureTypeController {
     );
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete expensediture' })
   @Delete('deleteExpenseType/:id_family/:id_expenditure_type')
   async deleteExpenseType(

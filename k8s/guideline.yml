@@ -23,7 +23,7 @@ spec:
       containers:
         - name: guideline
           image: mjkundta/guideline:<TAG>
-          command: ['pm2-runtime', 'dist/apps/guideline/src/main.js']
+          command: ['node', 'dist/apps/guideline/src/main.js']
           resources:
             limits:
               cpu: '100m'

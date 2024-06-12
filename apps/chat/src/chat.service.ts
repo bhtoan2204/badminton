@@ -255,17 +255,6 @@ export class ChatService {
     index: number,
   ): Promise<any> {
     try {
-      const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
-      const checkParams = [id_user, id_family];
-      const results = await this.entityManager.query(query, checkParams);
-      const isMember = results[0].f_is_user_member_of_family;
-      if (!isMember) {
-        throw new RpcException({
-          message: 'User is not a member of the family',
-          statusCode: HttpStatus.FORBIDDEN,
-        });
-      }
-
       const skip = index * limit;
       const messages = await this.familyConversationsRepository
         .findOne(
@@ -359,17 +348,6 @@ export class ChatService {
     messageData: { message: string; familyId: number },
   ): Promise<any> {
     try {
-      const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
-      const checkParams = [id_user, messageData.familyId];
-      const results = await this.entityManager.query(query, checkParams);
-      const isMember = results[0].f_is_user_member_of_family;
-      if (!isMember) {
-        throw new RpcException({
-          message: 'User is not a member of the family',
-          statusCode: HttpStatus.FORBIDDEN,
-        });
-      }
-
       const newMessage = {
         senderId: id_user,
         type: 'text',
@@ -400,17 +378,6 @@ export class ChatService {
     messageData: { imageData: string; familyId: number },
   ): Promise<any> {
     try {
-      const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
-      const checkParams = [id_user, messageData.familyId];
-      const results = await this.entityManager.query(query, checkParams);
-      const isMember = results[0].f_is_user_member_of_family;
-      if (!isMember) {
-        throw new RpcException({
-          message: 'User is not a member of the family',
-          statusCode: HttpStatus.FORBIDDEN,
-        });
-      }
-
       const fileName = 'family_' + messageData.familyId + '_' + Date.now();
       const fileUint8Array = await this.base64ToUint8Array(
         messageData.imageData,

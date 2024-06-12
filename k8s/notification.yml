@@ -23,7 +23,7 @@ spec:
       containers:
         - name: notification
           image: mjkundta/notification:<TAG>
-          command: ['pm2-runtime', 'dist/apps/notification/src/main.js']
+          command: ['node', 'dist/apps/notification/src/main.js']
           resources:
             limits:
               cpu: '100m'
