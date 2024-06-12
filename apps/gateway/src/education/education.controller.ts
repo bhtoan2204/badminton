@@ -95,7 +95,7 @@ export class EducationController {
     );
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete education progress' })
   @Delete('delete/:id_education_progress/:id_family')
   @ApiParam({ name: 'id_family', required: true, type: Number })

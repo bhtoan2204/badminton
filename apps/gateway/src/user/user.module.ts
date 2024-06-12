@@ -8,10 +8,12 @@ import { APP_GUARD } from '@nestjs/core';
 @Module({
   imports: [
     RmqModule.register({ name: USER_SERVICE }),
-    ThrottlerModule.forRoot([{
-      ttl: 300,
-      limit: 1,
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 300,
+        limit: 1,
+      },
+    ]),
   ],
   controllers: [UserController],
   providers: [

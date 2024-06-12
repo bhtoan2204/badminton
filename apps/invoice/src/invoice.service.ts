@@ -74,18 +74,6 @@ export class InvoiceService {
         invoice_date,
         description,
       } = dto;
-      const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
-      const parameters = [id_user, id_family];
-      const isUserMemberOfFamily = await this.entityManager.query(
-        query,
-        parameters,
-      );
-      if (!isUserMemberOfFamily[0].f_is_user_member_of_family) {
-        throw new RpcException({
-          message: 'User is not member of family',
-          statusCode: HttpStatus.UNAUTHORIZED,
-        });
-      }
       let fileUrl = null;
       if (file) {
         const filename =
@@ -164,18 +152,6 @@ export class InvoiceService {
         invoice_date,
         description,
       } = dto;
-      const query = 'SELECT * FROM f_is_user_member_of_family($1, $2)';
-      const parameters = [id_user, id_family];
-      const isUserMemberOfFamily = await this.entityManager.query(
-        query,
-        parameters,
-      );
-      if (!isUserMemberOfFamily[0].f_is_user_member_of_family) {
-        throw new RpcException({
-          message: 'User is not member of family',
-          statusCode: HttpStatus.UNAUTHORIZED,
-        });
-      }
       let fileUrl = null;
       if (file) {
         const filename =

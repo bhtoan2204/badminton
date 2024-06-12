@@ -10,7 +10,6 @@ import {
   Post,
   Put,
   Query,
-  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -73,7 +72,7 @@ export class InvoiceController {
     return this.invoiceService.updateInvoiceType(currentUser.id_user, dto);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete invoice type' })
   @Delete('deleteInvoiceType/:id_family/:id_invoice_type')
   @ApiParam({ name: 'id_family', required: true, type: Number })
@@ -251,7 +250,7 @@ export class InvoiceController {
     return this.invoiceService.updateInvoice(currentUser.id_user, dto, file);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete invoice' })
   @Delete('deleteInvoice/:id_family/:id_invoice')
   @ApiParam({ name: 'id_family', required: true, type: Number })
@@ -326,7 +325,7 @@ export class InvoiceController {
     return this.invoiceService.updateInvoiceItem(currentUser.id_user, dto);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete invoice item' })
   @Delete('deleteInvoiceItem/:id_family/:id_invoice/:id_item')
   @ApiParam({ name: 'id_family', required: true, type: Number })
@@ -362,10 +361,7 @@ export class InvoiceController {
     ),
   )
   @Post('upload')
-  async convertImageToText(
-    @UploadedFile() file: Express.Multer.File,
-    @Req() req: any,
-  ) {
+  async convertImageToText(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new HttpException('File not uploaded', HttpStatus.BAD_REQUEST);
     }

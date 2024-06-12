@@ -37,7 +37,7 @@ export class FinanceController {
     @CurrentUser() currentUser,
     @Param('id_family') id_family: number,
   ) {
-    return this.financeService.getExpenditure(currentUser.id_user, id_family);
+    // return this.financeService.getExpenditure(currentUser.id_user, id_family);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -47,6 +47,6 @@ export class FinanceController {
     @CurrentUser() currentUser,
     @Param('id_family') id_family: number,
   ) {
-    return this.financeService.getIncome(currentUser.id_user, id_family);
+    // return this.financeService.getIncome(currentUser.id_user, id_family);
   }
 }

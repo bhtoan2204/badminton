@@ -13,6 +13,8 @@ service StorageService {
   rpc deleteImageHousehold(DeleteFileRequest) returns (DeleteFileResponse);
   rpc uploadImageInvoice(UploadFileRequest) returns (UploadFileResponse);
   rpc deleteImageInvoice(DeleteFileRequest) returns (DeleteFileResponse);
+  rpc uploadImageUtility(UploadFileRequest) returns (UploadFileResponse);
+  rpc deleteImageUtility(DeleteFileRequest) returns (DeleteFileResponse);
 }
 
 message UploadFileRequest {

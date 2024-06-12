@@ -47,7 +47,7 @@ export class LoanController {
     return this.loanService.updateLoan();
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete Loan' })
   @Delete('deleteLoan')
   async deleteLoan() {

@@ -40,7 +40,7 @@ export class SavingController {
     return this.savingService.updateSaving();
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete saving' })
   @Delete('deleteSaving')
   async deleteSaving() {

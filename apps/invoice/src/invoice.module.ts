@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { InvoiceController } from './invoice.controller';
 import { InvoiceService } from './invoice.service';
 import { DatabaseModule, RmqModule } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { StorageModule } from './storage/storage.module';
+import { UtilitiesModule } from './utilities/utilities.module';
 
 @Module({
   imports: [
@@ -25,8 +26,10 @@ import { StorageModule } from './storage/storage.module';
     RmqModule,
     DatabaseModule,
     StorageModule,
+    forwardRef(() => UtilitiesModule),
   ],
   controllers: [InvoiceController],
   providers: [InvoiceService],
+  exports: [RmqModule],
 })
 export class InvoiceModule {}

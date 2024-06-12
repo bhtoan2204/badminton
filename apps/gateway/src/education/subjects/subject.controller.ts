@@ -76,7 +76,7 @@ export class SubjectController {
     return this.subjectService.updateDetailSubject(currentUser.id_user, dto);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete subject' })
   @Delete('delete/:id_family/:id_education_progress/:id_subject')
   @ApiParam({ name: 'id_family', required: true, type: Number })
@@ -129,7 +129,7 @@ export class SubjectController {
     return this.subjectService.updateComponentScore(currentUser.id_user, dto);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete component score' })
   @Delete('deleteComponentScore')
   async deleteComponentScore(
@@ -146,7 +146,7 @@ export class SubjectController {
     return this.subjectService.modifyScore(currentUser.id_user, dto);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Modify midterm, final, bonus score' })
   @Delete('removeScore')
   async removeScore(@CurrentUser() currentUser, @Body() dto: RemoveScoreDto) {
