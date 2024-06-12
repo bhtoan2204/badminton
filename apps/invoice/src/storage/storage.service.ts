@@ -37,4 +37,16 @@ export class StorageService implements OnModuleInit {
   ): Promise<DeleteFileResponse> {
     return this.storageService.deleteImageInvoice(request).toPromise();
   }
+
+  async uploadImageUtility(
+    request: UploadFileRequest,
+  ): Promise<UploadFileResponse> {
+    return this.storageService.uploadImageUtility(request).toPromise();
+  }
+
+  async deleteImageUtility(
+    request: DeleteFileRequest,
+  ): Promise<DeleteFileResponse> {
+    return this.storageService.deleteImageUtility(request).toPromise();
+  }
 }

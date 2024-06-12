@@ -133,7 +133,7 @@ export class CalendarController {
     return this.calendarService.updateCalendar(currentUser.id_user, dto);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a Calendar' })
   @ApiParam({ name: 'id_calendar', required: true })
   @Delete('deleteCalendar/:id_calendar')

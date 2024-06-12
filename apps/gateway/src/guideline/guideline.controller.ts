@@ -106,7 +106,7 @@ export class GuidelineController {
     return this.guidelineService.updateGuideline(currentUser.id_user, dto);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a guideline' })
   @Delete('deleteGuideline/:id_family/:id_guideline')
   async deleteGuideline(
@@ -309,7 +309,7 @@ export class GuidelineController {
     return this.guidelineService.updateStep(currentUser.id_user, dto, file);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete step' })
   @Delete('deleteStep/:id_family/:id_guideline/:index')
   async deleteStep(

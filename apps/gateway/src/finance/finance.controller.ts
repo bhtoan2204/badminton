@@ -29,4 +29,24 @@ export class FinanceController {
       id_family,
     );
   }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get expenditure last 30 days' })
+  @Get('getExpenditure/:id_family')
+  async getExpenditure(
+    @CurrentUser() currentUser,
+    @Param('id_family') id_family: number,
+  ) {
+    // return this.financeService.getExpenditure(currentUser.id_user, id_family);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get income last 30 days' })
+  @Get('getIncome/:id_family')
+  async getIncome(
+    @CurrentUser() currentUser,
+    @Param('id_family') id_family: number,
+  ) {
+    // return this.financeService.getIncome(currentUser.id_user, id_family);
+  }
 }

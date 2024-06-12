@@ -120,7 +120,7 @@ export class ShoppingController {
     return this.shoppingService.updateShoppingItem(currentUser.id_user, dto);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete shopping list' })
   @Delete('deleteShoppingList/:id_family/:id_list')
   async deleteShoppingList(
@@ -135,7 +135,7 @@ export class ShoppingController {
     );
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete shopping item' })
   @Delete('deleteShoppingItem/:id_family/:id_list/:id_item')
   async deleteShoppingItem(

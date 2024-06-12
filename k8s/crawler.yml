@@ -23,7 +23,7 @@ spec:
       containers:
         - name: crawler
           image: mjkundta/crawler:<TAG>
-          command: ['pm2-runtime', 'dist/apps/crawler/src/main.js']
+          command: ['node', 'dist/apps/crawler/src/main.js']
           resources:
             limits:
               cpu: '100m'

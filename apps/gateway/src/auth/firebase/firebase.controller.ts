@@ -35,7 +35,7 @@ export class FirebaseController {
   }
 
   @ApiOperation({ summary: 'Delete FCM Token' })
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBody({
     description: 'FCM token',
     schema: {

@@ -28,7 +28,7 @@ import { UserService } from './user.service';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { CheckOTPDto } from './dto/checkOtp.dto';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @ApiTags('User')
 @Controller('user')
@@ -68,9 +68,8 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Forgot Password' })
+  @UseGuards(ThrottlerGuard)
   @Post('forgotPassword')
-  // @UseGuards(ThrottlerGuard)
-  // @Throttle(5, 900)
   async forgotPassword(@Body() data: ForgotPasswordDto) {
     return this.userService.forgotPassword(data);
   }

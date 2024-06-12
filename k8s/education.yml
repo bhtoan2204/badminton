@@ -23,7 +23,7 @@ spec:
       containers:
         - name: education
           image: mjkundta/education:<TAG>
-          command: ['pm2-runtime', 'dist/apps/education/src/main.js']
+          command: ['node', 'dist/apps/education/src/main.js']
           resources:
             limits:
               cpu: '100m'

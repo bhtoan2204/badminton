@@ -23,10 +23,10 @@ spec:
       containers:
         - name: family
           image: mjkundta/family:<TAG>
-          command: ['pm2-runtime', 'dist/apps/family/src/main.js']
+          command: ['node', 'dist/apps/family/src/main.js']
           resources:
             limits:
-              cpu: '100m'
+              cpu: '150m'
               memory: '512Mi'
           env:
             - name: NODE_ENV

@@ -23,7 +23,7 @@ spec:
       containers:
         - name: chat
           image: mjkundta/chat:<TAG>
-          command: ['pm2-runtime', 'dist/apps/chat/src/main.js']
+          command: ['node', 'dist/apps/chat/src/main.js']
           resources:
             limits:
               cpu: '100m'

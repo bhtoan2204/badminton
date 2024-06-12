@@ -23,7 +23,7 @@ spec:
       containers:
         - name: finance
           image: mjkundta/finance:<TAG>
-          command: ['pm2-runtime', 'dist/apps/finance/src/main.js']
+          command: ['node', 'dist/apps/finance/src/main.js']
           resources:
             limits:
               cpu: '100m'
