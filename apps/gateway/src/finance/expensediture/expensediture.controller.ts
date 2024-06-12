@@ -117,7 +117,7 @@ export class ExpenseditureController {
     return this.expenseService.updateExpensediture(currentUser.id_user, dto);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete expensediture' })
   @Delete('deleteExpense/:id_family/:id_income')
   async deleteExpense(

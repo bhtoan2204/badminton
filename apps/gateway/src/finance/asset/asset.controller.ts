@@ -64,7 +64,7 @@ export class AssetController {
     return this.expenseService.updateAsset(currentUser.id_user, dto);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete Asset' })
   @Delete('deleteAsset/:id_family/:id_asset')
   async deleteAsset(

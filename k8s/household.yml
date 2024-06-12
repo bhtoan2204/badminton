@@ -23,7 +23,7 @@ spec:
       containers:
         - name: household
           image: mjkundta/household:<TAG>
-          command: ['pm2-runtime', 'dist/apps/household/src/main.js']
+          command: ['node', 'dist/apps/household/src/main.js']
           resources:
             limits:
               cpu: '100m'

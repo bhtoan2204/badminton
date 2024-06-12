@@ -242,7 +242,7 @@ export class HouseholdController {
     return this.householdService.inputConsumableItem(currentUser.id_user, dto);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete household item' })
   @ApiParam({
     name: 'id_family',

@@ -23,7 +23,7 @@ spec:
       containers:
         - name: auth
           image: mjkundta/auth:<TAG>
-          command: ['pm2-runtime', 'dist/apps/auth/src/main.js']
+          command: ['node', 'dist/apps/auth/src/main.js']
           resources:
             limits:
               cpu: '200m'

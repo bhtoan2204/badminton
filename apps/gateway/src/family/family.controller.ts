@@ -78,7 +78,7 @@ export class FamilyController {
     );
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a family' })
   @Delete('deleteFamily')
   async deleteFamily(
@@ -112,7 +112,7 @@ export class FamilyController {
     return this.familyService.addMember(currentUser.id_user, data);
   }
 
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete member' })
   @Delete('deleteMember')
   async deleteMember(

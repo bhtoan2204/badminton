@@ -23,7 +23,7 @@ spec:
       containers:
         - name: calendar
           image: mjkundta/calendar:<TAG>
-          command: ['pm2-runtime', 'dist/apps/calendar/src/main.js']
+          command: ['node', 'dist/apps/calendar/src/main.js']
           resources:
             limits:
               cpu: '100m'
