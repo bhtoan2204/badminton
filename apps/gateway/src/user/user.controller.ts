@@ -55,7 +55,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   async getProfile(@CurrentUser() user) {
-    return { message: 'ok', data: user };
+    return this.userService.getProfile(user);
   }
 
   @HttpCode(HttpStatus.OK)

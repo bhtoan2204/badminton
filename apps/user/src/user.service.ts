@@ -42,6 +42,22 @@ export class UserService {
     }
   }
 
+  async getProfile(user: any) {
+    try {
+      const query = 'SELECT * FROM users where id_user = $1';
+      const parameters = [user.id_user];
+      const data = await this.entityManager.query(query, parameters);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...userWithoutPassword } = data[0];
+      return userWithoutPassword;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
   async check_phone(phone) {
     try {
       const query = 'SELECT * FROM check_phone_number_exists($1)';
