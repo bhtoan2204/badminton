@@ -107,17 +107,6 @@ export class UserService {
 
   async updateProfile(user, data) {
     try {
-      const { firstname, lastname } = data;
-      if (
-        (firstname && user.firstname === firstname) ||
-        (lastname && user.lastname === lastname) ||
-        (!firstname && !lastname)
-      ) {
-        throw new ConflictException({
-          message: 'No changes detected',
-          statusCode: HttpStatus.BAD_REQUEST,
-        });
-      }
       const source = this.userClient
         .send('userClient/update_profile', { user, data })
         .pipe(timeout(15000));
