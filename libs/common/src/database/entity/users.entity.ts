@@ -61,4 +61,10 @@ export class Users {
 
   @Column('varchar', { nullable: true })
   avatar: string;
+
+  @Column('varchar', { nullable: true })
+  genre: string;
+
+  @Column('date', { nullable: true })
+  birthdate: Date;
 }

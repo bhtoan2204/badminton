@@ -7,6 +7,7 @@ import {
   ValidatorConstraintInterface,
   ValidationOptions,
   registerDecorator,
+  IsEnum,
 } from 'class-validator';
 
 @ValidatorConstraint({ async: false })
@@ -22,6 +23,12 @@ export class IsNotEmptyPropertyConstraint
   defaultMessage(args: ValidationArguments) {
     return `${args.property} should not be empty if the other is empty.`;
   }
+}
+
+enum Gender {
+  Male = 'male',
+  Female = 'female',
+  GenderNotSpecified = 'not_specified',
 }
 
 export function IsNotEmptyProperty(
@@ -55,4 +62,17 @@ export class UpdateProfileDto {
   })
   @ApiProperty({ description: 'Last name', required: false })
   lastname: string;
+
+  @ApiProperty({ example: 'male', description: 'male, female, not_specified' })
+  @IsOptional()
+  @IsString()
+  @IsEnum(Gender, {
+    message: 'Invalid gender value (male, female, not_specified)',
+  })
+  genre: string;
+
+  @ApiProperty({ example: '2002-06-20' })
+  @IsOptional()
+  @IsString()
+  birthdate: string;
 }

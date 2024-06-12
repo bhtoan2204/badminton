@@ -45,6 +45,24 @@ export class UserService {
     }
   }
 
+  async getProfile(currentUser) {
+    try {
+      const source = this.userClient
+        .send('userClient/get_profile', currentUser)
+        .pipe(timeout(15000));
+      const data = await lastValueFrom(source);
+      return data;
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
   async changePassword(currentUser, data: ChangePasswordDto) {
     try {
       const source = this.userClient
@@ -107,17 +125,6 @@ export class UserService {
 
   async updateProfile(user, data) {
     try {
-      const { firstname, lastname } = data;
-      if (
-        (firstname && user.firstname === firstname) ||
-        (lastname && user.lastname === lastname) ||
-        (!firstname && !lastname)
-      ) {
-        throw new ConflictException({
-          message: 'No changes detected',
-          statusCode: HttpStatus.BAD_REQUEST,
-        });
-      }
       const source = this.userClient
         .send('userClient/update_profile', { user, data })
         .pipe(timeout(15000));
