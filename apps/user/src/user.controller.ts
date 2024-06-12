@@ -16,6 +16,12 @@ export class UserController {
     return await this.userService.createAccount(dto);
   }
 
+  @EventPattern('userClient/get_profile')
+  async handleGetProfile(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.userService.getProfile(data);
+  }
+
   @EventPattern('userClient/change_password')
   async handleChangePassword(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);

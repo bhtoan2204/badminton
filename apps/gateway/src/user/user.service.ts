@@ -45,6 +45,24 @@ export class UserService {
     }
   }
 
+  async getProfile(currentUser) {
+    try {
+      const source = this.userClient
+        .send('userClient/get_profile', currentUser)
+        .pipe(timeout(15000));
+      const data = await lastValueFrom(source);
+      return data;
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
   async changePassword(currentUser, data: ChangePasswordDto) {
     try {
       const source = this.userClient
