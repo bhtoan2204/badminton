@@ -171,7 +171,9 @@
       "entryFile": "src/main",
       "sourceRoot": "./",
       "compilerOptions": {
-        "tsConfigPath": "apps/finance/tsconfig.app.json"
+        "tsConfigPath": "apps/finance/tsconfig.app.json",
+        "assets": ["proto/*.proto"],
+        "watchAssets": true
       }
     },
     "shopping": {

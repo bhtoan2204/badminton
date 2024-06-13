@@ -1,11 +1,16 @@
+import { UploadFileRequest } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { EntityManager } from 'typeorm';
 import { validate, version, NIL } from 'uuid';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class ExpenseditureService {
-  constructor(private readonly entityManager: EntityManager) {}
+  constructor(
+    private readonly entityManager: EntityManager,
+    private readonly storageService: StorageService,
+  ) {}
 
   convertStringToUUID(string: string): string {
     if (validate(string) && version(string)) {
@@ -251,6 +256,45 @@ export class ExpenseditureService {
         data: 'Income deleted successfully',
         message: 'Delete income',
       };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async uploadImageExpense(
+    id_user: string,
+    id_family: number,
+    id_expenditure: number,
+    file: any,
+  ) {
+    try {
+      let fileUrl = null;
+      if (file) {
+        const filename =
+          'expense_' + id_user + '_' + Date.now() + '_' + file.originalname;
+        const params: UploadFileRequest = {
+          file: new Uint8Array(file.buffer.data),
+          fileName: filename,
+        };
+        const uploadImageData =
+          await this.storageService.uploadImageExpense(params);
+        fileUrl = uploadImageData.fileUrl;
+        const query = `UPDATE finance_expenditure SET image_url = $1 WHERE id_expenditure = $2 AND id_family = $3 RETURNING *;`;
+        const updateParams = [fileUrl, id_expenditure, id_family];
+        const data = await this.entityManager.query(query, updateParams);
+        return {
+          data: data[0],
+          message: 'Upload image to expense',
+        };
+      } else {
+        throw new RpcException({
+          message: 'Failed to upload image, maybe the image is not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
     } catch (error) {
       throw new RpcException({
         message: error.message,

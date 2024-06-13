@@ -24,7 +24,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { GuidelineService } from './guideline.service';
-import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../utils';
+import {
+  CurrentUser,
+  JwtAuthGuard,
+  MemberFamilyGuard,
+  Permission,
+  PERMISSION_GUIDELINE,
+} from '../utils';
 import { CreateGuidelineDto } from './dto/createGuideline.dto';
 import { UpdateGuidelineDto } from './dto/updateGuideline.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -34,6 +40,7 @@ import { ImageFileInterceptor } from '../user/interceptor/imageFile.interceptor'
 @Controller('guideline')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@Permission([PERMISSION_GUIDELINE])
 export class GuidelineController {
   constructor(private readonly guidelineService: GuidelineService) {}
 

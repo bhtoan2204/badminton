@@ -18,7 +18,13 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../utils';
+import {
+  CurrentUser,
+  JwtAuthGuard,
+  MemberFamilyGuard,
+  Permission,
+  PERMISSION_SHOPPING,
+} from '../utils';
 import { CreateShoppingListDto } from './dto/createShoppingList.dto';
 import { CreateShoppingItemDto } from './dto/createShoppingItem.dto';
 import { UpdateShoppingListDto } from './dto/updateShoppingList.dto';
@@ -28,6 +34,7 @@ import { UpdateShoppingItemDto } from './dto/updateShoppingItem.dto';
 @Controller('shopping')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@Permission([PERMISSION_SHOPPING])
 export class ShoppingController {
   constructor(private readonly shoppingService: ShoppingService) {}
 

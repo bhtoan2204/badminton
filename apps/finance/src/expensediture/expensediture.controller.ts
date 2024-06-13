@@ -107,4 +107,15 @@ export class ExpenseditureController {
       data.id_expenditure,
     );
   }
+
+  @EventPattern('financeClient/uploadImageExpense')
+  async uploadImageExpense(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.expenseService.uploadImageExpense(
+      data.id_user,
+      data.id_family,
+      data.id_expenditure,
+      data.file,
+    );
+  }
 }

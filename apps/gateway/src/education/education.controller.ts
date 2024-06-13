@@ -18,7 +18,13 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../utils';
+import {
+  CurrentUser,
+  JwtAuthGuard,
+  MemberFamilyGuard,
+  Permission,
+  PERMISSION_EDUCATION,
+} from '../utils';
 import { EducationService } from './education.service';
 import { CreateEducationDto } from './dto/createEducation.dto';
 import { UpdateEducationDto } from './dto/updateEducation.dto';
@@ -27,6 +33,7 @@ import { UpdateEducationDto } from './dto/updateEducation.dto';
 @Controller('education')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@Permission([PERMISSION_EDUCATION])
 export class EducationController {
   constructor(private readonly educationService: EducationService) {}
 

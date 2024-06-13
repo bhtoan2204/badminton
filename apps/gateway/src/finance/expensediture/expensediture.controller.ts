@@ -9,24 +9,37 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiParam,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { ExpenseditureService } from './expensediture.service';
-import { CurrentUser, JwtAuthGuard } from '../../utils';
+import {
+  CurrentUser,
+  JwtAuthGuard,
+  MemberFamilyGuard,
+  Permission,
+  PERMISSION_FINANCE,
+} from '../../utils';
 import { CreateExpenseDto } from './dto/createExpense.dto';
 import { UpdateExpenseDto } from './dto/updateExpense.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageFileInterceptor } from '../../user/interceptor/imageFile.interceptor';
 
 @ApiTags('Expensediture')
 @Controller('finance/expensediture')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@Permission([PERMISSION_FINANCE])
 export class ExpenseditureController {
   constructor(private readonly expenseService: ExpenseditureService) {}
 
@@ -129,6 +142,44 @@ export class ExpenseditureController {
       currentUser.id_user,
       id_family,
       id_income,
+    );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Upload image to expense' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        expenseImg: {
+          type: 'string',
+          format: 'binary',
+          description: 'The image of the expense (optional)',
+        },
+      },
+    },
+  })
+  @ApiParam({ name: 'id_expenditure', required: true, type: Number })
+  @ApiParam({ name: 'id_family', required: true, type: Number })
+  @UseInterceptors(
+    FileInterceptor(
+      'expenseImg',
+      new ImageFileInterceptor().createMulterOptions(),
+    ),
+  )
+  @Post('uploadImageExpense/:id_family/:id_expenditure')
+  async uploadImageExpense(
+    @CurrentUser() currentUser,
+    @Param('id_family') id_family: number,
+    @Param('id_expenditure') id_expenditure: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.expenseService.uploadImageExpense(
+      currentUser.id_user,
+      id_family,
+      id_expenditure,
+      file,
     );
   }
 }

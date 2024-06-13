@@ -22,7 +22,13 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../../utils';
+import {
+  CurrentUser,
+  JwtAuthGuard,
+  MemberFamilyGuard,
+  Permission,
+  PERMISSION_INVOICE,
+} from '../../utils';
 import { UtilitiesService } from './utilities.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../../user/interceptor/imageFile.interceptor';
@@ -31,6 +37,7 @@ import { ImageFileInterceptor } from '../../user/interceptor/imageFile.intercept
 @Controller('utilities')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@Permission([PERMISSION_INVOICE])
 export class UtilitiesController {
   constructor(private readonly utilitiesService: UtilitiesService) {}
 

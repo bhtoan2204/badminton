@@ -147,4 +147,29 @@ export class ExpenseditureService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async uploadImageExpense(
+    id_user: string,
+    id_family: number,
+    id_expenditure: number,
+    file: any,
+  ) {
+    try {
+      const response = this.financeClient
+        .send('financeClient/uploadImageExpense', {
+          id_user,
+          id_family,
+          id_expenditure,
+          file,
+        })
+        .pipe(timeout(15000));
+      const data = await lastValueFrom(response);
+      return data;
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }

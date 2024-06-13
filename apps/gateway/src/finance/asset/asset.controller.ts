@@ -18,7 +18,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AssetService } from './asset.service';
-import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../../utils';
+import {
+  CurrentUser,
+  JwtAuthGuard,
+  MemberFamilyGuard,
+  Permission,
+  PERMISSION_FINANCE,
+} from '../../utils';
 import { CreateAssetDto } from './dto/createAsset.dto';
 import { UpdateAssetDto } from './dto/updateAsset.dto';
 
@@ -26,6 +32,7 @@ import { UpdateAssetDto } from './dto/updateAsset.dto';
 @Controller('finance/asset')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@Permission([PERMISSION_FINANCE])
 export class AssetController {
   constructor(private readonly expenseService: AssetService) {}
 

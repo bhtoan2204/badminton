@@ -18,7 +18,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CalendarService } from './calendar.service';
-import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../utils';
+import {
+  CurrentUser,
+  JwtAuthGuard,
+  MemberFamilyGuard,
+  Permission,
+  PERMISSION_CALENDAR,
+} from '../utils';
 import { CreateCalendarDto } from './dto/createCalendar.dto';
 import { UpdateCalendarDto } from './dto/updateCalendar.dto';
 import { GetEventDTO } from './dto/getEvent.dto';
@@ -29,6 +35,7 @@ import { UpdateCategoryEventDto } from './dto/updateCategoryEvent.dto';
 @Controller('calendar')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@Permission([PERMISSION_CALENDAR])
 export class CalendarController {
   constructor(private readonly calendarService: CalendarService) {}
 

@@ -2,8 +2,9 @@ import { Module, forwardRef } from '@nestjs/common';
 import { HouseholdController } from './household.controller';
 import { HouseholdService } from './household.service';
 import { RmqModule } from '@app/common';
-import { FAMILY_SERVICE, HOUSEHOLD_SERVICE } from '../utils';
+import { FAMILY_SERVICE, HOUSEHOLD_SERVICE, PermissionGuard } from '../utils';
 import { RoomModule } from './room/room.module';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -12,7 +13,13 @@ import { RoomModule } from './room/room.module';
     forwardRef(() => RoomModule),
   ],
   controllers: [HouseholdController],
-  providers: [HouseholdService],
+  providers: [
+    HouseholdService,
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard,
+    },
+  ],
   exports: [RmqModule],
 })
 export class HouseholdModule {}
