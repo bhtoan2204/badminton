@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthApiModule } from './auth/auth.module';
 import { PaymentModule } from './payment/payment.module';
 import { FamilyModule } from './family/family.module';
@@ -17,7 +17,9 @@ import { FinanceModule } from './finance/finance.module';
 import { ShoppingModule } from './shopping/shopping.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { MailModule } from './mailer/mailer.module';
+import { RedisModule } from '@nestjs-modules/ioredis';
 import * as Joi from 'joi';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -55,6 +57,14 @@ import * as Joi from 'joi';
         process.env.NODE_ENV === 'production'
           ? './apps/gateway/.env.production'
           : './apps/gateway/.env',
+    }),
+    RedisModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'single',
+        url: configService.get<string>('REDIS_URL'),
+      }),
+      inject: [ConfigService],
     }),
     AuthApiModule,
     UserModule,

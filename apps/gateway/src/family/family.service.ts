@@ -6,10 +6,15 @@ import { CreateFamilyDto } from './dto/createFamily.dto';
 import { MemberFamilyDto } from './dto/memberFamily.dto';
 import { DeleteMemberDTO } from './dto/deleteFamily.dto';
 import { UpdateFamilyDTO } from './dto/updateFamily.dto';
+import { InjectRedis } from '@nestjs-modules/ioredis';
+import Redis from 'ioredis';
 
 @Injectable()
 export class FamilyService {
-  constructor(@Inject(FAMILY_SERVICE) private familyClient: ClientProxy) {}
+  constructor(
+    @Inject(FAMILY_SERVICE) private familyClient: ClientProxy,
+    @InjectRedis() private readonly redisService: Redis
+  ) {}
 
   async getFamily(id_user, id_family) {
     try {
@@ -77,6 +82,8 @@ export class FamilyService {
         .send('family/add_Member', { id_user, memberFamilyDto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
+      const cacheKey = `familyCheck:${memberFamilyDto.id_family}:${id_user}`;
+      await this.redisService.del(cacheKey);
       return data;
     } catch (error) {
       if (error.name === 'TimeoutError') {
@@ -92,6 +99,8 @@ export class FamilyService {
         .send('family/delete_Member', { id_user, deleteMemberDTO })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
+      const cacheKey = `familyCheck:${deleteMemberDTO.id_family}:${id_user}`;
+      await this.redisService.del(cacheKey);
       return data;
     } catch (error) {
       if (error.name === 'TimeoutError') {

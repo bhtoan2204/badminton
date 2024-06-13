@@ -10,6 +10,8 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+    mem_limit: 2g
+    cpu_shares: 1024
 
   shopping:
     image: mjkundta/shopping:${TAG}
@@ -21,6 +23,8 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+    mem_limit: 2g
+    cpu_shares: 1024
 
   invoice:
     image: mjkundta/invoice:${TAG}
@@ -32,3 +36,5 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+    mem_limit: 2g
+    cpu_shares: 1024

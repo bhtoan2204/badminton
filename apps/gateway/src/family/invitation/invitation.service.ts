@@ -2,11 +2,14 @@ import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { FAMILY_SERVICE } from "../../utils";
 import { lastValueFrom, timeout } from "rxjs";
+import { InjectRedis } from "@nestjs-modules/ioredis";
+import Redis from "ioredis";
 
 @Injectable()
 export class InvitationService {
   constructor(
-    @Inject(FAMILY_SERVICE) private familyClient: ClientProxy
+    @Inject(FAMILY_SERVICE) private familyClient: ClientProxy,
+    @InjectRedis() private readonly redisService: Redis
   ) {}
 
   async getInvitationCode(id_user: string, id_family: number) {
@@ -45,6 +48,8 @@ export class InvitationService {
         .send('familyClient/handleInvitation', { id_user, id_family, code })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
+      const cacheKey = `familyCheck:${id_family}:${id_user}`;
+      await this.redisService.del(cacheKey);
       return data;
     } catch (error) {
       if (error.name === 'TimeoutError') {
