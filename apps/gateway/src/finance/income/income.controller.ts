@@ -19,14 +19,21 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { IncomeService } from './income.service';
-import { CurrentUser, JwtAuthGuard } from '../../utils';
+import {
+  CurrentUser,
+  JwtAuthGuard,
+  MemberFamilyGuard,
+  Permission,
+  PERMISSION_FINANCE,
+} from '../../utils';
 import { CreateIncomeDto } from './dto/createIncome.dto';
 import { UpdateIncomeDto } from './dto/updateIncome.dto';
 
 @ApiTags('Income')
 @Controller('finance/income')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@Permission([PERMISSION_FINANCE])
 export class IncomeController {
   constructor(private readonly incomeService: IncomeService) {}
 

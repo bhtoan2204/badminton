@@ -15,6 +15,8 @@ service StorageService {
   rpc deleteImageInvoice(DeleteFileRequest) returns (DeleteFileResponse);
   rpc uploadImageUtility(UploadFileRequest) returns (UploadFileResponse);
   rpc deleteImageUtility(DeleteFileRequest) returns (DeleteFileResponse);
+  rpc uploadImageExpense(UploadFileRequest) returns (UploadFileResponse);
+  rpc deleteImageExpense(DeleteFileRequest) returns (DeleteFileResponse);
 }
 
 message UploadFileRequest {

@@ -1,12 +1,26 @@
-import { Controller, Get, HttpCode, HttpStatus, Query, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from "../../utils";
-import { InvitationService } from "./invitation.service";
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  CurrentUser,
+  JwtAuthGuard,
+  MemberFamilyGuard,
+  Permission,
+  PERMISSION_FAMILY,
+} from '../../utils';
+import { InvitationService } from './invitation.service';
 
 @ApiTags('Invitation')
-@Controller("invitation")
+@Controller('invitation')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
+@Permission([PERMISSION_FAMILY])
 export class InvitationController {
   constructor(private readonly invitationService: InvitationService) {}
 
@@ -18,7 +32,10 @@ export class InvitationController {
     @Query('id_family') id_family: number,
     @CurrentUser() currentUser,
   ) {
-    return this.invitationService.getInvitationCode(currentUser.id_user, id_family);
+    return this.invitationService.getInvitationCode(
+      currentUser.id_user,
+      id_family,
+    );
   }
 
   @HttpCode(HttpStatus.CREATED)
@@ -29,7 +46,10 @@ export class InvitationController {
     @Query('id_family') id_family: number,
     @CurrentUser() currentUser,
   ) {
-    return this.invitationService.generateInvitation(currentUser.id_user, id_family);
+    return this.invitationService.generateInvitation(
+      currentUser.id_user,
+      id_family,
+    );
   }
 
   @HttpCode(HttpStatus.OK)
@@ -40,6 +60,10 @@ export class InvitationController {
     @Query('code') code: string,
     @CurrentUser() currentUser,
   ) {
-    return this.invitationService.handleInvitation(currentUser.id_user, id_family, code);
+    return this.invitationService.handleInvitation(
+      currentUser.id_user,
+      id_family,
+      code,
+    );
   }
 }

@@ -26,7 +26,13 @@ import {
 import { InvoiceService } from './invoice.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../user/interceptor/imageFile.interceptor';
-import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../utils';
+import {
+  CurrentUser,
+  JwtAuthGuard,
+  MemberFamilyGuard,
+  Permission,
+  PERMISSION_INVOICE,
+} from '../utils';
 import { CreateInvoiceTypeDto } from './dto/createInvoiceType.dto';
 import { UpdateInvoiceTypeDto } from './dto/updateInvoiceType.dto';
 import { CreateInvoiceDto } from './dto/createInvoice.dto';
@@ -38,6 +44,7 @@ import { UpdateInvoiceItemDto } from './dto/updateInvoiceItem.dto';
 @Controller('invoice')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@Permission([PERMISSION_INVOICE])
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}
 

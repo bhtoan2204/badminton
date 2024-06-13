@@ -20,7 +20,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { FamilyService } from './family.service';
-import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../utils';
+import {
+  CurrentUser,
+  JwtAuthGuard,
+  MemberFamilyGuard,
+  Permission,
+  PERMISSION_FAMILY,
+} from '../utils';
 import { CreateFamilyDto } from './dto/createFamily.dto';
 import { MemberFamilyDto } from './dto/memberFamily.dto';
 import { DeleteMemberDTO } from './dto/deleteFamily.dto';
@@ -32,6 +38,7 @@ import { ImageFileInterceptor } from '../user/interceptor/imageFile.interceptor'
 @Controller('family')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@Permission([PERMISSION_FAMILY])
 export class FamilyController {
   constructor(private readonly familyService: FamilyService) {}
 

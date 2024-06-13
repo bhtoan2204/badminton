@@ -12,7 +12,13 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RoomService } from './room.service';
-import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../../utils';
+import {
+  CurrentUser,
+  JwtAuthGuard,
+  MemberFamilyGuard,
+  Permission,
+  PERMISSION_HOUSEHOLD,
+} from '../../utils';
 import { CreateRoomDto } from './dto/createRoom.dto';
 import { UpdateRoomDto } from './dto/updateRoom.dto';
 
@@ -20,6 +26,7 @@ import { UpdateRoomDto } from './dto/updateRoom.dto';
 @Controller('room')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@Permission([PERMISSION_HOUSEHOLD])
 export class RoomController {
   constructor(private readonly roomService: RoomService) {}
 
