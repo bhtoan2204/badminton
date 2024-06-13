@@ -12,6 +12,8 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+    mem_limit: 2g
+    cpu_shares: 1024
 
   auth:
     image: mjkundta/auth:${TAG}
@@ -23,6 +25,8 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+    mem_limit: 2g
+    cpu_shares: 1024
 
   user:
     image: mjkundta/user:${TAG}
@@ -34,3 +38,5 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+    mem_limit: 2g
+    cpu_shares: 1024

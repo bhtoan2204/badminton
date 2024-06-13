@@ -10,6 +10,8 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+    mem_limit: 2g
+    cpu_shares: 1024
 
   # mailer:
   #   image: mjkundta/mailer:${TAG}
@@ -32,3 +34,5 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+    mem_limit: 2g
+    cpu_shares: 1024

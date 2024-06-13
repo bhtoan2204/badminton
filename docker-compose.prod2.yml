@@ -10,6 +10,8 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+    mem_limit: 2g
+    cpu_shares: 1024
 
   guideline:
     image: mjkundta/guideline:${TAG}
@@ -21,6 +23,8 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+    mem_limit: 2g
+    cpu_shares: 1024
 
   notification:
     image: mjkundta/notification:${TAG}
@@ -32,3 +36,5 @@ services:
     restart: on-failure
     environment:
       - NODE_ENV=production
+    mem_limit: 2g
+    cpu_shares: 1024

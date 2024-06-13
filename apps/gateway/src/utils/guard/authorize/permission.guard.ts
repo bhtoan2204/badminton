@@ -11,15 +11,16 @@ export class PermissionGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
-    const perrmissions = this.reflector.get<string[]>(
+    const permissions = this.reflector.getAllAndOverride<string[]>(
       PERMISSION_KEY,
-      context.getHandler(),
+      [context.getHandler(), context.getClass()],
     );
     const id_family =
       request.body.id_family ||
       request.params.id_family ||
       request.query.id_family;
-    console.log(perrmissions);
+    
+    console.log(permissions);
     console.log(id_family);
     return true;
   }
