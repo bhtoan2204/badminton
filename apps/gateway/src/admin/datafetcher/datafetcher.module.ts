@@ -1,11 +1,10 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { DatafetcherService } from './datafetcher.service';
 import { DatafetcherController } from './datafetcher.controller';
-import { RmqModule } from '@app/common';
-import { ELASTICSEARCH_SERVICE } from '../../utils';
+import { AdminModule } from '../admin.module';
 
 @Module({
-  imports: [RmqModule.register({ name: ELASTICSEARCH_SERVICE })],
+  imports: [forwardRef(() => AdminModule)],
   controllers: [DatafetcherController],
   providers: [DatafetcherService],
 })

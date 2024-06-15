@@ -8,6 +8,7 @@ import { RabbitMqModule } from './rabbitmq/rabbitmq.module';
 import { ProxyModule } from './proxy/proxy.module';
 import { DataStatsModule } from './postgresql/datastats.module';
 import { DatafetcherModule } from './datafetcher/datafetcher.module';
+import { PackageModule } from './packages/package.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { DatafetcherModule } from './datafetcher/datafetcher.module';
     forwardRef(() => RabbitMqModule),
     forwardRef(() => DataStatsModule),
     forwardRef(() => DatafetcherModule),
+    forwardRef(() => PackageModule),
   ],
   controllers: [SearchController],
   providers: [SearchService],

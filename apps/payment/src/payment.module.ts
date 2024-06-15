@@ -23,5 +23,6 @@ import * as Joi from 'joi';
   ],
   controllers: [PaymentController],
   providers: [PaymentService],
+  exports: [RmqModule, DatabaseModule],
 })
 export class PaymentModule {}
