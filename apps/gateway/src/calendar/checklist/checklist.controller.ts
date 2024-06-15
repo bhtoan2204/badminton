@@ -1,25 +1,52 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../../utils';
-import { CalendarService } from '../calendar.service';
+import { ChecklistService } from './checklist.service';
+import { CreateChecklistDto } from './dto/createChecklist.dto';
+import { UpdateChecklistDto } from './dto/updateChecklist.dto';
 
 @ApiTags('Checklist')
 @Controller('checklist')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, MemberFamilyGuard)
 export class ChecklistController {
-  constructor(
-    private readonly calendarService: CalendarService,
-  ){}
+  constructor(private readonly checkListService: ChecklistService) {}
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all checklist of family' })
+  @ApiQuery({ name: 'page', required: true, type: Number })
+  @ApiQuery({ name: 'itemsPerPage', required: true, type: Number })
   @Get('getAllChecklist/:id_family')
   async getAllChecklist(
     @CurrentUser() currentUser,
     @Param('id_family') id_family: number,
+    @Query('page') page: number,
+    @Query('itemsPerPage') itemsPerPage: number,
   ) {
-    return this.calendarService.getAllChecklist(currentUser.id_user, id_family);
+    return this.checkListService.getAllChecklist(
+      currentUser.id_user,
+      id_family,
+      page,
+      itemsPerPage,
+    );
   }
 
   @HttpCode(HttpStatus.OK)
@@ -27,9 +54,9 @@ export class ChecklistController {
   @Post('createChecklist')
   async createChecklist(
     @CurrentUser() currentUser,
-    @Body() dto: any,
+    @Body() dto: CreateChecklistDto,
   ) {
-    return this.calendarService.createChecklist(currentUser.id_user, dto);
+    return this.checkListService.createChecklist(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -37,18 +64,25 @@ export class ChecklistController {
   @Put('updateChecklist')
   async updateChecklist(
     @CurrentUser() currentUser,
-    @Body() dto: any,
+    @Body() dto: UpdateChecklistDto,
   ) {
-    return this.calendarService.updateChecklist(currentUser.id_user, dto);
+    return this.checkListService.updateChecklist(currentUser.id_user, dto);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete checklist of family' })
-  @Delete('deleteChecklist/:id_checklist')
+  @ApiParam({ name: 'id_checklist', required: true, type: Number })
+  @ApiParam({ name: 'id_family', required: true, type: Number })
+  @Delete('deleteChecklist/:id_checklist/:id_family')
   async deleteChecklist(
     @CurrentUser() currentUser,
     @Param('id_checklist') id_checklist: number,
+    @Param('id_family') id_family: number,
   ) {
-    return this.calendarService.deleteChecklist(currentUser.id_user, id_checklist);
+    return this.checkListService.deleteChecklist(
+      currentUser.id_user,
+      id_checklist,
+      id_family,
+    );
   }
 }

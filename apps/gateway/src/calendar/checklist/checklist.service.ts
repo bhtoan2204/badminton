@@ -9,10 +9,20 @@ export class ChecklistService {
     @Inject(CALENDAR_SERVICE) private readonly calendarClient: ClientProxy,
   ) {}
 
-  async getAllChecklist(id_user: string, id_family: number) {
+  async getAllChecklist(
+    id_user: string,
+    id_family: number,
+    page: number,
+    itemsPerPage: number,
+  ) {
     try {
       const response = this.calendarClient
-        .send('calendarClient/getAllChecklist', { id_user, id_family })
+        .send('calendarClient/getAllChecklist', {
+          id_user,
+          id_family,
+          page,
+          itemsPerPage,
+        })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -54,10 +64,18 @@ export class ChecklistService {
     }
   }
 
-  async deleteChecklist(id_user: string, id_checklist: number) {
+  async deleteChecklist(
+    id_user: string,
+    id_checklist: number,
+    id_family: number,
+  ) {
     try {
       const response = this.calendarClient
-        .send('calendarClient/deleteChecklist', { id_user, id_checklist })
+        .send('calendarClient/deleteChecklist', {
+          id_user,
+          id_checklist,
+          id_family,
+        })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
