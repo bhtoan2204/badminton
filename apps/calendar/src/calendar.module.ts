@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CalendarController } from './calendar.controller';
 import { CalendarService } from './calendar.service';
 import { DatabaseModule, RmqModule } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
+import { ChecklistModule } from './checklist/checklist.module';
 
 @Module({
   imports: [
@@ -20,8 +21,10 @@ import * as Joi from 'joi';
     }),
     RmqModule,
     DatabaseModule,
+    forwardRef(() => ChecklistModule),
   ],
   controllers: [CalendarController],
   providers: [CalendarService],
+  exports: [RmqModule, DatabaseModule],
 })
 export class CalendarModule {}

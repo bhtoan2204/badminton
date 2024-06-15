@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import {
+  Checklist,
+  Family,
   FirebaseService,
   GlobalJwtModule,
   RmqModule,
@@ -28,7 +30,7 @@ import * as Joi from 'joi';
     DatabaseModule,
     AuthModule,
     RmqModule,
-    TypeOrmModule.forFeature([Users]),
+    TypeOrmModule.forFeature([Users, Family, Checklist]),
     GlobalJwtModule,
   ],
   controllers: [AuthController],

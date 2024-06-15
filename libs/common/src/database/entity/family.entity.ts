@@ -4,7 +4,12 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
 } from 'typeorm';
+import { Users } from './users.entity';
+import { Checklist } from './checklist.entity';
 
 @Entity('family')
 export class Family {
@@ -14,8 +19,21 @@ export class Family {
   @Column('int')
   quantity: number;
 
+  @Column('varchar', { nullable: false })
+  name: string;
+
   @Column('varchar', { nullable: true })
   description: string;
+
+  @ManyToOne(() => Users, (user) => user.families)
+  @JoinColumn({ name: 'owner_id' })
+  owner_id: Users;
+
+  @Column('date', { nullable: true })
+  expired_at: Date;
+
+  @Column('varchar', { nullable: true })
+  avatar: string;
 
   @CreateDateColumn()
   created_at: Date;
@@ -23,6 +41,6 @@ export class Family {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @Column('varchar', { nullable: true })
-  name: string;
+  @OneToMany(() => Checklist, (checklist) => checklist.family)
+  checklists: Checklist[];
 }
