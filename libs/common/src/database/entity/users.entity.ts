@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { LoginType } from '../enum/login_type.enum';
+import { Family } from './family.entity';
 
 @Entity('users')
 export class Users {
@@ -67,4 +69,7 @@ export class Users {
 
   @Column('date', { nullable: true })
   birthdate: Date;
+
+  @OneToMany(() => Family, (family) => family.owner_id)
+  families: Family[];
 }
