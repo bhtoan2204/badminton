@@ -96,12 +96,21 @@ export class ExpenseditureController {
       year,
     );
   }
-  // @HttpCode(HttpStatus.OK)
-  // @ApiOperation({ summary: 'Get expenseditures by its id' })
-  // @Get('getExpenseById/:id_family/:id_expenditure')
-  // async getExpenseById(@CurrentUser() currentUser, @Param('id_family') id_family: number, @Param('id_expenditure') id_expenditure: number) {
-  //   return this.expenseService.getExpenseditureById(currentUser.id_user, id_family, id_expenditure);
-  // }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get expenseditures by its id' })
+  @Get('getExpenseById/:id_family/:id_expenditure')
+  async getExpenseById(
+    @CurrentUser() currentUser,
+    @Param('id_family') id_family: number,
+    @Param('id_expenditure') id_expenditure: number,
+  ) {
+    return this.expenseService.getExpenseditureById(
+      currentUser.id_user,
+      id_family,
+      id_expenditure,
+    );
+  }
 
   // @HttpCode(HttpStatus.OK)
   // @ApiOperation({ summary: 'Get statiscal expenseditures last six months' })

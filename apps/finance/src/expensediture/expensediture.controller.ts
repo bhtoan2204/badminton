@@ -62,7 +62,7 @@ export class ExpenseditureController {
   }
 
   @EventPattern('financeClient/getExpenseditureType')
-  async getExpense(@Payload() data: any, @Ctx() context: RmqContext) {
+  async getExpenseditureType(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.expenseService.getExpenseditureType(
       data.id_user,

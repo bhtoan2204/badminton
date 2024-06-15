@@ -52,9 +52,12 @@ export class InvoiceService {
     try {
       const query = 'SELECT * FROM f_get_invoices($1, $2, $3, $4)';
       const params = [id_user, id_family, page, itemsPerPage];
-      const data = await this.entityManager.query(query, params);
+      const countQuery = 'SELECT COUNT(*) FROM invoice WHERE id_family = $1';
+      const countParams = [id_family];
+      const [data, totalCount] = await Promise.all([this.entityManager.query(query, params), this.entityManager.query(countQuery, countParams)]);
       return {
-        data: data,
+        data,
+        totalCount,
         message: 'Get invoices',
       };
     } catch (error) {

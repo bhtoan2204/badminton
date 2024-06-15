@@ -26,7 +26,9 @@
       "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/auth/tsconfig.app.json",
-        "assets": ["proto/*.proto"],
+        "assets": [
+          "proto/*.proto"
+        ],
         "watchAssets": true
       }
     },
@@ -55,7 +57,9 @@
       "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/family/tsconfig.app.json",
-        "assets": ["proto/*.proto"]
+        "assets": [
+          "proto/*.proto"
+        ]
       }
     },
     "storage": {
@@ -65,7 +69,9 @@
       "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/storage/tsconfig.app.json",
-        "assets": ["proto/*.proto"],
+        "assets": [
+          "proto/*.proto"
+        ],
         "watchAssets": true
       }
     },
@@ -76,7 +82,9 @@
       "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/chat/tsconfig.app.json",
-        "assets": ["proto/*.proto"],
+        "assets": [
+          "proto/*.proto"
+        ],
         "watchAssets": true
       }
     },
@@ -123,7 +131,9 @@
       "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/guideline/tsconfig.app.json",
-        "assets": ["proto/*.proto"],
+        "assets": [
+          "proto/*.proto"
+        ],
         "watchAssets": true
       }
     },
@@ -161,7 +171,9 @@
       "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/household/tsconfig.app.json",
-        "assets": ["proto/*.proto"],
+        "assets": [
+          "proto/*.proto"
+        ],
         "watchAssets": true
       }
     },
@@ -172,7 +184,9 @@
       "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/finance/tsconfig.app.json",
-        "assets": ["proto/*.proto"],
+        "assets": [
+          "proto/*.proto"
+        ],
         "watchAssets": true
       }
     },
@@ -192,8 +206,19 @@
       "sourceRoot": "./",
       "compilerOptions": {
         "tsConfigPath": "apps/invoice/tsconfig.app.json",
-        "assets": ["proto/*.proto"],
+        "assets": [
+          "proto/*.proto"
+        ],
         "watchAssets": true
+      }
+    },
+    "background": {
+      "type": "application",
+      "root": "apps/background",
+      "entryFile": "main",
+      "sourceRoot": "apps/background/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/background/tsconfig.app.json"
       }
     }
   }
