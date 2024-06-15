@@ -1,11 +1,10 @@
-import { RmqModule } from '@app/common';
-import { Module } from '@nestjs/common';
-import { ELASTICSEARCH_SERVICE } from '../../utils';
+import { forwardRef, Module } from '@nestjs/common';
 import { RabbitMqController } from './rabbitmq.controller';
 import { RabbitMqService } from './rabbitmq.service';
+import { AdminModule } from '../admin.module';
 
 @Module({
-  imports: [RmqModule.register({ name: ELASTICSEARCH_SERVICE })],
+  imports: [forwardRef(() => AdminModule)],
   controllers: [RabbitMqController],
   providers: [RabbitMqService],
 })

@@ -6,10 +6,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('package')
-export class Package {
+@Entity('package_extra')
+export class PackageExtra {
   @PrimaryGeneratedColumn()
-  id_package: number;
+  id_extra_package: number;
 
   @Column('varchar')
   name: string;
@@ -19,6 +19,9 @@ export class Package {
 
   @Column('varchar', { nullable: true })
   description: string;
+
+  @Column('boolean', { default: true })
+  is_active: boolean;
 
   @CreateDateColumn()
   created_at: Date;

@@ -19,9 +19,13 @@ export class AuthService {
 
   async validateGoogleUser(accessToken: string, profile: any) {
     try {
-      const getUserQuery = 'SELECT * FROM users where email = $1 and login_type = $2';
+      const getUserQuery =
+        'SELECT * FROM users where email = $1 and login_type = $2';
       const getUserParams = [profile.emails[0].value, LoginType.GOOGLE];
-      const userResult = await this.entityManager.query(getUserQuery, getUserParams);
+      const userResult = await this.entityManager.query(
+        getUserQuery,
+        getUserParams,
+      );
       const user = userResult[0];
       if (!user) {
         const query =
@@ -59,9 +63,13 @@ export class AuthService {
 
   async validateFacebookUser(accessToken: string, profile: any) {
     try {
-      const getUserQuery = 'SELECT * FROM users where email = $1 and login_type = $2';
+      const getUserQuery =
+        'SELECT * FROM users where email = $1 and login_type = $2';
       const getUserParams = [profile.emails[0].value, LoginType.FACEBOOK];
-      const userResult = await this.entityManager.query(getUserQuery, getUserParams);
+      const userResult = await this.entityManager.query(
+        getUserQuery,
+        getUserParams,
+      );
       const user = userResult[0];
       if (!user) {
         const query =
