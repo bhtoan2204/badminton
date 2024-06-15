@@ -27,12 +27,20 @@ export class UtilitiesService {
 
   async getUtilities(id_family: number, page: number, itemsPerPage: number) {
     try {
-      const data = await this.entityManager.query(
-        `SELECT * FROM utilities WHERE id_family = $1 LIMIT $2 OFFSET $3;`,
-        [id_family, itemsPerPage, (page - 1) * itemsPerPage],
-      );
+      const [data, countResult] = await Promise.all([
+        this.entityManager.query(
+          `SELECT * FROM utilities WHERE id_family = $1 LIMIT $2 OFFSET $3;`,
+          [id_family, itemsPerPage, (page - 1) * itemsPerPage]
+        ),
+        this.entityManager.query(
+          `SELECT COUNT(*) FROM utilities WHERE id_family = $1;`,
+          [id_family]
+        )
+      ]);
+      const totalCount = parseInt(countResult[0].count, 10);
       return {
         data,
+        totalCount,
         message: 'Utilities retrieved successfully',
       };
     } catch (error) {

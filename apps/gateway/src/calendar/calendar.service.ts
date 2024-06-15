@@ -7,6 +7,18 @@ import { UpdateCalendarDto } from './dto/updateCalendar.dto';
 
 @Injectable()
 export class CalendarService {
+  getAllChecklist(id_user: any, id_family: number) {
+    throw new Error('Method not implemented.');
+  }
+  createChecklist(id_user: any, dto: any) {
+    throw new Error('Method not implemented.');
+  }
+  updateChecklist(id_user: any, dto: any) {
+    throw new Error('Method not implemented.');
+  }
+  deleteChecklist(id_user: any, id_checklist: number) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @Inject(CALENDAR_SERVICE) private readonly calendarClient: ClientProxy,
   ) {}
