@@ -1,9 +1,16 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { EntityManager } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
 import { StorageService } from './storage/storage.service';
-import { DeleteFileRequest, UploadFileRequest } from '@app/common';
+import {
+  DeleteFileRequest,
+  Family,
+  FamilyExtraPackages,
+  PackageExtra,
+  UploadFileRequest,
+} from '@app/common';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class FamilyService {
@@ -11,7 +18,43 @@ export class FamilyService {
     private readonly configService: ConfigService,
     private readonly entityManager: EntityManager,
     private readonly storageService: StorageService,
+    @InjectRepository(Family) private familyRepository: Repository<Family>,
+    @InjectRepository(PackageExtra)
+    private packageExtraRepository: Repository<PackageExtra>,
+    @InjectRepository(FamilyExtraPackages)
+    private familyExtraPackagesRepository: Repository<FamilyExtraPackages>,
   ) {}
+
+  async checkExtraPackage(
+    id_family: number,
+    permissions: string[],
+  ): Promise<boolean> {
+    try {
+      const family = await this.familyRepository.findOne({
+        where: { id_family },
+      });
+
+      if (!family) {
+        throw new Error('Family not found');
+      }
+      const familyExtraPackages = await this.familyExtraPackagesRepository.find(
+        {
+          where: { family: { id_family } },
+          relations: ['extra_package'],
+        },
+      );
+      const extraPackageNames = familyExtraPackages.map(
+        (fep) => fep.extra_package.name,
+      );
+
+      const hasAllPermissions = permissions.every((permission) =>
+        extraPackageNames.includes(permission),
+      );
+      return hasAllPermissions;
+    } catch (error) {
+      throw new Error(`Error checking extra packages: ${error.message}`);
+    }
+  }
 
   async checkIsMember(id_user: string, id_family: number): Promise<boolean> {
     try {

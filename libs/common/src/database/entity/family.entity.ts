@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Users } from './users.entity';
 import { Checklist } from './checklist.entity';
+import { FamilyExtraPackages } from './family_package_extra.entity';
 
 @Entity('family')
 export class Family {
@@ -43,4 +44,10 @@ export class Family {
 
   @OneToMany(() => Checklist, (checklist) => checklist.family)
   checklists: Checklist[];
+
+  @OneToMany(
+    () => FamilyExtraPackages,
+    (familyExtraPackage) => familyExtraPackage.family,
+  )
+  familyExtraPackages: FamilyExtraPackages[];
 }

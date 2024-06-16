@@ -2,13 +2,7 @@ import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from './user.service';
-import {
-  Checklist,
-  DatabaseModule,
-  Family,
-  RmqModule,
-  Users,
-} from '@app/common';
+import { DatabaseModule, RmqModule, Users } from '@app/common';
 import { StorageModule } from './storage/storage.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
@@ -40,7 +34,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
           : './apps/user/.env',
     }),
     DatabaseModule,
-    TypeOrmModule.forFeature([Users, Family, Checklist]),
+    TypeOrmModule.forFeature([Users]),
     RmqModule,
     StorageModule,
     MailerModule.forRootAsync({

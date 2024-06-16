@@ -3,12 +3,12 @@ import { CalendarModule } from '../calendar.module';
 import { ChecklistController } from './checklist.controller';
 import { ChecklistService } from './checklist.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Checklist, Family, Users } from '@app/common';
+import { Checklist } from '@app/common';
 
 @Module({
   imports: [
     forwardRef(() => CalendarModule),
-    TypeOrmModule.forFeature([Checklist, Family, Users]),
+    TypeOrmModule.forFeature([Checklist]),
   ],
   controllers: [ChecklistController],
   providers: [ChecklistService],

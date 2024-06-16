@@ -14,8 +14,8 @@ import Redis from 'ioredis';
 export class MemberFamilyGuard implements CanActivate {
   constructor(
     @Inject(FAMILY_SERVICE) private familyClient: ClientProxy,
-    @InjectRedis() private readonly redisService: Redis
-  ) { }
+    @InjectRedis() private readonly redisService: Redis,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();

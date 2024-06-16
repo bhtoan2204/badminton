@@ -1,11 +1,18 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { FamilyController } from './family.controller';
-import { DatabaseModule, RmqModule } from '@app/common';
+import {
+  DatabaseModule,
+  Family,
+  FamilyExtraPackages,
+  PackageExtra,
+  RmqModule,
+} from '@app/common';
 import { FamilyService } from './family.service';
 import { ConfigModule } from '@nestjs/config';
 import { StorageModule } from './storage/storage.module';
 import * as Joi from 'joi';
 import { InvitationModule } from './invitation/invitation.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -24,12 +31,10 @@ import { InvitationModule } from './invitation/invitation.module';
     RmqModule,
     StorageModule,
     forwardRef(() => InvitationModule),
+    TypeOrmModule.forFeature([Family, PackageExtra, FamilyExtraPackages]),
   ],
   controllers: [FamilyController],
   providers: [FamilyService],
-  exports: [
-    RmqModule,
-    DatabaseModule
-  ]
+  exports: [RmqModule, DatabaseModule],
 })
 export class FamilyModule {}

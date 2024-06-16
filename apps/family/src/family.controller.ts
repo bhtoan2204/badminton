@@ -92,4 +92,13 @@ export class FamilyController {
       data.file,
     );
   }
+
+  @EventPattern('family/checkExtraPackage')
+  async checkExtraPackage(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.familyService.checkExtraPackage(
+      data.id_family,
+      data.permissions,
+    );
+  }
 }
