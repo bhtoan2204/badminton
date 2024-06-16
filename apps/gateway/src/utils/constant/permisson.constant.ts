@@ -1,4 +1,3 @@
-export const PERMISSION_FAMILY = 'family';
 export const PERMISSION_CALENDAR = 'calendar';
 export const PERMISSION_GUIDELINE = 'guideline';
 export const PERMISSION_EDUCATION = 'education';
@@ -8,7 +7,6 @@ export const PERMISSION_INVOICE = 'invoice';
 export const PERMISSION_HOUSEHOLD = 'household';
 
 export const PERMISSIONS = [
-  PERMISSION_FAMILY,
   PERMISSION_CALENDAR,
   PERMISSION_GUIDELINE,
   PERMISSION_EDUCATION,

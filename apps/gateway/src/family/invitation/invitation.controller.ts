@@ -7,20 +7,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import {
-  CurrentUser,
-  JwtAuthGuard,
-  MemberFamilyGuard,
-  Permission,
-  PERMISSION_FAMILY,
-} from '../../utils';
+import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../../utils';
 import { InvitationService } from './invitation.service';
 
 @ApiTags('Invitation')
 @Controller('invitation')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-@Permission([PERMISSION_FAMILY])
 export class InvitationController {
   constructor(private readonly invitationService: InvitationService) {}
 

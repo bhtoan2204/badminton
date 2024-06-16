@@ -3,6 +3,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { parse } from 'pg-connection-string';
 import * as Joi from 'joi';
+import { Checklist } from './entity/checklist.entity';
+import { Family } from './entity/family.entity';
+import { PaymentHistory } from './entity/payment_history.entity';
+import { Users } from './entity/users.entity';
+import { FamilyExtraPackages } from './entity/family_package_extra.entity';
+import { PackageCombo } from './entity/package_combo.entity';
+import { PackageExtra } from './entity/package_extra.entity';
+import { PackageMain } from './entity/package_main.entity';
 
 @Module({
   imports: [
@@ -30,6 +38,16 @@ import * as Joi from 'joi';
           ssl: {
             rejectUnauthorized: false,
           },
+          entities: [
+            Checklist,
+            PaymentHistory,
+            Users,
+            Family,
+            FamilyExtraPackages,
+            PackageCombo,
+            PackageExtra,
+            PackageMain,
+          ],
         };
       },
       inject: [ConfigService],
