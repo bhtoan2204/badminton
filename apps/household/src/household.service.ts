@@ -1,21 +1,41 @@
-import { DeleteFileRequest, UploadFileRequest } from '@app/common';
+import {
+  DeleteFileRequest,
+  HouseholdConsumableItems,
+  HouseholdDurableItems,
+  HouseholdItemCategories,
+  HouseholdItems,
+  UploadFileRequest,
+} from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { EntityManager } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { StorageService } from './storage/storage.service';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class HouseholdService {
   constructor(
     private readonly entityManager: EntityManager,
     private readonly storageService: StorageService,
+    @InjectRepository(HouseholdItems)
+    private readonly householdItemsRepository: Repository<HouseholdItems>,
+    @InjectRepository(HouseholdItemCategories)
+    private readonly householdItemCategoriesRepository: Repository<HouseholdItemCategories>,
+    @InjectRepository(HouseholdDurableItems)
+    private readonly householdDurableItemsRepository: Repository<HouseholdDurableItems>,
+    @InjectRepository(HouseholdConsumableItems)
+    private readonly householdConsumableItemsRepository: Repository<HouseholdConsumableItems>,
   ) {}
 
   async getCategory() {
     try {
-      const query = 'SELECT * FROM household_item_categories';
-      const data = await this.entityManager.query(query);
-      return data;
+      const [data, totalCount] =
+        await this.householdItemCategoriesRepository.findAndCount();
+      return {
+        data,
+        totalCount,
+        message: 'Categories retrieved successfully',
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -31,10 +51,18 @@ export class HouseholdService {
     itemsPerPage: number,
   ) {
     try {
-      const query = 'SELECT * FROM f_get_household_item($1, $2, $3, $4)';
-      const params = [id_user, id_family, page, itemsPerPage];
-      const data = await this.entityManager.query(query, params);
-      return data;
+      const [data, totalCount] =
+        await this.householdItemsRepository.findAndCount({
+          where: { id_family },
+          take: itemsPerPage,
+          skip: (page - 1) * itemsPerPage,
+          relations: ['category', 'room'],
+        });
+      return {
+        data,
+        totalCount,
+        message: 'Items retrieved successfully',
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -45,9 +73,11 @@ export class HouseholdService {
 
   async getItemDetail(id_user: string, id_family: number, id_item: number) {
     try {
-      const query = 'SELECT * FROM f_get_household_item_detail($1, $2, $3)';
-      const params = [id_user, id_family, id_item];
-      const data = await this.entityManager.query(query, params);
+      const data = await this.householdItemsRepository.findOne({
+        where: { id_family, id_household_item: id_item },
+        relations: ['category', 'room', 'durableItem', 'consumableItem'],
+      });
+
       return data;
     } catch (error) {
       throw new RpcException({

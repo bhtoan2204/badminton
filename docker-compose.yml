@@ -106,19 +106,6 @@ services:
     volumes:
       - .:/usr/src/app
 
-  role:
-    image: mjkundta/role:latest
-    build:
-      context: .
-      dockerfile: ./apps/role/Dockerfile
-      target: development
-    command: npm run start:dev role
-    depends_on:
-      - auth
-    restart: on-failure
-    volumes:
-      - .:/usr/src/app
-
   crawler:
     image: mjkundta/crawler:latest
     build:
@@ -251,22 +238,6 @@ services:
     volumes:
       - .:/usr/src/app
 
-  # utilities:
-  #   image: mjkundta/utilities:latest
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/utilities/Dockerfile
-  #     target: development
-  #   # command: python manage.py runserver 0.0.0.0:8000
-  #   command: tail -f /dev/null
-  #   restart: on-failure
-  #   volumes:
-  #     - .:/usr/src/app
-  #   ports:
-  #     - '8000:8000'
-  #   environment:
-  #     - DJANGO_SETTINGS_MODULE=utilities.settings
-
   filebeat:
     image: mjkundta/filebeat:latest
     build:
@@ -281,21 +252,21 @@ services:
       co.elastic.logs/json.add_error_key: true
       co.elastic.logs/json.expand_keys: true
 
-  jaeger:
-    image: jaegertracing/all-in-one:1.30
-    container_name: jaeger
-    ports:
-      - '5775:5775/udp'
-      - '6831:6831/udp'
-      - '6832:6832/udp'
-      - '5778:5778'
-      - '16686:16686'
-      - '14250:14250'
-      - '14268:14268'
-      - '14269:14269'
-      - '9411:9411'
-    environment:
-      COLLECTOR_ZIPKIN_HTTP_PORT: 9411
+  # jaeger:
+  #   image: jaegertracing/all-in-one:1.30
+  #   container_name: jaeger
+  #   ports:
+  #     - '5775:5775/udp'
+  #     - '6831:6831/udp'
+  #     - '6832:6832/udp'
+  #     - '5778:5778'
+  #     - '16686:16686'
+  #     - '14250:14250'
+  #     - '14268:14268'
+  #     - '14269:14269'
+  #     - '9411:9411'
+  #   environment:
+  #     COLLECTOR_ZIPKIN_HTTP_PORT: 9411
 
   rabbitmq:
     image: rabbitmq:management

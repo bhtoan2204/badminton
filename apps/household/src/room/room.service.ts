@@ -1,18 +1,30 @@
+import { Room } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { EntityManager } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class RoomService {
-  constructor(private readonly entityManager: EntityManager) {}
+  constructor(
+    @InjectRepository(Room) private readonly roomRepository: Repository<Room>,
+  ) {}
 
-  async getRooms(id_user: string, id_family: number) {
+  async getRooms(
+    id_user: string,
+    id_family: number,
+    page: number,
+    itemsPerPages: number,
+  ) {
     try {
-      const query = 'SELECT * FROM f_get_rooms($1, $2)';
-      const params = [id_user, id_family];
-      const data = await this.entityManager.query(query, params);
+      const [data, totalCount] = await this.roomRepository.findAndCount({
+        where: { id_family },
+        take: itemsPerPages,
+        skip: (page - 1) * itemsPerPages,
+      });
       return {
-        data: data,
+        data,
+        totalCount,
         message: 'Rooms retrieved successfully',
       };
     } catch (error) {
@@ -26,13 +38,12 @@ export class RoomService {
   async createRoom(id_user: string, dto: any) {
     const { id_family, room_name } = dto;
     try {
-      const query = 'SELECT * FROM f_create_room($1, $2, $3)';
-      const params = [id_user, id_family, room_name];
-      const data = await this.entityManager.query(query, params);
-      return {
-        data: data[0],
-        message: 'Room created successfully',
-      };
+      const newRoom = await this.roomRepository.create({
+        id_family,
+        room_name,
+      });
+
+      return await this.roomRepository.save(newRoom);
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -44,10 +55,17 @@ export class RoomService {
   async updateRoom(id_user: string, dto: any) {
     const { id_family, id_room, room_name } = dto;
     try {
-      const query = 'SELECT * FROM f_update_room($1, $2, $3, $4)';
-      const params = [id_user, id_family, id_room, room_name];
-      const data = await this.entityManager.query(query, params);
-      return data;
+      const room = await this.roomRepository.findOne({
+        where: { id_family, id_room },
+      });
+      if (!room) {
+        throw new RpcException({
+          message: 'Room not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      room.room_name = room_name;
+      return await this.roomRepository.save(room);
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -58,13 +76,16 @@ export class RoomService {
 
   async deleteRoom(id_user: string, id_family: number, id_room: number) {
     try {
-      const query = 'SELECT * FROM f_delete_room($1, $2, $3)';
-      const params = [id_user, id_family, id_room];
-      const data = await this.entityManager.query(query, params);
-      return {
-        data: data[0].f_delete_room,
-        message: 'Room deleted successfully',
-      };
+      const room = await this.roomRepository.findOne({
+        where: { id_family, id_room },
+      });
+      if (!room) {
+        throw new RpcException({
+          message: 'Room not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      return await this.roomRepository.remove(room);
     } catch (error) {
       throw new RpcException({
         message: error.message,

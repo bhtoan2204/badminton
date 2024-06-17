@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { parse } from 'pg-connection-string';
-import * as Joi from 'joi';
 import { Checklist } from './entity/checklist.entity';
 import { Family } from './entity/family.entity';
 import { PaymentHistory } from './entity/payment_history.entity';
@@ -11,7 +9,13 @@ import { FamilyExtraPackages } from './entity/family_package_extra.entity';
 import { PackageCombo } from './entity/package_combo.entity';
 import { PackageExtra } from './entity/package_extra.entity';
 import { PackageMain } from './entity/package_main.entity';
-
+import { HouseholdItems } from './entity/household_items.entity';
+import { Room } from './entity/room.entity';
+import { HouseholdItemCategories } from './entity/household_item_categories.entity';
+import { HouseholdDurableItems } from './entity/household_durable_items.entity';
+import { HouseholdConsumableItems } from './entity/household_consumable_items.entity';
+import { parse } from 'pg-connection-string';
+import * as Joi from 'joi';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -47,6 +51,11 @@ import { PackageMain } from './entity/package_main.entity';
             PackageCombo,
             PackageExtra,
             PackageMain,
+            HouseholdItems,
+            Room,
+            HouseholdItemCategories,
+            HouseholdDurableItems,
+            HouseholdConsumableItems,
           ],
         };
       },

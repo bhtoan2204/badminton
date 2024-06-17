@@ -17,6 +17,12 @@ export * from './database/entity/family_package_extra.entity';
 export * from './database/entity/refresh_token.entity';
 export * from './database/entity/role.entity';
 export * from './database/entity/users.entity';
+export * from './database/entity/payment_history.entity';
+export * from './database/entity/household_items.entity';
+export * from './database/entity/room.entity';
+export * from './database/entity/household_item_categories.entity';
+export * from './database/entity/household_durable_items.entity';
+export * from './database/entity/household_consumable_items.entity';
 
 export * from './database/enum/login_type.enum';
 
