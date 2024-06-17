@@ -1,11 +1,19 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { HouseholdController } from './household.controller';
 import { HouseholdService } from './household.service';
-import { DatabaseModule, RmqModule } from '@app/common';
+import {
+  DatabaseModule,
+  HouseholdConsumableItems,
+  HouseholdDurableItems,
+  HouseholdItemCategories,
+  HouseholdItems,
+  RmqModule,
+} from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import { StorageModule } from './storage/storage.module';
 import * as Joi from 'joi';
 import { RoomModule } from './room/room.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -23,6 +31,12 @@ import { RoomModule } from './room/room.module';
     RmqModule,
     DatabaseModule,
     StorageModule,
+    TypeOrmModule.forFeature([
+      HouseholdItems,
+      HouseholdDurableItems,
+      HouseholdConsumableItems,
+      HouseholdItemCategories,
+    ]),
     forwardRef(() => RoomModule),
   ],
   controllers: [HouseholdController],

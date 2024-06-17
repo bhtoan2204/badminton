@@ -9,10 +9,20 @@ export class RoomService {
     @Inject(HOUSEHOLD_SERVICE) private householdClient: ClientProxy,
   ) {}
 
-  async getRooms(id_user: string, id_family: number) {
+  async getRooms(
+    id_user: string,
+    id_family: number,
+    page: number,
+    itemsPerPage: number,
+  ) {
     try {
       const response = this.householdClient
-        .send('householdClient/getRooms', { id_user, id_family })
+        .send('householdClient/getRooms', {
+          id_user,
+          id_family,
+          page,
+          itemsPerPage,
+        })
         .pipe(timeout(15000));
       return await lastValueFrom(response);
     } catch (error) {

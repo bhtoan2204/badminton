@@ -11,6 +11,8 @@ import {
 import { Users } from './users.entity';
 import { Checklist } from './checklist.entity';
 import { FamilyExtraPackages } from './family_package_extra.entity';
+import { Room } from './room.entity';
+import { HouseholdItems } from './household_items.entity';
 
 @Entity('family')
 export class Family {
@@ -50,4 +52,10 @@ export class Family {
     (familyExtraPackage) => familyExtraPackage.family,
   )
   familyExtraPackages: FamilyExtraPackages[];
+
+  @OneToMany(() => Room, (room) => room.family)
+  rooms: Room[];
+
+  @OneToMany(() => HouseholdItems, (household_item) => household_item.family)
+  householdItems: Room[];
 }
