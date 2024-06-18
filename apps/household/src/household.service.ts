@@ -191,14 +191,34 @@ export class HouseholdService {
   async inputDurableItem(id_user: string, dto: any) {
     try {
       const { id_family, id_item, condition } = dto;
-      const query =
-        'SELECT * FROM f_update_household_durable_item($1, $2, $3, $4)';
-      const params = [id_user, id_family, id_item, condition];
-      const data = await this.entityManager.query(query, params);
-      return {
-        message:
-          data[0].f_update_household_durable_item || 'Updated Successfully',
-      };
+
+      // Verify the existence of the household item
+      const householdItem = await this.householdItemsRepository.findOne({
+        where: { id_family, id_household_item: id_item },
+      });
+
+      if (!householdItem) {
+        throw new RpcException({
+          message: 'Household item not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      let durableItem = await this.householdDurableItemsRepository.findOne({
+        where: { id_household_item: id_item },
+      });
+
+      if (durableItem) {
+        durableItem.condition = condition;
+      } else {
+        durableItem = this.householdDurableItemsRepository.create({
+          id_household_item: id_item,
+          condition: condition,
+        });
+      }
+
+      await this.householdDurableItemsRepository.save(durableItem);
+
+      return { message: 'Durable item saved successfully', durableItem };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -210,21 +230,37 @@ export class HouseholdService {
   async inputConsumableItem(id_user: string, dto: any) {
     try {
       const { id_family, id_item, quantity, threshold, expired_date } = dto;
-      const query =
-        'SELECT * FROM f_update_household_consumable_item($1, $2, $3, $4, $5, $6)';
-      const params = [
-        id_user,
-        id_family,
-        id_item,
-        quantity,
-        threshold,
-        expired_date,
-      ];
-      const data = await this.entityManager.query(query, params);
-      return {
-        message:
-          data[0].f_update_household_consumable_item || 'Updated Successfully',
-      };
+      const householdItem = await this.householdItemsRepository.findOne({
+        where: { id_family, id_household_item: id_item },
+      });
+
+      if (!householdItem) {
+        throw new RpcException({
+          message: 'Household item not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      let consumableItem =
+        await this.householdConsumableItemsRepository.findOne({
+          where: { id_household_item: id_item },
+        });
+
+      if (consumableItem) {
+        consumableItem.quantity = quantity;
+        consumableItem.threshold = threshold;
+        consumableItem.expired_date = expired_date;
+      } else {
+        consumableItem = this.householdConsumableItemsRepository.create({
+          id_household_item: id_item,
+          quantity: quantity,
+          threshold: threshold,
+          expired_date: expired_date,
+        });
+      }
+
+      await this.householdConsumableItemsRepository.save(consumableItem);
+
+      return { message: 'Consumable item saved successfully', consumableItem };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -235,17 +271,33 @@ export class HouseholdService {
 
   async deleteItem(id_user: string, id_family: number, id_item: number) {
     try {
-      const query = 'SELECT * FROM f_delete_household_item($1, $2, $3)';
-      const params = [id_user, id_family, id_item];
-      const data = await this.entityManager.query(query, params);
-      const imageUrl = data[0].f_delete_household_item;
-      if (imageUrl) {
-        const deleteParams: DeleteFileRequest = {
-          fileName: imageUrl.split('/').pop(),
-        };
-        await this.storageService.deleteImageHousehold(deleteParams);
+      const item = await this.householdItemsRepository.findOne({
+        where: { id_family, id_household_item: id_item },
+        relations: ['durableItem', 'consumableItem'],
+      });
+
+      if (!item) {
+        throw new RpcException({
+          message: 'Item not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
       }
-      return { message: 'Deleted Successfully' };
+      if (item.durableItem) {
+        await this.householdDurableItemsRepository.delete({
+          id_household_item: id_item,
+        });
+      }
+      if (item.consumableItem) {
+        await this.householdConsumableItemsRepository.delete({
+          id_household_item: id_item,
+        });
+      }
+      await this.householdItemsRepository.delete({
+        id_family,
+        id_household_item: id_item,
+      });
+
+      return { message: 'Item deleted successfully' };
     } catch (error) {
       throw new RpcException({
         message: error.message,

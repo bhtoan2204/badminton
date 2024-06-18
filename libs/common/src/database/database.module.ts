@@ -16,6 +16,7 @@ import { HouseholdDurableItems } from './entity/household_durable_items.entity';
 import { HouseholdConsumableItems } from './entity/household_consumable_items.entity';
 import { parse } from 'pg-connection-string';
 import * as Joi from 'joi';
+import { GuideItems } from './entity/guide_items.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -56,6 +57,7 @@ import * as Joi from 'joi';
             HouseholdItemCategories,
             HouseholdDurableItems,
             HouseholdConsumableItems,
+            GuideItems,
           ],
         };
       },
