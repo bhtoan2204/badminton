@@ -23,6 +23,7 @@ export * from './database/entity/room.entity';
 export * from './database/entity/household_item_categories.entity';
 export * from './database/entity/household_durable_items.entity';
 export * from './database/entity/household_consumable_items.entity';
+export * from './database/entity/guide_items.entity';
 
 export * from './database/enum/login_type.enum';
 

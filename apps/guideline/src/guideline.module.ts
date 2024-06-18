@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { GuidelineController } from './guideline.controller';
 import { GuidelineService } from './guideline.service';
-import { DatabaseModule, RmqModule } from '@app/common';
+import { DatabaseModule, GuideItems, RmqModule } from '@app/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { StorageModule } from './storage/storage.module';
 import { ElasticsearchModule } from '@nestjs/elasticsearch';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch';
     RmqModule,
     DatabaseModule,
     StorageModule,
+    TypeOrmModule.forFeature([GuideItems]),
     ElasticsearchModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
