@@ -273,4 +273,19 @@ export class HouseholdController {
       id_item,
     );
   }
+
+  @ApiOperation({ summary: 'Get low condition item' })
+  @HttpCode(HttpStatus.OK)
+  @Get('getLowConditionItem/:id_family')
+  @ApiParam({
+    name: 'id_family',
+    required: true,
+    description: 'The ID of the family',
+  })
+  async getLowConditionItem(
+    @CurrentUser() currentUser,
+    @Param('id_family') id_family: number,
+  ) {
+    return this.householdService.getLowConditionItem(currentUser.id_user, id_family);
+  }
 }

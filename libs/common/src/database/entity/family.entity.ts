@@ -14,6 +14,7 @@ import { FamilyExtraPackages } from './family_package_extra.entity';
 import { Room } from './room.entity';
 import { HouseholdItems } from './household_items.entity';
 import { GuideItems } from './guide_items.entity';
+import { EducationProgress } from './education_progress.dto';
 
 @Entity('family')
 export class Family {
@@ -62,4 +63,10 @@ export class Family {
 
   @OneToMany(() => HouseholdItems, (household_item) => household_item.family)
   guideItems: GuideItems[];
+
+  @OneToMany(
+    () => EducationProgress,
+    (education_progress) => education_progress.family,
+  )
+  educationProgresses: EducationProgress[];
 }

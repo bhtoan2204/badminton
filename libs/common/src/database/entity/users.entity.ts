@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { LoginType } from '../enum/login_type.enum';
 import { Family } from './family.entity';
+import { EducationProgress } from './education_progress.dto';
 
 @Entity('users')
 export class Users {
@@ -57,10 +58,6 @@ export class Users {
   })
   login_type: LoginType;
 
-  // @ManyToOne(() => Family)
-  // @JoinColumn({ name: 'id_family' })
-  // id_family: Family;
-
   @Column('varchar', { nullable: true })
   avatar: string;
 
@@ -72,4 +69,10 @@ export class Users {
 
   @OneToMany(() => Family, (family) => family.owner_id)
   families: Family[];
+
+  @OneToMany(
+    () => EducationProgress,
+    (educationProgress) => educationProgress.user,
+  )
+  educationProgresses: EducationProgress[];
 }

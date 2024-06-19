@@ -81,4 +81,13 @@ export class HouseholdController {
       data.id_item,
     );
   }
+
+  @EventPattern('householdClient/getLowConditionItem')
+  async getLowConditionItem(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.householdService.getLowConditionItem(
+      data.id_user,
+      data.id_family,
+    );
+  }
 }
