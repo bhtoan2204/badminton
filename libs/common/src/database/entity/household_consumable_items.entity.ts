@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { HouseholdItems } from './household_items.entity';
 
-@Entity('housegold_consumable_items')
+@Entity('household_consumable_items')
 export class HouseholdConsumableItems {
   @PrimaryColumn()
   id_household_item: number;
