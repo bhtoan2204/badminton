@@ -308,19 +308,24 @@ export class HouseholdService {
 
   async getLowConditionItem(id_user: string, id_family: number) {
     try {
-      const queryBuilder = this.householdItemsRepository.createQueryBuilder('household_items')
-      .leftJoinAndSelect('household_items.durableItem', 'durableItem')
-      .leftJoinAndSelect('household_items.consumableItem', 'consumableItem')
-      .where('household_items.id_family = :id_family', { id_family })
-      .andWhere(new Brackets(qb => {
-        qb.where('durableItem.condition IN (:...conditions)', { conditions: ['worn', 'refurbished', 'poor'] })
-          .orWhere('consumableItem.threshold >= consumableItem.quantity * 0.2');
-      }));
+      const queryBuilder = this.householdItemsRepository
+        .createQueryBuilder('household_items')
+        .leftJoinAndSelect('household_items.durableItem', 'durableItem')
+        .leftJoinAndSelect('household_items.consumableItem', 'consumableItem')
+        .where('household_items.id_family = :id_family', { id_family })
+        .andWhere(
+          new Brackets((qb) => {
+            qb.where('durableItem.condition IN (:...conditions)', {
+              conditions: ['worn', 'refurbished', 'poor'],
+            }).orWhere(
+              'consumableItem.threshold * 5 <= consumableItem.quantity',
+            );
+          }),
+        );
 
-    const items = await queryBuilder.getMany();
-    return items;
-    }
-    catch (error) {
+      const items = await queryBuilder.getMany();
+      return items;
+    } catch (error) {
       throw new RpcException({
         message: error.message,
         statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,

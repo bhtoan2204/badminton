@@ -146,7 +146,7 @@ export class SubjectController {
     return this.subjectService.modifyScore(currentUser.id_user, dto);
   }
 
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Modify midterm, final, bonus score' })
   @Delete('removeScore')
   async removeScore(@CurrentUser() currentUser, @Body() dto: RemoveScoreDto) {
