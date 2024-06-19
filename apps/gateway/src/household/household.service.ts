@@ -132,4 +132,18 @@ export class HouseholdService {
       throw new HttpException(error, error.statusCode);
     }
   }
+  
+  async getLowConditionItem(id_user: string, id_family: number) {
+    try {
+      const response = this.householdClient
+        .send('householdClient/getLowConditionItem', { id_user, id_family })
+        .pipe(timeout(15000));
+      return await lastValueFrom(response);
+    } catch (error) {
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }

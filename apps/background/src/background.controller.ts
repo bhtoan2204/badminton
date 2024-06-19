@@ -4,9 +4,4 @@ import { BackgroundService } from './background.service';
 @Controller()
 export class BackgroundController {
   constructor(private readonly backgroundService: BackgroundService) {}
-
-  @Get()
-  getHello(): string {
-    return this.backgroundService.getHello();
-  }
 }
