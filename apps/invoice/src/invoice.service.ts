@@ -54,7 +54,10 @@ export class InvoiceService {
       const params = [id_user, id_family, page, itemsPerPage];
       const countQuery = 'SELECT COUNT(*) FROM invoice WHERE id_family = $1';
       const countParams = [id_family];
-      const [data, totalCount] = await Promise.all([this.entityManager.query(query, params), this.entityManager.query(countQuery, countParams)]);
+      const [data, totalCount] = await Promise.all([
+        this.entityManager.query(query, params),
+        this.entityManager.query(countQuery, countParams),
+      ]);
       return {
         data,
         totalCount,

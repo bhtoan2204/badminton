@@ -24,6 +24,8 @@ export * from './database/entity/household_item_categories.entity';
 export * from './database/entity/household_durable_items.entity';
 export * from './database/entity/household_consumable_items.entity';
 export * from './database/entity/guide_items.entity';
+export * from './database/entity/education_progress.dto';
+export * from './database/entity/subject.entity';
 
 export * from './database/enum/login_type.enum';
 
