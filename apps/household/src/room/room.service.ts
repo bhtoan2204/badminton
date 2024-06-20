@@ -17,14 +17,14 @@ export class RoomService {
     itemsPerPages: number,
   ) {
     try {
-      const [data, totalCount] = await this.roomRepository.findAndCount({
+      const [data, total] = await this.roomRepository.findAndCount({
         where: { id_family },
         take: itemsPerPages,
         skip: (page - 1) * itemsPerPages,
       });
       return {
         data,
-        totalCount,
+        total,
         message: 'Rooms retrieved successfully',
       };
     } catch (error) {

@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { LoginType } from '../enum/login_type.enum';
 import { Family } from './family.entity';
-import { EducationProgress } from './education_progress.dto';
+import { EducationProgress } from './education_progress.entity';
 
 @Entity('users')
 export class Users {

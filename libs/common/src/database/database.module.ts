@@ -15,10 +15,13 @@ import { HouseholdItemCategories } from './entity/household_item_categories.enti
 import { HouseholdDurableItems } from './entity/household_durable_items.entity';
 import { HouseholdConsumableItems } from './entity/household_consumable_items.entity';
 import { parse } from 'pg-connection-string';
-import * as Joi from 'joi';
 import { GuideItems } from './entity/guide_items.entity';
-import { EducationProgress } from './entity/education_progress.dto';
+import { EducationProgress } from './entity/education_progress.entity';
 import { Subjects } from './entity/subject.entity';
+import { ShoppingItemTypes } from './entity/shopping_item_types.entity';
+import { ShoppingItems } from './entity/shopping_items.entity';
+import { ShoppingLists } from './entity/shopping_lists.entity';
+import * as Joi from 'joi';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -62,6 +65,9 @@ import { Subjects } from './entity/subject.entity';
             GuideItems,
             EducationProgress,
             Subjects,
+            ShoppingItemTypes,
+            ShoppingItems,
+            ShoppingLists,
           ],
         };
       },

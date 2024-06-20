@@ -8,7 +8,6 @@ import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import { StorageService } from './storage/storage.service';
 import { EntityManager } from 'typeorm';
-import path from 'path';
 
 const limit = 30;
 
@@ -376,20 +375,24 @@ export class ChatService {
 
   async saveFamilyImageMessage(
     id_user: string,
-    messageData: { imageData: string; familyId: number },
+    id_family: number,
+    file: any,
   ): Promise<any> {
     try {
-      const fileName = 'family_' + messageData.familyId + '_' + Date.now();
-      const fileUint8Array = await this.base64ToUint8Array(
-        messageData.imageData,
-      );
+      if (!file) {
+        throw new RpcException({
+          message: 'File is required',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+      let fileUrl = null;
+      const fileName = 'chat_' + id_user + '_' + Date.now();
       const params: UploadFileRequest = {
+        file: new Uint8Array(file.buffer.data),
         fileName: fileName,
-        file: fileUint8Array,
       };
-
       const uploadImageData = await this.storageService.uploadImageChat(params);
-      const fileUrl = uploadImageData.fileUrl;
+      fileUrl = uploadImageData.fileUrl;
 
       const newMessage = {
         senderId: id_user,
@@ -401,7 +404,51 @@ export class ChatService {
 
       await this.familyConversationsRepository
         .findOneAndUpdate(
-          { familyId: messageData.familyId },
+          { familyId: id_family },
+          { $push: { conversations: newMessage } },
+          { new: true, upsert: true },
+        )
+        .exec();
+
+      return newMessage;
+    } catch (error) {
+      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
+      const message =
+        error.message || 'An error occurred while saving the family message.';
+      throw new RpcException({ message, statusCode });
+    }
+  }
+
+  async saveFamilyVideoMessage(id_user: string, id_family: number, file: any) {
+    try {
+      if (!file) {
+        throw new RpcException({
+          message: 'File is required',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+      let fileUrl = null;
+      const fileExtension = file.originalname;
+      const fileName =
+        'chat_' + id_user + '_' + Date.now() + '_' + fileExtension;
+      const params: UploadFileRequest = {
+        file: new Uint8Array(file.buffer.data),
+        fileName: fileName,
+      };
+      const uploadImageData = await this.storageService.uploadVideoChat(params);
+      fileUrl = uploadImageData.fileUrl;
+
+      const newMessage = {
+        senderId: id_user,
+        type: 'video',
+        content: fileUrl,
+        isRead: false,
+        timestamp: new Date(),
+      };
+
+      await this.familyConversationsRepository
+        .findOneAndUpdate(
+          { familyId: id_family },
           { $push: { conversations: newMessage } },
           { new: true, upsert: true },
         )

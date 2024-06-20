@@ -25,6 +25,7 @@ import { ChatGateway } from './chat.gateway';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
 import { VideoFileInterceptor } from '../utils/interceptor/videoFile.interceptor';
+import { NewFamilyMessageDto } from './dto/newFamilyMessage.dto';
 
 @ApiTags('Chat')
 @Controller('chat')
@@ -116,6 +117,92 @@ export class ChatController {
       file,
     );
     this.chatGateway.emitMessageToUser(dto.receiverId, data);
+    return data;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send family text message' })
+  @Post('sendFamilyMessage')
+  async sendFamilyMessage(
+    @CurrentUser() user,
+    @Body() dto: NewFamilyMessageDto,
+  ) {
+    const data = await this.chatService.saveFamilyMessage(user.id_user, dto);
+    this.chatGateway.emitFamilyMessageToUser(user.id_user, dto.familyId, data);
+    return data;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send family image message' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+          description: 'The image of the expense (optional)',
+        },
+        familyId: {
+          type: 'string',
+          description: 'The ID of the receiver',
+        },
+      },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('image', new ImageFileInterceptor().createMulterOptions()),
+  )
+  @Post('sendFamilyImage')
+  async sendFamilyImage(
+    @CurrentUser() user,
+    @Body() dto: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const data = await this.chatService.saveFamilyImageMessage(
+      user.id_user,
+      dto.familyId,
+      file,
+    );
+    this.chatGateway.emitFamilyMessageToUser(user.id_user, dto.familyId, data);
+    return data;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send family video message' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        video: {
+          type: 'string',
+          format: 'binary',
+          description: 'The video of the expense (optional)',
+        },
+        familyId: {
+          type: 'string',
+          description: 'The ID of the receiver',
+        },
+      },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('video', new VideoFileInterceptor().createMulterOptions()),
+  )
+  @Post('sendFamilyVideo')
+  async sendFamilyVideo(
+    @CurrentUser() user,
+    @Body() dto: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const data = await this.chatService.saveFamilyVideoMessage(
+      user.id_user,
+      dto.familyId,
+      file,
+    );
+    this.chatGateway.emitFamilyMessageToUser(user.id_user, dto.familyId, data);
     return data;
   }
 
