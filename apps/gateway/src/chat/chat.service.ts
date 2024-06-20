@@ -131,11 +131,28 @@ export class ChatService {
     }
   }
 
-  async saveImageMessage(id_user: string, message: any) {
+  async saveImageMessage(id_user: string, receiverId: string, file: any) {
     try {
       const response = this.chatClient.send('chatClient/sendImageMessage', {
         id_user,
-        message,
+        receiverId,
+        file,
+      });
+      return await lastValueFrom(response);
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async saveVideoMessage(id_user: string, receiverId: string, file: any) {
+    try {
+      const response = this.chatClient.send('chatClient/sendVideoMessage', {
+        id_user,
+        receiverId,
+        file,
       });
       return await lastValueFrom(response);
     } catch (error) {

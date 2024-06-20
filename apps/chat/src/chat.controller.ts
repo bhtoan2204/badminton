@@ -75,14 +75,29 @@ export class ChatController {
   @EventPattern('chatClient/sendImageMessage')
   async saveImageMessage(
     @Payload()
-    data: {
-      id_user: string;
-      message: { imageData: string; receiverId: string };
-    },
+    data: any,
     @Ctx() context: RmqContext,
   ) {
     this.rmqService.ack(context);
-    return this.chatService.saveImageMessage(data.id_user, data.message);
+    return this.chatService.saveImageMessage(
+      data.id_user,
+      data.receiverId,
+      data.file,
+    );
+  }
+
+  @EventPattern('chatClient/sendVideoMessage')
+  async saveVideoMessage(
+    @Payload()
+    data: any,
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    return this.chatService.saveVideoMessage(
+      data.id_user,
+      data.receiverId,
+      data.file,
+    );
   }
 
   @EventPattern('chatClient/markSeenMessage')

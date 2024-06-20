@@ -47,6 +47,8 @@ export interface StorageServiceClient {
 
   uploadImageChat(request: UploadFileRequest): Observable<UploadFileResponse>;
 
+  uploadVideoChat(request: UploadFileRequest): Observable<UploadFileResponse>;
+
   uploadImageStep(request: UploadFileRequest): Observable<UploadFileResponse>;
 
   deleteImageStep(request: DeleteFileRequest): Observable<DeleteFileResponse>;
@@ -108,6 +110,8 @@ export interface StorageServiceController {
 
   uploadImageChat(request: UploadFileRequest): UploadFileResult;
 
+  uploadVideoChat(request: UploadFileRequest): UploadFileResult;
+
   uploadImageStep(request: UploadFileRequest): UploadFileResult;
 
   deleteImageStep(
@@ -161,6 +165,7 @@ export function StorageServiceControllerMethods() {
       'readFile',
       'deleteFile',
       'uploadImageChat',
+      'uploadVideoChat',
       'uploadImageStep',
       'deleteImageStep',
       'uploadImageHousehold',

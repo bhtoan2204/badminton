@@ -33,7 +33,7 @@ import {
 import { CreateExpenseDto } from './dto/createExpense.dto';
 import { UpdateExpenseDto } from './dto/updateExpense.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ImageFileInterceptor } from '../../user/interceptor/imageFile.interceptor';
+import { ImageFileInterceptor } from '../../utils/interceptor/imageFile.interceptor';
 
 @ApiTags('Expensediture')
 @Controller('finance/expensediture')

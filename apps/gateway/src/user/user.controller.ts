@@ -18,7 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ImageFileInterceptor } from './interceptor/imageFile.interceptor';
+import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
 import { CurrentUser, JwtAuthGuard } from '../utils';
 import { ValidateEmailDto } from './dto/validateEmail.dto';
 import { UpdateProfileDto } from './dto/updateProfile.dto';

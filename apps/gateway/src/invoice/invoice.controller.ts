@@ -25,7 +25,7 @@ import {
 } from '@nestjs/swagger';
 import { InvoiceService } from './invoice.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ImageFileInterceptor } from '../user/interceptor/imageFile.interceptor';
+import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
 import {
   CurrentUser,
   JwtAuthGuard,
