@@ -13,7 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { ChatService } from './chat.service';
 import { NewMessageDto } from './dto/newMessage.dto';
 import { NewFamilyMessageDto } from './dto/newFamilyMessage.dto';
-import { NewImageMessageDto } from './dto/newImageMessage.dto';
+// import { NewImageMessageDto } from './dto/newImageMessage.dto';
 import { NewFamilyImageMessageDto } from './dto/newFamilyImageMessage.dto';
 
 interface TokenPayload {
@@ -88,6 +88,32 @@ export class ChatGateway implements OnModuleInit {
     } catch (error) {
       console.error('Error handling disconnection:', error.message);
       client.disconnect(true);
+    }
+  }
+
+  async emitMessageToUser(userId: string, message: any) {
+    try {
+      const receiverSocketIds = this.socketMap.get(userId);
+      if (receiverSocketIds) {
+        for (const socketId of receiverSocketIds) {
+          this.server.to(socketId).emit('onNewMessage', message);
+        }
+      }
+    } catch (error) {
+      console.error('Error emitting message:', error.message);
+    }
+  }
+
+  async emitFamilyMessageToUser(userId: string, message: any) {
+    try {
+      const receiverSocketIds = this.socketMap.get(userId);
+      if (receiverSocketIds) {
+        for (const socketId of receiverSocketIds) {
+          this.server.to(socketId).emit('onNewFamilyMessage', message);
+        }
+      }
+    } catch (error) {
+      console.error('Error emitting message:', error.message);
     }
   }
 
@@ -179,27 +205,27 @@ export class ChatGateway implements OnModuleInit {
     }
   }
 
-  @SubscribeMessage('newImageMessage')
-  @UseGuards(WsJwtAuthGuard)
-  async emitImageMessage(
-    @ConnectedSocket() client: Socket,
-    @WsCurrentUser() user,
-    @MessageBody() message: NewImageMessageDto,
-  ) {
-    try {
-      const receiverMessage = await this.chatService.saveImageMessage(
-        user.id_user,
-        message,
-      );
-      const receiverSocketIds = this.socketMap.get(message.receiverId);
-      if (receiverSocketIds) {
-        for (const socketId of receiverSocketIds) {
-          client.to(socketId).emit('onNewImageMessage', receiverMessage);
-        }
-      }
-      return 'Message sent';
-    } catch (error) {
-      console.error('Error emitting message:', error.message);
-    }
-  }
+  // @SubscribeMessage('newImageMessage')
+  // @UseGuards(WsJwtAuthGuard)
+  // async emitImageMessage(
+  //   @ConnectedSocket() client: Socket,
+  //   @WsCurrentUser() user,
+  //   @MessageBody() message: NewImageMessageDto,
+  // ) {
+  //   try {
+  //     const receiverMessage = await this.chatService.saveImageMessage(
+  //       user.id_user,
+  //       message,
+  //     );
+  //     const receiverSocketIds = this.socketMap.get(message.receiverId);
+  //     if (receiverSocketIds) {
+  //       for (const socketId of receiverSocketIds) {
+  //         client.to(socketId).emit('onNewImageMessage', receiverMessage);
+  //       }
+  //     }
+  //     return 'Message sent';
+  //   } catch (error) {
+  //     console.error('Error emitting message:', error.message);
+  //   }
+  // }
 }

@@ -26,7 +26,7 @@ import { MemberFamilyDto } from './dto/memberFamily.dto';
 import { DeleteMemberDTO } from './dto/deleteFamily.dto';
 import { UpdateFamilyDTO } from './dto/updateFamily.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ImageFileInterceptor } from '../user/interceptor/imageFile.interceptor';
+import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
 
 @ApiTags('Family')
 @Controller('family')

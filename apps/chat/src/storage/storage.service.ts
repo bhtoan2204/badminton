@@ -28,6 +28,12 @@ export class StorageService implements OnModuleInit {
     return this.storageService.uploadImageChat(request).toPromise();
   }
 
+  async uploadVideoChat(
+    request: UploadFileRequest,
+  ): Promise<UploadFileResponse> {
+    return this.storageService.uploadVideoChat(request).toPromise();
+  }
+
   async readFile(request: ReadFileRequest): Promise<ReadFileResponse> {
     return this.storageService.readFile(request).toPromise();
   }

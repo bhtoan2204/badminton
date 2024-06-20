@@ -8,6 +8,7 @@ import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import { StorageService } from './storage/storage.service';
 import { EntityManager } from 'typeorm';
+import path from 'path';
 
 const limit = 30;
 
@@ -444,30 +445,30 @@ export class ChatService {
     }
   }
 
-  async saveImageMessage(id_user, messageData) {
+  async saveImageMessage(
+    id_user: string,
+    receiverId: string,
+    file: any,
+  ): Promise<any> {
     try {
-      const fileName = 'chat_' + id_user + '_' + Date.now();
-      const fileUint8Array = await this.base64ToUint8Array(
-        messageData.imageData,
-      );
-      const params: UploadFileRequest = {
-        fileName: fileName,
-        file: fileUint8Array,
-      };
-
-      const uploadImageData = await this.storageService.uploadImageChat(params);
-      const fileUrl = uploadImageData.fileUrl;
-
-      if (
-        !id_user ||
-        !messageData.receiverId ||
-        id_user === messageData.receiverId
-      ) {
-        throw new Error('Invalid sender or receiver ID.');
+      if (!file) {
+        throw new RpcException({
+          message: 'File is required',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
       }
+      let fileUrl = null;
+      const fileName = 'chat_' + id_user + '_' + Date.now();
+      const params: UploadFileRequest = {
+        file: new Uint8Array(file.buffer.data),
+        fileName: fileName,
+      };
+      const uploadImageData = await this.storageService.uploadImageChat(params);
+      fileUrl = uploadImageData.fileUrl;
+
       const newMessage = {
         senderId: id_user,
-        receiverId: messageData.receiverId,
+        receiverId: receiverId,
         type: 'photo',
         content: fileUrl,
         isRead: false,
@@ -475,16 +476,51 @@ export class ChatService {
       };
 
       await Promise.all([
-        this.updateOrCreateConversation(
-          id_user,
-          messageData.receiverId,
-          newMessage,
-        ),
-        this.updateOrCreateConversation(
-          messageData.receiverId,
-          id_user,
-          newMessage,
-        ),
+        this.updateOrCreateConversation(id_user, receiverId, newMessage),
+        this.updateOrCreateConversation(receiverId, id_user, newMessage),
+      ]);
+
+      return newMessage;
+    } catch (error) {
+      const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
+      const message =
+        error.message || 'An error occurred while saving the message.';
+      throw new RpcException({ message, statusCode });
+    }
+  }
+
+  async saveVideoMessage(id_user: string, receiverId: string, file: any) {
+    try {
+      if (!file) {
+        throw new RpcException({
+          message: 'File is required',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+      let fileUrl = null;
+      const fileExtension = file.originalname;
+      const fileName =
+        'chat_' + id_user + '_' + Date.now() + '_' + fileExtension;
+      console.log('fileName', fileName);
+      const params: UploadFileRequest = {
+        file: new Uint8Array(file.buffer.data),
+        fileName: fileName,
+      };
+      const uploadImageData = await this.storageService.uploadVideoChat(params);
+      fileUrl = uploadImageData.fileUrl;
+
+      const newMessage = {
+        senderId: id_user,
+        receiverId: receiverId,
+        type: 'video',
+        content: fileUrl,
+        isRead: false,
+        timestamp: new Date(),
+      };
+
+      await Promise.all([
+        this.updateOrCreateConversation(id_user, receiverId, newMessage),
+        this.updateOrCreateConversation(receiverId, id_user, newMessage),
       ]);
 
       return newMessage;

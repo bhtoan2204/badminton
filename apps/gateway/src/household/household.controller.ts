@@ -31,7 +31,7 @@ import {
   PERMISSION_INVOICE,
 } from '../utils';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ImageFileInterceptor } from '../user/interceptor/imageFile.interceptor';
+import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
 import { InputDurableItemDto } from './dto/inputDurableItem.dto';
 import { InputConsumableItemDto } from './dto/inputConsumableItem.dto';
 
@@ -286,6 +286,9 @@ export class HouseholdController {
     @CurrentUser() currentUser,
     @Param('id_family') id_family: number,
   ) {
-    return this.householdService.getLowConditionItem(currentUser.id_user, id_family);
+    return this.householdService.getLowConditionItem(
+      currentUser.id_user,
+      id_family,
+    );
   }
 }

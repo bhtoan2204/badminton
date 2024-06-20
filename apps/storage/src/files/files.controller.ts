@@ -26,6 +26,12 @@ export class FilesController implements StorageServiceController {
     return await this.filesService.uploadFile(request, 'chat');
   }
 
+  async uploadVideoChat(
+    request: UploadFileRequest,
+  ): Promise<UploadFileResponse> {
+    return await this.filesService.uploadVideo(request, 'chat');
+  }
+
   async uploadImageStep(
     request: UploadFileRequest,
   ): Promise<UploadFileResponse> {

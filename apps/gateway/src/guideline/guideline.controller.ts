@@ -34,7 +34,7 @@ import {
 import { CreateGuidelineDto } from './dto/createGuideline.dto';
 import { UpdateGuidelineDto } from './dto/updateGuideline.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ImageFileInterceptor } from '../user/interceptor/imageFile.interceptor';
+import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
 
 @ApiTags('Guideline')
 @Controller('guideline')

@@ -31,7 +31,7 @@ import {
 } from '../../utils';
 import { UtilitiesService } from './utilities.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ImageFileInterceptor } from '../../user/interceptor/imageFile.interceptor';
+import { ImageFileInterceptor } from '../../utils/interceptor/imageFile.interceptor';
 
 @ApiTags('Utilities')
 @Controller('utilities')

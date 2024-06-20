@@ -6,15 +6,22 @@ service StorageService {
   rpc uploadFile(UploadFileRequest) returns (UploadFileResponse);
   rpc readFile(ReadFileRequest) returns (ReadFileResponse);
   rpc deleteFile(DeleteFileRequest) returns (DeleteFileResponse);
+
   rpc uploadImageChat(UploadFileRequest) returns (UploadFileResponse);
+  rpc uploadVideoChat(UploadFileRequest) returns (UploadFileResponse);
+
   rpc uploadImageStep(UploadFileRequest) returns (UploadFileResponse);
   rpc deleteImageStep(DeleteFileRequest) returns (DeleteFileResponse);
+
   rpc uploadImageHousehold(UploadFileRequest) returns (UploadFileResponse);
   rpc deleteImageHousehold(DeleteFileRequest) returns (DeleteFileResponse);
+
   rpc uploadImageInvoice(UploadFileRequest) returns (UploadFileResponse);
   rpc deleteImageInvoice(DeleteFileRequest) returns (DeleteFileResponse);
+
   rpc uploadImageUtility(UploadFileRequest) returns (UploadFileResponse);
   rpc deleteImageUtility(DeleteFileRequest) returns (DeleteFileResponse);
+
   rpc uploadImageExpense(UploadFileRequest) returns (UploadFileResponse);
   rpc deleteImageExpense(DeleteFileRequest) returns (DeleteFileResponse);
 }

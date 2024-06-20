@@ -1,27 +1,125 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
   Param,
+  Post,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../utils';
 import { ChatService } from './chat.service';
+import { NewMessageDto } from './dto/newMessage.dto';
+import { ChatGateway } from './chat.gateway';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
+import { VideoFileInterceptor } from '../utils/interceptor/videoFile.interceptor';
 
 @ApiTags('Chat')
 @Controller('chat')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, MemberFamilyGuard)
 export class ChatController {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly chatGateway: ChatGateway,
+  ) {}
 
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send text message' })
+  @Post('sendMessage')
+  async sendMessage(@CurrentUser() user, @Body() dto: NewMessageDto) {
+    const data = await this.chatService.saveMessage(user.id_user, dto);
+    this.chatGateway.emitMessageToUser(dto.receiverId, data);
+    return data;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send text message' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+          description: 'The image of the expense (optional)',
+        },
+        receiverId: {
+          type: 'string',
+          description: 'The ID of the receiver',
+        },
+      },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('image', new ImageFileInterceptor().createMulterOptions()),
+  )
+  @Post('sendImageMessage')
+  async sendImageMessage(
+    @CurrentUser() user,
+    @Body() dto: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const data = await this.chatService.saveImageMessage(
+      user.id_user,
+      dto.receiverId,
+      file,
+    );
+    this.chatGateway.emitMessageToUser(dto.receiverId, data);
+    return data;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send video message' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        video: {
+          type: 'string',
+          format: 'binary',
+          description: 'The video of the expense (optional)',
+        },
+        receiverId: {
+          type: 'string',
+          description: 'The ID of the receiver',
+        },
+      },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('video', new VideoFileInterceptor().createMulterOptions()),
+  )
+  @Post('sendVideoMessage')
+  async sendVideoMessage(
+    @CurrentUser() user,
+    @Body() dto: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const data = await this.chatService.saveVideoMessage(
+      user.id_user,
+      dto.receiverId,
+      file,
+    );
+    this.chatGateway.emitMessageToUser(dto.receiverId, data);
+    return data;
+  }
+
+  // --------------------------------------------------------------
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all chats' })
   @Get('getUsersChat/:index')
