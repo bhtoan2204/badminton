@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { EducationProgress } from './education_progress.dto';
+import { EducationProgress } from './education_progress.entity';
 
 @Entity('subject')
 export class Subjects {

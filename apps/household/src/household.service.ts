@@ -29,11 +29,11 @@ export class HouseholdService {
 
   async getCategory() {
     try {
-      const [data, totalCount] =
+      const [data, total] =
         await this.householdItemCategoriesRepository.findAndCount();
       return {
         data,
-        totalCount,
+        total,
         message: 'Categories retrieved successfully',
       };
     } catch (error) {
@@ -51,16 +51,15 @@ export class HouseholdService {
     itemsPerPage: number,
   ) {
     try {
-      const [data, totalCount] =
-        await this.householdItemsRepository.findAndCount({
-          where: { id_family },
-          take: itemsPerPage,
-          skip: (page - 1) * itemsPerPage,
-          relations: ['category', 'room'],
-        });
+      const [data, total] = await this.householdItemsRepository.findAndCount({
+        where: { id_family },
+        take: itemsPerPage,
+        skip: (page - 1) * itemsPerPage,
+        relations: ['category', 'room'],
+      });
       return {
         data,
-        totalCount,
+        total,
         message: 'Items retrieved successfully',
       };
     } catch (error) {

@@ -104,14 +104,27 @@ export class ChatGateway implements OnModuleInit {
     }
   }
 
-  async emitFamilyMessageToUser(userId: string, message: any) {
+  async emitFamilyMessageToUser(
+    id_user: string,
+    id_family: number,
+    message: any,
+  ) {
     try {
-      const receiverSocketIds = this.socketMap.get(userId);
-      if (receiverSocketIds) {
-        for (const socketId of receiverSocketIds) {
-          this.server.to(socketId).emit('onNewFamilyMessage', message);
-        }
-      }
+      const listReceiverId = await this.chatService.getListReceiverId(
+        id_user,
+        id_family,
+      );
+      await Promise.all(
+        listReceiverId.map(async (receiverId) => {
+          const receiverSocketIds = this.socketMap.get(receiverId) || [];
+          receiverSocketIds.forEach((socketId) => {
+            this.server.to(socketId).emit('onNewFamilyMessage', {
+              ...message,
+              familyId: id_family,
+            });
+          });
+        }),
+      );
     } catch (error) {
       console.error('Error emitting message:', error.message);
     }

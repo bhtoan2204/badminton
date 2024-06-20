@@ -14,7 +14,8 @@ import { FamilyExtraPackages } from './family_package_extra.entity';
 import { Room } from './room.entity';
 import { HouseholdItems } from './household_items.entity';
 import { GuideItems } from './guide_items.entity';
-import { EducationProgress } from './education_progress.dto';
+import { EducationProgress } from './education_progress.entity';
+import { ShoppingLists } from './shopping_lists.entity';
 
 @Entity('family')
 export class Family {
@@ -59,9 +60,9 @@ export class Family {
   rooms: Room[];
 
   @OneToMany(() => HouseholdItems, (household_item) => household_item.family)
-  householdItems: Room[];
+  householdItems: HouseholdItems[];
 
-  @OneToMany(() => HouseholdItems, (household_item) => household_item.family)
+  @OneToMany(() => GuideItems, (guide_item) => guide_item.family)
   guideItems: GuideItems[];
 
   @OneToMany(
@@ -69,4 +70,7 @@ export class Family {
     (education_progress) => education_progress.family,
   )
   educationProgresses: EducationProgress[];
+
+  @OneToMany(() => ShoppingLists, (shoppingList) => shoppingList.family)
+  shoppingLists: ShoppingLists[];
 }

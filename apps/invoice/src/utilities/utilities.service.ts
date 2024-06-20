@@ -37,10 +37,10 @@ export class UtilitiesService {
           [id_family],
         ),
       ]);
-      const totalCount = parseInt(countResult[0].count, 10);
+      const total = parseInt(countResult[0].count, 10);
       return {
         data,
-        totalCount,
+        total,
         message: 'Utilities retrieved successfully',
       };
     } catch (error) {

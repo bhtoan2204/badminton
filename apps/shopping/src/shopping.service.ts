@@ -1,15 +1,23 @@
+import { ShoppingItems, ShoppingItemTypes, ShoppingLists } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { EntityManager } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ShoppingService {
-  constructor(private readonly entityManager: EntityManager) {}
+  constructor(
+    @InjectRepository(ShoppingItems)
+    private shoppingItemsRepository: Repository<ShoppingItems>,
+    @InjectRepository(ShoppingItemTypes)
+    private shoppingItemTypesRepository: Repository<ShoppingItemTypes>,
+    @InjectRepository(ShoppingLists)
+    private shoppingListsRepository: Repository<ShoppingLists>,
+  ) {}
 
   async getShoppingItemType() {
     try {
-      const query = 'SELECT * FROM shopping_item_types';
-      const data = await this.entityManager.query(query);
+      const data = await this.shoppingItemTypesRepository.find();
       return {
         data: data,
         message: 'Get shopping item type',
@@ -29,11 +37,15 @@ export class ShoppingService {
     itemsPerPage: number,
   ) {
     try {
-      const query = 'SELECT * FROM f_get_shopping_list($1, $2, $3, $4)';
-      const params = [id_user, id_family, page, itemsPerPage];
-      const data = await this.entityManager.query(query, params);
+      const [data, total] = await this.shoppingListsRepository.findAndCount({
+        where: { id_family: id_family },
+        order: { id_list: 'DESC' },
+        skip: (page - 1) * itemsPerPage,
+        take: itemsPerPage,
+      });
       return {
         data: data,
+        total: total,
         message: 'Get shopping list',
       };
     } catch (error) {
@@ -51,12 +63,15 @@ export class ShoppingService {
     itemsPerPage: number,
   ) {
     try {
-      const query =
-        'SELECT * FROM f_get_shopping_item($1, $2, $3, $4) ORDER BY priority_level DESC';
-      const params = [id_user, id_list, page, itemsPerPage];
-      const data = await this.entityManager.query(query, params);
+      const [data, total] = await this.shoppingItemsRepository.findAndCount({
+        where: { id_list: id_list },
+        order: { id_item: 'DESC' },
+        skip: (page - 1) * itemsPerPage,
+        take: itemsPerPage,
+      });
       return {
         data: data,
+        total: total,
         message: 'Get shopping item',
       };
     } catch (error) {
@@ -70,9 +85,11 @@ export class ShoppingService {
   async createShoppingList(id_user: string, dto: any) {
     try {
       const { id_family, title, description } = dto;
-      const query = 'SELECT * FROM f_create_shopping_list($1, $2, $3, $4)';
-      const params = [id_user, id_family, title, description];
-      const data = await this.entityManager.query(query, params);
+      const newShoppingList = new ShoppingLists();
+      newShoppingList.id_family = id_family;
+      newShoppingList.title = title;
+      newShoppingList.description = description;
+      const data = await this.shoppingListsRepository.save(newShoppingList);
       return {
         data: data,
         message: 'Create shopping list',
@@ -97,20 +114,16 @@ export class ShoppingService {
         price,
         description,
       } = dto;
-      const query =
-        'SELECT * FROM f_create_shopping_item($1, $2, $3, $4, $5, $6, $7, $8, $9)';
-      const params = [
-        id_user,
-        id_list,
-        item_name,
-        quantity,
-        id_item_type,
-        priority_level,
-        reminder_date,
-        price,
-        description,
-      ];
-      const data = await this.entityManager.query(query, params);
+      const newShoppingItem = new ShoppingItems();
+      newShoppingItem.id_list = id_list;
+      newShoppingItem.item_name = item_name;
+      newShoppingItem.quantity = quantity;
+      newShoppingItem.id_item_type = id_item_type;
+      newShoppingItem.priority_level = priority_level;
+      newShoppingItem.reminder_date = reminder_date;
+      newShoppingItem.price = price;
+      newShoppingItem.description = description;
+      const data = await this.shoppingItemsRepository.save(newShoppingItem);
       return {
         data: data,
         message: 'Create shopping item',
@@ -126,9 +139,16 @@ export class ShoppingService {
   async updateShoppingList(id_user: string, dto: any) {
     try {
       const { id_list, title, description } = dto;
-      const query = 'SELECT * FROM f_update_shopping_list($1, $2, $3, $4)';
-      const params = [id_user, id_list, title, description];
-      const data = await this.entityManager.query(query, params);
+      const shoppingList = await this.shoppingListsRepository.findOne(id_list);
+      if (!shoppingList) {
+        throw new RpcException({
+          message: 'Shopping list not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      if (title) shoppingList.title = title;
+      if (description) shoppingList.description = description;
+      const data = await this.shoppingListsRepository.save(shoppingList);
       return {
         data: data,
         message: 'Update shopping list',
@@ -155,22 +175,25 @@ export class ShoppingService {
         description,
         id_item_type,
       } = dto;
-      const query =
-        'SELECT * FROM f_update_shopping_item($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)';
-      const params = [
-        id_user,
-        id_item,
-        id_list,
-        item_name,
-        quantity,
-        is_purchased,
-        priority_level,
-        reminder_date,
-        price,
-        description,
-        id_item_type,
-      ];
-      const data = await this.entityManager.query(query, params);
+      const shoppingItem = await this.shoppingItemsRepository.findOne({
+        where: { id_item: id_item, id_list: id_list },
+      });
+      if (!shoppingItem) {
+        throw new RpcException({
+          message: 'Shopping item not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      if (id_list) shoppingItem.id_list = id_list;
+      if (item_name) shoppingItem.item_name = item_name;
+      if (quantity) shoppingItem.quantity = quantity;
+      if (is_purchased) shoppingItem.is_purchased = is_purchased;
+      if (priority_level) shoppingItem.priority_level = priority_level;
+      if (reminder_date) shoppingItem.reminder_date = reminder_date;
+      if (price) shoppingItem.price = price;
+      if (description) shoppingItem.description = description;
+      if (id_item_type) shoppingItem.id_item_type = id_item_type;
+      const data = await this.shoppingItemsRepository.save(shoppingItem);
       return {
         data: data,
         message: 'Update shopping item',
@@ -189,12 +212,25 @@ export class ShoppingService {
     id_list: number,
   ) {
     try {
-      const query = 'SELECT * FROM f_delete_shopping_list($1, $2, $3)';
-      const params = [id_user, id_family, id_list];
-      const data = await this.entityManager.query(query, params);
+      const deletedShoppingItems = await this.shoppingItemsRepository.find({
+        where: { id_list: id_list },
+      });
+      const deletedShoppingList = await this.shoppingListsRepository.findOne({
+        where: { id_list: id_list },
+      });
+      if (!deletedShoppingList) {
+        throw new RpcException({
+          message: 'Shopping list not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      const shoppingItems =
+        await this.shoppingItemsRepository.remove(deletedShoppingItems);
+      const shoppingList =
+        await this.shoppingListsRepository.remove(deletedShoppingList);
       return {
-        data: data[0].f_delete_shopping_list,
         message: 'Delete shopping list',
+        data: { shoppingItems, shoppingList },
       };
     } catch (error) {
       throw new RpcException({
@@ -211,12 +247,20 @@ export class ShoppingService {
     id_item: number,
   ) {
     try {
-      const query = 'SELECT * FROM f_delete_shopping_item($1, $2, $3, $4)';
-      const params = [id_user, id_family, id_list, id_item];
-      const data = await this.entityManager.query(query, params);
+      const deletedShoppingItem = await this.shoppingItemsRepository.findOne({
+        where: { id_item: id_item, id_list: id_list },
+      });
+      if (!deletedShoppingItem) {
+        throw new RpcException({
+          message: 'Shopping item not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      const shoppingItem =
+        await this.shoppingItemsRepository.remove(deletedShoppingItem);
       return {
-        data: data,
         message: 'Delete shopping item',
+        data: shoppingItem,
       };
     } catch (error) {
       throw new RpcException({

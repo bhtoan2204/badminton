@@ -18,7 +18,7 @@ export class ChecklistService {
     itemsPerPage: number,
   ) {
     try {
-      const [data, totalCount] = await this.checklistRepository.findAndCount({
+      const [data, total] = await this.checklistRepository.findAndCount({
         where: { id_family: id_family },
         skip: (page - 1) * itemsPerPage,
         take: itemsPerPage,
@@ -26,7 +26,7 @@ export class ChecklistService {
 
       return {
         data: data,
-        totalCount: totalCount,
+        total: total,
         message: 'Get checklist successfully',
       };
     } catch (error) {
