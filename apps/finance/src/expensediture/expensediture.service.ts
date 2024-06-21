@@ -147,31 +147,6 @@ export class ExpenseditureService {
       });
     }
   }
-
-  async getExpenseByDateRange(
-    id_user: string,
-    id_family: number,
-    pageNumber: number,
-    itemsPerPage: number,
-    option: number,
-  ) {
-    try {
-      console.log(id_user, id_family,pageNumber,itemsPerPage, option)
-      const query = 'SELECT * FROM f_get_expenses_with_pagination($1, $2, $3, $4, $5)';
-      const params = [id_user, id_family, option,pageNumber, itemsPerPage];
-      const data = await this.entityManager.query(query, params);
-      return {
-        data: data,
-      };
-      
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  }
-  
   async getExpenditureById(
     id_user: string,
     id_family: number,
