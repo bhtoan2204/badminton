@@ -18,10 +18,10 @@ import { APP_GUARD } from '@nestjs/core';
   controllers: [UserController],
   providers: [
     UserService,
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerGuard,
+    // },
   ],
 })
 export class UserModule {}

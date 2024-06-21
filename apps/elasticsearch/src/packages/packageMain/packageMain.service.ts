@@ -2,7 +2,7 @@ import { PackageMain } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 
 @Injectable()
 export class PackageMainService {
@@ -11,11 +11,19 @@ export class PackageMainService {
     private packageMainRepository: Repository<PackageMain>,
   ) {}
 
-  async getAllPackageMain(page: number, itemsPerPage) {
+  async getAllPackageMain(
+    page: number,
+    itemsPerPage: number,
+    search: string,
+    sortBy: string,
+    sortDesc: boolean,
+  ) {
     try {
       const [data, total] = await this.packageMainRepository.findAndCount({
+        where: search ? { name: Like(`%${search}%`) } : {},
         take: itemsPerPage,
         skip: (page - 1) * itemsPerPage,
+        order: { [sortBy]: sortDesc ? 'DESC' : 'ASC' },
       });
       return {
         data: data,

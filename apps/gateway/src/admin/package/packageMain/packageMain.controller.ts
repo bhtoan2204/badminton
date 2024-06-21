@@ -27,12 +27,24 @@ export class PackageMainController {
   @HttpCode(HttpStatus.OK)
   @ApiQuery({ name: 'page', required: true, type: Number })
   @ApiQuery({ name: 'itemsPerPage', required: true, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'sortBy', required: false, type: String })
+  @ApiQuery({ name: 'sortDesc', required: false, type: Boolean })
   @Get('getAllPackage')
   async getAllPackage(
     @Query('page') page: number,
     @Query('itemsPerPage') itemsPerPage: number,
+    @Query('search') search: string,
+    @Query('sortBy') sortBy: string,
+    @Query('sortDesc') sortDesc: boolean,
   ) {
-    return this.packageMainService.getAllPackage(page, itemsPerPage);
+    return this.packageMainService.getAllPackage(
+      page,
+      itemsPerPage,
+      search,
+      sortBy,
+      sortDesc,
+    );
   }
 
   @HttpCode(HttpStatus.OK)

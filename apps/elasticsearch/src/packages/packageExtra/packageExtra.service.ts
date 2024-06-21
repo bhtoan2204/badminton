@@ -2,7 +2,7 @@ import { PackageExtra } from '@app/common';
 import { Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 
 @Injectable()
 export class PackageExtraService {
@@ -11,9 +11,16 @@ export class PackageExtraService {
     private packageMainRepository: Repository<PackageExtra>,
   ) {}
 
-  async getPackagesExtra(): Promise<PackageExtra[]> {
+  async getPackagesExtra(
+    search: string,
+    sortBy: string,
+    sortDesc: boolean,
+  ): Promise<PackageExtra[]> {
     try {
-      return this.packageMainRepository.find();
+      return this.packageMainRepository.find({
+        where: search ? { description: Like(`%${search}%`) } : {},
+        order: { [sortBy]: sortDesc ? 'DESC' : 'ASC' },
+      });
     } catch (error) {
       throw new RpcException(error);
     }

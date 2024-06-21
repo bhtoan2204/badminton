@@ -2,7 +2,7 @@ import { PackageCombo, PackageExtra } from '@app/common';
 import { Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 
 @Injectable()
 export class PackageComboService {
@@ -13,11 +13,20 @@ export class PackageComboService {
     private packageExtraRepository: Repository<PackageExtra>,
   ) {}
 
-  async getPackagesCombo(page: number, itemsPerPage: number): Promise<any> {
+  async getPackagesCombo(
+    page: number,
+    itemsPerPage: number,
+    search: string,
+    sortBy: string,
+    sortDesc: boolean,
+  ): Promise<any> {
     try {
       const [data, total] = await this.packageComboRepository.findAndCount({
+        where: search ? { name: Like(`%${search}%`) } : {},
         take: itemsPerPage,
         skip: (page - 1) * itemsPerPage,
+        relations: ['id_package_extra'],
+        order: { [sortBy]: sortDesc ? 'DESC' : 'ASC' },
       });
       return {
         data: data,

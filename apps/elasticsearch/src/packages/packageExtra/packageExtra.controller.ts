@@ -11,9 +11,16 @@ export class PackageExtraController {
   ) {}
 
   @EventPattern('elasticsearchClient/getExtraPackage')
-  async getPackagesExtra(@Ctx() context: RmqContext): Promise<any> {
+  async getPackagesExtra(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ): Promise<any> {
     this.rmqService.ack(context);
-    return this.packageExtraService.getPackagesExtra();
+    return this.packageExtraService.getPackagesExtra(
+      data.search,
+      data.sortBy,
+      data.sortDesc,
+    );
   }
 
   @EventPattern('elasticsearchClient/updateExtraPackage')

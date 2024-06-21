@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Put, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Admin, AdminGuard, JwtAuthGuard } from 'apps/gateway/src/utils';
 import { PackageExtraService } from './packageExtra.service';
 import { UpdatePackageExtraDto } from './dto/updatePackageExtra.dto';
@@ -13,8 +13,15 @@ export class PackageExtraController {
   constructor(private readonly packageExtraService: PackageExtraService) {}
 
   @Get()
-  async getPackagesExtra(): Promise<any> {
-    return this.packageExtraService.getPackagesExtra();
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'sortBy', required: false, type: String })
+  @ApiQuery({ name: 'sortDesc', required: false, type: Boolean })
+  async getPackagesExtra(
+    @Query('search') search: string,
+    @Query('sortBy') sortBy: string,
+    @Query('sortDesc') sortDesc: boolean,
+  ): Promise<any> {
+    return this.packageExtraService.getPackagesExtra(search, sortBy, sortDesc);
   }
 
   @Put()

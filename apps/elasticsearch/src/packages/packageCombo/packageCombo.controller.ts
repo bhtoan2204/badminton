@@ -19,6 +19,9 @@ export class PackageComboController {
     return this.packageComboService.getPackagesCombo(
       data.page,
       data.itemsPerPage,
+      data.search,
+      data.sortBy,
+      data.sortDesc,
     );
   }
 
