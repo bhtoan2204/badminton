@@ -10,10 +10,22 @@ export class PackageComboService {
     private readonly elasticsearchClient: ClientProxy,
   ) {}
 
-  async getPackagesCombo(page: number, itemsPerPage: number): Promise<any> {
+  async getPackagesCombo(
+    page: number,
+    itemsPerPage: number,
+    search: string,
+    sortBy: string,
+    sortDesc: boolean,
+  ): Promise<any> {
     try {
       const response = this.elasticsearchClient
-        .send('elasticsearchClient/getPackagesCombo', { page, itemsPerPage })
+        .send('elasticsearchClient/getPackagesCombo', {
+          page,
+          itemsPerPage,
+          search,
+          sortBy,
+          sortDesc,
+        })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;

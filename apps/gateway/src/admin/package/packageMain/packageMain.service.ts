@@ -10,12 +10,21 @@ export class PackageMainService {
     private readonly elasticsearchClient: ClientProxy,
   ) {}
 
-  async getAllPackage(page: number, itemsPerPage: number) {
+  async getAllPackage(
+    page: number,
+    itemsPerPage: number,
+    search: string,
+    sortBy: string,
+    sortDesc: boolean,
+  ) {
     try {
       const response = this.elasticsearchClient
         .send('elasticsearchClient/getAllPackageMain', {
           page,
           itemsPerPage,
+          search,
+          sortBy,
+          sortDesc,
         })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);

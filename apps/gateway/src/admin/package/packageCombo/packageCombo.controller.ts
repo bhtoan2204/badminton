@@ -28,11 +28,23 @@ export class PackageComboController {
   @Get()
   @ApiQuery({ name: 'page', required: true, type: Number })
   @ApiQuery({ name: 'itemsPerPage', required: true, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'sortBy', required: false, type: String })
+  @ApiQuery({ name: 'sortDesc', required: false, type: Boolean })
   async getPackagesCombo(
     @Query('page') page: number,
     @Query('itemsPerPage') itemsPerPage: number,
+    @Query('search') search: string,
+    @Query('sortBy') sortBy: string,
+    @Query('sortDesc') sortDesc: boolean,
   ): Promise<any> {
-    return this.packageComboService.getPackagesCombo(page, itemsPerPage);
+    return this.packageComboService.getPackagesCombo(
+      page,
+      itemsPerPage,
+      search,
+      sortBy,
+      sortDesc,
+    );
   }
 
   @HttpCode(201)

@@ -9,10 +9,18 @@ export class PackageExtraService {
     @Inject(ELASTICSEARCH_SERVICE)
     private readonly elasticsearchClient: ClientProxy,
   ) {}
-  async getPackagesExtra(): Promise<any> {
+  async getPackagesExtra(
+    search: string,
+    sortBy: string,
+    sortDesc: boolean,
+  ): Promise<any> {
     try {
       const response = this.elasticsearchClient
-        .send('elasticsearchClient/getExtraPackage', {})
+        .send('elasticsearchClient/getExtraPackage', {
+          search,
+          sortBy,
+          sortDesc,
+        })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;

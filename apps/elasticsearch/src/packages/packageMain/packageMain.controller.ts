@@ -13,7 +13,13 @@ export class PackageMainController {
   @EventPattern('elasticsearchClient/getAllPackageMain')
   async getAllPackage(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.invoiceService.getAllPackageMain(data.page, data.itemsPerPage);
+    return this.invoiceService.getAllPackageMain(
+      data.page,
+      data.itemsPerPage,
+      data.search,
+      data.sortBy,
+      data.sortDesc,
+    );
   }
 
   @EventPattern('elasticsearchClient/createPackageMain')
