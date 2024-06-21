@@ -173,29 +173,7 @@ export class IncomeService {
       });
     }
   }
-  async getIncomeByDateRange(
-    id_user: string,
-    id_family: number,
-    pageNumber: number,
-    itemsPerPage: number,
-    option: number,
-  ) {
-    try {
-      const query = 'SELECT * FROM f_get_income_with_pagination($1, $2, $3, $4, $5)';
-      const params = [id_user, id_family, option, pageNumber, itemsPerPage];
-      const data = await this.entityManager.query(query, params);
-      return {
-        data: data,
-      };
 
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  }
-  
   async getIncomeById(id_user: string, id_family: number, id_income: number) {
     try {
       const query = 'SELECT * FROM f_get_income_by_id($1, $2, $3)';
