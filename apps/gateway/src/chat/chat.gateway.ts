@@ -186,37 +186,37 @@ export class ChatGateway implements OnModuleInit {
     }
   }
 
-  @SubscribeMessage('newFamilyImageMessage')
-  @UseGuards(WsJwtAuthGuard)
-  async emitFamilyImageMessage(
-    @ConnectedSocket() client: Socket,
-    @WsCurrentUser() user,
-    @MessageBody() message: NewFamilyImageMessageDto,
-  ) {
-    try {
-      const receiverMessage = await this.chatService.saveFamilyImageMessage(
-        user.id_user,
-        message,
-      );
-      const listReceiverId = await this.chatService.getListReceiverId(
-        user.id_user,
-        message.familyId,
-      );
-      await Promise.all(
-        listReceiverId.map(async (receiverId) => {
-          const receiverSocketIds = this.socketMap.get(receiverId) || [];
-          receiverSocketIds.forEach((socketId) => {
-            client.to(socketId).emit('onNewFamilyImageMessage', {
-              ...receiverMessage,
-              familyId: message.familyId,
-            });
-          });
-        }),
-      );
-    } catch (error) {
-      console.error('Error emitting message:', error.message);
-    }
-  }
+  // @SubscribeMessage('newFamilyImageMessage')
+  // @UseGuards(WsJwtAuthGuard)
+  // async emitFamilyImageMessage(
+  //   @ConnectedSocket() client: Socket,
+  //   @WsCurrentUser() user,
+  //   @MessageBody() message: NewFamilyImageMessageDto,
+  // ) {
+  //   try {
+  //     const receiverMessage = await this.chatService.saveFamilyImageMessage(
+  //       user.id_user,
+  //       message,
+  //     );
+  //     const listReceiverId = await this.chatService.getListReceiverId(
+  //       user.id_user,
+  //       message.familyId,
+  //     );
+  //     await Promise.all(
+  //       listReceiverId.map(async (receiverId) => {
+  //         const receiverSocketIds = this.socketMap.get(receiverId) || [];
+  //         receiverSocketIds.forEach((socketId) => {
+  //           client.to(socketId).emit('onNewFamilyImageMessage', {
+  //             ...receiverMessage,
+  //             familyId: message.familyId,
+  //           });
+  //         });
+  //       }),
+  //     );
+  //   } catch (error) {
+  //     console.error('Error emitting message:', error.message);
+  //   }
+  // }
 
   // @SubscribeMessage('newImageMessage')
   // @UseGuards(WsJwtAuthGuard)

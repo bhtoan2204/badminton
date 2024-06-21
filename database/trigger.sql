@@ -47,7 +47,7 @@ CREATE OR REPLACE FUNCTION public.p_create_role()
 AS $function$
 BEGIN 
     EXECUTE 'CREATE ROLE ' || NEW.role;
-    EXECUTE 'GRANT CONNECT ON DATABASE famfund_i2wq_a3fq TO ' || NEW.role;
+    EXECUTE 'GRANT CONNECT ON DATABASE defaultdb TO ' || NEW.role;
     RETURN NEW;
 END;
 $function$

@@ -107,16 +107,14 @@ export class IncomeController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get Statiscal Income last six months' })
-  @Get('getStatiscalIncome/:id_family')
-  async getStatiscalIncome(
-    @CurrentUser() currentUser,
-    @Param('id_family') id_family: number,
-  ) {
-    return this.incomeService.getStasticalIncome(
-      currentUser.id_user,
-      id_family,
-    );
+  @ApiOperation({ summary: 'Get statiscal income' })
+  @Get('getIncomeByDateRange/:id_family')
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'itemsPerPage', required: false, type: Number })
+  @ApiQuery({ name: 'option', required: false, type: Number })
+  @ApiParam({name: 'id_family', required: true,  type: Number})
+  async getIncomeByDateRange(@CurrentUser() currentUser, @Param('id_family') id_family: number,  @Query('page') page: number, @Query('itemsPerPage') itemsPerPage: number, @Query('option') option: number) {
+    return this.incomeService.getIncomeByDateRange(currentUser.id_user, id_family, page, itemsPerPage, option);
   }
 
   @HttpCode(HttpStatus.CREATED)
