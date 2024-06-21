@@ -1,7 +1,7 @@
-import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { FINANCE_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
+import { TimeoutError, lastValueFrom, timeout } from 'rxjs';
 import { CreateExpenseDto } from './dto/createExpense.dto';
 
 @Injectable()
@@ -16,8 +16,8 @@ export class ExpenseditureService {
       const data = await lastValueFrom(response);
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
       }
       throw new HttpException(error, error.statusCode);
     }
@@ -36,8 +36,8 @@ export class ExpenseditureService {
       const data = await lastValueFrom(response);
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
       }
       throw new HttpException(error, error.statusCode);
     }
@@ -50,8 +50,8 @@ export class ExpenseditureService {
       const data = await lastValueFrom(response);
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
       }
       throw new HttpException(error, error.statusCode);
     }
@@ -73,23 +73,23 @@ export class ExpenseditureService {
       const data = await lastValueFrom(response);
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
       }
       throw new HttpException(error, error.statusCode);
     }
   }
 
-  async getStatiscalExpensediture(id_user: string, id_family: number) {
+  async getExpenseByDateRange(id_user: string, id_family: number,  page: number, itemsPerPage: number,  option: number) {
     try {
       const response = this.financeClient
-        .send('financeClient/getStatiscalExpensediture', { id_user, id_family })
+        .send('financeClient/getExpenseByDateRange', { id_user, id_family, page, itemsPerPage, option })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
       }
       throw new HttpException(error, error.statusCode);
     }
@@ -103,8 +103,8 @@ export class ExpenseditureService {
       const data = await lastValueFrom(response);
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
       }
       throw new HttpException(error, error.statusCode);
     }
@@ -118,8 +118,8 @@ export class ExpenseditureService {
       const data = await lastValueFrom(response);
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
       }
       throw new HttpException(error, error.statusCode);
     }
@@ -141,8 +141,8 @@ export class ExpenseditureService {
       const data = await lastValueFrom(response);
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
       }
       throw new HttpException(error, error.statusCode);
     }
@@ -166,8 +166,8 @@ export class ExpenseditureService {
       const data = await lastValueFrom(response);
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
       }
       throw new HttpException(error, error.statusCode);
     }

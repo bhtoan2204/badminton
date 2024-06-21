@@ -112,12 +112,16 @@ export class ExpenseditureController {
     );
   }
 
-  // @HttpCode(HttpStatus.OK)
-  // @ApiOperation({ summary: 'Get statiscal expenseditures last six months' })
-  // @Get('getStatiscalExpense/:id_family')
-  // async getStatiscalExpense(@CurrentUser() currentUser, @Param('id_family') id_family: number) {
-  //   return this.expenseService.getStatiscalExpensediture(currentUser.id_user, id_family);
-  // }
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get statiscal expenseditures' })
+  @Get('getExpenseByDateRange/:id_family')
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'itemsPerPage', required: false, type: Number })
+  @ApiQuery({ name: 'option', required: false, type: Number })
+  @ApiParam({name: 'id_family', required: true,  type: Number})
+  async getExpenseByDateRange(@CurrentUser() currentUser, @Param('id_family') id_family: number,  @Query('page') page: number, @Query('itemsPerPage') itemsPerPage: number, @Query('option') option: number) {
+    return this.expenseService.getExpenseByDateRange(currentUser.id_user, id_family, page, itemsPerPage, option);
+  }
 
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create expensediture' })
