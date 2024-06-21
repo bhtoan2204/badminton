@@ -1004,6 +1004,197 @@ END;
 $function$;
 
 -- DROP FUNCTION public.f_get_expenditure(text, int4, int4, int4);
+CREATE OR REPLACE FUNCTION public.f_get_expense_by_date_range(
+    p_id_user uuid, 
+    p_id_family integer, 
+    p_days_range integer
+)
+RETURNS TABLE (
+    id_expense_type integer,
+    expense_category text,
+    expense_amount numeric,
+    description text, 
+    name text, 
+    expenditure_date date
+)
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_user_exists BOOLEAN;
+    v_end_date DATE := CURRENT_DATE;
+    v_start_date DATE;
+BEGIN
+    -- Calculate the start date
+    v_start_date := v_end_date - (p_days_range || ' days')::interval;
+
+    -- Debugging: Raise notice to check the date range
+    RAISE NOTICE 'Start Date: %, End Date: %', v_start_date, v_end_date;
+
+    -- Check if the user is a member of the specified family
+    SELECT EXISTS (
+        SELECT 1
+        FROM member_family
+        WHERE id_user = p_id_user AND id_family = p_id_family
+    ) INTO v_user_exists;
+
+    IF NOT v_user_exists THEN
+        RAISE EXCEPTION 'User is not a member of the specified family.';
+    END IF;
+
+    -- Return the query results
+    RETURN QUERY
+    SELECT 
+        fe.id_expense_type,
+        f_get_category_name(p_id_family, fe.id_expense_type) AS expense_category,
+        fe.amount,
+        fe.description,
+        f_find_user(fe.id_created_by),
+        fe.expenditure_date
+    FROM 
+        finance_expenditure fe
+    WHERE 
+        fe.id_family = p_id_family 
+        AND fe.expenditure_date BETWEEN v_start_date AND v_end_date; 
+END;
+$function$;
+CREATE OR REPLACE FUNCTION public.f_get_expenses_with_pagination(
+    p_id_user uuid,
+    p_id_family integer,
+    p_days_range integer,
+    p_page_number integer,
+    p_items_per_page integer
+)
+RETURNS JSON
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_user_exists BOOLEAN;
+    v_total_count integer;
+    v_total_pages integer;
+    v_start_date DATE;
+    v_end_date DATE := CURRENT_DATE;
+    v_expenses JSON;
+BEGIN
+    -- Calculate the start date
+    v_start_date := v_end_date - (p_days_range || ' days')::interval;
+
+    -- Check if the user is a member of the specified family
+    SELECT EXISTS (
+        SELECT 1
+        FROM member_family
+        WHERE id_user = p_id_user AND id_family = p_id_family
+    ) INTO v_user_exists;
+
+    IF NOT v_user_exists THEN
+        RAISE EXCEPTION 'User is not a member of the specified family.';
+    END IF;
+
+    -- Get the total count of records
+    SELECT COUNT(*)
+    INTO v_total_count
+    FROM finance_expenditure fe
+    WHERE fe.id_family = p_id_family
+      AND fe.expenditure_date BETWEEN v_start_date AND v_end_date;
+
+    -- Calculate total pages
+    v_total_pages := CEIL(v_total_count::numeric / p_items_per_page);
+
+    -- Return the paginated query results and total pages as JSON
+    v_expenses := json_build_object(
+        'total_pages', v_total_pages,
+        'expenses', (
+            SELECT json_agg(json_build_object(
+                'id_expense_type', fe.id_expense_type,
+                'expense_category', f_get_category_name(p_id_family, fe.id_expense_type),
+                'expense_amount', fe.amount,
+                'description', fe.description,
+                'name', f_find_user(fe.id_created_by),
+                'expenditure_date', fe.expenditure_date
+            ) ORDER BY fe.expenditure_date DESC)
+            FROM finance_expenditure fe
+            WHERE fe.id_family = p_id_family 
+              AND fe.expenditure_date BETWEEN v_start_date AND v_end_date
+            OFFSET (p_page_number - 1) * p_items_per_page
+            LIMIT p_items_per_page
+        )
+    );
+
+    RETURN v_expenses;
+END;
+$function$;
+
+
+drop function f_get_expense_by_date_range(uuid,integer,integer) 
+select * from f_get_expenses_with_pagination('28905675-858b-4a93-a283-205899779622', 96, 90, 1,10)
+select * from f_get_income_with_pagination('28905675-858b-4a93-a283-205899779622', 96, 90, 1,10)
+
+
+CREATE OR REPLACE FUNCTION public.f_get_income_with_pagination(
+    p_id_user uuid,
+    p_id_family integer,
+    p_days_range integer,
+    p_page_number integer,
+    p_items_per_page integer
+)
+RETURNS JSON
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_user_exists BOOLEAN;
+    v_total_count integer;
+    v_total_pages integer;
+    v_start_date DATE;
+    v_end_date DATE := CURRENT_DATE;
+    v_income_records JSON;
+BEGIN
+    -- Calculate the start date
+    v_start_date := v_end_date - (p_days_range || ' days')::interval;
+
+    -- Check if the user is a member of the specified family
+    SELECT EXISTS (
+        SELECT 1
+        FROM member_family
+        WHERE id_user = p_id_user AND id_family = p_id_family
+    ) INTO v_user_exists;
+
+    IF NOT v_user_exists THEN
+        RAISE EXCEPTION 'User is not a member of the specified family.';
+    END IF;
+
+    -- Get the total count of income records
+    SELECT COUNT(*)
+    INTO v_total_count
+    FROM finance_income fi
+    WHERE fi.id_family = p_id_family
+      AND fi.income_date BETWEEN v_start_date AND v_end_date;
+
+    -- Calculate total pages
+    v_total_pages := CEIL(v_total_count::numeric / p_items_per_page);
+
+    -- Construct JSON object with pagination information and income records
+    v_income_records := json_build_object(
+        'total_pages', v_total_pages,
+        'income', (
+            SELECT json_agg(json_build_object(
+                'id_income_source', fi.id_income,
+                'income_category', f_get_income_name(p_id_family, fi.id_income),
+                'income_amount', fi.amount,
+                'description', fi.description,
+                'name', f_find_user(fi.id_created_by),
+                'income_date', fi.income_date
+            ) ORDER BY fi.income_date DESC)
+            FROM finance_income fi
+            WHERE fi.id_family = p_id_family
+              AND fi.income_date BETWEEN v_start_date AND v_end_date
+            OFFSET (p_page_number - 1) * p_items_per_page
+            LIMIT p_items_per_page
+        )
+    );
+
+    RETURN v_income_records;
+END;
+$function$;
+
 
 CREATE OR REPLACE FUNCTION public.f_get_expenditure(p_id_user text, p_id_family integer, p_page integer, p_items_per_page integer)
  RETURNS TABLE(id_expenditure integer, id_family integer, id_created_by uuid, expense_name character varying, amount numeric, expenditure_date date, description text)
@@ -1037,8 +1228,7 @@ $function$
 ALTER FUNCTION public.f_get_expenditure(text, int4, int4, int4) OWNER TO avnadmin;
 GRANT ALL ON FUNCTION public.f_get_expenditure(text, int4, int4, int4) TO avnadmin;
 
-
-CREATE OR REPLACE FUNCTION public.f_get_category_name(p_id_family integer, p_id_expense_type integer)
+CREATE OR REPLACE FUNCTION public.f_get_category_name(p_id_family INTEGER, p_id_expense_type INTEGER)
 RETURNS TEXT
 LANGUAGE plpgsql
 AS $function$
@@ -1046,22 +1236,25 @@ DECLARE
     v_category_name TEXT;
 BEGIN
     -- Lấy tên của category dựa trên id_expense_type và id_family
-   SELECT category->>'category' into v_category_name
-	FROM (
-	    SELECT jsonb_array_elements(finance_expenditure_type.expenditure_details) AS category
-	    FROM finance_expenditure_type 
-	    WHERE id_family = p_id_family
-	) AS subquery
-	WHERE (category->>'id_expense_type')::integer = p_id_expense_type;
+    SELECT category->>'category' INTO v_category_name
+    FROM (
+        SELECT jsonb_array_elements(finance_expenditure_type.expenditure_details) AS category
+        FROM finance_expenditure_type 
+        WHERE id_family = p_id_family
+    ) AS subquery
+    WHERE (category->>'id_expense_type')::integer = p_id_expense_type;
 
     -- Kiểm tra xem có tìm thấy category không
     IF NOT FOUND THEN
-        RAISE EXCEPTION 'Expense type with specified ID and family does not exist.';
+        v_category_name := 'Other';
     END IF;
 
     RETURN v_category_name;
 END;
 $function$;
+
+
+
 
 CREATE OR REPLACE FUNCTION public.f_get_income_name(p_id_family integer, p_id_income_type integer)
 RETURNS TEXT
@@ -1081,7 +1274,7 @@ BEGIN
 
     -- Kiểm tra xem có tìm thấy category không
     IF NOT FOUND THEN
-        RAISE EXCEPTION 'Expense type with specified ID and family does not exist.';
+        v_category_name := 'Other';
     END IF;
 
     RETURN v_category_name;
@@ -1381,6 +1574,7 @@ BEGIN
         v_categories := '[]'::jsonb;
         FOR v_category IN
             SELECT jsonb_build_object(
+            			'id_expense_type', fe.id_expense_type,
                        'name', f_get_category_name(p_id_family, fe.id_expense_type),
                        'amount', COALESCE(SUM(fe.amount), 0)
                    ) AS category
@@ -1847,7 +2041,7 @@ RETURNS TABLE (
 BEGIN
     IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = p_id_family AND f.id_user = p_id_user) THEN
         RETURN QUERY
-        SELECT * FROM category_event WHERE category_event.id_family = p_id_family;
+        SELECT category_event.id_category_event, category_event.title, category_event.color, category_event.id_family FROM category_event WHERE category_event.id_family = p_id_family;
     ELSE
         RAISE EXCEPTION 'User does not belong to the specified family';
     END IF;
@@ -1880,23 +2074,32 @@ CREATE OR REPLACE FUNCTION update_category_event(
     _color VARCHAR,
     _id_family INT,
     _id_user uuid
-) RETURNS VOID AS $$
+) RETURNS TABLE (
+    id_category_event INT,
+    title VARCHAR,
+    color VARCHAR,
+    id_family INT
+) AS $$
 BEGIN
-    IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = p_id_family AND f.id_user = p_id_user) THEN
+    IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = _id_family AND f.id_user = _id_user) THEN
+        -- Cập nhật mục và trả về mục vừa cập nhật
+        RETURN QUERY
         UPDATE category_event
         SET title = _title, color = _color, updated_at = now()
-        WHERE id_category_event = _id_category_event AND id_family = _id_family;
+        WHERE category_event.id_category_event = _id_category_event AND category_event.id_family = _id_family
+        RETURNING category_event.id_category_event, category_event.title, category_event.color, category_event.id_family;
     ELSE
         RAISE EXCEPTION 'User does not belong to the specified family';
     END IF;
 END;
 $$ LANGUAGE plpgsql;
 
+
 -- Delete
 CREATE OR REPLACE FUNCTION delete_category_event(_id_category_event INT, _id_family int,  _id_user uuid)
 RETURNS VOID AS $$
 BEGIN
-    IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = _id_family AND f.id_user = p_id_user) THEN
+    IF EXISTS (SELECT 1 FROM member_family f WHERE f.id_family = _id_family AND f.id_user = _id_user) THEN
         DELETE FROM category_event WHERE id_category_event = _id_category_event;
     ELSE
         RAISE EXCEPTION 'User does not belong to the specified family';
@@ -1904,5 +2107,40 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- DROP FUNCTION public.f_delete_calendar_event(uuid, int4);
 
+CREATE OR REPLACE FUNCTION public.f_delete_calendar_event(
+    p_id_user UUID, 
+    p_id_calendar INTEGER
+) 
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $function$
+BEGIN
+    -- Check if the user is associated with the calendar event
+    IF EXISTS (
+        SELECT 1
+        FROM member_family mf
+        JOIN calendar c ON mf.id_family = c.id_family
+        WHERE mf.id_user = p_id_user AND c.id_calendar = p_id_calendar
+    ) THEN
+        -- If exists, delete the calendar event
+        DELETE FROM calendar
+        WHERE id_calendar = p_id_calendar;
+        RETURN TRUE;
+    ELSE
+        -- Raise exception if the user is not associated with the event
+        RAISE EXCEPTION 'User does not belong to the specified family or the event does not exist.';
+    END IF;
+
+    -- Unreachable code, since the function will either return TRUE or raise an exception
+    -- RETURN FALSE;
+END;
+$function$;
+select * from f_delete_calendar_event('bd94ba3a-b046-4a05-a260-890913e09df9', 45)
+
+-- Permissions
+
+ALTER FUNCTION public.f_delete_calendar_event(uuid, int4) OWNER TO avnadmin;
+GRANT ALL ON FUNCTION public.f_delete_calendar_event(uuid, int4) TO avnadmin;
 

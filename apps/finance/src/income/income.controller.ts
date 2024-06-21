@@ -86,10 +86,10 @@ export class IncomeController {
     );
   }
 
-  @EventPattern('financeClient/getStatiscalIncome')
-  async getStatiscalIncome(@Payload() data: any, @Ctx() context: RmqContext) {
+  @EventPattern('financeClient/getIncomeByDateRange')
+  async getIncomeByDateRange(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.incomeService.getStasticalIncome(data.id_user, data.id_family);
+    return this.incomeService.getIncomeByDateRange(data.id_user, data.id_family, data.page, data.itemsPerPage, data.option);
   }
 
   @EventPattern('financeClient/createIncome')
