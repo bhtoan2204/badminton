@@ -86,11 +86,11 @@ export class ExpenseditureController {
     );
   }
 
-  // @EventPattern('financeClient/getStatiscalExpensediture')
-  // async getStatiscalExpense(@Payload() data: any, @Ctx() context: RmqContext) {
-  //   this.rmqService.ack(context);
-  //   return this.expenseService.getStatiscalExpensediture(data.id_user, data.id_family);
-  // }
+  @EventPattern('financeClient/getExpenseByDateRange')
+  async getExpenseByDateRange(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.expenseService.getExpenseByDateRange(data.id_user, data.id_family, data.page, data.itemsPerPage, data.option);
+  }
 
   @EventPattern('financeClient/updateExpensediture')
   async updateExpense(@Payload() data: any, @Ctx() context: RmqContext) {
