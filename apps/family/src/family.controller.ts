@@ -16,23 +16,23 @@ export class FamilyController {
     return this.familyService.checkIsMember(data.id_user, data.id_family);
   }
 
-  @EventPattern('family/get_Family')
+  @EventPattern('familyClient/get_Family')
   async getFamily(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.getFamily(data.id_user, data.id_family);
   }
-  @EventPattern('family/get_Member')
+  @EventPattern('familyClient/get_Member')
   async getMember(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.getMember(data.id_user);
   }
-  @EventPattern('family/get_all_Family')
+  @EventPattern('familyClient/get_all_Family')
   async getAllFamily(@Payload() id_user: string, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.getAllFamily(id_user);
   }
 
-  @EventPattern('family/get_all_Member')
+  @EventPattern('familyClient/get_all_Member')
   async getAllMember(
     @Payload() data: { id_user; id_family },
     @Ctx() context: RmqContext,
@@ -41,7 +41,7 @@ export class FamilyController {
     return this.familyService.getAllMember(data.id_user, data.id_family);
   }
 
-  @EventPattern('family/create_Family')
+  @EventPattern('familyClient/create_Family')
   async createFamily(
     @Payload() data: { id_user; createFamilyDto },
     @Ctx() context: RmqContext,
@@ -50,19 +50,19 @@ export class FamilyController {
     return this.familyService.createFamily(data.id_user, data.createFamilyDto);
   }
 
-  @EventPattern('family/add_Member')
+  @EventPattern('familyClient/add_Member')
   async addMember(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.addMember(data.id_user, data.memberFamilyDto);
   }
 
-  @EventPattern('family/delete_Member')
+  @EventPattern('familyClient/delete_Member')
   async deleteMember(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.deleteMember(data.id_user, data.DeleteMemberDTO);
   }
 
-  @EventPattern('family/update_Family')
+  @EventPattern('familyClient/update_Family')
   async updateFamily(
     @Payload() data: { id_user; updateFamilyDTO },
     @Ctx() context: RmqContext,
@@ -71,19 +71,19 @@ export class FamilyController {
     return this.familyService.updateFamily(data.id_user, data.updateFamilyDTO);
   }
 
-  @EventPattern('family/delete_Family')
+  @EventPattern('familyClient/delete_Family')
   async deleteFamily(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.deleteFamily(data.id_user, data.id_family);
   }
 
-  @EventPattern('family/getIdsMember')
+  @EventPattern('familyClient/getIdsMember')
   async getIdsMember(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.getIdsMember(data.id_user, data.id_family);
   }
 
-  @EventPattern('family/change_avatar')
+  @EventPattern('familyClient/change_avatar')
   async changeAvatar(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.changeAvatar(
@@ -93,12 +93,28 @@ export class FamilyController {
     );
   }
 
-  @EventPattern('family/checkExtraPackage')
+  @EventPattern('familyClient/checkExtraPackage')
   async checkExtraPackage(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.checkExtraPackage(
       data.id_family,
       data.permissions,
+    );
+  }
+
+  @EventPattern('familyClient/leave_Family')
+  async leaveFamily(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.familyService.leaveFamily(data.id_user, data.id_family);
+  }
+
+  @EventPattern('familyClient/kick_Member')
+  async kickMember(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.familyService.kickMember(
+      data.id_user,
+      data.id_user_kick,
+      data.id_family,
     );
   }
 }

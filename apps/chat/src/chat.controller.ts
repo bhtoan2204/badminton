@@ -137,4 +137,10 @@ export class ChatController {
       data.id_message,
     );
   }
+
+  @EventPattern('chatClient/getLinkedUser')
+  async getLinkedUser(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.chatService.getLinkedUser(data.id_user, data.search);
+  }
 }

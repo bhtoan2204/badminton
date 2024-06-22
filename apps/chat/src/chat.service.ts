@@ -1,13 +1,17 @@
 import {
+  Family,
   FamilyConversations,
+  MemberFamily,
   UploadFileRequest,
   UserConversations,
+  Users,
 } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import { StorageService } from './storage/storage.service';
-import { EntityManager } from 'typeorm';
+import { Brackets, EntityManager, In, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 const limit = 30;
 
@@ -17,9 +21,74 @@ export class ChatService {
     @InjectModel(UserConversations.name) private userConversationsRepository,
     @InjectModel(FamilyConversations.name)
     private familyConversationsRepository,
+    @InjectRepository(Users) private usersRepository: Repository<Users>,
+    @InjectRepository(Family) private familysRepository: Repository<Family>,
+    @InjectRepository(MemberFamily)
+    private memberFamilyRepository: Repository<MemberFamily>,
     private readonly storageService: StorageService,
     private readonly entityManager: EntityManager,
   ) {}
+
+  async getUsersChat(id_user: string, index: number): Promise<any> {
+    try {
+      const skipAmount = index * limit;
+      const mongoQuery = this.userConversationsRepository
+        .aggregate([
+          { $match: { userId: id_user } },
+          { $unwind: '$conversations' },
+          { $unwind: '$conversations.messages' },
+          { $sort: { 'conversations.messages.timestamp': -1 } },
+          {
+            $group: {
+              _id: '$conversations._id',
+              receiverId: { $first: '$conversations.receiverId' },
+              created_at: { $first: '$conversations.created_at' },
+              updated_at: { $first: '$conversations.updated_at' },
+              latestMessage: { $first: '$conversations.messages' },
+            },
+          },
+          { $sort: { 'latestMessage.timestamp': -1 } },
+          { $skip: skipAmount },
+          { $limit: limit },
+        ])
+        .exec();
+      const results = await mongoQuery;
+      const receiverIds = results.map(
+        (convo) => convo.latestMessage.receiverId,
+      );
+      const usersPromise = this.usersRepository.find({
+        where: {
+          id_user: In(receiverIds),
+        },
+      });
+      const users = await usersPromise;
+      const userMap = users.reduce((map, user) => {
+        map[user.id_user] = user;
+        return map;
+      }, {});
+      const populatedResults = results.map((convo) => {
+        const user = userMap[convo.latestMessage.receiverId];
+        return {
+          ...convo,
+          latestMessage: {
+            ...convo.latestMessage,
+            receiver: {
+              firstname: user.firstname,
+              lastname: user.lastname,
+              avatar: user.avatar,
+            },
+          },
+        };
+      });
+
+      return populatedResults;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
 
   async updateConversationWithExistOne(
     userId: string,
@@ -53,102 +122,6 @@ export class ChatService {
   async base64ToUint8Array(base64: string): Promise<Uint8Array> {
     const buffer = Buffer.from(base64, 'base64');
     return new Uint8Array(buffer);
-  }
-
-  async getUsersChat(id_user: string, index: number): Promise<any> {
-    try {
-      const skipAmount = index * limit;
-
-      const results = await this.userConversationsRepository
-        .aggregate([
-          { $match: { userId: id_user } },
-          { $unwind: '$conversations' },
-          { $unwind: '$conversations.messages' },
-          { $sort: { 'conversations.messages.timestamp': -1 } },
-          {
-            $group: {
-              _id: '$conversations._id',
-              receiverId: { $first: '$conversations.receiverId' },
-              created_at: { $first: '$conversations.created_at' },
-              updated_at: { $first: '$conversations.updated_at' },
-              latestMessage: { $first: '$conversations.messages' },
-            },
-          },
-          {
-            $group: {
-              _id: '$userId',
-              conversations: {
-                $push: {
-                  _id: '$_id',
-                  receiverId: '$receiverId',
-                  created_at: '$created_at',
-                  updated_at: '$updated_at',
-                  messages: ['$latestMessage'],
-                },
-              },
-            },
-          },
-          {
-            $lookup: {
-              from: 'userConversations',
-              localField: '_id',
-              foreignField: 'userId',
-              as: 'userDocument',
-            },
-          },
-          {
-            $replaceRoot: {
-              newRoot: {
-                $mergeObjects: [
-                  { $arrayElemAt: ['$userDocument', 0] },
-                  { conversations: '$conversations' },
-                ],
-              },
-            },
-          },
-          { $skip: skipAmount },
-          { $limit: limit },
-          {
-            $project: {
-              _id: 1,
-              userId: 1,
-              __v: 1,
-              conversations: 1,
-              created_at: 1,
-              updated_at: 1,
-            },
-          },
-        ])
-        .exec();
-      const datas = results[0].conversations;
-
-      const userIds = datas.map((result) => result.receiverId);
-      const usersQuery = 'SELECT * FROM f_get_users_info($1)';
-      const usersParams = [userIds];
-      const usersInfo = await this.entityManager.query(usersQuery, usersParams);
-      const enrichedResults = datas.map((data) => {
-        const userInfo = usersInfo.find(
-          (user) => user.id_user === data.receiverId,
-        );
-        return {
-          ...data,
-          user: userInfo
-            ? {
-                firstname: userInfo.firstname,
-                lastname: userInfo.lastname,
-                avatar: userInfo.avatar,
-              }
-            : null,
-        };
-      });
-
-      return enrichedResults;
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
   }
 
   async getMessages(
@@ -231,16 +204,33 @@ export class ChatService {
           {
             $group: {
               _id: '$_id',
+              familyId: { $first: '$familyId' },
               lastMessage: { $first: '$conversations' },
-              lastUpdated: { $first: '$updated_at' },
             },
           },
           { $sort: { 'lastMessage.timestamp': -1 } },
           { $limit: familyId.length },
         ])
         .exec();
-
-      return conversations;
+      const familyIds = conversations.map((convo) => convo.familyId);
+      const familys = await this.familysRepository.find({
+        where: {
+          id_family: In(familyIds),
+        },
+      });
+      const familyMap = familys.reduce((map, family) => {
+        map[family.id_family] = family;
+        return map;
+      }, {});
+      const populatedConversations = conversations.map((convo) => {
+        const family = familyMap[convo.familyId];
+        return {
+          ...convo,
+          name: family.name,
+          avatar: family.avatar,
+        };
+      });
+      return populatedConversations;
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -635,6 +625,81 @@ export class ChatService {
       }
 
       return { message: 'Remove message successfully' };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getLinkedUser(id_user: string, search: string): Promise<any> {
+    try {
+      const families = await this.memberFamilyRepository.find({
+        where: { id_user },
+        select: ['id_family'],
+      });
+
+      const familyIds = families.map((family) => family.id_family);
+
+      const familyUsers = await this.memberFamilyRepository
+        .createQueryBuilder('memberFamily')
+        .where('memberFamily.id_family IN (:...familyIds)', { familyIds })
+        .select(['memberFamily.id_user'])
+        .getMany();
+
+      const familyUserIds = familyUsers.map((member) => member.id_user);
+
+      const mongoQuery = this.userConversationsRepository
+        .aggregate([
+          { $match: { userId: id_user } },
+          { $unwind: '$conversations' },
+          { $unwind: '$conversations.messages' },
+          { $sort: { 'conversations.messages.timestamp': -1 } },
+          {
+            $group: {
+              _id: '$conversations._id',
+              receiverId: { $first: '$conversations.receiverId' },
+              created_at: { $first: '$conversations.created_at' },
+              updated_at: { $first: '$conversations.updated_at' },
+              latestMessage: { $first: '$conversations.messages' },
+            },
+          },
+          { $sort: { 'latestMessage.timestamp': -1 } },
+        ])
+        .exec();
+
+      const chatResults = await mongoQuery;
+      const chatUserIds = chatResults.map((convo) => convo.receiverId);
+
+      const combinedUserIds = Array.from(
+        new Set([...familyUserIds, ...chatUserIds]),
+      );
+      let query = this.usersRepository
+        .createQueryBuilder('user')
+        .where('user.id_user IN (:...ids)', { ids: combinedUserIds })
+        .select([
+          'user.id_user',
+          'user.firstname',
+          'user.lastname',
+          'user.avatar',
+        ])
+        .orderBy('RANDOM()')
+        .limit(30);
+
+      if (search) {
+        query = query.andWhere(
+          new Brackets((qb) => {
+            qb.where('user.firstname LIKE :search', { search: `%${search}%` })
+              .orWhere('user.lastname LIKE :search', { search: `%${search}%` })
+              .orWhere('user.avatar LIKE :search', { search: `%${search}%` });
+          }),
+        );
+      }
+
+      const users = await query.getMany();
+
+      return users;
     } catch (error) {
       throw new RpcException({
         message: error.message,

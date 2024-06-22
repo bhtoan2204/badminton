@@ -149,4 +149,29 @@ export class FamilyController {
       file,
     );
   }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Leave family' })
+  @Delete('leaveFamily')
+  async leaveFamily(
+    @CurrentUser() currentUser,
+    @Query('id_family') id_family: number,
+  ) {
+    return this.familyService.leaveFamily(currentUser.id_user, id_family);
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Kick member' })
+  @Delete('kickMember')
+  async kickMember(
+    @CurrentUser() currentUser,
+    @Query('id_user') id_user: string,
+    @Query('id_family') id_family: number,
+  ) {
+    return this.familyService.kickMember(
+      currentUser.id_user,
+      id_user,
+      id_family,
+    );
+  }
 }

@@ -63,7 +63,7 @@ export class NotificationService {
 
   async getListReceiverId(id_user: string, id_family: number) {
     try {
-      const response = this.familyClient.send('family/getIdsMember', {
+      const response = this.familyClient.send('familyClient/getIdsMember', {
         id_user,
         id_family,
       });

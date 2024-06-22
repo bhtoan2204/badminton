@@ -31,4 +31,10 @@ export class BackgroundService implements OnModuleInit {
     console.log(job.data);
     console.log('B');
   }
+
+  @Process('calendar')
+  async handleCalendar(job: Job<any>) {
+    console.log(job.data);
+    console.log('Calendar');
+  }
 }

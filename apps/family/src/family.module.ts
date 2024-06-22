@@ -4,6 +4,7 @@ import {
   DatabaseModule,
   Family,
   FamilyExtraPackages,
+  MemberFamily,
   PackageExtra,
   RmqModule,
 } from '@app/common';
@@ -31,7 +32,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     RmqModule,
     StorageModule,
     forwardRef(() => InvitationModule),
-    TypeOrmModule.forFeature([Family, PackageExtra, FamilyExtraPackages]),
+    TypeOrmModule.forFeature([
+      Family,
+      PackageExtra,
+      FamilyExtraPackages,
+      MemberFamily,
+    ]),
   ],
   controllers: [FamilyController],
   providers: [FamilyService],

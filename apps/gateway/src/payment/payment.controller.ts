@@ -14,6 +14,7 @@ import { PaymentService } from './payment.service';
 import { OrderDTO } from './dto/order.dto';
 import { CurrentUser, JwtAuthGuard } from '../utils';
 import { OrderReturnDTO } from './dto/OrderReturn.dto';
+import { PlaceOrderDto } from './dto/placeOrder.dto';
 
 @ApiTags('Payment')
 @ApiBearerAuth()
@@ -29,6 +30,39 @@ export class PaymentController {
     return this.paymentService.get_all_package();
   }
 
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get main package' })
+  @Get('getMainPackage')
+  async get_main_package() {
+    return this.paymentService.getMainPackage();
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get extra package' })
+  @Get('getExtraPackage')
+  async get_extra_package() {
+    return this.paymentService.getExtraPackage();
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get extra package' })
+  @Get('getComboPackage')
+  async get_combo_package() {
+    return this.paymentService.getComboPackage();
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get place order (main, combo, extra)' })
+  @Post('placeOrder')
+  async place_order(
+    @CurrentUser() user,
+    @Body() order: PlaceOrderDto,
+    @Ip() ip: string,
+  ) {
+    const id_user = user.id_user;
+    return this.paymentService.placeOrder(id_user, order, ip);
+  }
+  // --------------------------------------------------
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get package' })
   @Get('getPackage')

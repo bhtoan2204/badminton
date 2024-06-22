@@ -16,6 +16,7 @@ import {
   ApiConsumes,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../utils';
@@ -309,5 +310,14 @@ export class ChatController {
       receiver_id,
       id_message,
     );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get Linked User' })
+  @ApiQuery({ name: 'search', required: false, description: 'Search string' })
+  @UseGuards(JwtAuthGuard)
+  @Get('getLinkedUser')
+  async getLinkedUser(@CurrentUser() user, @Param('search') search: string) {
+    return this.chatService.getLinkedUser(user.id_user, search);
   }
 }

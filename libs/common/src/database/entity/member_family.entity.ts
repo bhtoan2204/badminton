@@ -5,31 +5,36 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   JoinColumn,
+  Column,
 } from 'typeorm';
 import { Users } from './users.entity';
 import { Family } from './family.entity';
-import { Role } from './role.entity';
 
 @Entity('member_family')
 export class MemberFamily {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Users)
-  @JoinColumn({ name: 'id_user' })
-  id_user: Users;
+  @Column()
+  id_user: string;
 
-  @ManyToOne(() => Family)
-  @JoinColumn({ name: 'id_family' })
-  id_family: Family;
+  @Column()
+  id_family: number;
 
-  @ManyToOne(() => Role)
-  @JoinColumn({ name: 'id_role' })
-  role: Role;
+  @Column({ nullable: true, default: 'Member' })
+  role: string;
 
   @CreateDateColumn()
   created_at: Date;
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @ManyToOne(() => Users, (user) => user.id_user)
+  @JoinColumn({ name: 'id_user' })
+  user: Users;
+
+  @ManyToOne(() => Family, (family) => family.id_family)
+  @JoinColumn({ name: 'id_family' })
+  family: Family;
 }

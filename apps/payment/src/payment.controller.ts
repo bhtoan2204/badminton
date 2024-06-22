@@ -10,39 +10,68 @@ export class PaymentController {
     private readonly rmqService: RmqService,
   ) {}
 
-  @EventPattern('payment/get_package')
+  @EventPattern('paymentClient/get_package')
   async get_package(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.paymentService.get_package(data.id_package);
   }
 
-  @EventPattern('payment/get_all_package')
+  @EventPattern('paymentClient/get_all_package')
   async get_all_package(@Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.paymentService.get_all_package();
   }
 
-  @EventPattern('payment/get_method')
+  @EventPattern('paymentClient/get_method')
   async get_method(@Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.paymentService.get_method();
   }
 
-  @EventPattern('payment/get_order')
+  @EventPattern('paymentClient/get_order')
   async get_order(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.paymentService.get_order(data.id_user);
   }
 
-  @EventPattern('payment/check_order_return')
+  @EventPattern('paymentClient/check_order_return')
   async UpdateStatus(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.paymentService.check_order(data.id_user, data.orderReturn);
   }
 
-  @EventPattern('payment/generateVnpay')
+  @EventPattern('paymentClient/generateVnpay')
   async generateVnpay(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.paymentService.generateVnpay(data.id_user, data.order, data.ip);
+  }
+
+  @EventPattern('paymentClient/get_main_package')
+  async get_main_package(@Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.getMainPackage();
+  }
+
+  @EventPattern('paymentClient/get_extra_package')
+  async get_extra_package(@Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.getExtraPackage();
+  }
+
+  @EventPattern('paymentClient/get_combo_package')
+  async get_combo_package(@Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.getComboPackage();
+  }
+
+  @EventPattern('paymentClient/place_order')
+  async place_order(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.placeOrder(
+      data.id_user,
+      data.order,
+      data.packageType,
+      data.ip,
+    );
   }
 }

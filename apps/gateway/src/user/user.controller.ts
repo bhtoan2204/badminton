@@ -46,6 +46,7 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verify account' })
   @Post('register/verifyAccount')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async verifyAccount(@Body() data: any) {
     // return this.userService.verifyAccount(data);
   }
@@ -123,13 +124,5 @@ export class UserController {
   @Post('validateEmail')
   async validateEmail(@CurrentUser() user, @Body() data: ValidateEmailDto) {
     return this.userService.validateEmail(user, data);
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get All User' })
-  @UseGuards(JwtAuthGuard)
-  @Get('getAllUser')
-  async getAllUser() {
-    return this.userService.getAllUser();
   }
 }

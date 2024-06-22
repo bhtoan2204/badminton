@@ -41,7 +41,7 @@ export class ChatService {
   async getFamilyChats(id_user: string) {
     try {
       const listFamilyId = this.familyClient
-        .send('family/get_all_Family', id_user)
+        .send('familyClient/get_all_Family', id_user)
         .pipe(timeout(15000));
       const family = await lastValueFrom(listFamilyId);
       const familyId = family.map((item: any) => item.id_family);
@@ -133,7 +133,7 @@ export class ChatService {
 
   async getListReceiverId(id_user: string, id_family: number) {
     try {
-      const response = this.familyClient.send('family/getIdsMember', {
+      const response = this.familyClient.send('familyClient/getIdsMember', {
         id_user,
         id_family,
       });
@@ -203,6 +203,21 @@ export class ChatService {
         id_user,
         receiver_id,
         id_message,
+      });
+      return await lastValueFrom(response);
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async getLinkedUser(id_user: string, search: string) {
+    try {
+      const response = this.chatClient.send('chatClient/getLinkedUser', {
+        id_user,
+        search,
       });
       return await lastValueFrom(response);
     } catch (error) {

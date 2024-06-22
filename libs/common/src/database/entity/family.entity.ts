@@ -16,6 +16,7 @@ import { HouseholdItems } from './household_items.entity';
 import { GuideItems } from './guide_items.entity';
 import { EducationProgress } from './education_progress.entity';
 import { ShoppingLists } from './shopping_lists.entity';
+import { MemberFamily } from './member_family.entity';
 
 @Entity('family')
 export class Family {
@@ -73,4 +74,7 @@ export class Family {
 
   @OneToMany(() => ShoppingLists, (shoppingList) => shoppingList.family)
   shoppingLists: ShoppingLists[];
+
+  @OneToMany(() => MemberFamily, (memberFamily) => memberFamily.family)
+  memberFamilies: MemberFamily[];
 }

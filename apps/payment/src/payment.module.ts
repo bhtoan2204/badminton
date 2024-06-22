@@ -1,9 +1,16 @@
 import { Module } from '@nestjs/common';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
-import { DatabaseModule, RmqModule } from '@app/common';
+import {
+  DatabaseModule,
+  PackageCombo,
+  PackageExtra,
+  PackageMain,
+  RmqModule,
+} from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -20,6 +27,7 @@ import * as Joi from 'joi';
     }),
     RmqModule,
     DatabaseModule,
+    TypeOrmModule.forFeature([PackageMain, PackageExtra, PackageCombo]),
   ],
   controllers: [PaymentController],
   providers: [PaymentService],

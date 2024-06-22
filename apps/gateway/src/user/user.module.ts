@@ -3,25 +3,26 @@ import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { USER_SERVICE } from '../utils';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, seconds } from '@nestjs/throttler';
+import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
 @Module({
   imports: [
     RmqModule.register({ name: USER_SERVICE }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 300,
-        limit: 1,
-      },
-    ]),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        throttlers: [{ limit: 1, ttl: seconds(60) }],
+        storage: new ThrottlerStorageRedisService({
+          host: configService.get<string>('REDIS_HOST'),
+          port: configService.get<number>('REDIS_PORT'),
+        }),
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [UserController],
-  providers: [
-    UserService,
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: ThrottlerGuard,
-    // },
-  ],
+  providers: [UserService],
 })
 export class UserModule {}

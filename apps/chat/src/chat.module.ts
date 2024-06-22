@@ -10,11 +10,15 @@ import {
   DatabaseModule,
   FamilyConversations,
   FamilyConversationsSchema,
+  Users,
+  Family,
+  MemberFamily,
 } from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { StorageModule } from './storage/storage.module';
 import * as Joi from 'joi';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -38,6 +42,7 @@ import * as Joi from 'joi';
     DatabaseModule,
     StorageModule,
     GrpcModule.register({ name: 'STORAGE' }),
+    TypeOrmModule.forFeature([Users, Family, MemberFamily]),
   ],
   controllers: [ChatController],
   providers: [ChatService],

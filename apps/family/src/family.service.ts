@@ -7,6 +7,7 @@ import {
   DeleteFileRequest,
   Family,
   FamilyExtraPackages,
+  MemberFamily,
   PackageExtra,
   UploadFileRequest,
 } from '@app/common';
@@ -23,6 +24,8 @@ export class FamilyService {
     private packageExtraRepository: Repository<PackageExtra>,
     @InjectRepository(FamilyExtraPackages)
     private familyExtraPackagesRepository: Repository<FamilyExtraPackages>,
+    @InjectRepository(MemberFamily)
+    private memberFamilyRepository: Repository<MemberFamily>,
   ) {}
 
   async checkExtraPackage(
@@ -256,6 +259,56 @@ export class FamilyService {
       return {
         message: file.size + ' bytes uploaded successfully',
         data: fileUrl,
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async leaveFamily(id_user: string, id_family: number) {
+    try {
+      const memberFamily = await this.memberFamilyRepository.findOne({
+        where: { id_user, id_family },
+      });
+      if (!memberFamily) {
+        throw new Error('Member not found');
+      }
+      await this.memberFamilyRepository.remove(memberFamily);
+      return {
+        message: 'Member left family',
+        data: true,
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async kickMember(id_user: string, id_user_kick: string, id_family: number) {
+    try {
+      const [roleOfKicker, memberFamily] = await Promise.all([
+        this.memberFamilyRepository.findOne({
+          where: { id_user, id_family },
+        }),
+        this.memberFamilyRepository.findOne({
+          where: { id_user: id_user_kick, id_family },
+        }),
+      ]);
+      if (!roleOfKicker || roleOfKicker.role !== 'Owner family') {
+        throw new Error('You are not admin');
+      }
+      if (!memberFamily) {
+        throw new Error('Member not found');
+      }
+      await this.memberFamilyRepository.remove(memberFamily);
+      return {
+        message: 'Member kicked',
+        data: true,
       };
     } catch (error) {
       throw new RpcException({

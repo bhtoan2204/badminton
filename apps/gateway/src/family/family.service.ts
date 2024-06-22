@@ -13,13 +13,13 @@ import Redis from 'ioredis';
 export class FamilyService {
   constructor(
     @Inject(FAMILY_SERVICE) private familyClient: ClientProxy,
-    @InjectRedis() private readonly redisService: Redis
+    @InjectRedis() private readonly redisService: Redis,
   ) {}
 
   async getFamily(id_user, id_family) {
     try {
       const response = this.familyClient
-        .send('family/get_Family', { id_user, id_family })
+        .send('familyClient/get_Family', { id_user, id_family })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -34,7 +34,7 @@ export class FamilyService {
   async getMember(id_user) {
     try {
       const response = this.familyClient
-        .send('family/get_Member', { id_user })
+        .send('familyClient/get_Member', { id_user })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -49,7 +49,7 @@ export class FamilyService {
   async getAllMember(id_user: string, id_family: any) {
     try {
       const response = this.familyClient
-        .send('family/get_all_Member', { id_user, id_family })
+        .send('familyClient/get_all_Member', { id_user, id_family })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -64,7 +64,7 @@ export class FamilyService {
   async getAllFamily(id_user: string) {
     try {
       const response = this.familyClient
-        .send('family/get_all_Family', id_user)
+        .send('familyClient/get_all_Family', id_user)
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -79,7 +79,7 @@ export class FamilyService {
   async addMember(id_user: string, memberFamilyDto: MemberFamilyDto) {
     try {
       const response = this.familyClient
-        .send('family/add_Member', { id_user, memberFamilyDto })
+        .send('familyClient/add_Member', { id_user, memberFamilyDto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       const cacheKey = `familyCheck:${memberFamilyDto.id_family}:${id_user}`;
@@ -96,7 +96,7 @@ export class FamilyService {
   async deleteMember(id_user: string, deleteMemberDTO: DeleteMemberDTO) {
     try {
       const response = this.familyClient
-        .send('family/delete_Member', { id_user, deleteMemberDTO })
+        .send('familyClient/delete_Member', { id_user, deleteMemberDTO })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       const cacheKey = `familyCheck:${deleteMemberDTO.id_family}:${id_user}`;
@@ -113,7 +113,7 @@ export class FamilyService {
   async createFamily(id_user, createFamilyDto: CreateFamilyDto) {
     try {
       const source = this.familyClient
-        .send('family/create_Family', { id_user, createFamilyDto })
+        .send('familyClient/create_Family', { id_user, createFamilyDto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
@@ -128,7 +128,7 @@ export class FamilyService {
   async updateFamily(id_user: string, updateFamilyDTO: UpdateFamilyDTO) {
     try {
       const source = this.familyClient
-        .send('family/update_Family', { id_user, updateFamilyDTO })
+        .send('familyClient/update_Family', { id_user, updateFamilyDTO })
         .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
@@ -143,7 +143,7 @@ export class FamilyService {
   async deleteFamily(id_user: string, id_family) {
     try {
       const source = this.familyClient
-        .send('family/delete_Family', { id_user, id_family })
+        .send('familyClient/delete_Family', { id_user, id_family })
         .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
@@ -162,9 +162,43 @@ export class FamilyService {
   ) {
     try {
       const source = this.familyClient
-        .send('family/change_avatar', { id_user, id_family, file })
+        .send('familyClient/change_avatar', { id_user, id_family, file })
         .pipe(timeout(15000));
       const data = await lastValueFrom(source);
+      return data;
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async leaveFamily(id_user: string, id_family: number) {
+    try {
+      const source = this.familyClient
+        .send('familyClient/leave_Family', { id_user, id_family })
+        .pipe(timeout(15000));
+      const data = await lastValueFrom(source);
+      const cacheKey = `familyCheck:${id_family}:${id_user}`;
+      await this.redisService.del(cacheKey);
+      return data;
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async kickMember(id_user: string, id_user_kick: string, id_family: number) {
+    try {
+      const source = this.familyClient
+        .send('familyClient/kick_Member', { id_user, id_user_kick, id_family })
+        .pipe(timeout(15000));
+      const data = await lastValueFrom(source);
+      const cacheKey = `familyCheck:${id_family}:${id_user_kick}`;
+      await this.redisService.del(cacheKey);
       return data;
     } catch (error) {
       if (error.name === 'TimeoutError') {
