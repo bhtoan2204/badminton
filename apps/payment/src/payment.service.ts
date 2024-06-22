@@ -271,6 +271,7 @@ export class PaymentService {
 
     try {
       // TODO: Create order
+      console.log(id_family);
       const orderId = 1;
       let price = null;
       switch (packageType) {

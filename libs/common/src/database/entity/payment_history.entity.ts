@@ -23,7 +23,7 @@ export class PaymentHistory {
   @JoinColumn({ name: 'id_user' })
   id_user: Users;
 
-  @Column('int', { nullable: false })
+  @Column('money', { nullable: false })
   amount: number;
 
   @Column('varchar', { nullable: false })
