@@ -171,6 +171,7 @@ export class UserService {
       const query = 'SELECT * FROM f_update_user_profile($1, $2, $3, $4, $5)';
       const parameters = [user.id_user, firstname, lastname, genre, birthdate];
       const result = await this.entityManager.query(query, parameters);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...userWithoutPassword } = result;
       return userWithoutPassword;
     } catch (error) {
@@ -203,13 +204,19 @@ export class UserService {
         };
         await this.storageService.deleteFile(deleteParams);
       }
-      const query = 'SELECT * FROM f_update_user_avatar($1, $2)';
-      const parameters = [currentUser.id_user, fileUrl];
-      const result = await this.entityManager.query(query, parameters);
+      const updatedUser = await this.userRepository.findOne({
+        where: { id_user: currentUser.id_user },
+      });
+      updatedUser.avatar = fileUrl;
+
+      await this.userRepository.save(updatedUser);
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...userWithoutPassword } = updatedUser;
+
       return {
-        message: file.size + ' bytes uploaded successfully',
-        data: uploadImageData,
-        result: result,
+        message: 'Avatar has been changed',
+        data: userWithoutPassword,
       };
     } catch (error) {
       throw new RpcException({
@@ -236,19 +243,6 @@ export class UserService {
         message: 'Email has been verified',
         data: result,
       };
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  }
-
-  async getAllUser() {
-    try {
-      const query = 'SELECT * FROM view_all_users_details';
-      const data = await this.entityManager.query(query);
-      return data;
     } catch (error) {
       throw new RpcException({
         message: error.message,

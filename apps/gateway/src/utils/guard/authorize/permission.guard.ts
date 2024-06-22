@@ -45,7 +45,7 @@ export class PermissionGuard implements CanActivate {
       }
 
       const checkIsPermission = this.familyClient
-        .send('family/checkExtraPackage', { id_family, permissions })
+        .send('familyClient/checkExtraPackage', { id_family, permissions })
         .pipe(timeout(15000));
       const result = await lastValueFrom(checkIsPermission);
       await this.redisService.set(cacheKey, result.toString(), 'EX', 3600);

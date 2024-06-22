@@ -4,6 +4,7 @@ import { BackgroundService } from './background.service';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
+import { RmqModule } from '@app/common';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import * as Joi from 'joi';
     BullModule.registerQueue({
       name: 'cron-queue',
     }),
+    RmqModule,
   ],
   controllers: [BackgroundController],
   providers: [BackgroundService],

@@ -52,12 +52,6 @@ export class UserController {
     return await this.userService.validateEmail(data);
   }
 
-  @EventPattern('userClient/get_all_user')
-  async handleGetAllUser(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return await this.userService.getAllUser();
-  }
-
   @EventPattern('mailClient/sendUserConfirmation')
   async sendUserConfirmation(@Payload() dto: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);

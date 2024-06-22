@@ -22,6 +22,7 @@ import { ShoppingItemTypes } from './entity/shopping_item_types.entity';
 import { ShoppingItems } from './entity/shopping_items.entity';
 import { ShoppingLists } from './entity/shopping_lists.entity';
 import * as Joi from 'joi';
+import { MemberFamily } from './entity/member_family.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -53,6 +54,7 @@ import * as Joi from 'joi';
             PaymentHistory,
             Users,
             Family,
+            MemberFamily,
             FamilyExtraPackages,
             PackageCombo,
             PackageExtra,

@@ -8,6 +8,12 @@ import {
 } from 'typeorm';
 import { Users } from './users.entity';
 
+export enum PackageType {
+  MAIN = 'main',
+  EXTRA = 'extra',
+  COMBO = 'combo',
+}
+
 @Entity('payment_history')
 export class PaymentHistory {
   @PrimaryGeneratedColumn()
@@ -17,8 +23,11 @@ export class PaymentHistory {
   @JoinColumn({ name: 'id_user' })
   id_user: Users;
 
-  @Column('money', { nullable: false })
+  @Column('int', { nullable: false })
   amount: number;
+
+  @Column('varchar', { nullable: false })
+  type: PackageType;
 
   @Column('varchar', { nullable: false })
   payment_method: string;

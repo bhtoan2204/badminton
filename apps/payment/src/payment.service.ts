@@ -1,11 +1,18 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
-import { EntityManager } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { RpcException } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { sortObject } from './utils';
 import * as moment from 'moment';
 import * as crypto from 'crypto';
 import * as qs from 'qs';
+import { InjectRepository } from '@nestjs/typeorm';
+import {
+  PackageCombo,
+  PackageExtra,
+  PackageMain,
+  PackageType,
+} from '@app/common';
 
 @Injectable()
 export class PaymentService {
@@ -17,6 +24,12 @@ export class PaymentService {
   constructor(
     private readonly entityManager: EntityManager,
     private readonly configService: ConfigService,
+    @InjectRepository(PackageMain)
+    private packageMainRepository: Repository<PackageMain>,
+    @InjectRepository(PackageExtra)
+    private packageExtraRepository: Repository<PackageExtra>,
+    @InjectRepository(PackageCombo)
+    private packageComboRepository: Repository<PackageCombo>,
   ) {
     this.vnpTmnCode = this.configService.get<string>('VNPAY_TMN_CODE');
     this.vnpHashSecret = this.configService.get<string>('VNPAY_HASH_SECRET');
@@ -153,6 +166,135 @@ export class PaymentService {
         isSuccess: true,
         paymentUrl: `${this.vnpUrl}?${qs.stringify(sortedVnpParams, { encode: false })}`,
       };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getMainPackage() {
+    try {
+      const [data, total] = await this.packageMainRepository.findAndCount({});
+      return {
+        data: data,
+        total: total,
+        message: 'Package fetched successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getExtraPackage() {
+    try {
+      const [data, total] = await this.packageExtraRepository.findAndCount({});
+      return {
+        data: data,
+        total: total,
+        message: 'Package fetched successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getComboPackage() {
+    try {
+      const [data, total] = await this.packageComboRepository.findAndCount({
+        relations: ['id_package_extra'],
+      });
+      return {
+        data: data,
+        total: total,
+        message: 'Package fetched successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async generateOrderLink(
+    orderId: number,
+    price: number,
+    ip: string,
+    bankCode: string,
+  ) {
+    const vnp_Params = {
+      vnp_Version: '2.1.0',
+      vnp_Command: 'pay',
+      vnp_TmnCode: this.vnpTmnCode,
+      vnp_Locale: 'vn',
+      vnp_CurrCode: 'VND',
+      vnp_TxnRef: orderId,
+      vnp_OrderInfo: `Pay for transaction code: ${String(orderId)}`,
+      vnp_OrderType: 'other',
+      vnp_Amount: price,
+      vnp_ReturnUrl: `${this.vnpReturnUrl}${String(orderId)}`,
+      vnp_IpAddr: ip.split(':').pop(),
+      vnp_CreateDate: moment().format('YYYYMMDDHHmmss'),
+      ...(bankCode && { vnp_BankCode: bankCode }),
+    };
+
+    const sortedVnpParams = sortObject(vnp_Params);
+    const signData = qs.stringify(sortedVnpParams, { encode: false });
+    const hmac = crypto.createHmac('sha512', this.vnpHashSecret);
+    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
+    sortedVnpParams['vnp_SecureHash'] = signed;
+
+    return `${this.vnpUrl}?${qs.stringify(sortedVnpParams, { encode: false })}`;
+  }
+
+  async placeOrder(
+    id_user: string,
+    order: any,
+    packageType: PackageType,
+    ip: string,
+  ) {
+    const {
+      id_main_package,
+      id_extra_package,
+      id_combo_package,
+      id_family,
+      bankCode,
+    } = order;
+
+    try {
+      // TODO: Create order
+      const orderId = 1;
+      let price = null;
+      switch (packageType) {
+        case PackageType.MAIN:
+          const mainPackage = await this.packageMainRepository.findOne({
+            where: { id_main_package },
+          });
+          price = mainPackage.price;
+          break;
+        case PackageType.EXTRA:
+          const extraPackage = await this.packageExtraRepository.findOne({
+            where: { id_extra_package },
+          });
+          price = extraPackage.price;
+          break;
+        case PackageType.COMBO:
+          const comboPackage = await this.packageComboRepository.findOne({
+            where: { id_combo_package },
+          });
+          price = comboPackage.price;
+          break;
+      }
+      console.log(orderId, Number(price), ip, bankCode);
+      return this.generateOrderLink(orderId, Math.floor(price), ip, bankCode);
     } catch (error) {
       throw new RpcException({
         message: error.message,

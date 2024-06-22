@@ -1,7 +1,6 @@
 import {
   ConflictException,
   HttpException,
-  HttpStatus,
   Inject,
   Injectable,
 } from '@nestjs/common';
@@ -160,21 +159,6 @@ export class UserService {
     try {
       const source = this.userClient
         .send('userClient/validate_email', { currentUser, data })
-        .pipe(timeout(15000));
-      const result = await lastValueFrom(source);
-      return result;
-    } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
-    }
-  }
-
-  async getAllUser() {
-    try {
-      const source = this.userClient
-        .send('userClient/get_all_user', {})
         .pipe(timeout(15000));
       const result = await lastValueFrom(source);
       return result;

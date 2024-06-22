@@ -13,6 +13,6 @@ export class MemberFamilyDto {
   @ApiProperty({ example: '' })
   phone: string;
 
-  @ApiProperty({ example: 'member' })
+  @ApiProperty({ example: 'Member' })
   role: string;
 }
