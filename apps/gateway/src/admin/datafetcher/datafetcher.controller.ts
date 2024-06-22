@@ -7,17 +7,22 @@ import {
   Param,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { DatafetcherService } from './datafetcher.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Admin, AdminGuard, JwtAuthGuard } from '../../utils';
 import { GetListOrdersDto } from './dto/getListOrders.dto';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 
 @ApiTags('Admin Datafetcher')
 @Controller()
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, AdminGuard)
 @Admin(true)
+@UseInterceptors(CacheInterceptor)
+@CacheTTL(60)
+@CacheKey('datafetcher')
 export class DatafetcherController {
   constructor(private readonly datafetcherService: DatafetcherService) {}
 
