@@ -6,18 +6,22 @@ import {
   HttpStatus,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Admin, AdminGuard, JwtAuthGuard } from '../../utils';
 import { SearchService } from './search.service';
 import { GetLogsFilterDto } from './dto/getLogFilter.dto';
 import { GetCountLogsByTimeRangeDto } from './dto/getCountLogsByTimeRange.dto';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 @ApiTags('Admin Logs')
 @Controller('logs')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, AdminGuard)
 @Admin(true)
+@UseInterceptors(CacheInterceptor)
+@CacheTTL(600)
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 

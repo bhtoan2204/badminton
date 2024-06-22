@@ -13,8 +13,6 @@ import { ConfigService } from '@nestjs/config';
 import { ChatService } from './chat.service';
 import { NewMessageDto } from './dto/newMessage.dto';
 import { NewFamilyMessageDto } from './dto/newFamilyMessage.dto';
-// import { NewImageMessageDto } from './dto/newImageMessage.dto';
-import { NewFamilyImageMessageDto } from './dto/newFamilyImageMessage.dto';
 
 interface TokenPayload {
   id_user: string;

@@ -302,6 +302,15 @@ export class ChatService {
       ) {
         throw new Error('Invalid sender or receiver ID.');
       }
+      const receiver = await this.usersRepository.findOne({
+        where: { id_user: messageData.receiverId },
+      });
+      if (!receiver) {
+        throw new RpcException({
+          message: 'Receiver not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
       const newMessage = {
         senderId: id_user,
         receiverId: messageData.receiverId,
@@ -345,7 +354,15 @@ export class ChatService {
         isRead: false,
         timestamp: new Date(),
       };
-
+      const family = await this.familysRepository.findOne({
+        where: { id_family: messageData.familyId },
+      });
+      if (!family) {
+        throw new RpcException({
+          message: 'Family not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
       await this.familyConversationsRepository
         .findOneAndUpdate(
           { familyId: messageData.familyId },
@@ -373,6 +390,15 @@ export class ChatService {
         throw new RpcException({
           message: 'File is required',
           statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+      const family = await this.familysRepository.findOne({
+        where: { id_family },
+      });
+      if (!family) {
+        throw new RpcException({
+          message: 'Family not found',
+          statusCode: HttpStatus.NOT_FOUND,
         });
       }
       let fileUrl = null;
@@ -415,6 +441,15 @@ export class ChatService {
         throw new RpcException({
           message: 'File is required',
           statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+      const family = await this.familysRepository.findOne({
+        where: { id_family },
+      });
+      if (!family) {
+        throw new RpcException({
+          message: 'Family not found',
+          statusCode: HttpStatus.NOT_FOUND,
         });
       }
       let fileUrl = null;
@@ -494,6 +529,16 @@ export class ChatService {
           statusCode: HttpStatus.BAD_REQUEST,
         });
       }
+      const receiver = await this.usersRepository.findOne({
+        where: { id_user: receiverId },
+      });
+      if (!receiver) {
+        throw new RpcException({
+          message: 'Receiver not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+
       let fileUrl = null;
       const fileName = 'chat_' + id_user + '_' + Date.now();
       const params: UploadFileRequest = {
@@ -532,6 +577,15 @@ export class ChatService {
         throw new RpcException({
           message: 'File is required',
           statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+      const receiver = await this.usersRepository.findOne({
+        where: { id_user: receiverId },
+      });
+      if (!receiver) {
+        throw new RpcException({
+          message: 'Receiver not found',
+          statusCode: HttpStatus.NOT_FOUND,
         });
       }
       let fileUrl = null;
