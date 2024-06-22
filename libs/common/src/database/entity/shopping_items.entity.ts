@@ -37,7 +37,7 @@ export class ShoppingItems {
   @Column({ nullable: true, default: new Date() })
   reminder_date: Date;
 
-  @Column('int', { default: 0 })
+  @Column('money', { default: 0 })
   price: number;
 
   @ManyToOne(
