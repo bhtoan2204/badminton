@@ -113,4 +113,21 @@ export class PackageComboService {
       throw new RpcException(error);
     }
   }
+
+  async deletePackageCombo(id_combo_package: number): Promise<any> {
+    try {
+      const packageCombo = await this.packageComboRepository.findOne({
+        where: { id_combo_package },
+      });
+
+      if (!packageCombo) {
+        throw new RpcException('PackageCombo not found');
+      }
+
+      await this.packageComboRepository.remove(packageCombo);
+      return { message: 'Combo package deleted successfully' };
+    } catch (error) {
+      throw new RpcException(error);
+    }
+  }
 }
