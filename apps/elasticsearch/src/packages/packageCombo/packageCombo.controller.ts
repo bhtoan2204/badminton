@@ -45,4 +45,13 @@ export class PackageComboController {
       data.dto,
     );
   }
+
+  @EventPattern('elasticsearchClient/deletePackageCombo')
+  async deletePackageCombo(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ): Promise<any> {
+    this.rmqService.ack(context);
+    return this.packageComboService.deletePackageCombo(data.id_combo_package);
+  }
 }
