@@ -30,6 +30,8 @@ export * from './database/entity/shopping_item_types.entity';
 export * from './database/entity/shopping_items.entity';
 export * from './database/entity/shopping_lists.entity';
 export * from './database/entity/member_family.entity';
+export * from './database/entity/feedback.entity';
+export * from './database/entity/feedbackMetadata.entity';
 
 export * from './database/enum/login_type.enum';
 

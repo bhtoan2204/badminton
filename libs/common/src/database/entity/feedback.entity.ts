@@ -1,19 +1,35 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Users } from './users.entity';
 
-@Entity('feedback')
+@Entity('feedbacks')
 export class Feedback {
   @PrimaryGeneratedColumn()
   id_feedback: number;
 
+  @Column({ type: 'text' })
+  comment: string;
+
+  @Column({ type: 'int', width: 1 })
+  rating: number;
+
   @Column()
   id_user: string;
 
-  @Column('text')
-  feedbackText: string;
+  @ManyToOne(() => Users, (user) => user.feedbacks, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'id_user' })
+  user: Users;
 
-  @Column('int')
-  rating: number;
+  @CreateDateColumn()
+  created_at: Date;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  date: Date;
+  @UpdateDateColumn()
+  updated_at: Date;
 }

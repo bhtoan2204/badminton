@@ -23,6 +23,8 @@ import { ShoppingItems } from './entity/shopping_items.entity';
 import { ShoppingLists } from './entity/shopping_lists.entity';
 import * as Joi from 'joi';
 import { MemberFamily } from './entity/member_family.entity';
+import { Feedback } from './entity/feedback.entity';
+import { FeedbackMetadata } from './entity/feedbackMetadata.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -70,6 +72,8 @@ import { MemberFamily } from './entity/member_family.entity';
             ShoppingItemTypes,
             ShoppingItems,
             ShoppingLists,
+            Feedback,
+            FeedbackMetadata,
           ],
         };
       },

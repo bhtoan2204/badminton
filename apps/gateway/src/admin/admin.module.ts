@@ -10,6 +10,7 @@ import { PackageModule } from './package/package.module';
 import { CacheModule, CacheStoreFactory } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as redisStore from 'cache-manager-redis-store';
+import { FeedbackModule } from './feedback/feedback.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import * as redisStore from 'cache-manager-redis-store';
     forwardRef(() => PostgresqlModule),
     forwardRef(() => DatafetcherModule),
     forwardRef(() => PackageModule),
+    forwardRef(() => FeedbackModule),
     RmqModule.register({ name: ELASTICSEARCH_SERVICE }),
     CacheModule.registerAsync({
       imports: [ConfigModule],

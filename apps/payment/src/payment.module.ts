@@ -3,6 +3,8 @@ import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 import {
   DatabaseModule,
+  Feedback,
+  FeedbackMetadata,
   PackageCombo,
   PackageExtra,
   PackageMain,
@@ -27,7 +29,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     }),
     RmqModule,
     DatabaseModule,
-    TypeOrmModule.forFeature([PackageMain, PackageExtra, PackageCombo]),
+    TypeOrmModule.forFeature([
+      PackageMain,
+      PackageExtra,
+      PackageCombo,
+      Feedback,
+      FeedbackMetadata,
+    ]),
   ],
   controllers: [PaymentController],
   providers: [PaymentService],

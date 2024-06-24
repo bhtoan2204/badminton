@@ -242,20 +242,14 @@ export class FamilyService {
       const uploadImageData = await this.storageService.uploadFile(params);
       const fileUrl = uploadImageData.fileUrl;
 
-      const changeAvtQuery = 'SELECT * FROM f_update_family_avatar($1, $2, $3)';
-      const changeAvtParam = [id_user, id_family, fileUrl];
-      const result = await this.entityManager.query(
-        changeAvtQuery,
-        changeAvtParam,
-      );
-      const oldUrl = result[0]['f_update_family_avatar'];
-      if (oldUrl) {
-        const deleteParams: DeleteFileRequest = {
-          fileName: oldUrl.split('/').pop(),
-        };
-        await this.storageService.deleteFile(deleteParams);
+      const family = await this.familyRepository.findOne({
+        where: { id_family },
+      });
+      if (!family) {
+        throw new Error('Family not found');
       }
-
+      family.avatar = fileUrl;
+      await this.familyRepository.save(family);
       return {
         message: file.size + ' bytes uploaded successfully',
         data: fileUrl,

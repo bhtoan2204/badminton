@@ -10,6 +10,7 @@ import { LoginType } from '../enum/login_type.enum';
 import { Family } from './family.entity';
 import { EducationProgress } from './education_progress.entity';
 import { MemberFamily } from './member_family.entity';
+import { Feedback } from './feedback.entity';
 
 @Entity('users')
 export class Users {
@@ -79,4 +80,7 @@ export class Users {
 
   @OneToMany(() => MemberFamily, (memberFamily) => memberFamily.user)
   memberFamilies: MemberFamily[];
+
+  @OneToMany(() => Feedback, (feedback) => feedback.user)
+  feedbacks: Feedback[];
 }
