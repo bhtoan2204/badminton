@@ -74,4 +74,28 @@ export class PaymentController {
       data.ip,
     );
   }
+
+  @EventPattern('paymentClient/createFeedback')
+  async createFeedback(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.createFeedback(data.id_user, data.dto);
+  }
+
+  @EventPattern('paymentClient/getFeedback')
+  async getFeedback(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.getFeedBack(
+      data.page,
+      data.itemsPerPage,
+      data.search,
+      data.sortBy,
+      data.sortDesc,
+    );
+  }
+
+  @EventPattern('paymentClient/getCountAndAverageRatingFeedback')
+  async getCountAndAverageRatingFeedback(@Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.getCountAndAverageRatingFeedback();
+  }
 }

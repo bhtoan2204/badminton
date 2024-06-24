@@ -8,6 +8,9 @@ import * as crypto from 'crypto';
 import * as qs from 'qs';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  Feedback,
+  FeedbackMetadata,
+  FeedbackMetadataKey,
   PackageCombo,
   PackageExtra,
   PackageMain,
@@ -30,6 +33,10 @@ export class PaymentService {
     private packageExtraRepository: Repository<PackageExtra>,
     @InjectRepository(PackageCombo)
     private packageComboRepository: Repository<PackageCombo>,
+    @InjectRepository(Feedback)
+    private feedbackRepository: Repository<Feedback>,
+    @InjectRepository(FeedbackMetadata)
+    private feedbackMetadataRepository: Repository<FeedbackMetadata>,
   ) {
     this.vnpTmnCode = this.configService.get<string>('VNPAY_TMN_CODE');
     this.vnpHashSecret = this.configService.get<string>('VNPAY_HASH_SECRET');
@@ -296,6 +303,120 @@ export class PaymentService {
       }
       console.log(orderId, Number(price), ip, bankCode);
       return this.generateOrderLink(orderId, Math.floor(price), ip, bankCode);
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async createFeedback(id_user: string, dto: any) {
+    try {
+      const { comment, rating } = dto;
+      const feedback = new Feedback();
+      feedback.comment = comment;
+      feedback.rating = rating;
+      feedback.id_user = id_user;
+      const savedFeedback = await this.feedbackRepository.save(feedback);
+      const feedbackMetadata = await this.feedbackMetadataRepository.findOne({
+        where: { metadata_key: FeedbackMetadataKey },
+      });
+      if (!feedbackMetadata) {
+        const metadata = new FeedbackMetadata();
+        metadata.metadata_key = FeedbackMetadataKey;
+        metadata.totalFeedbacks = 1;
+        metadata.averageRating = rating;
+        await this.feedbackMetadataRepository.save(metadata);
+      } else {
+        feedbackMetadata.averageRating =
+          (feedbackMetadata.averageRating * feedbackMetadata.totalFeedbacks +
+            rating) /
+          (feedbackMetadata.totalFeedbacks + 1);
+        feedbackMetadata.totalFeedbacks += 1;
+        await this.feedbackMetadataRepository.save(feedbackMetadata);
+      }
+      return {
+        data: savedFeedback,
+        message: 'Feedback created successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getCountAndAverageRatingFeedback() {
+    try {
+      const result = await this.feedbackMetadataRepository.findOne({
+        where: { metadata_key: FeedbackMetadataKey },
+      });
+      if (!result) {
+        return {
+          data: {
+            metadata_key: FeedbackMetadataKey,
+            totalFeedbacks: 0,
+            averageRating: 0,
+          },
+          message: 'Feedback fetched successfully',
+        };
+      }
+      return {
+        data: result,
+        message: 'Feedback fetched successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getFeedBack(
+    page: number,
+    itemsPerPage: number,
+    search: string,
+    sortBy: string,
+    sortDesc: boolean,
+  ) {
+    try {
+      const query = this.feedbackRepository
+        .createQueryBuilder('feedbacks')
+        .leftJoinAndSelect('feedbacks.user', 'users')
+        .select([
+          'feedbacks',
+          'users.avatar',
+          'users.firstname',
+          'users.lastname',
+        ])
+        .take(itemsPerPage)
+        .skip((page - 1) * itemsPerPage);
+
+      if (search) {
+        query.andWhere(
+          'users.firstname LIKE :search OR users.lastname LIKE :search',
+          { search: `%${search}%` },
+        );
+      }
+
+      if (sortBy && sortDesc !== undefined) {
+        query.orderBy(`feedbacks.${sortBy}`, sortDesc ? 'DESC' : 'ASC');
+      }
+
+      const [data, total] = await query.getManyAndCount();
+      return {
+        data: data,
+        total: total,
+        message: 'Feedback fetched successfully',
+      };
+      return {
+        data: data,
+        total: total,
+        message: 'Feedback fetched successfully',
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
