@@ -133,4 +133,13 @@ export class InvoiceController {
     this.rmqService.ack(context);
     return this.invoiceService.convertTextToInvoiceItems(data.text);
   }
+
+  @EventPattern('invoiceClient/processInvoice')
+  async processInvoice(
+    @Payload() file: Express.Multer.File,
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    return this.invoiceService.processInvoice(file);
+  }
 }

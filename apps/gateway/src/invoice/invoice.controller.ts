@@ -375,4 +375,24 @@ export class InvoiceController {
     const textInput = await this.invoiceService.convertImageToText(file);
     return await this.invoiceService.convertTextToInvoiceItems(textInput);
   }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Convert invoice image to json (for testing)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { invoiceImg: { type: 'string', format: 'binary' } },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor(
+      'invoiceImg',
+      new ImageFileInterceptor().createMulterOptions(),
+    ),
+  )
+  @Post('processInvoice')
+  async processInvoice(@UploadedFile() file: Express.Multer.File) {
+    return await this.invoiceService.processInvoice(file);
+  }
 }

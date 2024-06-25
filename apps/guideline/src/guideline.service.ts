@@ -1,10 +1,11 @@
 import { GuideItems, UploadFileRequest } from '@app/common';
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { RpcException } from '@nestjs/microservices';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { Repository } from 'typeorm';
 import { StorageService } from './storage/storage.service';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { InjectRepository } from '@nestjs/typeorm';
+import { lastValueFrom, timeout } from 'rxjs';
 
 @Injectable()
 export class GuidelineService {
@@ -13,6 +14,7 @@ export class GuidelineService {
     private readonly elasticsearchService: ElasticsearchService,
     @InjectRepository(GuideItems)
     private readonly guideItemsRepository: Repository<GuideItems>,
+    @Inject('ELASTICSEARCH') private readonly elasticsearchClient: ClientProxy,
   ) {}
 
   async getAllGuideline(
@@ -67,7 +69,10 @@ export class GuidelineService {
         steps: null,
       });
 
-      await this.guideItemsRepository.save(newGuideItem);
+      const data = await this.guideItemsRepository.save(newGuideItem);
+      await this.elasticsearchClient.emit('guidelineIndexer/indexGuideline', {
+        data,
+      });
       return {
         message: 'Success',
         data: newGuideItem,
@@ -98,7 +103,10 @@ export class GuidelineService {
       if (description !== undefined) {
         guideItem.description = description;
       }
-      await this.guideItemsRepository.save(guideItem);
+      const data = await this.guideItemsRepository.save(guideItem);
+      await this.elasticsearchClient.emit('guidelineIndexer/indexGuideline', {
+        data,
+      });
       return {
         message: 'Success',
         guideItem,
@@ -127,6 +135,9 @@ export class GuidelineService {
         });
       }
       await this.guideItemsRepository.remove(guideItem);
+      await this.elasticsearchClient.emit('guidelineIndexer/deleteGuideline', {
+        id_guideline,
+      });
       return {
         message: 'Success',
         data: 'Delete guideline successfully',
@@ -384,10 +395,19 @@ export class GuidelineService {
         });
       }
       guideItem.is_shared = !guideItem.is_shared;
-      await this.guideItemsRepository.save(guideItem);
+      const data = await this.guideItemsRepository.save(guideItem);
+
+      const elasticdata = await lastValueFrom(
+        this.elasticsearchClient
+          .send('guidelineIndexer/indexGuideline', {
+            data,
+          })
+          .pipe(timeout(5000)),
+      );
       return {
         message: 'Success',
         data: guideItem.is_shared,
+        elasticdata,
       };
     } catch (error) {
       throw new RpcException({

@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { StorageModule } from './storage/storage.module';
 import { UtilitiesModule } from './utilities/utilities.module';
+import { DocumentaiModule } from './documentai/documentai.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { UtilitiesModule } from './utilities/utilities.module';
     RmqModule,
     DatabaseModule,
     StorageModule,
+    DocumentaiModule,
     forwardRef(() => UtilitiesModule),
   ],
   controllers: [InvoiceController],

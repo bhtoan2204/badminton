@@ -1,6 +1,11 @@
 import { RmqModule } from '@app/common';
 import { Module } from '@nestjs/common';
-import { FAMILY_SERVICE, GUIDELINE_SERVICE, PermissionGuard } from '../utils';
+import {
+  ELASTICSEARCH_SERVICE,
+  FAMILY_SERVICE,
+  GUIDELINE_SERVICE,
+  PermissionGuard,
+} from '../utils';
 import { GuidelineController } from './guideline.controller';
 import { GuidelineService } from './guideline.service';
 import { APP_GUARD } from '@nestjs/core';
@@ -9,6 +14,7 @@ import { APP_GUARD } from '@nestjs/core';
   imports: [
     RmqModule.register({ name: GUIDELINE_SERVICE }),
     RmqModule.register({ name: FAMILY_SERVICE }),
+    RmqModule.register({ name: ELASTICSEARCH_SERVICE }),
   ],
   controllers: [GuidelineController],
   providers: [

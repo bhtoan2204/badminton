@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
 import { StorageService } from './storage/storage.service';
 import {
-  DeleteFileRequest,
   Family,
   FamilyExtraPackages,
   MemberFamily,
