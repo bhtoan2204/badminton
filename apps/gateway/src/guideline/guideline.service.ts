@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { GUIDELINE_SERVICE } from '../utils';
+import { ELASTICSEARCH_SERVICE, GUIDELINE_SERVICE } from '../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { TimeoutError, lastValueFrom, timeout } from 'rxjs';
 import { CreateGuidelineDto } from './dto/createGuideline.dto';
@@ -10,6 +10,7 @@ import { AddStepGuidelineDto } from './dto/addStep.dto';
 export class GuidelineService {
   constructor(
     @Inject(GUIDELINE_SERVICE) private guidelineClient: ClientProxy,
+    @Inject(ELASTICSEARCH_SERVICE) private elasticsearchClient: ClientProxy,
   ) {}
 
   async getAllGuideline(
@@ -222,8 +223,8 @@ export class GuidelineService {
     sort: string,
   ) {
     try {
-      const response = this.guidelineClient
-        .send('guidelineClient/getSharedGuideline', {
+      const response = this.elasticsearchClient
+        .send('guidelineIndexer/searchGuideline', {
           page,
           itemsPerPage,
           text,

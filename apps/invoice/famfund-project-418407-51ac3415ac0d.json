@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "famfund-project-418407",
+  "private_key_id": "51ac3415ac0dbd05d7e2b2499190743df83c7848",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCmf9/RCR6Jyay8\nW3cEFu/Mcyc1pnUwSnT26tT5mCWbgaBGB0XJW/wIrDWEm6+G7jslQjvKp7z5E2RP\n808D5oDYCzKgd67y55BmhHkQ3zNpsCAWQoxNrO9eBM4/1RdHfnOg9KSrtvnCoevZ\nf8AjLjTLUy0HbN7QQiG4/qkRs/SmbQKbH8B3UR/JFP4+pqv5wLPIJPfEGG9MBKNi\nNMCd3mvxu6VgVTzvIC6IooaD1Rg5OIUgTJWO3SfM2oGYRpSIDeiNLGseBw93hToO\ndZ4JGqZ1jW5TQkIsmS0El3sBQU835IAw06e+2lHgKtkdPCwj7Ra4AJZn0QAuW+FK\nXHaR96mLAgMBAAECggEAL9iVZ8uYE/55fhNGq00wEe+Rd/BiwsLSw9YN57/aJsrk\nVNtoKYoebhuWsYnPshWpt3ZGGmGDg4wYCoWf0j4eDneBT+20v6bdrygoZjnN23Q6\ndEshaHzmuHznDB7fNrNW5Q0IeTP2qADB9tmoTDPOBhPb38NgcDZg3HmJ+kVda6l2\nyxasR+LeiIZU/E9H6ft+S8ZlDSU2M/xhcGxjtAI3BIHQPrg6LtChsvAUWZAu3JWB\njXb4LStB7EBeX8WlpAaTURDr8891YlM/nyIXFoVNBeGjmzr4JCVfsTji5yyKZB8P\nE7kkLgo6vQwMGlZr3l8ct77xminYgr4NjUYKfj7cuQKBgQDfg6pE1jk89ip0XmsF\nngmXpXYKEnVZTdA3AnFohKCz7i8oZaShwdQyv0Gg8EvQbtiggUnU7w6S2nKebkLM\ntXxepqdEHCLZzXNCeCPQX16yQLG7/thhT3+zmdZZvMSLW8bVXK+qwxeWZKCKlaum\n2NmgnBHi97By5M6uWW+Kv58qBQKBgQC+stl/Ewd1tMupXM+KVtRtM5H6OC23wzPY\nvc2Ji4wOSx57bCHIvZq1SOYiDqDwusBERs+smYHmzElgNKhtzKqIJt3t1pP66uog\nVZRI1gB4O//LHKINyZmUFCT/SKeI+pXsXUB3mtl2j74btoyI+tX6cMIjR/QJ6j4D\ny6wSRdeKTwKBgQCxywcO+KTRJDNDG7Pf5QVWVmyduG8WGXqNt2jErfMzDTz/0lJx\nxT/pGg+3WE3GP9YbXpx/P6WFFTTlZ2nFcnu6wq/80rC6Nd4AOpaqcqJeAm4ez6oJ\nRfabw7wo56oj/F4ebDrkB4nkvKijdEj1UDtUsbDcrQ/zZKQvNb8vTBvsjQKBgGA8\nP5hqUPxspc6tYKsOkJsfSE6+5Qt0fgimGECOZLqd3B8q/Y2haZ6M0F5lhYCWrgqG\nta0DttNzSqA7Urg+bdzRyHOLMxiQTmDM700megwzMy4cIAfXMiLRW65cyvdMhjZH\nBQ6W3aGAfs7be+Zwt2VwW/iUCiqqxGsD8K00A8bvAoGBAI9EPrxkblG+dILPYP1g\nkjRsapRACLdEov29IVL78D6a3HkTo3RVmVoZI7xIqRli2hspA1NmK6edBZ2FxQOD\n2QtQpx7P0eJDDK3kgnv/yfIWz9S9MTuxj5S49W88TvYDBmE9EWThuqRgtLDJq0MP\n+WTDnWR/keOIGuVE+CNDsp7E\n-----END PRIVATE KEY-----\n",
+  "client_email": "document-ai@famfund-project-418407.iam.gserviceaccount.com",
+  "client_id": "101243020132658623908",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/document-ai%40famfund-project-418407.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

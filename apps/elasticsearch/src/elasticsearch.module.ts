@@ -9,6 +9,8 @@ import { ProxyModule } from './proxy/proxy.module';
 import { DataStatsModule } from './postgresql/datastats.module';
 import { DatafetcherModule } from './datafetcher/datafetcher.module';
 import { PackageModule } from './packages/package.module';
+import { GuidelineIndexerController } from './guideline_indexer.controller';
+import { GuidelineIndexerService } from './guideline_indexer.service';
 
 @Module({
   imports: [
@@ -37,8 +39,8 @@ import { PackageModule } from './packages/package.module';
     forwardRef(() => DatafetcherModule),
     forwardRef(() => PackageModule),
   ],
-  controllers: [SearchController],
-  providers: [SearchService],
+  controllers: [SearchController, GuidelineIndexerController],
+  providers: [SearchService, GuidelineIndexerService],
   exports: [RmqModule],
 })
 export class SearchModule {}

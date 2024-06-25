@@ -21,6 +21,7 @@
   "dependencies": {
     "@as-integrations/fastify": "^2.1.1",
     "@elastic/ecs-winston-format": "^1.5.3",
+    "@google-cloud/documentai": "^8.8.0",
     "@google-cloud/storage": "^7.11.2",
     "@google-cloud/video-transcoder": "^3.3.0",
     "@mercuriusjs/gateway": "^3.0.1",

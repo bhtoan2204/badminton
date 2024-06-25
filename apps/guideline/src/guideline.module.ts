@@ -25,6 +25,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           : './apps/guideline/.env',
     }),
     RmqModule,
+    RmqModule.register({ name: 'ELASTICSEARCH' }),
     DatabaseModule,
     StorageModule,
     TypeOrmModule.forFeature([GuideItems]),

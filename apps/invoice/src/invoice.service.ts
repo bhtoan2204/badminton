@@ -5,6 +5,7 @@ import { RpcException } from '@nestjs/microservices';
 import { UploadFileRequest } from '@app/common';
 import { ConfigService } from '@nestjs/config';
 import * as axios from 'axios';
+import { DocumentaiService } from './documentai/documentai.service';
 
 @Injectable()
 export class InvoiceService {
@@ -12,6 +13,7 @@ export class InvoiceService {
     private readonly entityManager: EntityManager,
     private readonly storageService: StorageService,
     private readonly configService: ConfigService,
+    private readonly documentaiService: DocumentaiService,
   ) {}
 
   async convertFormattedStringToJson(formattedString) {
@@ -429,6 +431,17 @@ export class InvoiceService {
         data: data,
         message: 'Convert text to invoice items',
       };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message || 'Internal server error',
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async processInvoice(file: Express.Multer.File) {
+    try {
+      return await this.documentaiService.processInvoice(file);
     } catch (error) {
       throw new RpcException({
         message: error.message || 'Internal server error',
