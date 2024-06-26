@@ -286,6 +286,7 @@ export class PaymentService {
           const mainPackage = await this.packageMainRepository.findOne({
             where: { id_main_package },
           });
+          console.log(mainPackage);
           price = mainPackage.price;
           break;
         case PackageType.EXTRA:
@@ -298,10 +299,11 @@ export class PaymentService {
           const comboPackage = await this.packageComboRepository.findOne({
             where: { id_combo_package },
           });
+          console.log(comboPackage);
           price = comboPackage.price;
           break;
       }
-      console.log(orderId, Number(price), ip, bankCode);
+      console.log(orderId, price, ip, bankCode);
       return this.generateOrderLink(orderId, Math.floor(price), ip, bankCode);
     } catch (error) {
       throw new RpcException({

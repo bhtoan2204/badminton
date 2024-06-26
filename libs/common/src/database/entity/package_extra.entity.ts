@@ -18,7 +18,7 @@ export class PackageExtra {
   @Column('varchar')
   name: string;
 
-  @Column('money', { nullable: true })
+  @Column('int', { nullable: false, default: 500000 })
   price: number;
 
   @Column('varchar', { nullable: true })
