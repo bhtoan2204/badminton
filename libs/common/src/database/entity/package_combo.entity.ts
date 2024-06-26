@@ -20,7 +20,7 @@ export class PackageCombo {
   @Column('varchar', { nullable: true })
   description: string;
 
-  @Column('money', { nullable: true })
+  @Column('int', { nullable: false, default: 500000 })
   price: number;
 
   @ManyToMany(
