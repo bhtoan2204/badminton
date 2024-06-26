@@ -38,7 +38,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 RUN npm install --only=production --ignore-scripts
-RUN gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
+# RUN gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
 RUN adduser -D nonroot && chown -R nonroot:nonroot /usr/src/app
 
 USER nonroot
