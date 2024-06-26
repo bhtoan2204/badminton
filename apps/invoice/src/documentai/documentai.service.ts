@@ -29,19 +29,16 @@ export class DocumentaiService {
   async processInvoice(file: Express.Multer.File) {
     try {
       const name = `projects/${this.projectId}/locations/${this.location}/processors/${this.processorId}`;
-
-      const request = {
+      const [result] = await this.client.processDocument({
         name,
         rawDocument: {
-          content: file.buffer.toString('base64'),
-          mimeType: file.mimetype, // Đảm bảo định dạng tệp hợp lệ
+          content: Buffer.from(file.buffer).toString('base64'),
+          mimeType: file.mimetype,
         },
-      };
-
-      const [result] = await this.client.processDocument(request);
+      });
       const { document } = result;
 
-      const invoiceData = this.extractFields(document);
+      const invoiceData = document.entities;
       return invoiceData;
     } catch (error) {
       throw new RpcException({

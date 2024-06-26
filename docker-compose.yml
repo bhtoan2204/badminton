@@ -232,8 +232,10 @@ services:
       dockerfile: ./apps/invoice/Dockerfile
       target: development
     command: npm run start:dev invoice
-    depends_on:
-      - gateway
+    env_file:
+      - ./apps/invoice/.env
+    # depends_on:
+    #   - gateway
     restart: on-failure
     volumes:
       - .:/usr/src/app
