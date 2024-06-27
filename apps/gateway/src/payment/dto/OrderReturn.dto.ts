@@ -1,25 +1,24 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber, IsNotEmpty } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, IsUUID } from 'class-validator';
 
 export class OrderReturnDTO {
+  @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
-  @ApiProperty({ example: 1 })
+  @IsUUID()
   id_order: number;
 
-  @IsString()
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  id_family: number;
+
   @ApiProperty({ example: 'NCB' })
+  @IsNotEmpty()
+  @IsString()
   bankCode: string;
 
-  @IsNumber()
   @ApiProperty({ example: 10000000 })
+  @IsNotEmpty()
+  @IsNumber()
   amount: number;
-
-  @IsString()
-  @ApiProperty({ example: '00' })
-  vnp_ResponseCode: string;
-
-  @IsString()
-  @ApiProperty({ example: '00' })
-  vnp_TransactionStatus: string;
 }

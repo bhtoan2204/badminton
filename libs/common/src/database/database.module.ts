@@ -25,6 +25,7 @@ import * as Joi from 'joi';
 import { MemberFamily } from './entity/member_family.entity';
 import { Feedback } from './entity/feedback.entity';
 import { FeedbackMetadata } from './entity/feedbackMetadata.entity';
+import { Order } from './entity/order.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -74,6 +75,7 @@ import { FeedbackMetadata } from './entity/feedbackMetadata.entity';
             ShoppingLists,
             Feedback,
             FeedbackMetadata,
+            Order,
           ],
         };
       },

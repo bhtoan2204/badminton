@@ -3,6 +3,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { PAYMENT_SERVICE } from '../utils';
 import { lastValueFrom, timeout } from 'rxjs';
 import { PackageType } from '@app/common';
+import { OrderReturnDTO } from './dto/OrderReturn.dto';
 
 @Injectable()
 export class PaymentService {
@@ -152,7 +153,7 @@ export class PaymentService {
     }
   }
 
-  async check_order_return(id_user, orderReturn) {
+  async checkOrderReturn(id_user: string, orderReturn: OrderReturnDTO) {
     try {
       const response = this.paymentClient
         .send('paymentClient/check_order_return', { id_user, orderReturn })

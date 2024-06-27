@@ -11,6 +11,7 @@ import { Family } from './family.entity';
 import { EducationProgress } from './education_progress.entity';
 import { MemberFamily } from './member_family.entity';
 import { Feedback } from './feedback.entity';
+import { Order } from './order.entity';
 
 @Entity('users')
 export class Users {
@@ -83,4 +84,7 @@ export class Users {
 
   @OneToMany(() => Feedback, (feedback) => feedback.user)
   feedbacks: Feedback[];
+
+  @OneToMany(() => Order, (order) => order.users)
+  orders: Order[];
 }

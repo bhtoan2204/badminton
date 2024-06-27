@@ -11,6 +11,8 @@ import {
   Feedback,
   FeedbackMetadata,
   FeedbackMetadataKey,
+  Order,
+  OrderStatus,
   PackageCombo,
   PackageExtra,
   PackageMain,
@@ -37,6 +39,8 @@ export class PaymentService {
     private feedbackRepository: Repository<Feedback>,
     @InjectRepository(FeedbackMetadata)
     private feedbackMetadataRepository: Repository<FeedbackMetadata>,
+    @InjectRepository(Order)
+    private orderRepository: Repository<Order>,
   ) {
     this.vnpTmnCode = this.configService.get<string>('VNPAY_TMN_CODE');
     this.vnpHashSecret = this.configService.get<string>('VNPAY_HASH_SECRET');
@@ -96,82 +100,23 @@ export class PaymentService {
       });
     }
   }
-  async create_order(id_user, id_package, amount, method, id_family) {
-    try {
-      const Query = 'SELECT * FROM f_create_order($1,$2,$3,$4, $5)';
-      const params = [id_user, id_package, amount, method, id_family];
-      const data = await this.entityManager.query(Query, params);
-      return {
-        data: data[0]['f_create_order'],
-        message: 'Order created',
-      };
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  }
 
   async check_order(id_user, orderReturn) {
-    const { id_order, amount, vnp_ResponseCode, vnp_TransactionStatus } =
-      orderReturn;
+    const { id_order, bankCode, amount, id_family } = orderReturn;
     try {
-      const Query = 'select * from f_check_order($1, $2, $3, $4, $5)';
-      const params = [
-        id_user,
-        id_order,
-        amount,
-        vnp_ResponseCode,
-        vnp_TransactionStatus,
-      ];
-      const data = await this.entityManager.query(Query, params);
-      return {
-        data: data[0]['f_check_order'],
-        message: 'Check order',
-      };
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      const order = await this.orderRepository.findOne({
+        where: {
+          id_order: id_order,
+          id_user: id_user,
+          price: amount,
+          id_family: id_family,
+          status: OrderStatus.PENDING,
+          bank_code: bankCode,
+        },
       });
-    }
-  }
-
-  async generateVnpay(id_user, order, fullIp) {
-    try {
-      const orderId = await this.create_order(
-        id_user,
-        order.id_package,
-        order.amount,
-        order.method,
-        order.id_family,
-      );
-      const vnp_Params = {
-        vnp_Version: '2.1.0',
-        vnp_Command: 'pay',
-        vnp_TmnCode: this.vnpTmnCode,
-        vnp_Locale: order.language || 'vn',
-        vnp_CurrCode: 'VND',
-        vnp_TxnRef: orderId,
-        vnp_OrderInfo: `Pay for transaction code: ${String(orderId)}`,
-        vnp_OrderType: 'other',
-        vnp_Amount: order.amount * 100,
-        vnp_ReturnUrl: `${this.vnpReturnUrl}${String(orderId)}`,
-        vnp_IpAddr: fullIp.split(':').pop(),
-        vnp_CreateDate: moment().format('YYYYMMDDHHmmss'),
-        ...(order.bankCode && { vnp_BankCode: order.bankCode }),
-      };
-
-      const sortedVnpParams = sortObject(vnp_Params);
-      const signData = qs.stringify(sortedVnpParams, { encode: false });
-      const hmac = crypto.createHmac('sha512', this.vnpHashSecret);
-      const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
-      sortedVnpParams['vnp_SecureHash'] = signed;
-
       return {
-        isSuccess: true,
-        paymentUrl: `${this.vnpUrl}?${qs.stringify(sortedVnpParams, { encode: false })}`,
+        data: order,
+        message: 'Check order',
       };
     } catch (error) {
       throw new RpcException({
@@ -232,34 +177,67 @@ export class PaymentService {
   }
 
   async generateOrderLink(
-    orderId: number,
+    id_package: number,
+    packageType: PackageType,
+    id_user: string,
+    id_family: number,
+    orderId: string,
     price: number,
     ip: string,
     bankCode: string,
   ) {
-    const vnp_Params = {
-      vnp_Version: '2.1.0',
-      vnp_Command: 'pay',
-      vnp_TmnCode: this.vnpTmnCode,
-      vnp_Locale: 'vn',
-      vnp_CurrCode: 'VND',
-      vnp_TxnRef: orderId,
-      vnp_OrderInfo: `Pay for transaction code: ${String(orderId)}`,
-      vnp_OrderType: 'other',
-      vnp_Amount: price,
-      vnp_ReturnUrl: `${this.vnpReturnUrl}${String(orderId)}`,
-      vnp_IpAddr: ip.split(':').pop(),
-      vnp_CreateDate: moment().format('YYYYMMDDHHmmss'),
-      ...(bankCode && { vnp_BankCode: bankCode }),
-    };
+    try {
+      const vnp_Params = {
+        vnp_Version: '2.1.0',
+        vnp_Command: 'pay',
+        vnp_TmnCode: this.vnpTmnCode,
+        vnp_Locale: 'vn',
+        vnp_CurrCode: 'VND',
+        vnp_TxnRef: orderId,
+        vnp_OrderInfo: `Pay for transaction code: ${String(orderId)}`,
+        vnp_OrderType: 'other',
+        vnp_Amount: price,
+        vnp_ReturnUrl: `${this.vnpReturnUrl}${String(orderId)}`,
+        vnp_IpAddr: ip.split(':').pop(),
+        vnp_CreateDate: moment().format('YYYYMMDDHHmmss'),
+        ...(bankCode && { vnp_BankCode: bankCode }),
+      };
 
-    const sortedVnpParams = sortObject(vnp_Params);
-    const signData = qs.stringify(sortedVnpParams, { encode: false });
-    const hmac = crypto.createHmac('sha512', this.vnpHashSecret);
-    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
-    sortedVnpParams['vnp_SecureHash'] = signed;
+      const sortedVnpParams = sortObject(vnp_Params);
+      const signData = qs.stringify(sortedVnpParams, { encode: false });
+      const hmac = crypto.createHmac('sha512', this.vnpHashSecret);
+      const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
+      sortedVnpParams['vnp_SecureHash'] = signed;
 
-    return `${this.vnpUrl}?${qs.stringify(sortedVnpParams, { encode: false })}`;
+      const order = new Order();
+      order.id_order = orderId;
+      order.id_user = id_user;
+      order.id_family = id_family;
+      order.bank_code = bankCode;
+      if (packageType === PackageType.MAIN) {
+        order.id_package_main = id_package;
+        order.id_package_combo = null;
+        order.id_package_extra = null;
+      } else if (packageType === PackageType.EXTRA) {
+        order.id_package_main = null;
+        order.id_package_combo = null;
+        order.id_package_extra = id_package;
+      } else if (packageType === PackageType.COMBO) {
+        order.id_package_main = null;
+        order.id_package_combo = id_package;
+        order.id_package_extra = null;
+      }
+      order.price = price;
+
+      await this.orderRepository.save(order);
+
+      return `${this.vnpUrl}?${qs.stringify(sortedVnpParams, { encode: false })}`;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
   }
 
   async placeOrder(
@@ -277,34 +255,48 @@ export class PaymentService {
     } = order;
 
     try {
-      // TODO: Create order
-      console.log(id_family);
-      const orderId = 1;
+      const order_id = crypto.randomUUID();
       let price = null;
+      let id_package = null;
       switch (packageType) {
         case PackageType.MAIN:
           const mainPackage = await this.packageMainRepository.findOne({
             where: { id_main_package },
           });
-          console.log(mainPackage);
+          id_package = mainPackage.id_main_package;
           price = mainPackage.price;
           break;
         case PackageType.EXTRA:
           const extraPackage = await this.packageExtraRepository.findOne({
             where: { id_extra_package },
           });
+          id_package = extraPackage.id_extra_package;
           price = extraPackage.price;
           break;
         case PackageType.COMBO:
           const comboPackage = await this.packageComboRepository.findOne({
             where: { id_combo_package },
           });
-          console.log(comboPackage);
+          id_package = comboPackage.id_combo_package;
           price = comboPackage.price;
           break;
       }
-      console.log(orderId, price, ip, bankCode);
-      return this.generateOrderLink(orderId, Math.floor(price), ip, bankCode);
+      if (price === null) {
+        throw new RpcException({
+          message: 'Package not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      return this.generateOrderLink(
+        id_package,
+        packageType,
+        id_user,
+        id_family,
+        order_id,
+        price * 100,
+        ip,
+        bankCode,
+      );
     } catch (error) {
       throw new RpcException({
         message: error.message,
