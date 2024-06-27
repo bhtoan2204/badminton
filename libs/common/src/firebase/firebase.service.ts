@@ -6,6 +6,7 @@ export class FirebaseService {
   private readonly firebaseAdmin: admin.app.App;
 
   constructor() {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const serviceAccount = require('./famfund-def53-firebase-adminsdk-dgnjy-044c4a7040.json');
     this.firebaseAdmin = admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
@@ -148,7 +149,7 @@ export class FirebaseService {
             body,
           );
           results.push(result);
-        }
+        } else continue;
       }
 
       return { success: true, message: 'Notifications sent', results };

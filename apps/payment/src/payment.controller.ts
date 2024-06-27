@@ -22,12 +22,6 @@ export class PaymentController {
     return this.paymentService.get_all_package();
   }
 
-  @EventPattern('paymentClient/get_method')
-  async get_method(@Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return this.paymentService.get_method();
-  }
-
   @EventPattern('paymentClient/get_order')
   async get_order(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
@@ -38,12 +32,6 @@ export class PaymentController {
   async UpdateStatus(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.paymentService.check_order(data.id_user, data.orderReturn);
-  }
-
-  @EventPattern('paymentClient/generateVnpay')
-  async generateVnpay(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return this.paymentService.generateVnpay(data.id_user, data.order, data.ip);
   }
 
   @EventPattern('paymentClient/get_main_package')

@@ -4,7 +4,7 @@ import { BackgroundService } from './background.service';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
-import { RmqModule } from '@app/common';
+import { FirebaseService, RmqModule } from '@app/common';
 
 @Module({
   imports: [
@@ -28,6 +28,6 @@ import { RmqModule } from '@app/common';
     RmqModule,
   ],
   controllers: [BackgroundController],
-  providers: [BackgroundService],
+  providers: [BackgroundService, FirebaseService],
 })
 export class BackgroundModule {}
