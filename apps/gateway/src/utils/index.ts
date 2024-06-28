@@ -23,6 +23,7 @@ export * from './guard/oauth.guard/google.guard';
 export * from './guard/authorize/role.guard';
 export * from './guard/authorize/member-family.guard';
 export * from './guard/authorize/permission.guard';
+export * from './guard/authorize/family-term-check.guard';
 
 export * from './strategies/jwt.strategy';
 export * from './strategies/local.strategy';

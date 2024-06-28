@@ -20,6 +20,7 @@ import {
 import { CalendarService } from './calendar.service';
 import {
   CurrentUser,
+  FamilyTermCheckGuard,
   JwtAuthGuard,
   MemberFamilyGuard,
   Permission,
@@ -34,7 +35,7 @@ import { UpdateCategoryEventDto } from './dto/updateCategoryEvent.dto';
 @ApiTags('Calendar')
 @Controller('calendar')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
 @Permission([PERMISSION_CALENDAR])
 export class CalendarController {
   constructor(private readonly calendarService: CalendarService) {}

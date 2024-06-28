@@ -18,7 +18,12 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { CurrentUser, JwtAuthGuard, MemberFamilyGuard } from '../../utils';
+import {
+  CurrentUser,
+  FamilyTermCheckGuard,
+  JwtAuthGuard,
+  MemberFamilyGuard,
+} from '../../utils';
 import { ChecklistService } from './checklist.service';
 import { CreateChecklistDto } from './dto/createChecklist.dto';
 import { UpdateChecklistDto } from './dto/updateChecklist.dto';
@@ -26,7 +31,7 @@ import { UpdateChecklistDto } from './dto/updateChecklist.dto';
 @ApiTags('Checklist')
 @Controller('checklist')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
 export class ChecklistController {
   constructor(private readonly checkListService: ChecklistService) {}
 

@@ -24,6 +24,7 @@ import {
 } from '@nestjs/swagger';
 import {
   CurrentUser,
+  FamilyTermCheckGuard,
   JwtAuthGuard,
   MemberFamilyGuard,
   Permission,
@@ -36,7 +37,7 @@ import { ImageFileInterceptor } from '../../utils/interceptor/imageFile.intercep
 @ApiTags('Utilities')
 @Controller('utilities')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
 @Permission([PERMISSION_INVOICE])
 export class UtilitiesController {
   constructor(private readonly utilitiesService: UtilitiesService) {}

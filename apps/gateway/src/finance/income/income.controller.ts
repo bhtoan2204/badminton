@@ -21,6 +21,7 @@ import {
 import { IncomeService } from './income.service';
 import {
   CurrentUser,
+  FamilyTermCheckGuard,
   JwtAuthGuard,
   MemberFamilyGuard,
   Permission,
@@ -32,7 +33,7 @@ import { UpdateIncomeDto } from './dto/updateIncome.dto';
 @ApiTags('Income')
 @Controller('finance/income')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
 @Permission([PERMISSION_FINANCE])
 export class IncomeController {
   constructor(private readonly incomeService: IncomeService) {}
@@ -112,9 +113,21 @@ export class IncomeController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'itemsPerPage', required: false, type: Number })
   @ApiQuery({ name: 'option', required: false, type: Number })
-  @ApiParam({name: 'id_family', required: true,  type: Number})
-  async getIncomeByDateRange(@CurrentUser() currentUser, @Param('id_family') id_family: number,  @Query('page') page: number, @Query('itemsPerPage') itemsPerPage: number, @Query('option') option: number) {
-    return this.incomeService.getIncomeByDateRange(currentUser.id_user, id_family, page, itemsPerPage, option);
+  @ApiParam({ name: 'id_family', required: true, type: Number })
+  async getIncomeByDateRange(
+    @CurrentUser() currentUser,
+    @Param('id_family') id_family: number,
+    @Query('page') page: number,
+    @Query('itemsPerPage') itemsPerPage: number,
+    @Query('option') option: number,
+  ) {
+    return this.incomeService.getIncomeByDateRange(
+      currentUser.id_user,
+      id_family,
+      page,
+      itemsPerPage,
+      option,
+    );
   }
 
   @HttpCode(HttpStatus.CREATED)

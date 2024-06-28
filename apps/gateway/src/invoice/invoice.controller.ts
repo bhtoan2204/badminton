@@ -28,6 +28,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
 import {
   CurrentUser,
+  FamilyTermCheckGuard,
   JwtAuthGuard,
   MemberFamilyGuard,
   Permission,
@@ -43,7 +44,7 @@ import { UpdateInvoiceItemDto } from './dto/updateInvoiceItem.dto';
 @ApiTags('Invoice')
 @Controller('invoice')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
 @Permission([PERMISSION_INVOICE])
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}

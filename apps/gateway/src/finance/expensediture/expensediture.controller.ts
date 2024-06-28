@@ -25,6 +25,7 @@ import {
 import { ExpenseditureService } from './expensediture.service';
 import {
   CurrentUser,
+  FamilyTermCheckGuard,
   JwtAuthGuard,
   MemberFamilyGuard,
   Permission,
@@ -38,7 +39,7 @@ import { ImageFileInterceptor } from '../../utils/interceptor/imageFile.intercep
 @ApiTags('Expensediture')
 @Controller('finance/expensediture')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
 @Permission([PERMISSION_FINANCE])
 export class ExpenseditureController {
   constructor(private readonly expenseService: ExpenseditureService) {}
@@ -118,9 +119,21 @@ export class ExpenseditureController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'itemsPerPage', required: false, type: Number })
   @ApiQuery({ name: 'option', required: false, type: Number })
-  @ApiParam({name: 'id_family', required: true,  type: Number})
-  async getExpenseByDateRange(@CurrentUser() currentUser, @Param('id_family') id_family: number,  @Query('page') page: number, @Query('itemsPerPage') itemsPerPage: number, @Query('option') option: number) {
-    return this.expenseService.getExpenseByDateRange(currentUser.id_user, id_family, page, itemsPerPage, option);
+  @ApiParam({ name: 'id_family', required: true, type: Number })
+  async getExpenseByDateRange(
+    @CurrentUser() currentUser,
+    @Param('id_family') id_family: number,
+    @Query('page') page: number,
+    @Query('itemsPerPage') itemsPerPage: number,
+    @Query('option') option: number,
+  ) {
+    return this.expenseService.getExpenseByDateRange(
+      currentUser.id_user,
+      id_family,
+      page,
+      itemsPerPage,
+      option,
+    );
   }
 
   @HttpCode(HttpStatus.CREATED)
