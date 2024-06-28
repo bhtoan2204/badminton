@@ -130,7 +130,10 @@ export class EducationService {
         },
       });
       if (!educationProgress) {
-        throw new Error('Education progress not found');
+        throw new RpcException({
+          message: 'Education progress not found',
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        });
       }
       if (title) {
         educationProgress.title = title;
@@ -167,7 +170,10 @@ export class EducationService {
         },
       });
       if (!educationProgress) {
-        throw new Error('Education progress not found');
+        throw new RpcException({
+          message: 'Education progress not found',
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        });
       }
       await this.entityManager.remove(educationProgress);
       return {

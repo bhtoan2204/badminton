@@ -24,7 +24,7 @@ export class Users {
   @Column('varchar', { nullable: true })
   phone: string;
 
-  @Column('varchar', { nullable: true })
+  @Column('varchar', { nullable: true, select: false })
   password: string;
 
   @Column('varchar', { nullable: true })
@@ -33,10 +33,10 @@ export class Users {
   @Column('varchar', { nullable: true })
   lastname: string;
 
-  @Column('varchar', { nullable: true })
+  @Column('varchar', { nullable: true, select: false })
   language: string;
 
-  @Column('boolean', { default: false })
+  @Column('boolean', { default: false, select: false })
   twofa: boolean;
 
   @CreateDateColumn()
@@ -45,13 +45,13 @@ export class Users {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @Column('boolean', { default: false })
+  @Column('boolean', { default: false, select: false })
   isemailverified: boolean;
 
   @Column('boolean', { default: false })
   isphoneverified: boolean;
 
-  @Column('boolean', { default: false })
+  @Column('boolean', { default: false, select: false })
   isadmin: boolean;
 
   @Column({

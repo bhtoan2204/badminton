@@ -16,23 +16,23 @@ export class FamilyController {
     return this.familyService.checkIsMember(data.id_user, data.id_family);
   }
 
-  @EventPattern('familyClient/get_Family')
+  @EventPattern('familyClient/getFamily')
   async getFamily(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.getFamily(data.id_user, data.id_family);
   }
-  @EventPattern('familyClient/get_Member')
+  @EventPattern('familyClient/getMember')
   async getMember(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.getMember(data.id_user);
   }
-  @EventPattern('familyClient/get_all_Family')
+  @EventPattern('familyClient/getAllFamily')
   async getAllFamily(@Payload() id_user: string, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.getAllFamily(id_user);
   }
 
-  @EventPattern('familyClient/get_all_Member')
+  @EventPattern('familyClient/getAllMember')
   async getAllMember(
     @Payload() data: { id_user; id_family },
     @Ctx() context: RmqContext,
@@ -41,7 +41,7 @@ export class FamilyController {
     return this.familyService.getAllMember(data.id_user, data.id_family);
   }
 
-  @EventPattern('familyClient/create_Family')
+  @EventPattern('familyClient/createFamily')
   async createFamily(
     @Payload() data: { id_user; createFamilyDto },
     @Ctx() context: RmqContext,
@@ -50,19 +50,19 @@ export class FamilyController {
     return this.familyService.createFamily(data.id_user, data.createFamilyDto);
   }
 
-  @EventPattern('familyClient/add_Member')
+  @EventPattern('familyClient/addMember')
   async addMember(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.addMember(data.id_user, data.memberFamilyDto);
   }
 
-  @EventPattern('familyClient/delete_Member')
+  @EventPattern('familyClient/deleteMember')
   async deleteMember(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.deleteMember(data.id_user, data.DeleteMemberDTO);
   }
 
-  @EventPattern('familyClient/update_Family')
+  @EventPattern('familyClient/updateFamily')
   async updateFamily(
     @Payload() data: { id_user; updateFamilyDTO },
     @Ctx() context: RmqContext,
@@ -71,7 +71,7 @@ export class FamilyController {
     return this.familyService.updateFamily(data.id_user, data.updateFamilyDTO);
   }
 
-  @EventPattern('familyClient/delete_Family')
+  @EventPattern('familyClient/deleteFamily')
   async deleteFamily(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.deleteFamily(data.id_user, data.id_family);
@@ -83,7 +83,7 @@ export class FamilyController {
     return this.familyService.getIdsMember(data.id_user, data.id_family);
   }
 
-  @EventPattern('familyClient/change_avatar')
+  @EventPattern('familyClient/changeAvatar')
   async changeAvatar(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.changeAvatar(
@@ -102,13 +102,13 @@ export class FamilyController {
     );
   }
 
-  @EventPattern('familyClient/leave_Family')
+  @EventPattern('familyClient/leaveFamily')
   async leaveFamily(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.leaveFamily(data.id_user, data.id_family);
   }
 
-  @EventPattern('familyClient/kick_Member')
+  @EventPattern('familyClient/kickMember')
   async kickMember(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.familyService.kickMember(

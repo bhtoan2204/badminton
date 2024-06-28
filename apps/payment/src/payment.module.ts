@@ -3,8 +3,11 @@ import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 import {
   DatabaseModule,
+  Family,
+  FamilyExtraPackages,
   Feedback,
   FeedbackMetadata,
+  MemberFamily,
   Order,
   PackageCombo,
   PackageExtra,
@@ -37,6 +40,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       Feedback,
       FeedbackMetadata,
       Order,
+      Family,
+      MemberFamily,
+      FamilyExtraPackages,
     ]),
   ],
   controllers: [PaymentController],

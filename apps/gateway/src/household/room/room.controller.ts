@@ -9,10 +9,14 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiQuery,
   ApiTags,
@@ -25,8 +29,8 @@ import {
   Permission,
   PERMISSION_HOUSEHOLD,
 } from '../../utils';
-import { CreateRoomDto } from './dto/createRoom.dto';
-import { UpdateRoomDto } from './dto/updateRoom.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageFileInterceptor } from '../../utils/interceptor/imageFile.interceptor';
 
 @ApiTags('Room')
 @Controller('room')
@@ -59,16 +63,71 @@ export class RoomController {
 
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create room' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        id_family: {
+          type: 'number',
+        },
+        room_name: {
+          type: 'string',
+        },
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['id_family', 'room_name'],
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('image', new ImageFileInterceptor().createMulterOptions()),
+  )
   @Post('createRoom')
-  async createRoom(@CurrentUser() currentUser, @Body() body: CreateRoomDto) {
-    return this.roomService.createRoom(currentUser.id_user, body);
+  async createRoom(
+    @CurrentUser() currentUser,
+    @Body() body: { id_family: number; room_name: string },
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.roomService.createRoom(currentUser.id_user, body, file);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update room' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        id_room: {
+          type: 'number',
+        },
+        id_family: {
+          type: 'number',
+        },
+        room_name: {
+          type: 'string',
+        },
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['id_family', 'id_room'],
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('image', new ImageFileInterceptor().createMulterOptions()),
+  )
   @Put('updateRoom')
-  async updateRoom(@CurrentUser() currentUser, @Body() body: UpdateRoomDto) {
-    return this.roomService.updateRoom(currentUser.id_user, body);
+  async updateRoom(
+    @CurrentUser() currentUser,
+    @Body() body: { id_room: number; room_name: string },
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.roomService.updateRoom(currentUser.id_user, body, file);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)

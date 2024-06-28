@@ -26,7 +26,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   private async validateUser(payload: any) {
     try {
       const userRequest$ = this.authClient
-        .send('authClient/validate_user_id', payload.id_user)
+        .send('authClient/validateUserId', payload.id_user)
         .pipe(timeout(15000));
       return await lastValueFrom(userRequest$);
     } catch (err) {

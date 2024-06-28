@@ -49,7 +49,7 @@ export class AuthController {
     return await this.authService.logout(refreshToken);
   }
 
-  @EventPattern('authClient/validate_user_id')
+  @EventPattern('authClient/validateUserId')
   async handleValidateUserId(
     @Payload() id_user: string,
     @Ctx() context: RmqContext,
@@ -58,7 +58,7 @@ export class AuthController {
     return await this.authService.validateUserId(id_user);
   }
 
-  @EventPattern('authClient/validate_user')
+  @EventPattern('authClient/validateUser')
   async handleValidateUser(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     const { email, password } = data;

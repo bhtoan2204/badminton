@@ -10,6 +10,11 @@ import {
 import { Users } from './users.entity';
 import { Family } from './family.entity';
 
+export enum FamilyRole {
+  MEMBER = 'Member',
+  OWNER = 'Owner',
+}
+
 @Entity('member_family')
 export class MemberFamily {
   @PrimaryGeneratedColumn()
@@ -21,8 +26,8 @@ export class MemberFamily {
   @Column()
   id_family: number;
 
-  @Column({ nullable: true, default: 'Member' })
-  role: string;
+  @Column({ nullable: true, default: 'Member', type: 'enum', enum: FamilyRole })
+  role: FamilyRole;
 
   @CreateDateColumn()
   created_at: Date;

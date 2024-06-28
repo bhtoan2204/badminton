@@ -1,13 +1,15 @@
-import { Room } from '@app/common';
+import { Room, UploadFileRequest } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class RoomService {
   constructor(
     @InjectRepository(Room) private readonly roomRepository: Repository<Room>,
+    private readonly storageService: StorageService,
   ) {}
 
   async getRooms(
@@ -35,12 +37,24 @@ export class RoomService {
     }
   }
 
-  async createRoom(id_user: string, dto: any) {
+  async createRoom(id_user: string, dto: any, file: any) {
     const { id_family, room_name } = dto;
     try {
+      let fileUrl = null;
+      if (file) {
+        const fileName = 'room_' + id_user + '_' + Date.now();
+        const params: UploadFileRequest = {
+          fileName: fileName,
+          file: new Uint8Array(file.buffer.data),
+        };
+        const uploadImageData =
+          await this.storageService.uploadImageHousehold(params);
+        fileUrl = uploadImageData.fileUrl;
+      }
       const newRoom = await this.roomRepository.create({
         id_family,
         room_name,
+        room_image: fileUrl,
       });
 
       return await this.roomRepository.save(newRoom);
@@ -52,7 +66,7 @@ export class RoomService {
     }
   }
 
-  async updateRoom(id_user: string, dto: any) {
+  async updateRoom(id_user: string, dto: any, file: any) {
     const { id_family, id_room, room_name } = dto;
     try {
       const room = await this.roomRepository.findOne({
@@ -64,7 +78,20 @@ export class RoomService {
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
-      room.room_name = room_name;
+      let fileUrl = null;
+      if (file) {
+        const fileName = 'room_' + id_user + '_' + Date.now();
+        const params: UploadFileRequest = {
+          fileName: fileName,
+          file: new Uint8Array(file.buffer.data),
+        };
+        const uploadImageData =
+          await this.storageService.uploadImageHousehold(params);
+        fileUrl = uploadImageData.fileUrl;
+        console.log(fileUrl);
+        room.room_image = fileUrl;
+      }
+      if (room_name) room.room_name = room_name;
       return await this.roomRepository.save(room);
     } catch (error) {
       throw new RpcException({

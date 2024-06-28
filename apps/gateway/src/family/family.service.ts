@@ -19,7 +19,7 @@ export class FamilyService {
   async getFamily(id_user, id_family) {
     try {
       const response = this.familyClient
-        .send('familyClient/get_Family', { id_user, id_family })
+        .send('familyClient/getFamily', { id_user, id_family })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -34,7 +34,7 @@ export class FamilyService {
   async getMember(id_user) {
     try {
       const response = this.familyClient
-        .send('familyClient/get_Member', { id_user })
+        .send('familyClient/getMember', { id_user })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -49,7 +49,7 @@ export class FamilyService {
   async getAllMember(id_user: string, id_family: any) {
     try {
       const response = this.familyClient
-        .send('familyClient/get_all_Member', { id_user, id_family })
+        .send('familyClient/getAllMember', { id_user, id_family })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -64,7 +64,7 @@ export class FamilyService {
   async getAllFamily(id_user: string) {
     try {
       const response = this.familyClient
-        .send('familyClient/get_all_Family', id_user)
+        .send('familyClient/getAllFamily', id_user)
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -79,7 +79,7 @@ export class FamilyService {
   async addMember(id_user: string, memberFamilyDto: MemberFamilyDto) {
     try {
       const response = this.familyClient
-        .send('familyClient/add_Member', { id_user, memberFamilyDto })
+        .send('familyClient/addMember', { id_user, memberFamilyDto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       const cacheKey = `familyCheck:${memberFamilyDto.id_family}:${id_user}`;
@@ -96,7 +96,7 @@ export class FamilyService {
   async deleteMember(id_user: string, deleteMemberDTO: DeleteMemberDTO) {
     try {
       const response = this.familyClient
-        .send('familyClient/delete_Member', { id_user, deleteMemberDTO })
+        .send('familyClient/deleteMember', { id_user, deleteMemberDTO })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       const cacheKey = `familyCheck:${deleteMemberDTO.id_family}:${id_user}`;
@@ -113,7 +113,7 @@ export class FamilyService {
   async createFamily(id_user, createFamilyDto: CreateFamilyDto) {
     try {
       const source = this.familyClient
-        .send('familyClient/create_Family', { id_user, createFamilyDto })
+        .send('familyClient/createFamily', { id_user, createFamilyDto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
@@ -128,7 +128,7 @@ export class FamilyService {
   async updateFamily(id_user: string, updateFamilyDTO: UpdateFamilyDTO) {
     try {
       const source = this.familyClient
-        .send('familyClient/update_Family', { id_user, updateFamilyDTO })
+        .send('familyClient/updateFamily', { id_user, updateFamilyDTO })
         .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
@@ -143,7 +143,7 @@ export class FamilyService {
   async deleteFamily(id_user: string, id_family) {
     try {
       const source = this.familyClient
-        .send('familyClient/delete_Family', { id_user, id_family })
+        .send('familyClient/deleteFamily', { id_user, id_family })
         .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
@@ -162,7 +162,7 @@ export class FamilyService {
   ) {
     try {
       const source = this.familyClient
-        .send('familyClient/change_avatar', { id_user, id_family, file })
+        .send('familyClient/changeAvatar', { id_user, id_family, file })
         .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
@@ -177,7 +177,7 @@ export class FamilyService {
   async leaveFamily(id_user: string, id_family: number) {
     try {
       const source = this.familyClient
-        .send('familyClient/leave_Family', { id_user, id_family })
+        .send('familyClient/leaveFamily', { id_user, id_family })
         .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       const cacheKey = `familyCheck:${id_family}:${id_user}`;
@@ -194,7 +194,7 @@ export class FamilyService {
   async kickMember(id_user: string, id_user_kick: string, id_family: number) {
     try {
       const source = this.familyClient
-        .send('familyClient/kick_Member', { id_user, id_user_kick, id_family })
+        .send('familyClient/kickMember', { id_user, id_user_kick, id_family })
         .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       const cacheKey = `familyCheck:${id_family}:${id_user_kick}`;

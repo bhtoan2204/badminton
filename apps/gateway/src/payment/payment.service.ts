@@ -3,7 +3,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { PAYMENT_SERVICE } from '../utils';
 import { lastValueFrom, timeout } from 'rxjs';
 import { PackageType } from '@app/common';
-import { OrderReturnDTO } from './dto/OrderReturn.dto';
+import { OrderReturnDTO } from './dto/orderReturn.dto';
 
 @Injectable()
 export class PaymentService {
@@ -27,7 +27,7 @@ export class PaymentService {
   async getMainPackage() {
     try {
       const response = this.paymentClient
-        .send('paymentClient/get_main_package', {})
+        .send('paymentClient/getMainPackage', {})
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -42,7 +42,7 @@ export class PaymentService {
   async getExtraPackage() {
     try {
       const response = this.paymentClient
-        .send('paymentClient/get_extra_package', {})
+        .send('paymentClient/getExtraPackage', {})
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -57,7 +57,7 @@ export class PaymentService {
   async getComboPackage() {
     try {
       const response = this.paymentClient
-        .send('paymentClient/get_combo_package', {})
+        .send('paymentClient/getComboPackage', {})
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -83,7 +83,7 @@ export class PaymentService {
         packageType = PackageType.COMBO;
       }
       const response = this.paymentClient
-        .send('paymentClient/place_order', { id_user, order, packageType, ip })
+        .send('paymentClient/placeOrder', { id_user, order, packageType, ip })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -138,6 +138,21 @@ export class PaymentService {
     }
   }
 
+  async getAvailableFunction(id_user: string, id_family: number) {
+    try {
+      const response = this.paymentClient
+        .send('paymentClient/getAvailableFunction', { id_user, id_family })
+        .pipe(timeout(15000));
+      const data = await lastValueFrom(response);
+      return data;
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
   async generateVnpay(id_user, order, ip) {
     try {
       const response = this.paymentClient
@@ -156,7 +171,7 @@ export class PaymentService {
   async checkOrderReturn(id_user: string, orderReturn: OrderReturnDTO) {
     try {
       const response = this.paymentClient
-        .send('paymentClient/check_order_return', { id_user, orderReturn })
+        .send('paymentClient/checkOrderReturn', { id_user, orderReturn })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;

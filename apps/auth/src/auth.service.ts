@@ -50,8 +50,7 @@ export class AuthService {
           },
         });
       } else {
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
+        return user;
       }
     } catch (error) {
       throw new RpcException({
@@ -93,8 +92,7 @@ export class AuthService {
           },
         });
       } else {
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
+        return user;
       }
     } catch (error) {
       throw new RpcException({
@@ -271,16 +269,20 @@ export class AuthService {
         statusCode: 404,
       });
     }
-    const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return user;
   }
 
   async validateLocalUser(email: string, inputPassword: string) {
     let user;
     try {
-      user = await this.userRepository.findOne({
-        where: { email, login_type: LoginType.LOCAL },
-      });
+      user = await this.userRepository
+        .createQueryBuilder('user')
+        .addSelect('user.password')
+        .where('user.email = :email', { email })
+        .andWhere('user.login_type = :login_type', {
+          login_type: LoginType.LOCAL,
+        })
+        .getOne();
     } catch (error) {
       throw new RpcException({
         message: 'An error occurred while retrieving user information',
@@ -308,8 +310,7 @@ export class AuthService {
       });
     }
 
-    const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return user;
   }
 
   async saveFCMToken(userId: string, fcmToken: string) {

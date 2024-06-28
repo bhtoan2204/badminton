@@ -1,4 +1,5 @@
 import {
+  Column,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -9,10 +10,16 @@ import { PackageExtra } from './package_extra.entity';
 import { Family } from './family.entity';
 
 @Entity('family_extra_packages')
-@Unique(['family', 'extra_package'])
+@Unique(['id_family', 'id_extra_package'])
 export class FamilyExtraPackages {
   @PrimaryGeneratedColumn()
   id_family_extra_package: number;
+
+  @Column('int', { nullable: false })
+  id_family: number;
+
+  @Column('int', { nullable: false })
+  id_extra_package: number;
 
   @ManyToOne(() => Family, (family) => family.familyExtraPackages)
   @JoinColumn({ name: 'id_family' })

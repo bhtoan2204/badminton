@@ -28,32 +28,41 @@ export class PaymentController {
     return this.paymentService.get_order(data.id_user);
   }
 
-  @EventPattern('paymentClient/check_order_return')
-  async UpdateStatus(@Payload() data: any, @Ctx() context: RmqContext) {
+  @EventPattern('paymentClient/getAvailableFunction')
+  async getAvailableFunction(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.paymentService.check_order(data.id_user, data.orderReturn);
+    return this.paymentService.getAvailableFunction(
+      data.id_user,
+      data.id_family,
+    );
   }
 
-  @EventPattern('paymentClient/get_main_package')
+  @EventPattern('paymentClient/checkOrderReturn')
+  async updateStatus(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.checkOrder(data.id_user, data.orderReturn);
+  }
+
+  @EventPattern('paymentClient/getMainPackage')
   async get_main_package(@Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.paymentService.getMainPackage();
   }
 
-  @EventPattern('paymentClient/get_extra_package')
+  @EventPattern('paymentClient/getExtraPackage')
   async get_extra_package(@Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.paymentService.getExtraPackage();
   }
 
-  @EventPattern('paymentClient/get_combo_package')
+  @EventPattern('paymentClient/getComboPackage')
   async get_combo_package(@Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.paymentService.getComboPackage();
   }
 
-  @EventPattern('paymentClient/place_order')
-  async place_order(@Payload() data: any, @Ctx() context: RmqContext) {
+  @EventPattern('paymentClient/placeOrder')
+  async placeOrder(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.paymentService.placeOrder(
       data.id_user,

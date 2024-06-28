@@ -300,7 +300,10 @@ export class ChatService {
         !messageData.receiverId ||
         id_user === messageData.receiverId
       ) {
-        throw new Error('Invalid sender or receiver ID.');
+        throw new RpcException({
+          message: 'Invalid user id or receiver id',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
       }
       const receiver = await this.usersRepository.findOne({
         where: { id_user: messageData.receiverId },
