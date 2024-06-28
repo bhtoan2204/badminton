@@ -5,9 +5,6 @@ import {
   IsOptional,
   IsString,
   Validate,
-} from 'class-validator';
-
-import {
   registerDecorator,
   ValidationArguments,
   ValidationOptions,

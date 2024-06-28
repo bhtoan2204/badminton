@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { BackgroundModule } from './background.module';
-import { RmqService } from '@app/common';
+// import { RmqService } from '@app/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(BackgroundModule);
