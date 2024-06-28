@@ -33,11 +33,17 @@ export class Family {
   @Column('varchar', { nullable: true, default: '' })
   description: string;
 
+  @Column('uuid', { nullable: false })
+  owner_id: string;
+
   @ManyToOne(() => Users, (user) => user.families, { nullable: false })
   @JoinColumn({ name: 'owner_id' })
-  owner_id: Users;
+  users: Users;
 
-  @Column('date', { nullable: false, default: new Date() })
+  @Column('timestamptz', {
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   expired_at: Date;
 
   @Column('varchar', { nullable: true })

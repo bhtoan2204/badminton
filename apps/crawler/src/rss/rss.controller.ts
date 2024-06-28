@@ -10,9 +10,19 @@ export class RssController {
     private readonly rmqService: RmqService,
   ) {}
 
+  @EventPattern('crawlerClient/getCategoriesNews')
+  async getCategories(@Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.rssService.getCategoriesNews();
+  }
+
   @EventPattern('crawlerClient/getNews')
   async getRssData(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.rssService.getRssData(data.type, data.page, data.itemsPerPage);
+    return this.rssService.getArticles(
+      data.id_article_category,
+      data.page,
+      data.itemsPerPage,
+    );
   }
 }

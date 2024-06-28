@@ -21,11 +21,14 @@ import { Subjects } from './entity/subject.entity';
 import { ShoppingItemTypes } from './entity/shopping_item_types.entity';
 import { ShoppingItems } from './entity/shopping_items.entity';
 import { ShoppingLists } from './entity/shopping_lists.entity';
-import * as Joi from 'joi';
 import { MemberFamily } from './entity/member_family.entity';
 import { Feedback } from './entity/feedback.entity';
 import { FeedbackMetadata } from './entity/feedbackMetadata.entity';
 import { Order } from './entity/order.entity';
+import { ArticleCategory } from './entity/article_category.entity';
+import { Article } from './entity/article.entity';
+import * as Joi from 'joi';
+import { Enclosure } from './entity/enclosure.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -75,6 +78,10 @@ import { Order } from './entity/order.entity';
             ShoppingLists,
             Feedback,
             FeedbackMetadata,
+            ArticleCategory,
+            Article,
+            Enclosure,
+            PaymentHistory,
             Order,
           ],
         };

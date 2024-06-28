@@ -25,7 +25,7 @@ export class PackageComboService {
         where: search ? { name: Like(`%${search}%`) } : {},
         take: itemsPerPage,
         skip: (page - 1) * itemsPerPage,
-        relations: ['id_package_extra'],
+        relations: ['packageExtras'],
         order: { [sortBy]: sortDesc ? 'DESC' : 'ASC' },
       });
       return {
@@ -54,7 +54,7 @@ export class PackageComboService {
       packageCombo.name = name;
       packageCombo.description = description;
       packageCombo.price = price;
-      packageCombo.id_package_extra = packageExtras;
+      packageCombo.packageExtras = packageExtras;
 
       const savedPackageCombo =
         await this.packageComboRepository.save(packageCombo);
@@ -97,7 +97,7 @@ export class PackageComboService {
           throw new RpcException('Some PackageExtra IDs are invalid');
         }
 
-        packageCombo.id_package_extra = packageExtras;
+        packageCombo.packageExtras = packageExtras;
       }
       if (is_active !== undefined) {
         packageCombo.is_active = is_active;

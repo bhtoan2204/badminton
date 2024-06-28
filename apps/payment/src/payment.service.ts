@@ -1,5 +1,5 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import { RpcException } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { sortObject } from './utils';
@@ -10,9 +10,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   Family,
   FamilyExtraPackages,
+  FamilyRole,
   Feedback,
   FeedbackMetadata,
   FeedbackMetadataKey,
+  MemberFamily,
   Order,
   OrderStatus,
   PackageCombo,
@@ -47,6 +49,8 @@ export class PaymentService {
     private familyRepository: Repository<Family>,
     @InjectRepository(FamilyExtraPackages)
     private familyExtraRepository: Repository<FamilyExtraPackages>,
+    @InjectRepository(MemberFamily)
+    private memberFamilyRepository: Repository<MemberFamily>,
   ) {
     this.vnpTmnCode = this.configService.get<string>('VNPAY_TMN_CODE');
     this.vnpHashSecret = this.configService.get<string>('VNPAY_HASH_SECRET');
@@ -54,45 +58,6 @@ export class PaymentService {
     this.vnpReturnUrl = this.configService.get<string>('VNPAY_RETURN_URL');
   }
 
-  async get_all_package() {
-    try {
-      const Query = 'SELECT * from v_package';
-      const data = await this.entityManager.query(Query);
-      return data;
-    } catch (error) {
-      throw new RpcException({
-        code: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: error.message,
-      });
-    }
-  }
-
-  async get_package(id_package) {
-    try {
-      const Query = 'SELECT * from v_package where id_package=$1';
-      const params = [id_package];
-      const data = await this.entityManager.query(Query, params);
-      return data;
-    } catch (error) {
-      throw new RpcException({
-        code: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: error.message,
-      });
-    }
-  }
-
-  async get_method() {
-    try {
-      const Query = 'SELECT * from payment_method';
-      const data = await this.entityManager.query(Query);
-      return data;
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  }
   async get_order(id_user) {
     try {
       const Query = 'SELECT * FROM f_get_order_info($1)';
@@ -145,68 +110,27 @@ export class PaymentService {
 
   async checkOrder(id_user: string, dto: any) {
     const { id_order, bankCode, amount, id_family } = dto;
+
     try {
-      const order = await this.orderRepository.findOne({
-        where: {
-          id_order: id_order,
-          id_user: id_user,
-          price: amount,
-          id_family: id_family,
-          status: OrderStatus.PENDING,
-          bank_code: bankCode,
-        },
-      });
+      const order = await this.findPendingOrder(
+        id_user,
+        id_order,
+        amount,
+        id_family,
+        bankCode,
+      );
       if (!order) {
         throw new RpcException({
           message: 'Order not found',
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
-      if (order.status === OrderStatus.SUCCESS) {
-        throw new RpcException({
-          message: 'Order already paid',
-          statusCode: HttpStatus.BAD_REQUEST,
-        });
-      }
-      if (order.id_package_main) {
-        const mainPackage = await this.packageMainRepository.findOne({
-          where: { id_main_package: order.id_package_main },
-        });
-        if (order.id_family) {
-          const family = await this.familyRepository.findOne({
-            where: { id_family: order.id_family },
-          });
-          order.status = OrderStatus.SUCCESS;
-          await this.familyRepository.save(family);
-          await this.orderRepository.save(order);
-          return {
-            data: order,
-            message: 'Check order',
-          };
-        } else {
-        }
-      } else if (order.id_package_extra) {
-        if (order.id_family) {
-        } else {
-          throw new RpcException({
-            message: 'Order not found',
-            statusCode: HttpStatus.NOT_FOUND,
-          });
-        }
-      } else if (order.id_package_combo) {
-        if (order.id_family) {
-        } else {
-          throw new RpcException({
-            message: 'Order not found',
-            statusCode: HttpStatus.NOT_FOUND,
-          });
-        }
-      }
-      order.status = OrderStatus.SUCCESS;
+
+      await this.handleOrderStatus(order);
 
       return {
         data: order,
-        message: 'Check order',
+        message: 'Check order success',
       };
     } catch (error) {
       throw new RpcException({
@@ -214,6 +138,134 @@ export class PaymentService {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
+  }
+
+  private async findPendingOrder(
+    id_user: string,
+    id_order: string,
+    amount: number,
+    id_family: number,
+    bankCode: string,
+  ) {
+    return this.orderRepository.findOne({
+      where: {
+        id_order,
+        id_user,
+        price: amount,
+        id_family,
+        status: OrderStatus.PENDING,
+        bank_code: bankCode,
+      },
+    });
+  }
+
+  private async handleOrderStatus(order: Order) {
+    if (order.status === OrderStatus.SUCCESS) {
+      throw new RpcException({
+        message: 'Order already paid',
+        statusCode: HttpStatus.BAD_REQUEST,
+      });
+    }
+
+    if (order.id_package_main) {
+      await this.handleMainPackage(order);
+    } else if (order.id_package_extra) {
+      await this.handleExtraPackage(order);
+    } else if (order.id_package_combo) {
+      await this.handleComboPackage(order);
+    } else {
+      throw new RpcException({
+        message: 'Invalid order package',
+        statusCode: HttpStatus.BAD_REQUEST,
+      });
+    }
+
+    order.status = OrderStatus.SUCCESS;
+    await this.orderRepository.save(order);
+  }
+
+  private async handleMainPackage(order: Order) {
+    const mainPackage = await this.packageMainRepository.findOne({
+      where: { id_main_package: order.id_package_main },
+    });
+
+    if (order.id_family) {
+      const family = await this.familyRepository.findOne({
+        where: { id_family: order.id_family },
+      });
+      family.expired_at = moment(family.expired_at)
+        .add(mainPackage.duration_months, 'months')
+        .toDate();
+      await this.familyRepository.save(family);
+    } else {
+      const family = new Family();
+      family.quantity = 1;
+      family.owner_id = order.id_user;
+      family.expired_at = moment()
+        .add(mainPackage.duration_months, 'months')
+        .toDate();
+      const memberFamily = new MemberFamily();
+      memberFamily.id_user = order.id_user;
+      memberFamily.role = FamilyRole.OWNER;
+      memberFamily.id_family = family.id_family;
+      await this.memberFamilyRepository.save(memberFamily);
+      await this.familyRepository.save(family);
+      order.id_family = family.id_family;
+    }
+  }
+
+  private async handleExtraPackage(order: Order) {
+    if (order.id_family) {
+      const familyExtra = new FamilyExtraPackages();
+      familyExtra.id_family = order.id_family;
+      familyExtra.id_extra_package = order.id_package_extra;
+      await this.familyExtraRepository.save(familyExtra);
+    } else {
+      throw new RpcException({
+        message: 'Order not found',
+        statusCode: HttpStatus.NOT_FOUND,
+      });
+    }
+  }
+
+  private async handleComboPackage(order: Order) {
+    if (!order.id_family) {
+      throw new RpcException({
+        message: 'Order not found',
+        statusCode: HttpStatus.NOT_FOUND,
+      });
+    }
+
+    const packageCombo = await this.packageComboRepository.findOne({
+      where: { id_combo_package: order.id_package_combo },
+      relations: ['packageExtras'],
+    });
+
+    const familyExtras = packageCombo.packageExtras.map((item) => ({
+      id_family: order.id_family,
+      id_extra_package: item.id_extra_package,
+    }));
+
+    // Collect all ids for the packages
+    const extraPackageIds = familyExtras.map((item) => item.id_extra_package);
+
+    // Query the familyExtraRepository for all items with these ids
+    const existingFamilyExtras = await this.familyExtraRepository.find({
+      where: {
+        id_family: order.id_family,
+        id_extra_package: In(extraPackageIds),
+      },
+    });
+
+    if (existingFamilyExtras.length > 0) {
+      throw new RpcException({
+        message: 'Family already bought one or more of these extra packages',
+        statusCode: HttpStatus.BAD_REQUEST,
+      });
+    }
+
+    // Save new family extras if no existing packages found
+    await this.familyExtraRepository.save(familyExtras);
   }
 
   async getMainPackage() {
@@ -251,7 +303,7 @@ export class PaymentService {
   async getComboPackage() {
     try {
       const [data, total] = await this.packageComboRepository.findAndCount({
-        relations: ['id_package_extra'],
+        relations: ['packageExtras'],
       });
       return {
         data: data,
@@ -292,6 +344,8 @@ export class PaymentService {
         vnp_CreateDate: moment().format('YYYYMMDDHHmmss'),
         ...(bankCode && { vnp_BankCode: bankCode }),
       };
+
+      console.log(vnp_Params);
 
       const sortedVnpParams = sortObject(vnp_Params);
       const signData = qs.stringify(sortedVnpParams, { encode: false });
