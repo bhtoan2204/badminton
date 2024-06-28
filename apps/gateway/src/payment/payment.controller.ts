@@ -12,7 +12,7 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import { CurrentUser, JwtAuthGuard } from '../utils';
-import { OrderReturnDTO } from './dto/orderReturn.dto';
+import { VerifyOrderDTO } from './dto/verifyOrder.dto';
 import { PlaceOrderDto } from './dto/placeOrder.dto';
 
 @ApiTags('Payment')
@@ -66,12 +66,9 @@ export class PaymentController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Check order' })
   @Post('checkOrder')
-  async checkOrderReturn(
-    @CurrentUser() user,
-    @Body() orderReturn: OrderReturnDTO,
-  ) {
+  async checkOrderReturn(@CurrentUser() user, @Body() dto: VerifyOrderDTO) {
     const id_user = user.id_user;
-    return this.paymentService.checkOrderReturn(id_user, orderReturn);
+    return this.paymentService.checkOrderReturn(id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)

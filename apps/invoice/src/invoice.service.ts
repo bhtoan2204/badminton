@@ -188,9 +188,7 @@ export class InvoiceService {
         queryUpdateInvoice,
         paramsUpdateInvoice,
       );
-      // if (fileUrl && data[0].f_update_invoice) {
-      //   await this.storageService.deleteImageInvoice(data[0].f_update_invoice);
-      // }
+
       return {
         data,
         message: 'Update invoice',

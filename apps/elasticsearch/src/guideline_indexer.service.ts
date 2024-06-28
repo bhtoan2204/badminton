@@ -85,7 +85,7 @@ export class GuidelineIndexerService {
       }
 
       const data = await this.elasticSearchService.search(option);
-      if (data.hits && data.hits.hits) {
+      if (data && data.hits && data.hits.hits) {
         return {
           data: data.hits.hits.map((hit) => hit._source),
         };
