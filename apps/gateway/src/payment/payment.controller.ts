@@ -7,11 +7,12 @@ import {
   Get,
   UseGuards,
   Ip,
+  Param,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import { CurrentUser, JwtAuthGuard } from '../utils';
-import { OrderReturnDTO } from './dto/OrderReturn.dto';
+import { OrderReturnDTO } from './dto/orderReturn.dto';
 import { PlaceOrderDto } from './dto/placeOrder.dto';
 
 @ApiTags('Payment')
@@ -79,5 +80,16 @@ export class PaymentController {
   async get_order(@CurrentUser() user) {
     const id_user = user.id_user;
     return this.paymentService.get_order(id_user);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get available function' })
+  @Get('getAvailableFunction/:id_family')
+  async getAvailableFunction(
+    @CurrentUser() user,
+    @Param('id_family') id_family: number,
+  ) {
+    const id_user = user.id_user;
+    return this.paymentService.getAvailableFunction(id_user, id_family);
   }
 }

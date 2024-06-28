@@ -24,13 +24,13 @@ export class RoomController {
   @EventPattern('householdClient/createRoom')
   async createRoom(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.roomService.createRoom(data.id_user, data.dto);
+    return await this.roomService.createRoom(data.id_user, data.dto, data.file);
   }
 
   @EventPattern('householdClient/updateRoom')
   async updateRoom(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.roomService.updateRoom(data.id_user, data.dto);
+    return await this.roomService.updateRoom(data.id_user, data.dto, data.file);
   }
 
   @EventPattern('householdClient/deleteRoom')

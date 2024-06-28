@@ -6,6 +6,7 @@ import { StorageService } from './storage/storage.service';
 import {
   Family,
   FamilyExtraPackages,
+  FamilyRole,
   MemberFamily,
   PackageExtra,
   UploadFileRequest,
@@ -37,7 +38,10 @@ export class FamilyService {
       });
 
       if (!family) {
-        throw new Error('Family not found');
+        throw new RpcException({
+          message: 'Family not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
       }
       const familyExtraPackages = await this.familyExtraPackagesRepository.find(
         {
@@ -54,7 +58,10 @@ export class FamilyService {
       );
       return hasAllPermissions;
     } catch (error) {
-      throw new Error(`Error checking extra packages: ${error.message}`);
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
     }
   }
 
@@ -100,12 +107,17 @@ export class FamilyService {
     }
   }
 
-  async getAllMember(id_user: any, id_family: any) {
+  async getAllMember(id_user: string, id_family: number) {
     try {
-      const q2 = 'select * from f_get_all_member($1, $2)';
-      const param = [id_user, id_family];
-      const data = await this.entityManager.query(q2, param);
-      return data;
+      const members = await this.memberFamilyRepository.find({
+        where: { id_family },
+        relations: ['user'],
+      });
+
+      return {
+        data: members,
+        message: 'All members of family',
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -245,7 +257,10 @@ export class FamilyService {
         where: { id_family },
       });
       if (!family) {
-        throw new Error('Family not found');
+        throw new RpcException({
+          message: 'Family not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
       }
       family.avatar = fileUrl;
       await this.familyRepository.save(family);
@@ -267,7 +282,10 @@ export class FamilyService {
         where: { id_user, id_family },
       });
       if (!memberFamily) {
-        throw new Error('Member not found');
+        throw new RpcException({
+          message: 'Member not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
       }
       await this.memberFamilyRepository.remove(memberFamily);
       return {
@@ -292,11 +310,17 @@ export class FamilyService {
           where: { id_user: id_user_kick, id_family },
         }),
       ]);
-      if (!roleOfKicker || roleOfKicker.role !== 'Owner family') {
-        throw new Error('You are not admin');
+      if (!roleOfKicker || roleOfKicker.role !== FamilyRole.OWNER) {
+        throw new RpcException({
+          message: 'Only owner can kick member',
+          statusCode: HttpStatus.FORBIDDEN,
+        });
       }
       if (!memberFamily) {
-        throw new Error('Member not found');
+        throw new RpcException({
+          message: 'Member not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
       }
       await this.memberFamilyRepository.remove(memberFamily);
       return {

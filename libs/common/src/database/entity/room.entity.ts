@@ -24,6 +24,9 @@ export class Room {
   @Column('varchar', { length: 255, nullable: false })
   room_name: string;
 
+  @Column('varchar', { nullable: true, default: null })
+  room_image: string;
+
   @CreateDateColumn()
   created_at: Date;
 

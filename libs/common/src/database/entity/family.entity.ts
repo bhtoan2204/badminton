@@ -27,17 +27,17 @@ export class Family {
   @Column('int')
   quantity: number;
 
-  @Column('varchar', { nullable: false })
+  @Column('varchar', { nullable: false, default: 'New Family' })
   name: string;
 
-  @Column('varchar', { nullable: true })
+  @Column('varchar', { nullable: true, default: '' })
   description: string;
 
-  @ManyToOne(() => Users, (user) => user.families)
+  @ManyToOne(() => Users, (user) => user.families, { nullable: false })
   @JoinColumn({ name: 'owner_id' })
   owner_id: Users;
 
-  @Column('date', { nullable: true })
+  @Column('date', { nullable: false, default: new Date() })
   expired_at: Date;
 
   @Column('varchar', { nullable: true })

@@ -33,10 +33,10 @@ export class RoomService {
     }
   }
 
-  async createRoom(id_user: string, dto: any) {
+  async createRoom(id_user: string, dto: any, file: any) {
     try {
       const response = this.householdClient
-        .send('householdClient/createRoom', { id_user, dto })
+        .send('householdClient/createRoom', { id_user, dto, file })
         .pipe(timeout(15000));
       return await lastValueFrom(response);
     } catch (error) {
@@ -47,10 +47,10 @@ export class RoomService {
     }
   }
 
-  async updateRoom(id_user: string, dto: any) {
+  async updateRoom(id_user: string, dto: any, file: any) {
     try {
       const response = this.householdClient
-        .send('householdClient/updateRoom', { id_user, dto })
+        .send('householdClient/updateRoom', { id_user, dto, file })
         .pipe(timeout(15000));
       return await lastValueFrom(response);
     } catch (error) {

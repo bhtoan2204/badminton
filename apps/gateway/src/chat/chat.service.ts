@@ -41,7 +41,7 @@ export class ChatService {
   async getFamilyChats(id_user: string) {
     try {
       const listFamilyId = this.familyClient
-        .send('familyClient/get_all_Family', id_user)
+        .send('familyClient/getAllFamily', id_user)
         .pipe(timeout(15000));
       const family = await lastValueFrom(listFamilyId);
       const familyId = family.map((item: any) => item.id_family);

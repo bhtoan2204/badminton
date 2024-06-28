@@ -22,7 +22,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   private async validateUser(email: string, password: string) {
     try {
       const userValidation$ = this.authClient
-        .send('authClient/validate_user', { email, password })
+        .send('authClient/validateUser', { email, password })
         .pipe(timeout(15000));
       return await lastValueFrom(userValidation$);
     } catch (err) {

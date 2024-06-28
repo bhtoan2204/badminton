@@ -21,7 +21,10 @@ export class UtilitiesService {
         message: 'Utility types retrieved successfully',
       };
     } catch (error) {
-      throw new Error(error);
+      throw new RpcException({
+        message: error.message || 'Internal server error',
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+      });
     }
   }
 
@@ -44,7 +47,10 @@ export class UtilitiesService {
         message: 'Utilities retrieved successfully',
       };
     } catch (error) {
-      throw new Error(error);
+      throw new RpcException({
+        message: error.message || 'Internal server error',
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+      });
     }
   }
 

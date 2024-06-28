@@ -10,6 +10,7 @@ import {
 } from '@app/common';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class StorageService implements OnModuleInit {
@@ -25,28 +26,28 @@ export class StorageService implements OnModuleInit {
   async uploadImageInvoice(
     request: UploadFileRequest,
   ): Promise<UploadFileResponse> {
-    return this.storageService.uploadImageInvoice(request).toPromise();
+    return await lastValueFrom(this.storageService.uploadImageInvoice(request));
   }
 
   async readFile(request: ReadFileRequest): Promise<ReadFileResponse> {
-    return this.storageService.readFile(request).toPromise();
+    return await lastValueFrom(this.storageService.readFile(request));
   }
 
   async deleteImageInvoice(
     request: DeleteFileRequest,
   ): Promise<DeleteFileResponse> {
-    return this.storageService.deleteImageInvoice(request).toPromise();
+    return await lastValueFrom(this.storageService.deleteImageInvoice(request));
   }
 
   async uploadImageUtility(
     request: UploadFileRequest,
   ): Promise<UploadFileResponse> {
-    return this.storageService.uploadImageUtility(request).toPromise();
+    return await lastValueFrom(this.storageService.uploadImageUtility(request));
   }
 
   async deleteImageUtility(
     request: DeleteFileRequest,
   ): Promise<DeleteFileResponse> {
-    return this.storageService.deleteImageUtility(request).toPromise();
+    return await lastValueFrom(this.storageService.deleteImageUtility(request));
   }
 }

@@ -44,12 +44,10 @@ export class UserService {
 
   async getProfile(user: any) {
     try {
-      const query = 'SELECT * FROM users where id_user = $1';
-      const parameters = [user.id_user];
-      const data = await this.entityManager.query(query, parameters);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...userWithoutPassword } = data[0];
-      return userWithoutPassword;
+      const userProfile = await this.userRepository.findOne({
+        where: { id_user: user.id_user },
+      });
+      return userProfile;
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -85,9 +83,12 @@ export class UserService {
       const { password } = await this.userRepository.findOne({
         where: { id_user: user.id_user },
       });
-      const Query = 'SELECT * FROM compare_passwords($1,$2)';
-      const param = [oldPassword, password];
-      const isMatch = await this.entityManager.query(Query, param);
+      const comparePasswordQuery = 'SELECT * FROM compare_passwords($1,$2)';
+      const comparePasswordParams = [oldPassword, password];
+      const isMatch = await this.entityManager.query(
+        comparePasswordQuery,
+        comparePasswordParams,
+      );
 
       if (!isMatch) {
         throw new RpcException({
@@ -95,9 +96,9 @@ export class UserService {
           statusCode: HttpStatus.UNAUTHORIZED,
         });
       }
-      const query = 'SELECT * FROM f_change_password($1, $2)';
-      const parameters = [user.id_user, newPassword];
-      await this.entityManager.query(query, parameters);
+      const changePassQuery = 'SELECT * FROM f_change_password($1, $2)';
+      const changeParameters = [user.id_user, newPassword];
+      await this.entityManager.query(changePassQuery, changeParameters);
       return {
         message: 'Password has been changed',
         data: true,

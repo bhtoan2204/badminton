@@ -28,7 +28,7 @@ export class WsJwtStrategy extends PassportStrategy(Strategy, 'ws-jwt') {
 
   async validate(payload: any) {
     const userRequest$ = this.authClient
-      .send('authClient/validate_user_id', payload.id_user)
+      .send('authClient/validateUserId', payload.id_user)
       .pipe(timeout(15000));
     try {
       const user = await lastValueFrom(userRequest$);
