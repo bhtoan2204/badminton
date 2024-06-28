@@ -184,9 +184,8 @@ export class IncomeService {
       const query = 'SELECT * FROM f_get_income_with_pagination($1, $2, $3, $4, $5)';
       const params = [id_user, id_family, option, pageNumber, itemsPerPage];
       const data = await this.entityManager.query(query, params);
-      return {
-        data: data,
-      };
+      return data[0]?.f_get_income_with_pagination || [];
+
 
     } catch (error) {
       throw new RpcException({

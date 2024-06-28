@@ -1086,7 +1086,7 @@ BEGIN
     ) INTO v_user_exists;
 
     IF NOT v_user_exists THEN
-        RAISE EXCEPTION 'User is not a member of the specified family.';
+        RETURN '{"total_pages": 0, "current_page": 0, "expenses": []}'::JSON;
     END IF;
 
     -- Get the total count of records
@@ -1099,23 +1099,30 @@ BEGIN
     -- Calculate total pages
     v_total_pages := CEIL(v_total_count::numeric / p_items_per_page);
 
+    -- Ensure the requested page is within the range
+
+
     -- Return the paginated query results and total pages as JSON
     v_expenses := json_build_object(
         'total_pages', v_total_pages,
+        'current_page', p_page_number,
         'expenses', (
-            SELECT json_agg(json_build_object(
-                'id_expense_type', fe.id_expense_type,
-                'expense_category', f_get_category_name(p_id_family, fe.id_expense_type),
-                'expense_amount', fe.amount,
-                'description', fe.description,
-                'name', f_find_user(fe.id_created_by),
-                'expenditure_date', fe.expenditure_date
-            ) ORDER BY fe.expenditure_date DESC)
-            FROM finance_expenditure fe
-            WHERE fe.id_family = p_id_family 
-              AND fe.expenditure_date BETWEEN v_start_date AND v_end_date
-            OFFSET (p_page_number - 1) * p_items_per_page
-            LIMIT p_items_per_page
+            SELECT COALESCE(json_agg(expense_data), '[]'::JSON)
+            FROM (
+                SELECT
+                    fe.id_expense_type,
+                    f_get_category_name(p_id_family, fe.id_expense_type) AS expense_category,
+                    fe.amount AS expense_amount,
+                    fe.description,
+                    f_find_user(fe.id_created_by) AS name,
+                    fe.expenditure_date
+                FROM finance_expenditure fe
+                WHERE fe.id_family = p_id_family 
+                  AND fe.expenditure_date BETWEEN v_start_date AND v_end_date
+                ORDER BY fe.expenditure_date DESC
+                OFFSET (p_page_number - 1) * p_items_per_page
+                LIMIT p_items_per_page
+            ) AS expense_data
         )
     );
 
@@ -1126,7 +1133,8 @@ $function$;
 
 drop function f_get_expense_by_date_range(uuid,integer,integer) 
 select * from f_get_expenses_with_pagination('28905675-858b-4a93-a283-205899779622', 96, 90, 1,10)
-select * from f_get_income_with_pagination('28905675-858b-4a93-a283-205899779622', 96, 90, 1,10)
+
+select * from f_get_income_with_pagination('28905675-858b-4a93-a283-205899779622', 96, 90, 2,10)
 
 
 CREATE OR REPLACE FUNCTION public.f_get_income_with_pagination(
@@ -1158,7 +1166,7 @@ BEGIN
     ) INTO v_user_exists;
 
     IF NOT v_user_exists THEN
-        RAISE EXCEPTION 'User is not a member of the specified family.';
+        RETURN '{"total_pages": 0, "income": []}'::JSON;
     END IF;
 
     -- Get the total count of income records
@@ -1171,29 +1179,39 @@ BEGIN
     -- Calculate total pages
     v_total_pages := CEIL(v_total_count::numeric / p_items_per_page);
 
+    -- Ensure the requested page is within the range
+    IF p_page_number < 1 OR p_page_number > v_total_pages THEN
+        RETURN '{"total_pages": ' || v_total_pages || ', "income": []}'::JSON;
+    END IF;
+
     -- Construct JSON object with pagination information and income records
     v_income_records := json_build_object(
         'total_pages', v_total_pages,
+        'current_page', p_page_number,
         'income', (
-            SELECT json_agg(json_build_object(
-                'id_income_source', fi.id_income,
-                'income_category', f_get_income_name(p_id_family, fi.id_income),
-                'income_amount', fi.amount,
-                'description', fi.description,
-                'name', f_find_user(fi.id_created_by),
-                'income_date', fi.income_date
-            ) ORDER BY fi.income_date DESC)
-            FROM finance_income fi
-            WHERE fi.id_family = p_id_family
-              AND fi.income_date BETWEEN v_start_date AND v_end_date
-            OFFSET (p_page_number - 1) * p_items_per_page
-            LIMIT p_items_per_page
+            SELECT COALESCE(json_agg(income_data), '[]'::JSON)
+            FROM (
+                SELECT
+                    fi.id_income AS id_income_source,
+                    f_get_income_name(p_id_family, fi.id_income) AS income_category,
+                    fi.amount AS income_amount,
+                    fi.description,
+                    f_find_user(fi.id_created_by) AS name,
+                    fi.income_date
+                FROM finance_income fi
+                WHERE fi.id_family = p_id_family
+                  AND fi.income_date BETWEEN v_start_date AND v_end_date
+                ORDER BY fi.income_date DESC
+                OFFSET (p_page_number - 1) * p_items_per_page
+                LIMIT p_items_per_page
+            ) AS income_data
         )
     );
 
     RETURN v_income_records;
 END;
 $function$;
+
 
 
 CREATE OR REPLACE FUNCTION public.f_get_expenditure(p_id_user text, p_id_family integer, p_page integer, p_items_per_page integer)
