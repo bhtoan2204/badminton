@@ -9,21 +9,6 @@ import { VerifyOrderDTO } from './dto/verifyOrder.dto';
 export class PaymentService {
   constructor(@Inject(PAYMENT_SERVICE) private paymentClient: ClientProxy) {}
 
-  async get_all_package() {
-    try {
-      const response = this.paymentClient
-        .send('paymentClient/get_all_package', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
-    } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
-    }
-  }
-
   async getMainPackage() {
     try {
       const response = this.paymentClient
@@ -95,20 +80,6 @@ export class PaymentService {
     }
   }
 
-  async get_package(id_package) {
-    try {
-      const response = this.paymentClient
-        .send('paymentClient/get_package', { id_package })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
-    } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
-    }
-  }
   async get_method() {
     try {
       const response = this.paymentClient

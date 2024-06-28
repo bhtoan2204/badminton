@@ -1,6 +1,6 @@
 export function sortObject(obj) {
-  let sorted = {};
-  let str = [];
+  const sorted = {};
+  const str = [];
   let key;
   for (key in obj) {
     if (obj.hasOwnProperty(key)) {

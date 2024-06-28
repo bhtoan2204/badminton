@@ -39,7 +39,7 @@ export class PackageCombo {
       referencedColumnName: 'id_extra_package',
     },
   })
-  id_package_extra: PackageExtra[];
+  packageExtras: PackageExtra[];
 
   @Column('boolean', { nullable: false, default: true })
   is_active: boolean;

@@ -23,13 +23,6 @@ export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get all package' })
-  @Get('getAllPackage')
-  async get_all_package() {
-    return this.paymentService.get_all_package();
-  }
-
-  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get main package' })
   @Get('getMainPackage')
   async get_main_package() {

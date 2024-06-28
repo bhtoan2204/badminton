@@ -23,22 +23,32 @@ export class CrawlerController {
   constructor(private readonly crawlerService: CrawlerService) {}
 
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get categories news' })
+  @Get('categories')
+  async getCategories() {
+    return this.crawlerService.getCategoriesNews();
+  }
+
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary:
-      'home, health, world, life, news, business, startup, entertainment, sports, law, education, newest, featured, travel, science, digital, car, opinion, confide, funny, mostviewed',
+    summary: 'Get news by category',
   })
-  @ApiQuery({ name: 'type', required: true, type: String })
+  @ApiQuery({ name: 'id_article_category', required: true, type: Number })
   @ApiQuery({ name: 'page', required: false, type: String })
   @ApiQuery({ name: 'itemsPerPage', required: false, type: String })
   @Get('news')
   async getNews(
-    @Query('type') type: string,
+    @Query('id_article_category') id_article_category: number,
     @Query('page') page: string,
     @Query('itemsPerPage') itemsPerPage: string,
   ) {
     const pageNumber = parseInt(page, 10) || 1;
     const itemsPerPageNumber = parseInt(itemsPerPage, 10) || 10;
-    return this.crawlerService.getRssData(type, pageNumber, itemsPerPageNumber);
+    return this.crawlerService.getRssData(
+      id_article_category,
+      pageNumber,
+      itemsPerPageNumber,
+    );
   }
 
   @HttpCode(HttpStatus.OK)

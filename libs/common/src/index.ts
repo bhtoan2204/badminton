@@ -33,6 +33,10 @@ export * from './database/entity/member_family.entity';
 export * from './database/entity/feedback.entity';
 export * from './database/entity/feedbackMetadata.entity';
 export * from './database/entity/order.entity';
+export * from './database/entity/article_category.entity';
+export * from './database/entity/article.entity';
+export * from './database/entity/enclosure.entity';
+export * from './database/entity/payment_history.entity';
 
 export * from './database/enum/login_type.enum';
 

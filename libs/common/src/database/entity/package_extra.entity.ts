@@ -33,10 +33,7 @@ export class PackageExtra {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToMany(
-    () => PackageCombo,
-    (packageCombo) => packageCombo.id_package_extra,
-  )
+  @ManyToMany(() => PackageCombo, (packageCombo) => packageCombo.packageExtras)
   packageCombos: PackageCombo[];
 
   @OneToMany(

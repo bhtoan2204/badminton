@@ -24,7 +24,7 @@ export class Order {
   @Column('uuid')
   id_user: string;
 
-  @Column('int')
+  @Column('int', { nullable: true })
   id_family: number;
 
   @Column({

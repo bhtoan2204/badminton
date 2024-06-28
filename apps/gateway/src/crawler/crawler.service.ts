@@ -7,10 +7,32 @@ import { lastValueFrom, timeout } from 'rxjs';
 export class CrawlerService {
   constructor(@Inject(CRAWLER_SERVICE) private crawlerClient: ClientProxy) {}
 
-  async getRssData(type: string, page: number, itemsPerPage: number) {
+  async getCategoriesNews() {
     try {
       const response = this.crawlerClient
-        .send('crawlerClient/getNews', { type, page, itemsPerPage })
+        .send('crawlerClient/getCategoriesNews', {})
+        .pipe(timeout(15000));
+      return await lastValueFrom(response);
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async getRssData(
+    id_article_category: number,
+    page: number,
+    itemsPerPage: number,
+  ) {
+    try {
+      const response = this.crawlerClient
+        .send('crawlerClient/getNews', {
+          id_article_category,
+          page,
+          itemsPerPage,
+        })
         .pipe(timeout(15000));
       return await lastValueFrom(response);
     } catch (error) {
