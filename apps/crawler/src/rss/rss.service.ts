@@ -152,10 +152,15 @@ export class RssService implements OnModuleInit {
   @Process('crawl-articles')
   async getRssData() {
     for (const type of category) {
-      console.log(type);
+      console.log(`Processing RSS for category ${type}`);
       const feed = await this.crawlRss(type);
-      for (const item of feed.items) {
+
+      const itemsToProcess = feed.items.slice(0, 10);
+
+      for (const item of itemsToProcess) {
         await this.saveArticle(item, type);
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
   }
