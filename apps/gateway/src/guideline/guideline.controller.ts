@@ -26,6 +26,7 @@ import {
 import { GuidelineService } from './guideline.service';
 import {
   CurrentUser,
+  FamilyTermCheckGuard,
   JwtAuthGuard,
   MemberFamilyGuard,
   Permission,
@@ -39,7 +40,7 @@ import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor
 @ApiTags('Guideline')
 @Controller('guideline')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
 @Permission([PERMISSION_GUIDELINE])
 export class GuidelineController {
   constructor(private readonly guidelineService: GuidelineService) {}

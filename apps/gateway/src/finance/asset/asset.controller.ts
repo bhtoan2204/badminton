@@ -20,6 +20,7 @@ import {
 import { AssetService } from './asset.service';
 import {
   CurrentUser,
+  FamilyTermCheckGuard,
   JwtAuthGuard,
   MemberFamilyGuard,
   Permission,
@@ -31,7 +32,7 @@ import { UpdateAssetDto } from './dto/updateAsset.dto';
 @ApiTags('Asset')
 @Controller('finance/asset')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
 @Permission([PERMISSION_FINANCE])
 export class AssetController {
   constructor(private readonly expenseService: AssetService) {}

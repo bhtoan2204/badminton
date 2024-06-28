@@ -132,7 +132,7 @@ export class HouseholdService {
       throw new HttpException(error, error.statusCode);
     }
   }
-  
+
   async getLowConditionItem(id_user: string, id_family: number) {
     try {
       const response = this.householdClient

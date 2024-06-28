@@ -24,6 +24,7 @@ import {
 import { RoomService } from './room.service';
 import {
   CurrentUser,
+  FamilyTermCheckGuard,
   JwtAuthGuard,
   MemberFamilyGuard,
   Permission,
@@ -35,7 +36,7 @@ import { ImageFileInterceptor } from '../../utils/interceptor/imageFile.intercep
 @ApiTags('Room')
 @Controller('room')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
 @Permission([PERMISSION_HOUSEHOLD])
 export class RoomController {
   constructor(private readonly roomService: RoomService) {}

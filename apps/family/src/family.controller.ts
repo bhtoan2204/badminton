@@ -117,4 +117,10 @@ export class FamilyController {
       data.id_family,
     );
   }
+
+  @EventPattern('familyClient/termCheck')
+  async termCheck(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.familyService.termCheck(data.id_family);
+  }
 }

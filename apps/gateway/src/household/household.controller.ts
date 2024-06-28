@@ -25,10 +25,11 @@ import {
 import { HouseholdService } from './household.service';
 import {
   CurrentUser,
+  FamilyTermCheckGuard,
   JwtAuthGuard,
   MemberFamilyGuard,
   Permission,
-  PERMISSION_INVOICE,
+  PERMISSION_HOUSEHOLD,
 } from '../utils';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
@@ -38,8 +39,8 @@ import { InputConsumableItemDto } from './dto/inputConsumableItem.dto';
 @ApiTags('Household')
 @Controller('household')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, MemberFamilyGuard)
-@Permission([PERMISSION_INVOICE])
+@UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
+@Permission([PERMISSION_HOUSEHOLD])
 export class HouseholdController {
   constructor(private readonly householdService: HouseholdService) {}
 

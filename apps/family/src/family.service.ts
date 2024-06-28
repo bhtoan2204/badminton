@@ -93,7 +93,7 @@ export class FamilyService {
     }
   }
 
-  async getMember(id_user: any) {
+  async getMember(id_user: string) {
     try {
       const q2 = 'SELECT * FROM view_users where id_user = $1';
       const param = [id_user];
@@ -128,10 +128,14 @@ export class FamilyService {
 
   async getAllFamily(id_user: string) {
     try {
-      const q2 = 'select * from get_all_family($1)';
-      const param = [id_user];
-      const data = await this.entityManager.query(q2, param);
-      return data;
+      const memberFamilies = await this.memberFamilyRepository.find({
+        where: { id_user },
+        relations: ['family'],
+      });
+      const families = memberFamilies.map(
+        (memberFamily) => memberFamily.family,
+      );
+      return families;
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -327,6 +331,29 @@ export class FamilyService {
         message: 'Member kicked',
         data: true,
       };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async termCheck(id_family: number) {
+    try {
+      const family = await this.familyRepository.findOne({
+        where: { id_family },
+      });
+      if (!family) {
+        throw new RpcException({
+          message: 'Family not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      const currentDate = new Date();
+      const expiredDate = family.expired_at;
+      console.log(currentDate, expiredDate);
+      return currentDate < expiredDate;
     } catch (error) {
       throw new RpcException({
         message: error.message,

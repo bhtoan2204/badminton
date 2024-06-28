@@ -13,6 +13,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { InvestmentService } from './investment.service';
 import {
   CurrentUser,
+  FamilyTermCheckGuard,
   JwtAuthGuard,
   MemberFamilyGuard,
   Permission,
@@ -23,7 +24,7 @@ import { CreateInvestmentDto } from './dto/createInvestment.dto';
 @ApiTags('Investment')
 @Controller('finance/investment')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, MemberFamilyGuard)
+@UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
 @Permission([PERMISSION_FINANCE])
 export class InvestmentController {
   constructor(private readonly investmentService: InvestmentService) {}
