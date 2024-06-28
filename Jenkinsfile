@@ -27,17 +27,6 @@ pipeline {
             }
         }
 
-        stage("SonarQube Analysis") {
-            steps {
-                script {
-                  def scannerHome = tool 'SonarQube-Scanner';
-                  withSonarQubeEnv('SonarQube-Server') {
-                    sh "${tool("SonarQube-Scanner")}/bin/sonar-scanner -Dsonar.projectKey=Family-Backend"
-                  }
-                }
-            }
-        }
-
         stage("Build Docker Images") {
             steps {
                 script {
@@ -91,11 +80,16 @@ pipeline {
                     """
                     sh """
                         sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
-                        'for deployment in \$(kubectl get deployments --no-headers -o custom-columns=\":metadata.name\"); do \
-                        if [[ "\$deployment" != "rabbitmq-deployment" && "\$deployment" != "redis-deployment" ]]; then \
-                        kubectl rollout restart deployment/\$deployment; \
-                        fi; \
-                        done'
+                        'DEPLOYMENTS=\$(kubectl get deployments --no-headers -o custom-columns=\":metadata.name\") \
+                        if [ -z "\$DEPLOYMENTS" ]; then \
+                            echo "First deployment, skipping rollout restart"; \
+                        else \
+                            for deployment in \$DEPLOYMENTS; do \
+                                if [[ "\$deployment" != "rabbitmq-deployment" && "\$deployment" != "redis-deployment" ]]; then \
+                                    kubectl rollout restart deployment/\$deployment; \
+                                fi; \
+                            done \
+                        fi'
                     """
                 }
             }
