@@ -11,6 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import * as Joi from 'joi';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import * as Joi from 'joi';
     RmqModule,
     TypeOrmModule.forFeature([Users]),
     GlobalJwtModule,
+    UserModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, FirebaseService],

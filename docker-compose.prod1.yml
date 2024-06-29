@@ -27,16 +27,3 @@ services:
       - NODE_ENV=production
     mem_limit: 2g
     cpu_shares: 1024
-
-  user:
-    image: mjkundta/user:${TAG}
-    build:
-      context: .
-      dockerfile: ./apps/user/Dockerfile
-      target: production
-    command: node dist/apps/user/src/main
-    restart: on-failure
-    environment:
-      - NODE_ENV=production
-    mem_limit: 2g
-    cpu_shares: 1024

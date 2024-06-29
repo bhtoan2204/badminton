@@ -8,16 +8,16 @@ import { lastValueFrom, timeout } from 'rxjs';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 import { CreateAccountDto } from './dto/createAccount.dto';
 import { ClientProxy } from '@nestjs/microservices';
-import { USER_SERVICE } from '../utils';
+import { AUTH_SERVICE } from '../utils';
 
 @Injectable()
 export class UserService {
-  constructor(@Inject(USER_SERVICE) private userClient: ClientProxy) {}
+  constructor(@Inject(AUTH_SERVICE) private authClient: ClientProxy) {}
 
   async createAccount(dto: CreateAccountDto) {
     try {
-      const source = this.userClient
-        .send('userClient/create_account', dto)
+      const source = this.authClient
+        .send('authClient/create_account', dto)
         .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
@@ -31,8 +31,8 @@ export class UserService {
 
   async checkPhone(phone: string) {
     try {
-      const source = this.userClient
-        .send('userClient/check_phone', { phone })
+      const source = this.authClient
+        .send('authClient/check_phone', { phone })
         .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
@@ -46,8 +46,8 @@ export class UserService {
 
   async getProfile(currentUser) {
     try {
-      const source = this.userClient
-        .send('userClient/get_profile', currentUser)
+      const source = this.authClient
+        .send('authClient/get_profile', currentUser)
         .pipe(timeout(15000));
       const data = await lastValueFrom(source);
       return data;
@@ -64,8 +64,8 @@ export class UserService {
 
   async changePassword(currentUser, data: ChangePasswordDto) {
     try {
-      const source = this.userClient
-        .send('userClient/change_password', { currentUser, data })
+      const source = this.authClient
+        .send('authClient/change_password', { currentUser, data })
         .pipe(timeout(15000));
       const result = await lastValueFrom(source);
       return result;
@@ -79,8 +79,8 @@ export class UserService {
 
   async forgotPassword(data: any) {
     try {
-      const source = this.userClient
-        .send('userClient/forgot_password', data)
+      const source = this.authClient
+        .send('authClient/forgot_password', data)
         .pipe(timeout(15000));
       const result = await lastValueFrom(source);
       return result;
@@ -94,8 +94,8 @@ export class UserService {
 
   async checkOTP(data: any) {
     try {
-      const source = this.userClient
-        .send('userClient/check_otp', data)
+      const source = this.authClient
+        .send('authClient/check_otp', data)
         .pipe(timeout(15000));
       const result = await lastValueFrom(source);
       return result;
@@ -109,8 +109,8 @@ export class UserService {
 
   async resetPassword(data: any) {
     try {
-      const source = this.userClient
-        .send('userClient/reset_password', data)
+      const source = this.authClient
+        .send('authClient/reset_password', data)
         .pipe(timeout(15000));
       const result = await lastValueFrom(source);
       return result;
@@ -124,8 +124,8 @@ export class UserService {
 
   async updateProfile(user, data) {
     try {
-      const source = this.userClient
-        .send('userClient/update_profile', { user, data })
+      const source = this.authClient
+        .send('authClient/update_profile', { user, data })
         .pipe(timeout(15000));
       const result = await lastValueFrom(source);
       return result;
@@ -142,8 +142,8 @@ export class UserService {
 
   async changeAvatar(currentUser, file: Express.Multer.File) {
     try {
-      const source = this.userClient
-        .send('userClient/change_avatar', { currentUser, file })
+      const source = this.authClient
+        .send('authClient/change_avatar', { currentUser, file })
         .pipe(timeout(10000));
       const result = await lastValueFrom(source);
       return result;
@@ -157,8 +157,8 @@ export class UserService {
 
   async validateEmail(currentUser, data) {
     try {
-      const source = this.userClient
-        .send('userClient/validate_email', { currentUser, data })
+      const source = this.authClient
+        .send('authClient/validate_email', { currentUser, data })
         .pipe(timeout(15000));
       const result = await lastValueFrom(source);
       return result;

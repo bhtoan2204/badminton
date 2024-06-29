@@ -23,10 +23,17 @@
       "type": "application",
       "root": "apps/auth",
       "entryFile": "src/main",
-      "sourceRoot": "./",
+      "sourceRoot": "apps/auth",
       "compilerOptions": {
         "tsConfigPath": "apps/auth/tsconfig.app.json",
-        "assets": ["proto/*.proto"],
+        "assets": [
+          {
+            "include": "*.proto"
+          },
+          {
+            "include": "templates/*.hbs"
+          }
+        ],
         "watchAssets": true
       }
     },
@@ -98,24 +105,6 @@
         "tsConfigPath": "apps/calendar/tsconfig.app.json"
       }
     },
-    "user": {
-      "type": "application",
-      "root": "apps/user",
-      "entryFile": "src/main",
-      "sourceRoot": "apps/user",
-      "compilerOptions": {
-        "tsConfigPath": "apps/user/tsconfig.app.json",
-        "assets": [
-          {
-            "include": "*.proto"
-          },
-          {
-            "include": "templates/*.hbs"
-          }
-        ],
-        "watchAssets": true
-      }
-    },
     "guideline": {
       "type": "application",
       "root": "apps/guideline",
@@ -125,15 +114,6 @@
         "tsConfigPath": "apps/guideline/tsconfig.app.json",
         "assets": ["proto/*.proto"],
         "watchAssets": true
-      }
-    },
-    "notification": {
-      "type": "application",
-      "root": "apps/notification",
-      "entryFile": "src/main",
-      "sourceRoot": "./",
-      "compilerOptions": {
-        "tsConfigPath": "apps/notification/tsconfig.app.json"
       }
     },
     "education": {

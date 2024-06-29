@@ -1,11 +1,11 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
-import { USER_SERVICE } from '../utils';
+import { AUTH_SERVICE } from '../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, timeout } from 'rxjs';
 
 @Injectable()
 export class MailService {
-  constructor(@Inject(USER_SERVICE) private mailerClient: ClientProxy) {}
+  constructor(@Inject(AUTH_SERVICE) private mailerClient: ClientProxy) {}
 
   async sendUserConfirmation(userInfo: any, email: string) {
     try {

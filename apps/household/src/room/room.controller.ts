@@ -11,13 +11,22 @@ export class RoomController {
   ) {}
 
   @EventPattern('householdClient/getRooms')
-  async getRooms(@Payload() data: any, @Ctx() context: RmqContext) {
+  async getRooms(
+    @Payload()
+    data: {
+      id_user: string;
+      id_family: number;
+      page: number;
+      itemsPerPage: number;
+    },
+    @Ctx() context: RmqContext,
+  ) {
     this.rmqService.ack(context);
     return await this.roomService.getRooms(
       data.id_user,
       data.id_family,
       data.page,
-      data.itemsPerPages,
+      data.itemsPerPage,
     );
   }
 
