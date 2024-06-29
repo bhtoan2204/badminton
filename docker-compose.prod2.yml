@@ -25,16 +25,3 @@ services:
       - NODE_ENV=production
     mem_limit: 2g
     cpu_shares: 1024
-
-  notification:
-    image: mjkundta/notification:${TAG}
-    build:
-      context: .
-      dockerfile: ./apps/notification/Dockerfile
-      target: production
-    command: node dist/apps/notification/src/main
-    restart: on-failure
-    environment:
-      - NODE_ENV=production
-    mem_limit: 2g
-    cpu_shares: 1024
