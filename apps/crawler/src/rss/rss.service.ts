@@ -94,7 +94,7 @@ export class RssService implements OnModuleInit {
     await this.crawlerQueue.add(
       'crawl-articles',
       {},
-      { repeat: { cron: '0 0 * * *' } },
+      { repeat: { cron: '0 0 */12 * *' } },
     );
   }
 
