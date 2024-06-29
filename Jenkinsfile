@@ -66,31 +66,34 @@ pipeline {
                     string(credentialsId: 'SSH_user', variable: 'SSH_USER'),
                     string(credentialsId: 'SSH_ip', variable: 'SSH_IP')
                 ]) {
-                    sh """
-                        sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
-                        'TAG=${COMMIT_ID} tar -xzvf k8s.tar.gz'
-                    """
-                    sh """
-                        sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
-                        'find ./k8s -type f -name "*.yml" -print0 | xargs -0 sed -i "s/<TAG>/${COMMIT_ID}/g"'
-                    """
-                    sh """
-                        sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
-                        'kubectl apply -f ./k8s'
-                    """
-                    sh """
-                        sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
-                        'DEPLOYMENTS=\$(kubectl get deployments --no-headers -o custom-columns=\":metadata.name\") \
-                        if [ -z "\$DEPLOYMENTS" ]; then \
-                            echo "First deployment, skipping rollout restart"; \
-                        else \
-                            for deployment in \$DEPLOYMENTS; do \
-                                if [[ "\$deployment" != "rabbitmq-deployment" && "\$deployment" != "redis-deployment" ]]; then \
-                                    kubectl rollout restart deployment/\$deployment; \
-                                fi; \
-                            done \
-                        fi'
-                    """
+                    script {
+                        // Use double quotes around the shell script block
+                        sh """
+                            sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
+                            'TAG=${COMMIT_ID} tar -xzvf k8s.tar.gz'
+                        """
+                        sh """
+                            sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
+                            'find ./k8s -type f -name "*.yml" -print0 | xargs -0 sed -i "s/<TAG>/${COMMIT_ID}/g"'
+                        """
+                        sh """
+                            sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
+                            'kubectl apply -f ./k8s'
+                        """
+                        sh """
+                            sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
+                            'DEPLOYMENTS=\$(kubectl get deployments --no-headers -o custom-columns=\":metadata.name\") && \
+                            if [ -z "\$DEPLOYMENTS" ]; then \
+                                echo "First deployment, skipping rollout restart"; \
+                            else \
+                                for deployment in \$DEPLOYMENTS; do \
+                                    if [[ "\$deployment" != "rabbitmq-deployment" && "\$deployment" != "redis-deployment" ]]; then \
+                                        kubectl rollout restart deployment/\$deployment; \
+                                    fi; \
+                                done \
+                            fi'
+                        """
+                    }
                 }
             }
         }

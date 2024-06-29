@@ -295,11 +295,7 @@ export class ChatService {
     messageData: { message: string; receiverId: string },
   ): Promise<any> {
     try {
-      if (
-        !id_user ||
-        !messageData.receiverId ||
-        id_user === messageData.receiverId
-      ) {
+      if (!id_user || !messageData.receiverId) {
         throw new RpcException({
           message: 'Invalid user id or receiver id',
           statusCode: HttpStatus.BAD_REQUEST,

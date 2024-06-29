@@ -28,18 +28,18 @@ services:
     volumes:
       - .:/usr/src/app
 
-  user:
-    image: mjkundta/user:latest
-    build:
-      context: .
-      dockerfile: ./apps/user/Dockerfile
-      target: development
-    command: npm run start:dev user
-    depends_on:
-      - gateway
-    restart: on-failure
-    volumes:
-      - .:/usr/src/app
+  # user:
+  #   image: mjkundta/user:latest
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/user/Dockerfile
+  #     target: development
+  #   command: npm run start:dev user
+  #   depends_on:
+  #     - gateway
+  #   restart: on-failure
+  #   volumes:
+  #     - .:/usr/src/app
 
   payment:
     image: mjkundta/payment:latest

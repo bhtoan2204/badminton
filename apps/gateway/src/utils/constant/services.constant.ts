@@ -1,5 +1,4 @@
 export const AUTH_SERVICE = 'AUTH';
-export const USER_SERVICE = 'USER';
 export const PAYMENT_SERVICE = 'PAYMENT';
 export const FAMILY_SERVICE = 'FAMILY';
 export const CHAT_SERVICE = 'CHAT';

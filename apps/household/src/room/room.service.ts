@@ -16,13 +16,13 @@ export class RoomService {
     id_user: string,
     id_family: number,
     page: number,
-    itemsPerPages: number,
+    itemsPerPage: number,
   ) {
     try {
       const [data, total] = await this.roomRepository.findAndCount({
         where: { id_family },
-        take: itemsPerPages,
-        skip: (page - 1) * itemsPerPages,
+        take: itemsPerPage,
+        skip: (page - 1) * itemsPerPage,
       });
       return {
         data,

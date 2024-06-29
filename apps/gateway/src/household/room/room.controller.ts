@@ -43,8 +43,8 @@ export class RoomController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all rooms' })
-  @ApiQuery({ name: 'page', type: Number, required: false })
-  @ApiQuery({ name: 'itemsPerPage', type: Number, required: false })
+  @ApiQuery({ name: 'page', type: Number, required: true })
+  @ApiQuery({ name: 'itemsPerPage', type: Number, required: true })
   @Get('getRooms/:id_family')
   async getRooms(
     @CurrentUser() currentUser,
@@ -52,8 +52,6 @@ export class RoomController {
     @Query('page') page: number,
     @Query('itemsPerPage') itemsPerPage: number,
   ) {
-    if (!page) page = 1;
-    if (!itemsPerPage) itemsPerPage = 10;
     return this.roomService.getRooms(
       currentUser.id_user,
       id_family,
