@@ -112,12 +112,14 @@ services:
       context: .
       dockerfile: ./apps/crawler/Dockerfile
       target: development
-    command: npm run start:dev crawler
-    depends_on:
-      - gateway
+    command: node dist/apps/crawler/src/main.js
+    # depends_on:
+    #   - gateway
     restart: on-failure
-    volumes:
-      - .:/usr/src/app
+    environment:
+      - NODE_ENV=production
+    # volumes:
+    #   - .:/usr/src/app
 
   calendar:
     image: mjkundta/calendar:latest
