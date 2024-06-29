@@ -14,6 +14,9 @@ import * as Joi from 'joi';
       validationSchema: Joi.object({
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_CRAWLER_QUEUE: Joi.string().required(),
+
+        REDIS_HOST: Joi.string().required(),
+        REDIS_PORT: Joi.number().required(),
       }),
       envFilePath:
         process.env.NODE_ENV === 'production'
