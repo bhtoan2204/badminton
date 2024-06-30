@@ -123,4 +123,16 @@ export class FamilyController {
     this.rmqService.ack(context);
     return this.familyService.termCheck(data.id_family);
   }
+
+  @EventPattern('familyClient/getFamilyRoles')
+  async getFamilyRoles(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.familyService.getFamilyRoles();
+  }
+
+  @EventPattern('familyClient/assignFamilyRole')
+  async assignFamilyRole(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.familyService.assignFamilyRole(data.dto);
+  }
 }

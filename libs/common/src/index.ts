@@ -37,6 +37,7 @@ export * from './database/entity/article_category.entity';
 export * from './database/entity/article.entity';
 export * from './database/entity/enclosure.entity';
 export * from './database/entity/payment_history.entity';
+export * from './database/entity/family_roles.entity';
 
 export * from './database/enum/login_type.enum';
 
