@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Put,
   Query,
@@ -17,6 +18,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
+  ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
 import { FamilyService } from './family.service';
@@ -32,6 +34,7 @@ import { DeleteMemberDTO } from './dto/deleteFamily.dto';
 import { UpdateFamilyDTO } from './dto/updateFamily.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
+import { AssignRoleDto } from './dto/assignRole.dto';
 
 @ApiTags('Family')
 @Controller('family')
@@ -178,5 +181,22 @@ export class FamilyController {
       id_user,
       id_family,
     );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get family roles' })
+  @Get('getFamilyRoles')
+  async getFamilyRoles() {
+    return this.familyService.getFamilyRoles();
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Assign Family Role' })
+  @Post('assignFamilyRole')
+  async assignFamilyRole(
+    @CurrentUser() currentUser,
+    @Body() dto: AssignRoleDto,
+  ) {
+    return this.familyService.assignFamilyRole(dto);
   }
 }

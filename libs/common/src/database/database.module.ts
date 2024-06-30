@@ -30,6 +30,7 @@ import { Article } from './entity/article.entity';
 import * as Joi from 'joi';
 import { Enclosure } from './entity/enclosure.entity';
 import { OrderSubscriber } from './subcriber/order.subcriber';
+import { FamilyRoles } from './entity/family_roles.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -84,6 +85,7 @@ import { OrderSubscriber } from './subcriber/order.subcriber';
             Enclosure,
             PaymentHistory,
             Order,
+            FamilyRoles,
           ],
           // subscribers: [OrderSubscriber],
         };

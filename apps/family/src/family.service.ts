@@ -1,12 +1,12 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { EntityManager, Repository } from 'typeorm';
-import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
 import { StorageService } from './storage/storage.service';
 import {
   Family,
   FamilyExtraPackages,
   FamilyRole,
+  FamilyRoles,
   MemberFamily,
   PackageExtra,
   UploadFileRequest,
@@ -16,7 +16,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class FamilyService {
   constructor(
-    private readonly configService: ConfigService,
     private readonly entityManager: EntityManager,
     private readonly storageService: StorageService,
     @InjectRepository(Family) private familyRepository: Repository<Family>,
@@ -26,6 +25,8 @@ export class FamilyService {
     private familyExtraPackagesRepository: Repository<FamilyExtraPackages>,
     @InjectRepository(MemberFamily)
     private memberFamilyRepository: Repository<MemberFamily>,
+    @InjectRepository(FamilyRoles)
+    private familyRolesRepository: Repository<FamilyRoles>,
   ) {}
 
   async checkExtraPackage(
@@ -95,10 +96,14 @@ export class FamilyService {
 
   async getMember(id_user: string) {
     try {
-      const q2 = 'SELECT * FROM view_users where id_user = $1';
-      const param = [id_user];
-      const data = await this.entityManager.query(q2, param);
-      return data;
+      const data = await this.memberFamilyRepository.findOne({
+        where: { id_user },
+        relations: ['familyRoles', 'user'],
+      });
+      return {
+        data: data,
+        message: 'Member found',
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -111,7 +116,7 @@ export class FamilyService {
     try {
       const members = await this.memberFamilyRepository.find({
         where: { id_family },
-        relations: ['user'],
+        relations: ['user', 'familyRoles'],
       });
 
       return {
@@ -354,6 +359,49 @@ export class FamilyService {
       const expiredDate = family.expired_at;
       console.log(currentDate, expiredDate);
       return currentDate < expiredDate;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getFamilyRoles() {
+    try {
+      const familyRoles = await this.familyRolesRepository.find();
+      return familyRoles;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async assignFamilyRole(dto: {
+    id_user: string;
+    id_family: number;
+    id_family_role: number;
+  }) {
+    try {
+      const { id_user, id_family, id_family_role } = dto;
+      const memberFamily = await this.memberFamilyRepository.findOne({
+        where: { id_user, id_family },
+      });
+      if (!memberFamily) {
+        throw new RpcException({
+          message: 'Member not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      memberFamily.id_family_role = id_family_role;
+
+      const data = await this.memberFamilyRepository.save(memberFamily);
+      return {
+        message: 'Role assigned',
+        data: data,
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,

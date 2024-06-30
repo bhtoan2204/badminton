@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Users } from './users.entity';
 import { Family } from './family.entity';
+import { FamilyRoles } from './family_roles.entity';
 
 export enum FamilyRole {
   MEMBER = 'Member',
@@ -26,6 +27,9 @@ export class MemberFamily {
   @Column()
   id_family: number;
 
+  @Column('int', { default: 1 })
+  id_family_role: number;
+
   @Column({ nullable: true, default: 'Member', type: 'enum', enum: FamilyRole })
   role: FamilyRole;
 
@@ -42,4 +46,8 @@ export class MemberFamily {
   @ManyToOne(() => Family, (family) => family.id_family)
   @JoinColumn({ name: 'id_family' })
   family: Family;
+
+  @ManyToOne(() => FamilyRoles, (role) => role.id_family_role)
+  @JoinColumn({ name: 'id_family_role' })
+  familyRoles: FamilyRoles;
 }

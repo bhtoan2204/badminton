@@ -207,4 +207,40 @@ export class FamilyService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async getFamilyRoles() {
+    try {
+      const source = this.familyClient
+        .send('familyClient/getFamilyRoles', {})
+        .pipe(timeout(15000));
+      const data = await lastValueFrom(source);
+      return data;
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async assignFamilyRole(dto: {
+    id_user: string;
+    id_family_role: number;
+    id_family: number;
+  }) {
+    try {
+      const source = this.familyClient
+        .send('familyClient/assignFamilyRole', {
+          dto,
+        })
+        .pipe(timeout(15000));
+      const data = await lastValueFrom(source);
+      return data;
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }
