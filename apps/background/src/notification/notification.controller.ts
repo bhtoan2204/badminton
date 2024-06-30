@@ -10,7 +10,7 @@ export class NotificationController {
     private readonly rmqService: RmqService,
   ) {}
 
-  @EventPattern('notificationClient/getNotifications')
+  @EventPattern('backgroundClient/getNotifications')
   async getNotification(@Payload() dto: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return await this.notificationService.getNotification(
@@ -19,7 +19,7 @@ export class NotificationController {
     );
   }
 
-  @EventPattern('notificationClient/createNotification')
+  @EventPattern('backgroundClient/createNotification')
   async createNotification(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return await this.notificationService.createNotification(
@@ -29,7 +29,7 @@ export class NotificationController {
     );
   }
 
-  @EventPattern('notificationClient/markRead')
+  @EventPattern('backgroundClient/markRead')
   async markRead(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return await this.notificationService.markRead(

@@ -2,8 +2,8 @@ import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PAYMENT_SERVICE } from '../utils';
 import { lastValueFrom, timeout } from 'rxjs';
-import { PackageType } from '@app/common';
 import { VerifyOrderDTO } from './dto/verifyOrder.dto';
+import { PackageType } from '@app/common';
 
 @Injectable()
 export class PaymentService {
@@ -94,10 +94,10 @@ export class PaymentService {
       throw new HttpException(error, error.statusCode);
     }
   }
-  async get_order(id_user) {
+  async getOrder(id_user) {
     try {
       const response = this.paymentClient
-        .send('paymentClient/get_order', { id_user })
+        .send('paymentClient/getOrder', { id_user })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -143,6 +143,21 @@ export class PaymentService {
     try {
       const response = this.paymentClient
         .send('paymentClient/verifyOrder', { id_user, dto })
+        .pipe(timeout(15000));
+      const data = await lastValueFrom(response);
+      return data;
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async paymentHistory(id_user: string, page: number, itemsPerPage: number) {
+    try {
+      const response = this.paymentClient
+        .send('paymentClient/paymentHistory', { id_user, page, itemsPerPage })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;

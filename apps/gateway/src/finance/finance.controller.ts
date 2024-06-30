@@ -4,9 +4,18 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Post,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FinanceService } from './finance.service';
 import {
   CurrentUser,
@@ -16,6 +25,8 @@ import {
   Permission,
   PERMISSION_FINANCE,
 } from '../utils';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
 
 @ApiTags('Finance')
 @Controller('finance')
@@ -36,5 +47,25 @@ export class FinanceController {
       currentUser.id_user,
       id_family,
     );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Convert invoice image to json (for testing)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { invoiceImg: { type: 'string', format: 'binary' } },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor(
+      'invoiceImg',
+      new ImageFileInterceptor().createMulterOptions(),
+    ),
+  )
+  @Post('processInvoice')
+  async processInvoice(@UploadedFile() file: Express.Multer.File) {
+    return await this.financeService.processInvoice(file);
   }
 }

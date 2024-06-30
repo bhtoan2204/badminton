@@ -159,4 +159,21 @@ export class ShoppingController {
       id_item,
     );
   }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get suggestions' })
+  @Get('getSuggestions/:id_family/:id_list/:id_item')
+  async getSuggestions(
+    @CurrentUser() currentUser,
+    @Param('id_list') id_list: number,
+    @Param('id_item') id_item: number,
+    @Param('id_family') id_family: number,
+  ) {
+    return this.shoppingService.getSuggestions(
+      currentUser.id_user,
+      id_family,
+      id_list,
+      id_item,
+    );
+  }
 }

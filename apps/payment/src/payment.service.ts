@@ -1,12 +1,12 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
-import { EntityManager, In, Repository } from 'typeorm';
+import { DataSource, EntityManager, In, Repository } from 'typeorm';
 import { RpcException } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { sortObject } from './utils';
 import * as moment from 'moment';
 import * as crypto from 'crypto';
 import * as qs from 'qs';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import {
   Family,
   FamilyExtraPackages,
@@ -21,6 +21,7 @@ import {
   PackageExtra,
   PackageMain,
   PackageType,
+  PaymentHistory,
 } from '@app/common';
 
 @Injectable()
@@ -51,6 +52,9 @@ export class PaymentService {
     private familyExtraRepository: Repository<FamilyExtraPackages>,
     @InjectRepository(MemberFamily)
     private memberFamilyRepository: Repository<MemberFamily>,
+    @InjectRepository(PaymentHistory)
+    private paymentHistoryRepository: Repository<PaymentHistory>,
+    @InjectDataSource() private readonly dataSource: DataSource,
   ) {
     this.vnpTmnCode = this.configService.get<string>('VNPAY_TMN_CODE');
     this.vnpHashSecret = this.configService.get<string>('VNPAY_HASH_SECRET');
@@ -58,7 +62,7 @@ export class PaymentService {
     this.vnpReturnUrl = this.configService.get<string>('VNPAY_RETURN_URL');
   }
 
-  async get_order(id_user) {
+  async getOrder(id_user) {
     try {
       const Query = 'SELECT * FROM f_get_order_info($1)';
       const params = [id_user];
@@ -112,13 +116,17 @@ export class PaymentService {
     const { id_order, bankCode, amount, id_family } = dto;
 
     try {
-      const order = await this.findPendingOrder(
-        id_user,
-        id_order,
-        amount,
-        id_family,
-        bankCode,
-      );
+      const order = await this.orderRepository.findOne({
+        where: {
+          id_order,
+          id_user,
+          price: amount,
+          id_family,
+          status: OrderStatus.PENDING,
+          bank_code: bankCode,
+        },
+      });
+
       if (!order) {
         throw new RpcException({
           message: 'Order not found',
@@ -138,25 +146,6 @@ export class PaymentService {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
-  }
-
-  private async findPendingOrder(
-    id_user: string,
-    id_order: string,
-    amount: number,
-    id_family: number,
-    bankCode: string,
-  ) {
-    return this.orderRepository.findOne({
-      where: {
-        id_order,
-        id_user,
-        price: amount,
-        id_family,
-        status: OrderStatus.PENDING,
-        bank_code: bankCode,
-      },
-    });
   }
 
   private async handleOrderStatus(order: Order) {
@@ -204,12 +193,13 @@ export class PaymentService {
       family.expired_at = moment()
         .add(mainPackage.duration_months, 'months')
         .toDate();
+      const newFamily = await this.familyRepository.save(family);
+      console.log(newFamily);
       const memberFamily = new MemberFamily();
       memberFamily.id_user = order.id_user;
       memberFamily.role = FamilyRole.OWNER;
-      memberFamily.id_family = family.id_family;
+      memberFamily.id_family = newFamily.id_family;
       await this.memberFamilyRepository.save(memberFamily);
-      await this.familyRepository.save(family);
       order.id_family = family.id_family;
     }
   }
@@ -345,8 +335,6 @@ export class PaymentService {
         ...(bankCode && { vnp_BankCode: bankCode }),
       };
 
-      console.log(vnp_Params);
-
       const sortedVnpParams = sortObject(vnp_Params);
       const signData = qs.stringify(sortedVnpParams, { encode: false });
       const hmac = crypto.createHmac('sha512', this.vnpHashSecret);
@@ -372,7 +360,7 @@ export class PaymentService {
         order.id_package_extra = null;
       }
       order.price = price;
-
+      console.log(order);
       await this.orderRepository.save(order);
 
       return `${this.vnpUrl}?${qs.stringify(sortedVnpParams, { encode: false })}`;
@@ -399,6 +387,15 @@ export class PaymentService {
     } = order;
 
     try {
+      const family = await this.familyRepository.findOne({
+        where: { id_family: id_family },
+      });
+      if (!family) {
+        throw new RpcException({
+          message: 'Family not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
       const order_id = crypto.randomUUID();
       let price = null;
       let id_package = null;
@@ -407,6 +404,12 @@ export class PaymentService {
           const mainPackage = await this.packageMainRepository.findOne({
             where: { id_main_package },
           });
+          if (!mainPackage) {
+            throw new RpcException({
+              message: 'Main package not found',
+              statusCode: HttpStatus.NOT_FOUND,
+            });
+          }
           id_package = mainPackage.id_main_package;
           price = mainPackage.price;
           break;
@@ -414,6 +417,12 @@ export class PaymentService {
           const extraPackage = await this.packageExtraRepository.findOne({
             where: { id_extra_package },
           });
+          if (!extraPackage) {
+            throw new RpcException({
+              message: 'Extra package not found',
+              statusCode: HttpStatus.NOT_FOUND,
+            });
+          }
           id_package = extraPackage.id_extra_package;
           price = extraPackage.price;
           break;
@@ -421,6 +430,12 @@ export class PaymentService {
           const comboPackage = await this.packageComboRepository.findOne({
             where: { id_combo_package },
           });
+          if (!comboPackage) {
+            throw new RpcException({
+              message: 'Combo package not found',
+              statusCode: HttpStatus.NOT_FOUND,
+            });
+          }
           id_package = comboPackage.id_combo_package;
           price = comboPackage.price;
           break;
@@ -504,6 +519,27 @@ export class PaymentService {
       return {
         data: result,
         message: 'Feedback fetched successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async paymentHistory(id_user: string, page: number, itemsPerPage: number) {
+    try {
+      const [data, total] = await this.paymentHistoryRepository.findAndCount({
+        where: { id_user: id_user },
+        order: { created_at: 'DESC' },
+        skip: (page - 1) * itemsPerPage,
+        take: itemsPerPage,
+      });
+      return {
+        data: data,
+        total: total,
+        message: 'Payment history fetched successfully',
       };
     } catch (error) {
       throw new RpcException({

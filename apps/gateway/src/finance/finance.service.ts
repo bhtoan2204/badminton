@@ -20,4 +20,18 @@ export class FinanceService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async processInvoice(file: Express.Multer.File) {
+    try {
+      const response = this.financeClient
+        .send('invoiceClient/processInvoice', file)
+        .pipe(timeout(50000));
+      return await lastValueFrom(response);
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }

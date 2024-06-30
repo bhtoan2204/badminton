@@ -12,6 +12,7 @@ import {
   PackageCombo,
   PackageExtra,
   PackageMain,
+  PaymentHistory,
   RmqModule,
 } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
@@ -43,6 +44,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       Family,
       MemberFamily,
       FamilyExtraPackages,
+      PaymentHistory,
     ]),
   ],
   controllers: [PaymentController],
