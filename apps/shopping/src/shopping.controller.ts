@@ -82,4 +82,15 @@ export class ShoppingController {
       data.id_item,
     );
   }
+
+  @EventPattern('shoppingClient/getSuggestions')
+  async getSuggestions(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.shoppingService.getSuggestions(
+      data.id_user,
+      data.id_family,
+      data.id_list,
+      data.id_item,
+    );
+  }
 }

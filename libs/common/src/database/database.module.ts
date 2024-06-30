@@ -29,6 +29,7 @@ import { ArticleCategory } from './entity/article_category.entity';
 import { Article } from './entity/article.entity';
 import * as Joi from 'joi';
 import { Enclosure } from './entity/enclosure.entity';
+import { OrderSubscriber } from './subcriber/order.subcriber';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -84,10 +85,12 @@ import { Enclosure } from './entity/enclosure.entity';
             PaymentHistory,
             Order,
           ],
+          // subscribers: [OrderSubscriber],
         };
       },
       inject: [ConfigService],
     }),
   ],
+  providers: [OrderSubscriber],
 })
 export class DatabaseModule {}

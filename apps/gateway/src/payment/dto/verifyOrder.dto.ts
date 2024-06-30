@@ -1,14 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber, IsNotEmpty, IsUUID } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsNotEmpty,
+  IsUUID,
+  IsOptional,
+} from 'class-validator';
 
 export class VerifyOrderDTO {
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID()
-  id_order: number;
+  id_order: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   id_family: number;
 
@@ -17,7 +23,7 @@ export class VerifyOrderDTO {
   @IsString()
   bankCode: string;
 
-  @ApiProperty({ example: 10000000 })
+  @ApiProperty({ example: 5000000 })
   @IsNotEmpty()
   @IsNumber()
   amount: number;

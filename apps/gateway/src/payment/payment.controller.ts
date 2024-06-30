@@ -8,8 +8,14 @@ import {
   UseGuards,
   Ip,
   Param,
+  Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import { CurrentUser, JwtAuthGuard } from '../utils';
 import { VerifyOrderDTO } from './dto/verifyOrder.dto';
@@ -48,13 +54,12 @@ export class PaymentController {
   @Post('placeOrder')
   async place_order(
     @CurrentUser() user,
-    @Body() order: PlaceOrderDto,
+    @Body() dto: PlaceOrderDto,
     @Ip() ip: string,
   ) {
     const id_user = user.id_user;
-    return this.paymentService.placeOrder(id_user, order, ip);
+    return this.paymentService.placeOrder(id_user, dto, ip);
   }
-  // --------------------------------------------------
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Check order' })
@@ -67,9 +72,9 @@ export class PaymentController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get successful orders for current user' })
   @Get('getOrder')
-  async get_order(@CurrentUser() user) {
+  async getOrder(@CurrentUser() user) {
     const id_user = user.id_user;
-    return this.paymentService.get_order(id_user);
+    return this.paymentService.getOrder(id_user);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -81,5 +86,19 @@ export class PaymentController {
   ) {
     const id_user = user.id_user;
     return this.paymentService.getAvailableFunction(id_user, id_family);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Payment History' })
+  @ApiQuery({ name: 'page', required: true, type: Number })
+  @ApiQuery({ name: 'itemsPerPage', required: true, type: Number })
+  @Get('paymentHistory')
+  async paymentHistory(
+    @CurrentUser() user,
+    @Query('page') page,
+    @Query('itemsPerPage') itemsPerPage,
+  ) {
+    const id_user = user.id_user;
+    return this.paymentService.paymentHistory(id_user, page, itemsPerPage);
   }
 }

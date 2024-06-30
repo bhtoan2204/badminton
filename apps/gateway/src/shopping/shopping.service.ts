@@ -172,4 +172,28 @@ export class ShoppingService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async getSuggestions(
+    id_user: string,
+    id_family: number,
+    id_list: number,
+    id_item: number,
+  ) {
+    try {
+      const response = this.shoppingClient
+        .send('shoppingClient/getSuggestions', {
+          id_user,
+          id_family,
+          id_list,
+          id_item,
+        })
+        .pipe(timeout(15000));
+      return await lastValueFrom(response);
+    } catch (error) {
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }

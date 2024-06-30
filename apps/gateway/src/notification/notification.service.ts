@@ -1,12 +1,12 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
-import { FAMILY_SERVICE, NOTIFICATION_SERVICE } from '../utils';
+import { FAMILY_SERVICE, BACKGROUND_SERVICE } from '../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, timeout } from 'rxjs';
 
 @Injectable()
 export class NotificationService {
   constructor(
-    @Inject(NOTIFICATION_SERVICE)
+    @Inject(BACKGROUND_SERVICE)
     private readonly notificationClient: ClientProxy,
     @Inject(FAMILY_SERVICE) private readonly familyClient: ClientProxy,
   ) {}
@@ -14,7 +14,7 @@ export class NotificationService {
   async getNotifications(id_user: string, index: number) {
     try {
       const response = this.notificationClient
-        .send('notificationClient/getNotifications', { id_user, index })
+        .send('backgroundClient/getNotifications', { id_user, index })
         .pipe(timeout(15000));
       return await lastValueFrom(response);
     } catch (error) {
@@ -32,7 +32,7 @@ export class NotificationService {
   ) {
     try {
       const response = this.notificationClient
-        .send('notificationClient/createNotification', {
+        .send('backgroundClient/createNotification', {
           id_user,
           dto,
           listReceiverId,
@@ -50,7 +50,7 @@ export class NotificationService {
   async markRead(id_user: string, id_notification: string) {
     try {
       const response = this.notificationClient
-        .send('notificationClient/markRead', { id_user, id_notification })
+        .send('backgroundClient/markRead', { id_user, id_notification })
         .pipe(timeout(15000));
       return await lastValueFrom(response);
     } catch (error) {

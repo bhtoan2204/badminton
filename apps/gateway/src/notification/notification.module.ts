@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import {
   AUTH_SERVICE,
   FAMILY_SERVICE,
-  NOTIFICATION_SERVICE,
+  BACKGROUND_SERVICE,
   WsJwtStrategy,
 } from '../utils';
 import { NotificationController } from './notification.controller';
@@ -12,7 +12,7 @@ import { NotificationGateway } from './notification.gateway';
 
 @Module({
   imports: [
-    RmqModule.register({ name: NOTIFICATION_SERVICE }),
+    RmqModule.register({ name: BACKGROUND_SERVICE }),
     RmqModule.register({ name: AUTH_SERVICE }),
     RmqModule.register({ name: FAMILY_SERVICE }),
     GlobalJwtModule,

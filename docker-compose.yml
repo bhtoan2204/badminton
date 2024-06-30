@@ -22,8 +22,6 @@ services:
       dockerfile: ./apps/auth/Dockerfile
       target: development
     command: npm run start:dev auth
-    depends_on:
-      - gateway
     restart: on-failure
     volumes:
       - .:/usr/src/app
@@ -112,14 +110,12 @@ services:
       context: .
       dockerfile: ./apps/crawler/Dockerfile
       target: development
-    command: node dist/apps/crawler/src/main.js
-    # depends_on:
-    #   - gateway
+    command: npm run start:dev crawler
+    depends_on:
+      - auth
     restart: on-failure
-    environment:
-      - NODE_ENV=production
-    # volumes:
-    #   - .:/usr/src/app
+    volumes:
+      - .:/usr/src/app
 
   calendar:
     image: mjkundta/calendar:latest
@@ -128,8 +124,6 @@ services:
       dockerfile: ./apps/calendar/Dockerfile
       target: development
     command: npm run start:dev calendar
-    depends_on:
-      - gateway
     restart: on-failure
     volumes:
       - .:/usr/src/app
@@ -141,8 +135,6 @@ services:
       dockerfile: ./apps/guideline/Dockerfile
       target: development
     command: npm run start:dev guideline
-    depends_on:
-      - gateway
     restart: on-failure
     volumes:
       - .:/usr/src/app
@@ -154,8 +146,6 @@ services:
       dockerfile: ./apps/education/Dockerfile
       target: development
     command: npm run start:dev education
-    depends_on:
-      - gateway
     restart: on-failure
     volumes:
       - .:/usr/src/app
@@ -167,8 +157,6 @@ services:
       dockerfile: ./apps/elasticsearch/Dockerfile
       target: development
     command: npm run start:dev elasticsearch
-    depends_on:
-      - gateway
     restart: on-failure
     volumes:
       - .:/usr/src/app
@@ -182,8 +170,6 @@ services:
       dockerfile: ./apps/household/Dockerfile
       target: development
     command: npm run start:dev household
-    depends_on:
-      - gateway
     restart: on-failure
     volumes:
       - .:/usr/src/app
@@ -195,8 +181,6 @@ services:
       dockerfile: ./apps/finance/Dockerfile
       target: development
     command: npm run start:dev finance
-    depends_on:
-      - gateway
     restart: on-failure
     volumes:
       - .:/usr/src/app
@@ -208,8 +192,6 @@ services:
       dockerfile: ./apps/shopping/Dockerfile
       target: development
     command: npm run start:dev shopping
-    depends_on:
-      - gateway
     restart: on-failure
     volumes:
       - .:/usr/src/app
@@ -223,8 +205,19 @@ services:
     command: npm run start:dev invoice
     env_file:
       - ./apps/invoice/.env
-    # depends_on:
-    #   - gateway
+    restart: on-failure
+    volumes:
+      - .:/usr/src/app
+
+  background:
+    image: mjkundta/background:latest
+    build:
+      context: .
+      dockerfile: ./apps/background/Dockerfile
+      target: development
+    command: npm run start:dev background
+    env_file:
+      - ./apps/background/.env
     restart: on-failure
     volumes:
       - .:/usr/src/app

@@ -10,10 +10,10 @@ export class PaymentController {
     private readonly rmqService: RmqService,
   ) {}
 
-  @EventPattern('paymentClient/get_order')
-  async get_order(@Payload() data: any, @Ctx() context: RmqContext) {
+  @EventPattern('paymentClient/getOrder')
+  async getOrder(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.paymentService.get_order(data.id_user);
+    return this.paymentService.getOrder(data.id_user);
   }
 
   @EventPattern('paymentClient/getAvailableFunction')
@@ -82,5 +82,15 @@ export class PaymentController {
   async getCountAndAverageRatingFeedback(@Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.paymentService.getCountAndAverageRatingFeedback();
+  }
+
+  @EventPattern('paymentClient/paymentHistory')
+  async paymentHistory(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.paymentHistory(
+      data.id_user,
+      data.page,
+      data.itemsPerPage,
+    );
   }
 }

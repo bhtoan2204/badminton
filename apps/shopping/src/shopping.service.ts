@@ -3,6 +3,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { SerperService } from './serper/serper.service';
 
 @Injectable()
 export class ShoppingService {
@@ -13,6 +14,7 @@ export class ShoppingService {
     private shoppingItemTypesRepository: Repository<ShoppingItemTypes>,
     @InjectRepository(ShoppingLists)
     private shoppingListsRepository: Repository<ShoppingLists>,
+    private serperService: SerperService,
   ) {}
 
   async getShoppingItemType() {
@@ -261,6 +263,37 @@ export class ShoppingService {
       return {
         message: 'Delete shopping item',
         data: shoppingItem,
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getSuggestions(
+    id_user: number,
+    id_family: number,
+    id_list: number,
+    id_item: number,
+  ) {
+    try {
+      const item = await this.shoppingItemsRepository.findOne({
+        where: { id_item: id_item, id_list: id_list },
+      });
+      if (!item) {
+        throw new RpcException({
+          message: 'Shopping item not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      const data = await this.serperService.getShoppingSuggestions(
+        item.item_name,
+      );
+      return {
+        data: data,
+        message: 'Get suggestions',
       };
     } catch (error) {
       throw new RpcException({
