@@ -535,6 +535,7 @@ export class PaymentService {
         order: { created_at: 'DESC' },
         skip: (page - 1) * itemsPerPage,
         take: itemsPerPage,
+        relations: ['orders'],
       });
       return {
         data: data,
