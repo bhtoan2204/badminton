@@ -12,7 +12,7 @@ export class HouseholdConsumableItems {
   @Column('int', { nullable: false })
   threshold: number;
 
-  @Column('date', { nullable: false })
+  @Column('date', { nullable: true })
   expired_date: Date;
 
   @OneToOne(() => HouseholdItems, (householdItem) => householdItem.durableItem)

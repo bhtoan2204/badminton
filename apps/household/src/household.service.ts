@@ -1,5 +1,4 @@
 import {
-  DeleteFileRequest,
   HouseholdConsumableItems,
   HouseholdDurableItems,
   HouseholdItemCategories,
@@ -107,23 +106,33 @@ export class HouseholdService {
       item_imageUrl = uploadImageData.fileUrl;
     }
     try {
-      const query =
-        'SELECT * FROM f_create_household_item($1, $2, $3, $4, $5, $6, $7, $8)';
-      const params = [
-        id_user,
-        id_family,
-        item_name,
-        id_room,
-        item_description,
-        id_category,
-        item_type,
-        item_imageUrl,
-      ];
-      const data = await this.entityManager.query(query, params);
-
+      const newHouseHoldItem = this.householdItemsRepository.create({
+        id_family: id_family,
+        item_name: item_name,
+        description: item_description,
+        item_imageurl: item_imageUrl,
+        id_category: id_category,
+        id_room: id_room,
+      });
+      const data = await this.householdItemsRepository.save(newHouseHoldItem);
+      if (item_type === 'durable') {
+        const durableItem = this.householdDurableItemsRepository.create({
+          id_household_item: data.id_household_item,
+          condition: 'good',
+        });
+        await this.householdDurableItemsRepository.save(durableItem);
+      } else {
+        const consumableItem = this.householdConsumableItemsRepository.create({
+          id_household_item: data.id_household_item,
+          quantity: 0,
+          threshold: 0,
+          expired_date: null,
+        });
+        await this.householdConsumableItemsRepository.save(consumableItem);
+      }
       return {
-        data: data[0],
-        message: 'Item created',
+        message: 'Item created successfully',
+        data: data,
       };
     } catch (error) {
       throw new RpcException({
@@ -143,6 +152,15 @@ export class HouseholdService {
         item_description,
         id_room,
       } = dto;
+      const item = await this.householdItemsRepository.findOne({
+        where: { id_family, id_household_item: id_item },
+      });
+      if (!item) {
+        throw new RpcException({
+          message: 'Item not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
       let item_imageUrl = null;
       if (file) {
         const fileName = 'household_' + id_user + '_' + Date.now();
@@ -154,30 +172,25 @@ export class HouseholdService {
           await this.storageService.uploadImageHousehold(params);
         item_imageUrl = uploadImageData.fileUrl;
       }
-      const query =
-        'SELECT * FROM f_update_household_item($1, $2, $3, $4, $5, $6, $7, $8)';
-      const params = [
-        id_user,
-        id_family,
-        id_item,
-        id_room,
-        item_name,
-        item_description,
-        id_category,
-        item_imageUrl,
-      ];
-      const data = await this.entityManager.query(query, params);
-      const oldImageUrl = data[0].old_imageurl;
-      if (oldImageUrl) {
-        const deleteParams: DeleteFileRequest = {
-          fileName: oldImageUrl.split('/').pop(),
-        };
-        await this.storageService.deleteImageHousehold(deleteParams);
+      if (item_name) {
+        item.item_name = item_name;
       }
-      delete data[0].old_imageurl;
+      if (id_category) {
+        item.id_category = id_category;
+      }
+      if (item_description) {
+        item.description = item_description;
+      }
+      if (id_room) {
+        item.id_room = id_room;
+      }
+      if (item_imageUrl) {
+        item.item_imageurl = item_imageUrl;
+      }
+      const data = await this.householdItemsRepository.save(item);
       return {
-        message: 'Updated Successfully',
-        data: data[0],
+        message: 'Item updated successfully',
+        data: data,
       };
     } catch (error) {
       throw new RpcException({
@@ -217,7 +230,7 @@ export class HouseholdService {
 
       await this.householdDurableItemsRepository.save(durableItem);
 
-      return { message: 'Durable item saved successfully', durableItem };
+      return { message: 'Durable item saved successfully', data: durableItem };
     } catch (error) {
       throw new RpcException({
         message: error.message,
