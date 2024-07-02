@@ -28,7 +28,6 @@ import {
 } from '../utils';
 import { CreateCalendarDto } from './dto/createCalendar.dto';
 import { UpdateCalendarDto } from './dto/updateCalendar.dto';
-import { GetEventDTO } from './dto/getEvent.dto';
 import { CreateCategoryEventDto } from './dto/createCategoryEvent.dto';
 import { UpdateCategoryEventDto } from './dto/updateCategoryEvent.dto';
 
@@ -100,12 +99,12 @@ export class CalendarController {
     return this.calendarService.getAllCalendar(currentUser.id_user, id_family);
   }
 
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get events for family on date' })
-  @Post('getEventOnDate')
-  async getEventOnDate(@CurrentUser() currentUser, @Body() dto: GetEventDTO) {
-    return this.calendarService.getEventOnDate(currentUser.id_user, dto);
-  }
+  // @HttpCode(HttpStatus.OK)
+  // @ApiOperation({ summary: 'Get events for family on date' })
+  // @Post('getEventOnDate')
+  // async getEventOnDate(@CurrentUser() currentUser, @Body() dto: GetEventDTO) {
+  //   return this.calendarService.getEventOnDate(currentUser.id_user, dto);
+  // }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get Calendar detail' })
