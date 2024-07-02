@@ -2,12 +2,18 @@ import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { CHAT_SERVICE, FAMILY_SERVICE } from '../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, timeout } from 'rxjs';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { NewMessageDto } from './dto/newMessage.dto';
+import { NotificationType } from '@app/common';
+import { NewFamilyMessageDto } from './dto/newFamilyMessage.dto';
 
 @Injectable()
 export class ChatService {
   constructor(
     @Inject(CHAT_SERVICE) private readonly chatClient: ClientProxy,
     @Inject(FAMILY_SERVICE) private readonly familyClient: ClientProxy,
+    @InjectQueue('notifications') private readonly notificationsQueue: Queue,
   ) {}
 
   async getUsersChat(id_user: string, index: number) {
@@ -71,13 +77,24 @@ export class ChatService {
     }
   }
 
-  async saveMessage(id_user: string, message: any) {
+  async saveMessage(id_user: string, message: NewMessageDto) {
     try {
       const response = this.chatClient.send('chatClient/sendMessage', {
         id_user,
         message,
       });
-      return await lastValueFrom(response);
+      const data = await lastValueFrom(response);
+      await this.notificationsQueue.add('createNotificationUser', {
+        id_user: message.receiverId,
+        notificationData: {
+          title: 'New message',
+          content: message.message,
+          type: NotificationType.CHAT,
+          id_family: null,
+          id_target: message.receiverId,
+        },
+      });
+      return data;
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
@@ -86,13 +103,24 @@ export class ChatService {
     }
   }
 
-  async saveFamilyMessage(id_user: string, message: any) {
+  async saveFamilyMessage(id_user: string, message: NewFamilyMessageDto) {
     try {
       const response = this.chatClient.send('chatClient/sendFamilyMessage', {
         id_user,
         message,
       });
-      return await lastValueFrom(response);
+      const data = await lastValueFrom(response);
+      await this.notificationsQueue.add('createNotificationFamily', {
+        id_family: message.familyId,
+        notificationData: {
+          title: 'New message',
+          content: message.message,
+          type: NotificationType.CHAT,
+          id_family: message.familyId,
+          id_target: message.familyId,
+        },
+      });
+      return data;
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
@@ -101,13 +129,24 @@ export class ChatService {
     }
   }
 
-  async saveFamilyImageMessage(id_user: string, message: any, file: any) {
+  async saveFamilyImageMessage(id_user: string, familyId: number, file: any) {
     try {
       const response = this.chatClient.send(
         'chatClient/sendFamilyImageMessage',
-        { id_user, message, file },
+        { id_user, message: familyId, file },
       );
-      return await lastValueFrom(response);
+      const data = await lastValueFrom(response);
+      await this.notificationsQueue.add('createNotificationFamily', {
+        id_family: familyId,
+        notificationData: {
+          title: 'New message',
+          content: 'You have received an image message',
+          type: NotificationType.CHAT,
+          id_family: familyId,
+          id_target: familyId,
+        },
+      });
+      return data;
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
@@ -122,7 +161,18 @@ export class ChatService {
         'chatClient/sendFamilyVideoMessage',
         { id_user, familyId, file },
       );
-      return await lastValueFrom(response);
+      const data = await lastValueFrom(response);
+      await this.notificationsQueue.add('createNotificationFamily', {
+        id_family: familyId,
+        notificationData: {
+          title: 'New message',
+          content: 'You have received a video message',
+          type: NotificationType.CHAT,
+          id_family: familyId,
+          id_target: familyId,
+        },
+      });
+      return data;
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
@@ -153,7 +203,18 @@ export class ChatService {
         receiverId,
         file,
       });
-      return await lastValueFrom(response);
+      const data = await lastValueFrom(response);
+      await this.notificationsQueue.add('createNotificationUser', {
+        id_user: receiverId,
+        notificationData: {
+          title: 'New message',
+          content: "You've received an image message",
+          type: NotificationType.CHAT,
+          id_family: null,
+          id_target: receiverId,
+        },
+      });
+      return data;
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
@@ -169,7 +230,18 @@ export class ChatService {
         receiverId,
         file,
       });
-      return await lastValueFrom(response);
+      const data = await lastValueFrom(response);
+      await this.notificationsQueue.add('createNotificationUser', {
+        id_user: receiverId,
+        notificationData: {
+          title: 'New message',
+          content: "You've received an video message",
+          type: NotificationType.CHAT,
+          id_family: null,
+          id_target: receiverId,
+        },
+      });
+      return data;
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);

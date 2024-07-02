@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { DynamicModule, MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthApiModule } from './auth/auth.module';
 import { PaymentModule } from './payment/payment.module';
@@ -10,7 +10,6 @@ import { CalendarModule } from './calendar/calendar.module';
 import { UserModule } from './user/user.module';
 import { GuidelineModule } from './guideline/guideline.module';
 import { AppLoggerMiddleware } from './utils';
-import { NotificationModule } from './notification/notification.module';
 import { EducationModule } from './education/education.module';
 import { HouseholdModule } from './household/household.module';
 import { FinanceModule } from './finance/finance.module';
@@ -18,8 +17,13 @@ import { ShoppingModule } from './shopping/shopping.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { MailModule } from './mailer/mailer.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import { BullModule } from '@nestjs/bull';
 import * as Joi from 'joi';
 
+const globalModule = (module: DynamicModule) => {
+  module.global = true;
+  return module;
+};
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -66,13 +70,27 @@ import * as Joi from 'joi';
       }),
       inject: [ConfigService],
     }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get<string>('REDIS_HOST'),
+          port: configService.get<number>('REDIS_PORT'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
+    globalModule(
+      BullModule.registerQueue({
+        name: 'notifications',
+      }),
+    ),
     AuthApiModule,
     UserModule,
     PaymentModule,
     MailModule,
     FamilyModule,
     ChatModule,
-    NotificationModule,
     CrawlerModule,
     CalendarModule,
     GuidelineModule,
@@ -83,7 +101,6 @@ import * as Joi from 'joi';
     InvoiceModule,
     AdminModule,
   ],
-  providers: [],
 })
 export class GatewayModule {
   configure(consumer: MiddlewareConsumer): void {

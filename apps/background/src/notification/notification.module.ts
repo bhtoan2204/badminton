@@ -1,36 +1,29 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { NotificationController } from './notification.controller';
 import { NotificationService } from './notification.service';
-import { ConfigModule } from '@nestjs/config';
-import * as Joi from 'joi';
 import {
   MgDatabaseModule,
-  RmqModule,
   NotificationData,
   NotificationDataSchema,
+  MemberFamily,
+  DatabaseModule,
 } from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { NotificationProcessor } from './notification.processor';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { BackgroundModule } from '../background.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      validationSchema: Joi.object({
-        RABBIT_MQ_URI: Joi.string().required(),
-        RABBIT_MQ_NOTIFICATION_QUEUE: Joi.string().required(),
-      }),
-      envFilePath:
-        process.env.NODE_ENV === 'production'
-          ? './apps/notification/.env.production'
-          : './apps/notification/.env',
-    }),
-    RmqModule,
     MgDatabaseModule,
     MongooseModule.forFeature([
       { name: NotificationData.name, schema: NotificationDataSchema },
     ]),
+    TypeOrmModule.forFeature([MemberFamily]),
+    DatabaseModule,
+    forwardRef(() => BackgroundModule),
   ],
   controllers: [NotificationController],
-  providers: [NotificationService],
+  providers: [NotificationService, NotificationProcessor],
 })
 export class NotificationModule {}

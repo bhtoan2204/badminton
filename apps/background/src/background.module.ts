@@ -1,10 +1,25 @@
-import { Module } from '@nestjs/common';
-import { BackgroundController } from './background.controller';
+import { DynamicModule, forwardRef, Module } from '@nestjs/common';
 import { BackgroundService } from './background.service';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import {
+  DatabaseModule,
+  Family,
+  MemberFamily,
+  MgDatabaseModule,
+  NotificationData,
+  NotificationDataSchema,
+  RmqModule,
+} from '@app/common';
+import { MongooseModule } from '@nestjs/mongoose';
 import * as Joi from 'joi';
-import { FirebaseService, RmqModule } from '@app/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { NotificationModule } from './notification/notification.module';
+
+const globalModule = (module: DynamicModule) => {
+  module.global = true;
+  return module;
+};
 
 @Module({
   imports: [
@@ -22,12 +37,31 @@ import { FirebaseService, RmqModule } from '@app/common';
       }),
       inject: [ConfigService],
     }),
-    BullModule.registerQueue({
-      name: 'cron-queue',
-    }),
+    globalModule(
+      BullModule.registerQueue({
+        name: 'chats',
+      }),
+    ),
+    globalModule(
+      BullModule.registerQueue({
+        name: 'cron-queue',
+      }),
+    ),
+    globalModule(
+      BullModule.registerQueue({
+        name: 'notifications',
+      }),
+    ),
+    MgDatabaseModule,
+    MongooseModule.forFeature([
+      { name: NotificationData.name, schema: NotificationDataSchema },
+    ]),
     RmqModule,
+    DatabaseModule,
+    TypeOrmModule.forFeature([Family, MemberFamily]),
+    forwardRef(() => NotificationModule),
   ],
-  controllers: [BackgroundController],
-  providers: [BackgroundService, FirebaseService],
+  providers: [BackgroundService],
+  exports: [RmqModule],
 })
 export class BackgroundModule {}

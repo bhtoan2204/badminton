@@ -5,10 +5,9 @@ import {
   FAMILY_SERVICE,
   BACKGROUND_SERVICE,
   WsJwtStrategy,
-} from '../utils';
+} from '../../utils';
 import { NotificationController } from './notification.controller';
 import { NotificationService } from './notification.service';
-import { NotificationGateway } from './notification.gateway';
 
 @Module({
   imports: [
@@ -18,6 +17,6 @@ import { NotificationGateway } from './notification.gateway';
     GlobalJwtModule,
   ],
   controllers: [NotificationController],
-  providers: [NotificationService, NotificationGateway, WsJwtStrategy],
+  providers: [NotificationService, WsJwtStrategy],
 })
 export class NotificationModule {}

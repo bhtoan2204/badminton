@@ -125,4 +125,17 @@ export class ChatGateway implements OnModuleInit {
       console.error('Error emitting message:', error.message);
     }
   }
+
+  async emitNotificationToUser(userId: string, notification: any) {
+    try {
+      const receiverSocketIds: string[] = await this.cacheManager.get(userId);
+      if (receiverSocketIds) {
+        for (const socketId of receiverSocketIds) {
+          this.server.to(socketId).emit('onNewNotification', notification);
+        }
+      }
+    } catch (error) {
+      console.error('Error emitting notification:', error.message);
+    }
+  }
 }
