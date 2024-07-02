@@ -62,12 +62,19 @@ export class PaymentService {
     this.vnpReturnUrl = this.configService.get<string>('VNPAY_RETURN_URL');
   }
 
-  async getOrder(id_user) {
+  async getOrder(id_user: string, page: number, itemsPerPage: number) {
     try {
-      const Query = 'SELECT * FROM f_get_order_info($1)';
-      const params = [id_user];
-      const data = await this.entityManager.query(Query, params);
-      return data;
+      const [data, total] = await this.orderRepository.findAndCount({
+        where: { id_user: id_user },
+        order: { created_at: 'DESC' },
+        skip: (page - 1) * itemsPerPage,
+        take: itemsPerPage,
+      });
+      return {
+        data: data,
+        total: total,
+        message: 'Order fetched successfully',
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,

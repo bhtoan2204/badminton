@@ -71,10 +71,16 @@ export class PaymentController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get successful orders for current user' })
+  @ApiQuery({ name: 'page', required: true, type: Number })
+  @ApiQuery({ name: 'itemsPerPage', required: true, type: Number })
   @Get('getOrder')
-  async getOrder(@CurrentUser() user) {
+  async getOrder(
+    @CurrentUser() user,
+    @Query('page') page,
+    @Query('itemsPerPage') itemsPerPage,
+  ) {
     const id_user = user.id_user;
-    return this.paymentService.getOrder(id_user);
+    return this.paymentService.getOrder(id_user, page, itemsPerPage);
   }
 
   @HttpCode(HttpStatus.OK)

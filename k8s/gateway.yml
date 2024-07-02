@@ -57,6 +57,10 @@ spec:
           env:
             - name: NODE_ENV
               value: 'production'
+            - name: REDIS_HOST
+              value: 'redis'
+            - name: REDIS_PORT
+              value: '6379'
           volumeMounts:
             - name: log-volume
               mountPath: /usr/src/app/logs

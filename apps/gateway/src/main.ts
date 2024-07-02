@@ -10,8 +10,6 @@ async function bootstrap() {
   const app = await NestFactory.create(GatewayModule);
   app.useGlobalPipes(new ValidationPipe());
   const configService = app.get(ConfigService);
-  const port = +configService.get<number>('PORT') | 8080;
-  console.log(port);
 
   app.setGlobalPrefix('api/v1');
 
@@ -35,6 +33,6 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(port);
+  await app.listen(configService.get<number>('PORT'));
 }
 bootstrap();

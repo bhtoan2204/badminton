@@ -13,7 +13,11 @@ export class PaymentController {
   @EventPattern('paymentClient/getOrder')
   async getOrder(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.paymentService.getOrder(data.id_user);
+    return this.paymentService.getOrder(
+      data.id_user,
+      data.page,
+      data.itemsPerPage,
+    );
   }
 
   @EventPattern('paymentClient/getAvailableFunction')

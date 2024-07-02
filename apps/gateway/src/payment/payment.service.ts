@@ -94,10 +94,10 @@ export class PaymentService {
       throw new HttpException(error, error.statusCode);
     }
   }
-  async getOrder(id_user) {
+  async getOrder(id_user: string, page: number, itemsPerPage: number) {
     try {
       const response = this.paymentClient
-        .send('paymentClient/getOrder', { id_user })
+        .send('paymentClient/getOrder', { id_user, page, itemsPerPage })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;

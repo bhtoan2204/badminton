@@ -43,6 +43,6 @@ spec:
     app: household
   ports:
     - protocol: TCP
-      port: 8094
-      targetPort: 8094
+      port: 8099
+      targetPort: 8099
   type: ClusterIP
