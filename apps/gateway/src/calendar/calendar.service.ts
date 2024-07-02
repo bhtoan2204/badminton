@@ -4,11 +4,16 @@ import { ClientProxy } from '@nestjs/microservices';
 import { CreateCalendarDto } from './dto/createCalendar.dto';
 import { lastValueFrom, timeout } from 'rxjs';
 import { UpdateCalendarDto } from './dto/updateCalendar.dto';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { NotificationType } from '@app/common';
+import { CreateCategoryEventDto } from './dto/createCategoryEvent.dto';
 
 @Injectable()
 export class CalendarService {
   constructor(
     @Inject(CALENDAR_SERVICE) private readonly calendarClient: ClientProxy,
+    @InjectQueue('notifications') private readonly notificationsQueue: Queue,
   ) {}
 
   async getAllCategoryEvent(id_user: string, id_family: number) {
@@ -26,12 +31,22 @@ export class CalendarService {
     }
   }
 
-  async createCategoryEvent(id_user: string, dto: any) {
+  async createCategoryEvent(id_user: string, dto: CreateCategoryEventDto) {
     try {
       const response = this.calendarClient
         .send('calendarClient/createCategoryEvent', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
+      await this.notificationsQueue.add('createNotificationFamily', {
+        id_family: dto.id_family,
+        notificationData: {
+          title: 'New Category Event',
+          content: 'New Category Event has been created',
+          type: NotificationType.CALENDAR,
+          id_family: dto.id_family,
+          id_target: data[0].id_category_event,
+        },
+      });
       return data;
     } catch (error) {
       if (error.name === 'TimeoutError') {
@@ -83,21 +98,6 @@ export class CalendarService {
     try {
       const response = this.calendarClient
         .send('calendarClient/getAllCalendar', { id_user, id_family })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
-    } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
-    }
-  }
-
-  async getEventOnDate(id_user: string, dto) {
-    try {
-      const response = this.calendarClient
-        .send('calendarClient/getEventOnDate', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
