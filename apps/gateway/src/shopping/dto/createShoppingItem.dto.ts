@@ -8,6 +8,11 @@ import {
 } from 'class-validator';
 
 export class CreateShoppingItemDto {
+  @ApiProperty({ description: 'id of family' })
+  @IsNotEmpty()
+  @IsNumber()
+  id_family: number;
+
   @ApiProperty({ description: 'id of list' })
   @IsNotEmpty()
   @IsNumber()

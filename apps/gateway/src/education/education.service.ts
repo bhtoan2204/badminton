@@ -3,19 +3,35 @@ import { TimeoutError, lastValueFrom, timeout } from 'rxjs';
 import { EDUCATION_SERVICE } from '../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { UpdateEducationDto } from './dto/updateEducation.dto';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { NotificationType } from '@app/common';
+import { CreateEducationDto } from './dto/createEducation.dto';
 
 @Injectable()
 export class EducationService {
   constructor(
     @Inject(EDUCATION_SERVICE) private educationClient: ClientProxy,
+    @InjectQueue('notifications') private readonly notificationsQueue: Queue,
   ) {}
 
-  async createEducationProgress(id_user: string, dto: any) {
+  async createEducationProgress(id_user: string, dto: CreateEducationDto) {
     try {
       const response = this.educationClient
         .send('educationClient/createEducationProgress', { id_user, dto })
         .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      const data = await lastValueFrom(response);
+      await this.notificationsQueue.add('createNotificationFamily', {
+        id_family: dto.id_family,
+        notificationData: {
+          title: 'New Education Progress',
+          content: 'New education progress has been added to the family',
+          type: NotificationType.EDUCATION,
+          id_family: dto.id_family,
+          id_target: data.data.id_education_progress,
+        },
+      });
+      return data;
     } catch (error) {
       if (error instanceof TimeoutError) {
         throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
@@ -84,7 +100,18 @@ export class EducationService {
       const response = this.educationClient
         .send('educationClient/updateDetailEducationProgress', { id_user, dto })
         .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      const data = await lastValueFrom(response);
+      await this.notificationsQueue.add('createNotificationFamily', {
+        id_family: dto.id_family,
+        notificationData: {
+          title: 'Education Progress Updated',
+          content: 'An education progress has been updated in the family',
+          type: NotificationType.EDUCATION,
+          id_family: dto.id_family,
+          id_target: dto.id_education_progress,
+        },
+      });
+      return data;
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
@@ -106,7 +133,18 @@ export class EducationService {
           id_education_progress,
         })
         .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      const data = await lastValueFrom(response);
+      await this.notificationsQueue.add('createNotificationFamily', {
+        id_family,
+        notificationData: {
+          title: 'Education Progress Deleted',
+          content: 'An education progress has been deleted in the family',
+          type: NotificationType.EDUCATION,
+          id_family,
+          id_target: id_education_progress,
+        },
+      });
+      return data;
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);

@@ -130,6 +130,16 @@ export class CalendarService {
         .send('calendarClient/createCalendar', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
+      await this.notificationsQueue.add('createNotificationFamily', {
+        id_family: dto.id_family,
+        notificationData: {
+          title: 'New Calendar Event Created',
+          content: 'New Category Event has been created',
+          type: NotificationType.CALENDAR,
+          id_family: dto.id_family,
+          id_target: data.data.id_calendar,
+        },
+      });
       return data;
     } catch (error) {
       if (error.name === 'TimeoutError') {
