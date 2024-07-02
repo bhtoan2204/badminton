@@ -1,5 +1,5 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
-import { FAMILY_SERVICE, BACKGROUND_SERVICE } from '../utils';
+import { FAMILY_SERVICE, BACKGROUND_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, timeout } from 'rxjs';
 
@@ -15,28 +15,6 @@ export class NotificationService {
     try {
       const response = this.notificationClient
         .send('backgroundClient/getNotifications', { id_user, index })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
-    } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
-    }
-  }
-
-  async createNotification(
-    id_user: string,
-    dto: any,
-    listReceiverId: string[],
-  ) {
-    try {
-      const response = this.notificationClient
-        .send('backgroundClient/createNotification', {
-          id_user,
-          dto,
-          listReceiverId,
-        })
         .pipe(timeout(15000));
       return await lastValueFrom(response);
     } catch (error) {

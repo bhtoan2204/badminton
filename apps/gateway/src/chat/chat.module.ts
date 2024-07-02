@@ -12,12 +12,28 @@ import { ChatService } from './chat.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisClientOptions } from 'redis';
+import { BullModule } from '@nestjs/bull';
+import { ChatProcessor } from './chat.processor';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
     RmqModule.register({ name: CHAT_SERVICE }),
     RmqModule.register({ name: AUTH_SERVICE }),
     RmqModule.register({ name: FAMILY_SERVICE }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get<string>('REDIS_HOST'),
+          port: configService.get<number>('REDIS_PORT'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
+    BullModule.registerQueue({
+      name: 'chats',
+    }),
     CacheModule.registerAsync<RedisClientOptions>({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -29,8 +45,9 @@ import { RedisClientOptions } from 'redis';
       inject: [ConfigService],
     }),
     GlobalJwtModule,
+    NotificationModule,
   ],
   controllers: [ChatController],
-  providers: [ChatGateway, WsJwtStrategy, ChatService],
+  providers: [ChatGateway, WsJwtStrategy, ChatService, ChatProcessor],
 })
 export class ChatModule {}

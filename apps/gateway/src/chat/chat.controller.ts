@@ -27,6 +27,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
 import { VideoFileInterceptor } from '../utils/interceptor/videoFile.interceptor';
 import { NewFamilyMessageDto } from './dto/newFamilyMessage.dto';
+import { RmqService } from '@app/common';
 
 @ApiTags('Chat')
 @Controller('chat')
@@ -36,6 +37,7 @@ export class ChatController {
   constructor(
     private readonly chatService: ChatService,
     private readonly chatGateway: ChatGateway,
+    private readonly rmqService: RmqService,
   ) {}
 
   @HttpCode(HttpStatus.OK)

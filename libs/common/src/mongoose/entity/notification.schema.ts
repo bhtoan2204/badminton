@@ -1,7 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Types } from 'mongoose';
+import { Types, Schema as MongooseSchema } from 'mongoose';
 
 export type NotificationDocument = NotificationData & Document;
+
+export enum NotificationType {
+  FAMILY = 'FAMILY',
+  CHAT = 'CHAT',
+  CALENDAR = 'CALENDAR',
+  CHECKLIST = 'CHECKLIST',
+  GUIDELINE = 'GUIDELINE',
+  EDUCATION = 'EDUCATION',
+}
 
 @Schema({
   toJSON: {
@@ -20,13 +29,16 @@ class NotificationDetail {
   @Prop({ required: true })
   content: string;
 
-  @Prop({ required: true })
-  type: string;
+  @Prop({ required: true, enum: NotificationType })
+  type: NotificationType;
 
-  @Prop({ required: true })
-  data: string;
+  @Prop({ required: false })
+  id_family: number;
 
-  @Prop({ required: true })
+  @Prop({ type: MongooseSchema.Types.Mixed, required: true })
+  id_target: string | number;
+
+  @Prop({ required: true, default: false })
   isRead: boolean;
 
   @Prop({ required: true, default: () => Date.now() })
