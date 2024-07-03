@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Queue } from 'bull';
 import {
+  Checklist,
   Family,
   MemberFamily,
   NotificationData,
@@ -9,7 +10,13 @@ import {
 } from '@app/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { FAMILY_PACKAGE_EXPIRED } from './constant';
+import {
+  CALENDAR_EVENT_OCCURED,
+  CHECKLIST_OCCURED,
+  EXPENSE_REPORT,
+  FAMILY_PACKAGE_EXPIRED,
+  INCOME_REPORT,
+} from './constant';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, Repository } from 'typeorm';
 import * as moment from 'moment';
@@ -25,6 +32,8 @@ export class BackgroundService implements OnModuleInit {
     @InjectRepository(Family) private familyRepository: Repository<Family>,
     @InjectRepository(MemberFamily)
     private memberFamilyRepository: Repository<MemberFamily>,
+    @InjectRepository(Checklist)
+    private checklistRepository: Repository<Checklist>,
   ) {}
 
   async createNotificationFamily(
@@ -102,6 +111,10 @@ export class BackgroundService implements OnModuleInit {
 
   async onModuleInit() {
     await this.addFamilyPackageExpiredJob();
+    await this.addChecklistNotificationJobs();
+    await this.addIncomeReportJob();
+    await this.addExpenseReportJob();
+    await this.addCalendarEventOccuredJob();
   }
 
   async addFamilyPackageExpiredJob() {
@@ -110,6 +123,42 @@ export class BackgroundService implements OnModuleInit {
       FAMILY_PACKAGE_EXPIRED,
       {},
       { repeat: { cron: '0 0 * * *' } },
+    );
+  }
+
+  async addChecklistNotificationJobs() {
+    // Cron expression for every 10 minutes
+    await this.cronQueue.add(
+      CHECKLIST_OCCURED,
+      {},
+      { repeat: { cron: '*/10 * * * *' } },
+    );
+  }
+
+  async addIncomeReportJob() {
+    // Cron expression for the last day of each month at 12:00 AM
+    await this.cronQueue.add(
+      INCOME_REPORT,
+      {},
+      { repeat: { cron: '0 0 L * *' } },
+    );
+  }
+
+  async addExpenseReportJob() {
+    // Cron expression for the last day of each month at 12:00 AM
+    await this.cronQueue.add(
+      EXPENSE_REPORT,
+      {},
+      { repeat: { cron: '0 0 L * *' } },
+    );
+  }
+
+  async addCalendarEventOccuredJob() {
+    // Cron expression for every 10 minutes
+    await this.cronQueue.add(
+      CALENDAR_EVENT_OCCURED,
+      {},
+      { repeat: { cron: '*/10 * * * *' } },
     );
   }
 
@@ -134,6 +183,109 @@ export class BackgroundService implements OnModuleInit {
           }),
         ),
       );
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  @Process(CALENDAR_EVENT_OCCURED)
+  async handleCalendarEventOccured() {
+    try {
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  @Process(CHECKLIST_OCCURED)
+  async handleChecklistOccured() {
+    try {
+      const now = moment();
+      const threeDaysBefore = now.clone().add(3, 'days').toDate();
+      const oneDayBefore = now.clone().add(1, 'days').toDate();
+
+      const checklists = await this.checklistRepository.find({
+        where: [
+          {
+            due_date: LessThan(threeDaysBefore),
+            is_notified_3_days_before: false,
+          },
+          { due_date: LessThan(oneDayBefore), is_notified_1_day_before: false },
+          { due_date: LessThan(now.toDate()), is_notified_on_due_date: false },
+        ],
+      });
+
+      console.log('checklists', checklists);
+
+      await Promise.all(
+        checklists.map(async (checklist) => {
+          const notifications = [];
+          const now = moment();
+          const dueDate = moment(checklist.due_date);
+
+          if (
+            dueDate.isSame(now.clone().add(3, 'days'), 'day') &&
+            !checklist.is_notified_3_days_before
+          ) {
+            notifications.push(
+              this.createNotificationFamily(checklist.id_family, {
+                type: NotificationType.CHECKLIST,
+                title: 'Checklist due in 3 days',
+                content: `Checklist "${checklist.task_name}" is due in 3 days`,
+                id_target: checklist.id_checklist,
+              }),
+            );
+            checklist.is_notified_3_days_before = true;
+          }
+          if (
+            dueDate.isSame(now.clone().add(1, 'days'), 'day') &&
+            !checklist.is_notified_1_day_before
+          ) {
+            notifications.push(
+              this.createNotificationFamily(checklist.id_family, {
+                type: NotificationType.CHECKLIST,
+                title: 'Checklist due tomorrow',
+                content: `Task "${checklist.task_name}" is due tomorrow`,
+                id_target: checklist.id_checklist,
+              }),
+            );
+            checklist.is_notified_1_day_before = true;
+          }
+
+          if (
+            dueDate.isSame(now, 'day') &&
+            !checklist.is_notified_on_due_date
+          ) {
+            notifications.push(
+              this.createNotificationFamily(checklist.id_family, {
+                type: NotificationType.CHECKLIST,
+                title: 'Checklist due today',
+                content: `Task "${checklist.task_name}" is due today`,
+                id_target: checklist.id_checklist,
+              }),
+            );
+            checklist.is_notified_on_due_date = true;
+          }
+
+          await Promise.all(notifications);
+          await this.checklistRepository.save(checklist);
+        }),
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  @Process(EXPENSE_REPORT)
+  async handleExpenseReport() {
+    try {
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  @Process(INCOME_REPORT)
+  async handleIncomeReport() {
+    try {
     } catch (error) {
       console.error(error);
     }

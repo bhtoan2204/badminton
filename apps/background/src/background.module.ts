@@ -3,6 +3,7 @@ import { BackgroundService } from './background.service';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
+  Checklist,
   DatabaseModule,
   Family,
   MemberFamily,
@@ -58,7 +59,7 @@ const globalModule = (module: DynamicModule) => {
     ]),
     RmqModule,
     DatabaseModule,
-    TypeOrmModule.forFeature([Family, MemberFamily]),
+    TypeOrmModule.forFeature([Family, MemberFamily, Checklist]),
     forwardRef(() => NotificationModule),
   ],
   providers: [BackgroundService],

@@ -9,6 +9,9 @@ import {
 } from 'typeorm';
 import { Family } from './family.entity';
 import { Users } from './users.entity';
+import { PackageMain } from './package_main.entity';
+import { PackageExtra } from './package_extra.entity';
+import { PackageCombo } from './package_combo.entity';
 
 export enum OrderStatus {
   PENDING = 'PENDING',
@@ -65,4 +68,16 @@ export class Order {
   @ManyToOne(() => Users, (user) => user.orders)
   @JoinColumn({ name: 'id_user' })
   users: Users;
+
+  @ManyToOne(() => PackageMain, (packageMain) => packageMain.orders)
+  @JoinColumn({ name: 'id_package_main' })
+  packageMain: PackageMain;
+
+  @ManyToOne(() => PackageExtra, (packageExtra) => packageExtra.orders)
+  @JoinColumn({ name: 'id_package_extra' })
+  packageExtra: PackageExtra;
+
+  @ManyToOne(() => PackageCombo, (packageCombo) => packageCombo.orders)
+  @JoinColumn({ name: 'id_package_combo' })
+  packageCombo: PackageCombo;
 }

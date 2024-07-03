@@ -335,7 +335,7 @@ export class PaymentService {
         vnp_TxnRef: orderId,
         vnp_OrderInfo: `Pay for transaction code: ${String(orderId)}`,
         vnp_OrderType: 'other',
-        vnp_Amount: price,
+        vnp_Amount: price * 100,
         vnp_ReturnUrl: `${this.vnpReturnUrl}${String(orderId)}`,
         vnp_IpAddr: ip.split(':').pop(),
         vnp_CreateDate: moment().format('YYYYMMDDHHmmss'),
@@ -459,7 +459,7 @@ export class PaymentService {
         id_user,
         id_family,
         order_id,
-        price * 100,
+        price,
         ip,
         bankCode,
       );

@@ -36,8 +36,9 @@ export class DatafetcherController {
       page: number;
       itemsPerPage: number;
       search: string;
-      sort: string;
-      packageId: number;
+      sortBy: string;
+      sortDirection: 'ASC' | 'DESC' | null;
+      type: 'ALL' | 'MAIN' | 'EXTRA' | 'COMBO';
     },
   ) {
     this.rmqService.ack(context);
@@ -45,8 +46,9 @@ export class DatafetcherController {
       payload.page,
       payload.itemsPerPage,
       payload.search,
-      payload.sort,
-      payload.packageId,
+      payload.sortBy,
+      payload.sortDirection,
+      payload.type,
     );
   }
 }

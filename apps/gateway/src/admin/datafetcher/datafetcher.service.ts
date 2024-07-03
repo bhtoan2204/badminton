@@ -57,7 +57,7 @@ export class DatafetcherService {
   async getListOrders(dto: any) {
     try {
       const response = this.elasticsearchClient
-        .send('datafetcherClient/getListOrders', { dto })
+        .send('datafetcherClient/getListOrders', dto)
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;

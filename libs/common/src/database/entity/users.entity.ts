@@ -51,7 +51,7 @@ export class Users {
   @Column('boolean', { default: false })
   isphoneverified: boolean;
 
-  @Column('boolean', { default: false, select: false })
+  @Column('boolean', { default: false })
   isadmin: boolean;
 
   @Column({

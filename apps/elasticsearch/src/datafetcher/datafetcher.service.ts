@@ -1,9 +1,11 @@
+import { Family, Order, OrderStatus, Users } from '@app/common';
 import { HttpService } from '@nestjs/axios';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
+import { InjectRepository } from '@nestjs/typeorm';
 import { firstValueFrom } from 'rxjs';
-import { EntityManager } from 'typeorm';
+import { EntityManager, IsNull, Not, Repository } from 'typeorm';
 
 @Injectable()
 export class DatafetcherService {
@@ -12,6 +14,12 @@ export class DatafetcherService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
     private readonly entityManager: EntityManager,
+    @InjectRepository(Users)
+    private readonly usersRepository: Repository<Users>,
+    @InjectRepository(Family)
+    private readonly familyRepository: Repository<Family>,
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
   ) {
     this.ip_api_url = this.configService.get<string>('IP_API_URL');
   }
@@ -32,11 +40,62 @@ export class DatafetcherService {
 
   async getSummary() {
     try {
-      const query = 'SELECT * from f_get_summary()';
-      const response = await this.entityManager.query(query);
+      const totalUsers = this.usersRepository.count();
+      const totalFamilies = this.familyRepository.count();
+      const totalOrderSuccess = this.orderRepository.count({
+        where: { status: OrderStatus.SUCCESS },
+      });
+      const totalOrderPending = this.orderRepository.count({
+        where: { status: OrderStatus.PENDING },
+      });
+      const totalOrderFailed = this.orderRepository.count({
+        where: { status: OrderStatus.FAILED },
+      });
+      const totalRevenue = this.orderRepository.sum('price');
+      const totalMainPackageOrderSuccess = this.orderRepository.count({
+        where: { status: OrderStatus.SUCCESS, id_package_main: Not(IsNull()) },
+      });
+      const totalExtraPackageOrderSuccess = this.orderRepository.count({
+        where: { status: OrderStatus.SUCCESS, id_package_extra: Not(IsNull()) },
+      });
+      const totalComboPackageOrderSuccess = this.orderRepository.count({
+        where: { status: OrderStatus.SUCCESS, id_package_combo: Not(IsNull()) },
+      });
+      const [
+        totalUsersCount,
+        totalFamiliesCount,
+        totalOrderSuccessCount,
+        totalOrderPendingCount,
+        totalOrderFailedCount,
+        totalRevenueCount,
+        totalMainPackageOrderSuccessCount,
+        totalExtraPackageOrderSuccessCount,
+        totalComboPackageOrderSuccessCount,
+      ] = await Promise.all([
+        totalUsers,
+        totalFamilies,
+        totalOrderSuccess,
+        totalOrderPending,
+        totalOrderFailed,
+        totalRevenue,
+        totalMainPackageOrderSuccess,
+        totalExtraPackageOrderSuccess,
+        totalComboPackageOrderSuccess,
+      ]);
+
       return {
-        data: response,
-        message: 'Summary fetched successfully',
+        data: {
+          totalUsers: totalUsersCount,
+          totalFamilies: totalFamiliesCount,
+          totalOrderSuccess: totalOrderSuccessCount,
+          totalOrderPending: totalOrderPendingCount,
+          totalOrderFailed: totalOrderFailedCount,
+          totalRevenue: totalRevenueCount,
+          totalMainPackageOrderSuccess: totalMainPackageOrderSuccessCount,
+          totalExtraPackageOrderSuccess: totalExtraPackageOrderSuccessCount,
+          totalComboPackageOrderSuccess: totalComboPackageOrderSuccessCount,
+        },
+        message: 'Get summary successfully',
       };
     } catch (error) {
       throw new RpcException({
@@ -65,65 +124,53 @@ export class DatafetcherService {
   async getListOrders(
     page: number,
     itemsPerPage: number,
-    search: string,
-    sort: string,
-    packageId: number,
+    search: string | null,
+    sortBy: string | null,
+    sortDirection: 'ASC' | 'DESC' | null,
+    type: 'ALL' | 'MAIN' | 'EXTRA' | 'COMBO',
   ) {
     try {
-      const baseQuery = `
-        SELECT u.id_user, u.email, u.phone, u.firstname, u.lastname, u.avatar,
-               o.id_order, o.id_package, o.status, o.created_at, o.updated_at, o.method, o.expired_at as package_expired_at,
-               pk.name as package_name, pk.price as package_price
-        FROM "order" o 
-        JOIN package pk ON o.id_package = pk.id_package 
-        JOIN users u ON o.id_user = u.id_user
-      `;
-      let whereClause = '';
-      let sortClause = '';
-      let limitClause = '';
-      let offsetClause = '';
+      const queryBuilder = this.orderRepository
+        .createQueryBuilder('order')
+        .leftJoinAndSelect('order.users', 'users')
+        .leftJoinAndSelect('order.family', 'family')
+        .leftJoinAndSelect('order.packageMain', 'packageMain')
+        .leftJoinAndSelect('order.packageExtra', 'packageExtra')
+        .leftJoinAndSelect('order.packageCombo', 'packageCombo')
+        .skip((page - 1) * itemsPerPage)
+        .take(itemsPerPage);
 
       if (search) {
-        whereClause = `
-          WHERE u.email LIKE '%${search}%' 
-          OR u.phone LIKE '%${search}%' 
-          OR u.firstname LIKE '%${search}%' 
-          OR u.lastname LIKE '%${search}%'
-        `;
+        queryBuilder.andWhere(
+          `order.method LIKE :search 
+          OR users.email LIKE :search 
+          OR users.phone LIKE :search 
+          OR family.name LIKE :search 
+          OR family.description LIKE :search`,
+          { search: `%${search}%` },
+        );
       }
 
-      if (packageId) {
-        whereClause +=
-          (whereClause ? ' AND' : ' WHERE') + ` o.id_package = ${packageId}`;
+      if (sortBy && sortDirection) {
+        queryBuilder.orderBy(`order.${sortBy}`, sortDirection);
       }
 
-      if (sort) {
-        const validSortColumns = ['created_at', 'updated_at', 'status'];
-        if (validSortColumns.includes(sort)) {
-          sortClause = ` ORDER BY ${sort}`;
+      if (type !== 'ALL') {
+        if (type === 'MAIN') {
+          queryBuilder.andWhere('order.id_package_main IS NOT NULL');
+        } else if (type === 'EXTRA') {
+          queryBuilder.andWhere('order.id_package_extra IS NOT NULL');
+        } else if (type === 'COMBO') {
+          queryBuilder.andWhere('order.id_package_combo IS NOT NULL');
         }
       }
 
-      if (itemsPerPage > 0) {
-        limitClause = ` LIMIT ${itemsPerPage}`;
-      }
+      const [data, total] = await queryBuilder.getManyAndCount();
 
-      if (page > 0) {
-        const offset = (page - 1) * itemsPerPage;
-        offsetClause = ` OFFSET ${offset}`;
-      }
-
-      const finalQuery = `
-        ${baseQuery}
-        ${whereClause}
-        ${sortClause}
-        ${limitClause}
-        ${offsetClause}
-      `;
-      const response = await this.entityManager.query(finalQuery);
       return {
-        data: response,
-        message: 'List orders fetched successfully',
+        data,
+        total,
+        message: 'Get list orders successfully',
       };
     } catch (error) {
       throw new RpcException({
