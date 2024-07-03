@@ -4,10 +4,12 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { PackageExtra } from './package_extra.entity';
+import { Order } from './order.entity';
 
 @Entity('package_combo')
 export class PackageCombo {
@@ -49,4 +51,7 @@ export class PackageCombo {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @OneToMany(() => Order, (order) => order.packageCombo)
+  orders: Order[];
 }

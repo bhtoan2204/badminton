@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsString, IsEnum, Min } from 'class-validator';
+import {
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsEnum,
+  Min,
+  IsNotEmpty,
+} from 'class-validator';
 
 export class GetListOrdersDto {
   @ApiProperty({
@@ -18,6 +25,15 @@ export class GetListOrdersDto {
   @Min(1)
   itemsPerPage: number;
 
+  @ApiProperty({
+    description: 'type of package',
+    example: 'ALL',
+    enum: ['ALL', 'MAIN', 'EXTRA', 'COMBO'],
+  })
+  @IsEnum(['ALL', 'MAIN', 'EXTRA', 'COMBO'])
+  @IsNotEmpty()
+  type?: 'ALL' | 'MAIN' | 'EXTRA' | 'COMBO';
+
   @ApiPropertyOptional({
     description: 'Search keyword to filter results',
     example: 'john',
@@ -28,19 +44,17 @@ export class GetListOrdersDto {
 
   @ApiPropertyOptional({
     description: 'Sort by field',
-    enum: ['created_at', 'updated_at', 'status'],
     example: 'created_at',
   })
   @IsString()
   @IsOptional()
-  @IsEnum(['created_at', 'updated_at', 'status'])
-  sort?: string;
+  sortBy?: string;
 
   @ApiPropertyOptional({
-    description: 'Package ID to filter results',
-    example: 2,
+    description: 'Sort direction',
+    example: 'DESC',
   })
-  @IsNumber()
+  @IsEnum(['ASC', 'DESC'])
   @IsOptional()
-  packageId?: number;
+  sortDirection?: 'ASC' | 'DESC';
 }

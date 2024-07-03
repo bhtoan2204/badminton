@@ -29,6 +29,15 @@ export class Checklist {
   @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
   due_date: Date;
 
+  @Column('boolean', { default: false })
+  is_notified_3_days_before: boolean;
+
+  @Column('boolean', { default: false })
+  is_notified_1_day_before: boolean;
+
+  @Column('boolean', { default: false })
+  is_notified_on_due_date: boolean;
+
   @CreateDateColumn()
   created_at: Date;
 

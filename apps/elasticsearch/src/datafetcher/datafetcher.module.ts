@@ -4,7 +4,8 @@ import { DatafetcherService } from './datafetcher.service';
 import { SearchModule } from '../elasticsearch.module';
 import { ConfigModule } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
-import { DatabaseModule } from '@app/common';
+import { DatabaseModule, Family, Order, Users } from '@app/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { DatabaseModule } from '@app/common';
     HttpModule,
     DatabaseModule,
     forwardRef(() => SearchModule),
+    TypeOrmModule.forFeature([Users, Family, Order]),
   ],
   controllers: [DatafetcherController],
   providers: [DatafetcherService],
