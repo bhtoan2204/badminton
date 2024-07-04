@@ -44,39 +44,6 @@ export class ChatService {
     }
   }
 
-  async getFamilyChats(id_user: string) {
-    try {
-      const listFamilyId = this.familyClient
-        .send('familyClient/getAllFamily', id_user)
-        .pipe(timeout(15000));
-      const family = await lastValueFrom(listFamilyId);
-      const familyId = family.map((item: any) => item.id_family);
-      const response = this.chatClient
-        .send('chatClient/getFamilyChats', { familyId })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
-    } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
-    }
-  }
-
-  async getFamilyMessages(id_user: string, id_family: number, index: number) {
-    try {
-      const response = this.chatClient
-        .send('chatClient/getFamilyMessages', { id_user, id_family, index })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
-    } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
-    }
-  }
-
   async saveMessage(id_user: string, message: NewMessageDto) {
     try {
       const response = this.chatClient.send('chatClient/sendMessage', {
@@ -181,21 +148,6 @@ export class ChatService {
     }
   }
 
-  async getListReceiverId(id_user: string, id_family: number) {
-    try {
-      const response = this.familyClient.send('familyClient/getIdsMember', {
-        id_user,
-        id_family,
-      });
-      return await lastValueFrom(response);
-    } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
-    }
-  }
-
   async saveImageMessage(id_user: string, receiverId: string, file: any) {
     try {
       const response = this.chatClient.send('chatClient/sendImageMessage', {
@@ -242,6 +194,54 @@ export class ChatService {
         },
       });
       return data;
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async getFamilyChats(id_user: string) {
+    try {
+      const listFamilyId = this.familyClient
+        .send('familyClient/getAllFamily', id_user)
+        .pipe(timeout(15000));
+      const family = await lastValueFrom(listFamilyId);
+      const familyId = family.map((item: any) => item.id_family);
+      const response = this.chatClient
+        .send('chatClient/getFamilyChats', { familyId })
+        .pipe(timeout(15000));
+      return await lastValueFrom(response);
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async getFamilyMessages(id_user: string, id_family: number, index: number) {
+    try {
+      const response = this.chatClient
+        .send('chatClient/getFamilyMessages', { id_user, id_family, index })
+        .pipe(timeout(15000));
+      return await lastValueFrom(response);
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async getListReceiverId(id_user: string, id_family: number) {
+    try {
+      const response = this.familyClient.send('familyClient/getIdsMember', {
+        id_user,
+        id_family,
+      });
+      return await lastValueFrom(response);
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);

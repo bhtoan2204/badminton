@@ -25,16 +25,3 @@ services:
       - NODE_ENV=production
     mem_limit: 2g
     cpu_shares: 1024
-
-  invoice:
-    image: mjkundta/invoice:${TAG}
-    build:
-      context: .
-      dockerfile: ./apps/invoice/Dockerfile
-      target: production
-    command: node dist/apps/invoice/src/main
-    restart: on-failure
-    environment:
-      - NODE_ENV=production
-    mem_limit: 2g
-    cpu_shares: 1024

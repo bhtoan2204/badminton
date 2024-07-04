@@ -36,6 +36,8 @@ pipeline {
                   sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod4.yml build"
                   sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod5.yml build"
                   sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod6.yml build"
+                  sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod7.yml build"
+                  sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod8.yml build"
                 }
             }
         }
@@ -51,6 +53,8 @@ pipeline {
                         sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod4.yml push"
                         sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod5.yml push"
                         sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod6.yml push"
+                        sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod7.yml push"
+                        sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod8.yml push"
                         sh "tar -czvf k8s.tar.gz k8s/"
                         sh "sshpass -p ${SSH_password} scp -o StrictHostKeyChecking=no -r k8s.tar.gz ${SSH_user}@${SSH_ip}:~/"
                         sh "rm -rf k8s.tar.gz"
