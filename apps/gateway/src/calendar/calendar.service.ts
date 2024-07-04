@@ -109,10 +109,18 @@ export class CalendarService {
     }
   }
 
-  async getCalendarDetail(id_user: string, id_calendar: number) {
+  async getCalendarDetail(
+    id_user: string,
+    id_calendar: number,
+    id_family: number,
+  ) {
     try {
       const response = this.calendarClient
-        .send('calendarClient/getCalendarDetail', { id_user, id_calendar })
+        .send('calendarClient/getCalendarDetail', {
+          id_user,
+          id_calendar,
+          id_family,
+        })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -164,10 +172,18 @@ export class CalendarService {
     }
   }
 
-  async deleteCalendar(id_user: string, id_calendar: number) {
+  async deleteCalendar(
+    id_user: string,
+    id_calendar: number,
+    id_family: number,
+  ) {
     try {
       const response = this.calendarClient
-        .send('calendarClient/deleteCalendar', { id_user, id_calendar })
+        .send('calendarClient/deleteCalendar', {
+          id_user,
+          id_calendar,
+          id_family,
+        })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;

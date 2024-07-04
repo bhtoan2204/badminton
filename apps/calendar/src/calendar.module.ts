@@ -1,10 +1,16 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { CalendarController } from './calendar.controller';
 import { CalendarService } from './calendar.service';
-import { DatabaseModule, RmqModule } from '@app/common';
+import {
+  Calendar,
+  CategoryEvent,
+  DatabaseModule,
+  RmqModule,
+} from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ChecklistModule } from './checklist/checklist.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -21,6 +27,7 @@ import { ChecklistModule } from './checklist/checklist.module';
     }),
     RmqModule,
     DatabaseModule,
+    TypeOrmModule.forFeature([Calendar, CategoryEvent]),
     forwardRef(() => ChecklistModule),
   ],
   controllers: [CalendarController],

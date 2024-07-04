@@ -9,32 +9,37 @@ import {
 } from 'class-validator';
 
 export class UpdateCalendarDto {
+  @ApiProperty({ example: 1 })
   @IsNotEmpty()
   @IsNumber()
-  @ApiProperty({ example: 1 })
   id_calendar: number;
 
+  @ApiProperty({ example: 96 })
+  @IsNotEmpty()
+  @IsNumber()
+  id_family: number;
+
+  @ApiProperty({ example: 'Vinh Ha Long trip' })
   @IsString()
   @IsOptional()
-  @ApiProperty({ example: 'Vinh Ha Long trip' })
   title: string;
 
-  @IsString()
-  @IsOptional()
   @ApiProperty({
     example:
       "The family's off to Ha Long Bay, bonding over its stunning vistas and creating lasting memories",
   })
+  @IsString()
+  @IsOptional()
   description: string;
 
+  @ApiProperty({ example: '2021-12-31T18:00:00.000Z' })
   @IsDateString()
   @IsOptional()
-  @ApiProperty({ example: '2021-12-31T18:00:00.000Z' })
   time_start: string;
 
+  @ApiProperty({ example: '2021-12-31T18:00:00.000Z' })
   @IsDateString()
   @IsOptional()
-  @ApiProperty({ example: '2021-12-31T18:00:00.000Z' })
   time_end: string;
 
   @ApiProperty({ example: 'red' })
@@ -47,7 +52,6 @@ export class UpdateCalendarDto {
   @IsOptional()
   is_all_day: boolean;
 
-  // Thêm các trường sau đây:
   @ApiProperty({ example: 1 })
   @IsNotEmpty()
   @IsNumber()

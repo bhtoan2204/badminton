@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Queue } from 'bull';
 import {
+  Calendar,
   Checklist,
   Family,
   MemberFamily,
@@ -34,6 +35,8 @@ export class BackgroundService implements OnModuleInit {
     private memberFamilyRepository: Repository<MemberFamily>,
     @InjectRepository(Checklist)
     private checklistRepository: Repository<Checklist>,
+    @InjectRepository(Calendar)
+    private calendarRepository: Repository<Calendar>,
   ) {}
 
   async createNotificationFamily(

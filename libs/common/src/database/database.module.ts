@@ -31,6 +31,8 @@ import * as Joi from 'joi';
 import { Enclosure } from './entity/enclosure.entity';
 import { OrderSubscriber } from './subcriber/order.subcriber';
 import { FamilyRoles } from './entity/family_roles.entity';
+import { Calendar } from './entity/calendar.entity';
+import { CategoryEvent } from './entity/category_event.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -86,6 +88,8 @@ import { FamilyRoles } from './entity/family_roles.entity';
             PaymentHistory,
             Order,
             FamilyRoles,
+            Calendar,
+            CategoryEvent,
           ],
           // subscribers: [OrderSubscriber],
         };

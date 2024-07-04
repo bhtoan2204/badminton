@@ -99,24 +99,20 @@ export class CalendarController {
     return this.calendarService.getAllCalendar(currentUser.id_user, id_family);
   }
 
-  // @HttpCode(HttpStatus.OK)
-  // @ApiOperation({ summary: 'Get events for family on date' })
-  // @Post('getEventOnDate')
-  // async getEventOnDate(@CurrentUser() currentUser, @Body() dto: GetEventDTO) {
-  //   return this.calendarService.getEventOnDate(currentUser.id_user, dto);
-  // }
-
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get Calendar detail' })
   @ApiParam({ name: 'id_calendar', required: true })
-  @Get('getCalendarDetail/:id_calendar')
+  @ApiParam({ name: 'id_family', required: true })
+  @Get('getCalendarDetail/:id_family/:id_calendar')
   async getCalendarDetail(
     @CurrentUser() currentUser,
     @Param('id_calendar') id_calendar: number,
+    @Param('id_family') id_family: number,
   ) {
     return this.calendarService.getCalendarDetail(
       currentUser.id_user,
       id_calendar,
+      id_family,
     );
   }
 
@@ -143,14 +139,17 @@ export class CalendarController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a Calendar' })
   @ApiParam({ name: 'id_calendar', required: true })
-  @Delete('deleteCalendar/:id_calendar')
+  @ApiParam({ name: 'id_family', required: true })
+  @Delete('deleteCalendar/:id_family/:id_calendar')
   async deleteCalendar(
     @CurrentUser() currentUser,
     @Param('id_calendar') id_calendar: number,
+    @Param('id_family') id_family: number,
   ) {
     return this.calendarService.deleteCalendar(
       currentUser.id_user,
       id_calendar,
+      id_family,
     );
   }
 }
