@@ -22,9 +22,4 @@ export class VerifyOrderDTO {
   @IsNotEmpty()
   @IsString()
   bankCode: string;
-
-  @ApiProperty({ example: 5000000 })
-  @IsNotEmpty()
-  @IsNumber()
-  amount: number;
 }
