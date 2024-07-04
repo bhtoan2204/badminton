@@ -120,14 +120,13 @@ export class PaymentService {
   }
 
   async checkOrder(id_user: string, dto: any) {
-    const { id_order, bankCode, amount, id_family } = dto;
+    const { id_order, bankCode, id_family } = dto;
 
     try {
       const order = await this.orderRepository.findOne({
         where: {
           id_order,
           id_user,
-          price: amount,
           id_family,
           status: OrderStatus.PENDING,
           bank_code: bankCode,
