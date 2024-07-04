@@ -10,8 +10,7 @@ services:
     ports:
       - '8080:8080'
     restart: on-failure
-    environment:
-      - NODE_ENV=production
+    env_file: './apps/gateway/.env.production'
     mem_limit: 2g
     cpu_shares: 1024
 
@@ -23,7 +22,6 @@ services:
       target: production
     command: node dist/apps/auth/src/main
     restart: on-failure
-    environment:
-      - NODE_ENV=production
+    env_file: './apps/auth/.env.production'
     mem_limit: 2g
     cpu_shares: 1024

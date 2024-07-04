@@ -8,8 +8,7 @@ services:
       target: production
     command: node dist/apps/family/src/main
     restart: on-failure
-    environment:
-      - NODE_ENV=production
+    env_file: './apps/family/.env.production'
     mem_limit: 2g
     cpu_shares: 1024
 
@@ -21,7 +20,6 @@ services:
       target: production
     command: node dist/apps/invoice/src/main
     restart: on-failure
-    environment:
-      - NODE_ENV=production
+    env_file: './apps/invoice/.env.production'
     mem_limit: 2g
     cpu_shares: 1024
