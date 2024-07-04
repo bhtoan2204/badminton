@@ -1,25 +1,25 @@
 version: '3.8'
 services:
-  crawler:
-    image: mjkundta/crawler:${TAG}
+  background:
+    image: mjkundta/background:${TAG}
     build:
       context: .
-      dockerfile: ./apps/crawler/Dockerfile
+      dockerfile: ./apps/background/Dockerfile
       target: production
-    command: node dist/apps/crawler/src/main
+    command: node dist/apps/background/src/main
     restart: on-failure
     environment:
       - NODE_ENV=production
     mem_limit: 2g
     cpu_shares: 1024
 
-  education:
-    image: mjkundta/education:${TAG}
+  payment:
+    image: mjkundta/payment:${TAG}
     build:
       context: .
-      dockerfile: ./apps/education/Dockerfile
+      dockerfile: ./apps/payment/Dockerfile
       target: production
-    command: node dist/apps/education/src/main
+    command: node dist/apps/payment/src/main
     restart: on-failure
     environment:
       - NODE_ENV=production
