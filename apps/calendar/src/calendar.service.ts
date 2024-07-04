@@ -1,20 +1,36 @@
+import { Calendar, CategoryEvent } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
-import { EntityManager } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import {
+  And,
+  EntityManager,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 
 @Injectable()
 export class CalendarService {
   constructor(
     private readonly configService: ConfigService,
     private readonly entityManager: EntityManager,
+    @InjectRepository(Calendar)
+    private readonly calendarRepository: Repository<Calendar>,
+    @InjectRepository(CategoryEvent)
+    private readonly categoryEventRepository: Repository<CategoryEvent>,
   ) {}
   async getAllCategoryEvent(id_user: string, id_family: number) {
     try {
-      const query = 'SELECT * FROM get_all_category_events($1, $2)';
-      const params = [id_family, id_user];
-      const data = await this.entityManager.query(query, params);
-      return data;
+      const [data, total] = await this.categoryEventRepository.findAndCount({
+        where: { id_family },
+      });
+      return {
+        message: 'Success',
+        data: data,
+        total: total,
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -26,10 +42,16 @@ export class CalendarService {
   async createCategoryEvent(id_user: string, dto: any) {
     try {
       const { title, color, id_family } = dto;
-      const query = 'SELECT * FROM create_category_event($1, $2, $3, $4)';
-      const params = [title, color, id_family, id_user];
-      const data = await this.entityManager.query(query, params);
-      return data;
+      const newCategoryEvent = this.categoryEventRepository.create({
+        title,
+        color,
+        id_family,
+      });
+      const data = await this.categoryEventRepository.save(newCategoryEvent);
+      return {
+        message: 'Success',
+        data: data,
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -41,10 +63,22 @@ export class CalendarService {
     try {
       const { id_category_event, title, color, id_family } = dto;
 
-      const query = 'SELECT * FROM update_category_event($1, $2, $3, $4, $5)';
-      const params = [id_category_event, title, color, id_family, id_user];
-      const data = await this.entityManager.query(query, params);
-      return data;
+      const categoryEvent = await this.categoryEventRepository.findOne({
+        where: { id_category_event, id_family },
+      });
+      if (!categoryEvent) {
+        throw new RpcException({
+          message: 'Category event not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      if (title) categoryEvent.title = title;
+      if (color) categoryEvent.color = color;
+      const data = await this.categoryEventRepository.save(categoryEvent);
+      return {
+        message: 'Success',
+        data: data,
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -58,12 +92,19 @@ export class CalendarService {
     id_category_event: number,
   ) {
     try {
-      const query = 'SELECT * FROM delete_category_event($1, $2, $3)';
-      const params = [id_category_event, id_family, id_user];
-      const data = await this.entityManager.query(query, params);
+      const categoryEvent = await this.categoryEventRepository.findOne({
+        where: { id_category_event, id_family },
+      });
+      if (!categoryEvent) {
+        throw new RpcException({
+          message: 'Category event not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      await this.categoryEventRepository.remove(categoryEvent);
       return {
         message: 'Success',
-        data: data.delete_category_event,
+        data: categoryEvent,
       };
     } catch (error) {
       throw new RpcException({
@@ -75,12 +116,14 @@ export class CalendarService {
 
   async getAllCalendar(id_user: string, id_family: number) {
     try {
-      const query = 'SELECT * FROM f_get_calendar_events($1, $2)';
-      const params = [id_user, id_family];
-      const data = await this.entityManager.query(query, params);
+      const [data, total] = await this.calendarRepository.findAndCount({
+        where: { id_family },
+        relations: ['categoryEvent', 'family'],
+      });
       return {
         message: 'Success',
         data: data,
+        total: total,
       };
     } catch (error) {
       throw new RpcException({
@@ -96,14 +139,13 @@ export class CalendarService {
       const dateStart = new Date(date);
       const dateEnd = new Date(date);
       dateEnd.setHours(23, 59, 59);
-      const query = 'SELECT * FROM f_get_events_for_family($1, $2, $3, $4)';
-      const params = [
-        id_user,
-        id_family,
-        dateStart.toISOString(),
-        dateEnd.toISOString(),
-      ];
-      const data = await this.entityManager.query(query, params);
+      const data = await this.calendarRepository.find({
+        where: {
+          id_family,
+          time_start: And(MoreThanOrEqual(dateStart), LessThanOrEqual(dateEnd)),
+        },
+        relations: ['categoryEvent', 'family'],
+      });
       return {
         message: 'Success',
         data: data,
@@ -116,11 +158,22 @@ export class CalendarService {
     }
   }
 
-  async getCalendarDetail(id_user: string, id_calendar: number) {
+  async getCalendarDetail(
+    id_user: string,
+    id_calendar: number,
+    id_family: number,
+  ) {
     try {
-      const query = 'SELECT * FROM f_get_calendar_detail($1, $2)';
-      const params = [id_user, id_calendar];
-      const data = await this.entityManager.query(query, params);
+      const data = await this.calendarRepository.findOne({
+        where: { id_calendar, id_family },
+        relations: ['categoryEvent', 'family'],
+      });
+      if (!data) {
+        throw new RpcException({
+          message: 'Calendar event not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
       return {
         message: 'Success',
         data: data,
@@ -151,10 +204,39 @@ export class CalendarService {
         start_timezone,
         end_timezone,
       } = dto;
-      const query =
-        'SELECT * FROM f_create_calendar_event($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)';
-      const params = [
-        id_user,
+      const newCalendar = this.calendarRepository.create({
+        title,
+        description,
+        id_family,
+        time_start,
+        time_end,
+        color,
+        is_all_day,
+        category,
+        location,
+        recurrence_exception,
+        recurrence_id,
+        recurrence_rule,
+        start_timezone,
+        end_timezone,
+      });
+      const data = await this.calendarRepository.save(newCalendar);
+      return {
+        message: 'Success',
+        data: data,
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async updateCalendar(id_user: string, dto: any) {
+    try {
+      const {
+        id_calendar,
         id_family,
         title,
         description,
@@ -169,74 +251,31 @@ export class CalendarService {
         recurrence_rule,
         start_timezone,
         end_timezone,
-      ];
-      const data = await this.entityManager.query(query, params);
-      return {
-        message: 'Success',
-        data: {
-          id_calendar: data[0].f_create_calendar_event,
-          title,
-          description,
-          id_family,
-          time_start,
-          time_end,
-          color,
-          is_all_day,
-          category,
-          location,
-          recurrence_exception,
-          recurrence_id,
-          recurrence_rule,
-          start_timezone,
-          end_timezone,
-        },
-      };
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  }
-
-  async updateCalendar(id_user: string, dto: any) {
-    try {
-      const {
-        id_calendar,
-        title,
-        description,
-        time_start,
-        time_end,
-        color,
-        is_all_day,
-        category,
-        location,
-        recurrence_exception,
-        recurrence_id,
-        recurrence_rule,
-        start_timezone,
-        end_timezone,
       } = dto;
-      const query =
-        'SELECT * FROM f_update_calendar_event($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)';
-      const params = [
-        id_user,
-        id_calendar,
-        title,
-        description,
-        time_start,
-        time_end,
-        color,
-        is_all_day,
-        category,
-        location,
-        recurrence_exception,
-        recurrence_id,
-        recurrence_rule,
-        start_timezone,
-        end_timezone,
-      ];
-      const data = await this.entityManager.query(query, params);
+      const calendar = await this.calendarRepository.findOne({
+        where: { id_calendar, id_family },
+      });
+      if (!calendar) {
+        throw new RpcException({
+          message: 'Calendar event not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      if (title) calendar.title = title;
+      if (description) calendar.description = description;
+      if (time_start) calendar.time_start = time_start;
+      if (time_end) calendar.time_end = time_end;
+      if (color) calendar.color = color;
+      if (is_all_day !== undefined) calendar.is_all_day = is_all_day;
+      if (category) calendar.category = category;
+      if (location) calendar.location = location;
+      if (recurrence_exception)
+        calendar.recurrence_exception = recurrence_exception;
+      if (recurrence_id) calendar.recurrence_id = recurrence_id;
+      if (recurrence_rule) calendar.recurrence_rule = recurrence_rule;
+      if (start_timezone) calendar.start_timezone = start_timezone;
+      if (end_timezone) calendar.end_timezone = end_timezone;
+      const data = await this.calendarRepository.save(calendar);
       return {
         message: 'Success',
         data: data,
@@ -249,14 +288,25 @@ export class CalendarService {
     }
   }
 
-  async deleteCalendar(id_user: string, id_calendar: number) {
+  async deleteCalendar(
+    id_user: string,
+    id_calendar: number,
+    id_family: number,
+  ) {
     try {
-      const query = 'SELECT * FROM f_delete_calendar_event($1, $2)';
-      const params = [id_user, id_calendar];
-      const data = await this.entityManager.query(query, params);
+      const calendar = await this.calendarRepository.findOne({
+        where: { id_calendar, id_family },
+      });
+      if (!calendar) {
+        throw new RpcException({
+          message: 'Calendar event not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      await this.calendarRepository.remove(calendar);
       return {
         message: 'Success',
-        data: data,
+        data: calendar,
       };
     } catch (error) {
       throw new RpcException({

@@ -59,6 +59,7 @@ export class CalendarController {
     return this.calendarService.getCalendarDetail(
       data.id_user,
       data.id_calendar,
+      data.id_family,
     );
   }
 
@@ -77,6 +78,10 @@ export class CalendarController {
   @EventPattern('calendarClient/deleteCalendar')
   async deleteCalendar(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.calendarService.deleteCalendar(data.id_user, data.id_calendar);
+    return this.calendarService.deleteCalendar(
+      data.id_user,
+      data.id_calendar,
+      data.id_family,
+    );
   }
 }
