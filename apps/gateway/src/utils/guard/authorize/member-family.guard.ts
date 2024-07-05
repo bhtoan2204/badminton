@@ -18,6 +18,7 @@ export class MemberFamilyGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    console.log('MemberFamilyGuard');
     const request = context.switchToHttp().getRequest();
     const id_family =
       request.body.id_family ||

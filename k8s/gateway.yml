@@ -61,6 +61,8 @@ spec:
               value: 'redis'
             - name: REDIS_PORT
               value: '6379'
+            - name: RABBIT_MQ_BACKGROUND_QUEUE
+              value: 'BACKGROUND'
           volumeMounts:
             - name: log-volume
               mountPath: /usr/src/app/logs

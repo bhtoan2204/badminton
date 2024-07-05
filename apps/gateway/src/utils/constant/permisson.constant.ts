@@ -1,10 +1,9 @@
-export const PERMISSION_CALENDAR = 'calendar';
-export const PERMISSION_GUIDELINE = 'guideline';
-export const PERMISSION_EDUCATION = 'education';
-export const PERMISSION_FINANCE = 'finance';
-export const PERMISSION_SHOPPING = 'shopping';
-export const PERMISSION_INVOICE = 'invoice';
-export const PERMISSION_HOUSEHOLD = 'household';
+export const PERMISSION_CALENDAR = 'Calendar';
+export const PERMISSION_GUIDELINE = 'Guideline';
+export const PERMISSION_EDUCATION = 'Education';
+export const PERMISSION_FINANCE = 'Finance';
+export const PERMISSION_SHOPPING = 'Shopping';
+export const PERMISSION_HOUSEHOLD = 'Household';
 
 export const PERMISSIONS = [
   PERMISSION_CALENDAR,
@@ -12,6 +11,5 @@ export const PERMISSIONS = [
   PERMISSION_EDUCATION,
   PERMISSION_FINANCE,
   PERMISSION_SHOPPING,
-  PERMISSION_INVOICE,
   PERMISSION_HOUSEHOLD,
 ];

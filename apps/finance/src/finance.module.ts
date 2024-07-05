@@ -6,11 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AssetModule } from './asset/asset.module';
 import { ExpenseditureModule } from './expensediture/expensediture.module';
 import { IncomeModule } from './income/income.module';
-import { InvestmentModule } from './investment/investment.module';
-import { LoanModule } from './loan/loan.module';
-import { SavingModule } from './saving/saving.module';
+import { UtilitiesModule } from './utilities/utilities.module';
 import * as Joi from 'joi';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -29,9 +26,7 @@ import * as Joi from 'joi';
     forwardRef(() => AssetModule),
     forwardRef(() => ExpenseditureModule),
     forwardRef(() => IncomeModule),
-    forwardRef(() => InvestmentModule),
-    forwardRef(() => LoanModule),
-    forwardRef(() => SavingModule),
+    forwardRef(() => UtilitiesModule),
   ],
   controllers: [FinanceController],
   providers: [FinanceService],

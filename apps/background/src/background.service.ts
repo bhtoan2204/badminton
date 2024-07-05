@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
-import { Queue } from 'bull';
+import { Job, Queue } from 'bull';
 import {
   Calendar,
   Checklist,
@@ -12,14 +12,17 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import {
-  CALENDAR_EVENT_OCCURED,
+  CALENDAR_EVENT_OCCURED_REPEATLY_DAILY,
+  CALENDAR_EVENT_OCCURED_REPEATLY_MONTHLY,
+  CALENDAR_EVENT_OCCURED_REPEATLY_WEEKLY,
+  CALENDAR_EVENT_OCCURED_REPEATLY_YEARLY,
   CHECKLIST_OCCURED,
   EXPENSE_REPORT,
   FAMILY_PACKAGE_EXPIRED,
   INCOME_REPORT,
 } from './constant';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThan, Repository } from 'typeorm';
+import { LessThan, Like, Repository } from 'typeorm';
 import * as moment from 'moment';
 
 @Injectable()
@@ -113,6 +116,7 @@ export class BackgroundService implements OnModuleInit {
   }
 
   async onModuleInit() {
+    await this.addCalendarEventOccuredNonRepeatlyJob();
     await this.addFamilyPackageExpiredJob();
     await this.addChecklistNotificationJobs();
     await this.addIncomeReportJob();
@@ -157,12 +161,125 @@ export class BackgroundService implements OnModuleInit {
   }
 
   async addCalendarEventOccuredJob() {
-    // Cron expression for every 10 minutes
     await this.cronQueue.add(
-      CALENDAR_EVENT_OCCURED,
+      CALENDAR_EVENT_OCCURED_REPEATLY_DAILY,
       {},
-      { repeat: { cron: '*/10 * * * *' } },
+      { repeat: { cron: '0 0 * * *' } },
     );
+    await this.cronQueue.add(
+      CALENDAR_EVENT_OCCURED_REPEATLY_WEEKLY,
+      {},
+      { repeat: { cron: '0 0 * * 0' } },
+    );
+    await this.cronQueue.add(
+      CALENDAR_EVENT_OCCURED_REPEATLY_MONTHLY,
+      {},
+      { repeat: { cron: '0 0 1 * *' } },
+    );
+    await this.cronQueue.add(
+      CALENDAR_EVENT_OCCURED_REPEATLY_YEARLY,
+      {},
+      { repeat: { cron: '0 0 1 1 *' } },
+    );
+  }
+
+  async addCalendarEventOccuredNonRepeatlyJob() {
+    await this.cronQueue.add(CALENDAR_EVENT_OCCURED_REPEATLY_DAILY, {});
+  }
+
+  async processCalendarEvents(frequency: string) {
+    try {
+      const repeatlyEvents = await this.calendarRepository.find({
+        where: { recurrence_rule: Like(`%FREQ=${frequency}%`) },
+      });
+
+      for (const event of repeatlyEvents) {
+        console.log('ID CALENDAR', event.id_calendar);
+        const ruleParts = event.recurrence_rule.split(';');
+        let interval = 1; // Default interval
+        for (const part of ruleParts) {
+          if (part.startsWith('INTERVAL=')) {
+            interval = parseInt(part.split('=')[1], 10);
+          }
+        }
+        console.log('INTERVAL', interval);
+        const jobName = `calendar_event_${event.id_calendar}_${frequency.toLowerCase()}_interval_${interval}`;
+        let repeatEvery: number;
+        switch (frequency) {
+          case 'DAILY':
+            repeatEvery = interval * 24 * 60 * 60 * 1000;
+            break;
+          case 'WEEKLY':
+            repeatEvery = interval * 7 * 24 * 60 * 60 * 1000;
+            break;
+          case 'MONTHLY':
+            repeatEvery = interval * 30 * 24 * 60 * 60 * 1000;
+            break;
+          case 'YEARLY':
+            repeatEvery = interval * 365 * 24 * 60 * 60 * 1000;
+            break;
+        }
+
+        await this.cronQueue.add(
+          jobName,
+          { eventId: event.id_calendar },
+          {
+            repeat: {
+              every: repeatEvery,
+            },
+          },
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  @Process(CALENDAR_EVENT_OCCURED_REPEATLY_DAILY)
+  async handleCalendarEventOccured() {
+    await this.processCalendarEvents('DAILY');
+  }
+
+  @Process(CALENDAR_EVENT_OCCURED_REPEATLY_WEEKLY)
+  async handleCalendarEventOccuredWeekly() {
+    await this.processCalendarEvents('WEEKLY');
+  }
+
+  @Process(CALENDAR_EVENT_OCCURED_REPEATLY_MONTHLY)
+  async handleCalendarEventOccuredMonthly() {
+    await this.processCalendarEvents('MONTHLY');
+  }
+
+  @Process(CALENDAR_EVENT_OCCURED_REPEATLY_YEARLY)
+  async handleCalendarEventOccuredYearly() {
+    await this.processCalendarEvents('YEARLY');
+  }
+
+  @Process('calendar_event_*_interval_*')
+  async handleCalendarEventNotification(job: Job<{ eventId: number }>) {
+    try {
+      const event = await this.calendarRepository.findOne({
+        where: { id_calendar: job.data.eventId },
+      });
+      if (event) {
+        await this.createNotificationFamily(event.id_family, {
+          type: NotificationType.CALENDAR,
+          title: `Reminder for event: ${event.title}`,
+          content: `The event "${event.title}" is scheduled for ${moment(
+            event.time_start,
+          ).format('MMMM Do YYYY, h:mm:ss a')}`,
+          id_target: event.id_calendar,
+        });
+        this.createNotificationFamily(event.id_family, {
+          type: NotificationType.CALENDAR,
+          title: 'Reminder for event',
+          content: `The event "${event.title}" is scheduled for ${moment(event.time_start).format('MMMM Do YYYY, h:mm:ss a')}`,
+          id_target: event.id_family,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   @Process(FAMILY_PACKAGE_EXPIRED)
@@ -191,14 +308,6 @@ export class BackgroundService implements OnModuleInit {
     }
   }
 
-  @Process(CALENDAR_EVENT_OCCURED)
-  async handleCalendarEventOccured() {
-    try {
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   @Process(CHECKLIST_OCCURED)
   async handleChecklistOccured() {
     try {
@@ -216,8 +325,6 @@ export class BackgroundService implements OnModuleInit {
           { due_date: LessThan(now.toDate()), is_notified_on_due_date: false },
         ],
       });
-
-      console.log('checklists', checklists);
 
       await Promise.all(
         checklists.map(async (checklist) => {

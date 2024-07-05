@@ -15,10 +15,10 @@ export class ShoppingService {
     @InjectQueue('notifications') private readonly notificationsQueue: Queue,
   ) {}
 
-  async getShoppingItemType() {
+  async getShoppingItemType(search: string) {
     try {
       const response = this.shoppingClient
-        .send('shoppingClient/getShoppingItemType', {})
+        .send('shoppingClient/getShoppingItemType', { search })
         .pipe(timeout(15000));
       return await lastValueFrom(response);
     } catch (error) {
@@ -56,6 +56,7 @@ export class ShoppingService {
   async getShoppingItem(
     id_user: string,
     id_list: number,
+    id_family: number,
     page: number,
     itemsPerPage: number,
   ) {
@@ -64,6 +65,7 @@ export class ShoppingService {
         .send('shoppingClient/getShoppingItem', {
           id_user,
           id_list,
+          id_family,
           page,
           itemsPerPage,
         })
@@ -95,6 +97,20 @@ export class ShoppingService {
       });
 
       return data;
+    } catch (error) {
+      if (error instanceof TimeoutError) {
+        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async getShoppingListType(search: string) {
+    try {
+      const response = this.shoppingClient
+        .send('shoppingClient/getShoppingListType', { search })
+        .pipe(timeout(15000));
+      return await lastValueFrom(response);
     } catch (error) {
       if (error instanceof TimeoutError) {
         throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);

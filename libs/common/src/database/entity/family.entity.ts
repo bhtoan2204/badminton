@@ -19,6 +19,7 @@ import { ShoppingLists } from './shopping_lists.entity';
 import { MemberFamily } from './member_family.entity';
 import { Order } from './order.entity';
 import { Calendar } from './calendar.entity';
+import { Utilities } from './utilities.entity';
 
 @Entity('family')
 export class Family {
@@ -91,4 +92,7 @@ export class Family {
 
   @OneToMany(() => Calendar, (calendar) => calendar.family)
   calendars: Calendar[];
+
+  @OneToMany(() => Utilities, (utilities) => utilities.family)
+  utilities: Utilities[];
 }

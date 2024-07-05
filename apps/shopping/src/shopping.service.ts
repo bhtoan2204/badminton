@@ -1,8 +1,13 @@
-import { ShoppingItems, ShoppingItemTypes, ShoppingLists } from '@app/common';
+import {
+  ShoppingItems,
+  ShoppingItemTypes,
+  ShoppingLists,
+  ShoppingListTypes,
+} from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { SerperService } from './serper/serper.service';
 
 @Injectable()
@@ -14,12 +19,20 @@ export class ShoppingService {
     private shoppingItemTypesRepository: Repository<ShoppingItemTypes>,
     @InjectRepository(ShoppingLists)
     private shoppingListsRepository: Repository<ShoppingLists>,
+    @InjectRepository(ShoppingListTypes)
+    private shoppingListTypesRepository: Repository<ShoppingListTypes>,
     private serperService: SerperService,
   ) {}
 
-  async getShoppingItemType() {
+  async getShoppingItemType(search: string) {
     try {
-      const data = await this.shoppingItemTypesRepository.find();
+      const option = {};
+      if (search)
+        option['where'] = [
+          { item_type_name_en: Like(`%${search}%`) },
+          { item_type_name_vn: Like(`%${search}%`) },
+        ];
+      const data = await this.shoppingItemTypesRepository.find(option);
       return {
         data: data,
         message: 'Get shopping item type',
@@ -44,6 +57,7 @@ export class ShoppingService {
         order: { id_list: 'DESC' },
         skip: (page - 1) * itemsPerPage,
         take: itemsPerPage,
+        relations: ['listType'],
       });
       return {
         data: data,
@@ -61,15 +75,26 @@ export class ShoppingService {
   async getShoppingItem(
     id_user: string,
     id_list: number,
+    id_family: number,
     page: number,
     itemsPerPage: number,
   ) {
     try {
+      const shoppingList = await this.shoppingListsRepository.findOne({
+        where: { id_list: id_list, id_family: id_family },
+      });
+      if (!shoppingList) {
+        throw new RpcException({
+          message: 'Shopping list not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
       const [data, total] = await this.shoppingItemsRepository.findAndCount({
         where: { id_list: id_list },
-        order: { id_item: 'DESC' },
+        order: { created_at: 'DESC' },
         skip: (page - 1) * itemsPerPage,
         take: itemsPerPage,
+        relations: ['itemType', 'shoppingList'],
       });
       return {
         data: data,
@@ -86,11 +111,12 @@ export class ShoppingService {
 
   async createShoppingList(id_user: string, dto: any) {
     try {
-      const { id_family, title, description } = dto;
+      const { id_family, id_shopping_list_type, title, description } = dto;
       const newShoppingList = new ShoppingLists();
       newShoppingList.id_family = id_family;
       newShoppingList.title = title;
       newShoppingList.description = description;
+      newShoppingList.id_shopping_list_type = id_shopping_list_type;
       const data = await this.shoppingListsRepository.save(newShoppingList);
       return {
         data: data,
@@ -129,6 +155,29 @@ export class ShoppingService {
       return {
         data: data,
         message: 'Create shopping item',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getShoppingListType(search: string) {
+    try {
+      const option = {};
+      if (search)
+        option['where'] = [
+          { type_name_en: Like(`%${search}%`) },
+          { type_name_vn: Like(`%${search}%`) },
+        ];
+      const [data, total] =
+        await this.shoppingListTypesRepository.findAndCount(option);
+      return {
+        total: total,
+        data: data,
+        message: 'Get shopping list type',
       };
     } catch (error) {
       throw new RpcException({

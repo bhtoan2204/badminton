@@ -29,6 +29,7 @@ export * from './database/entity/subject.entity';
 export * from './database/entity/shopping_item_types.entity';
 export * from './database/entity/shopping_items.entity';
 export * from './database/entity/shopping_lists.entity';
+export * from './database/entity/shopping_list_type.entity';
 export * from './database/entity/member_family.entity';
 export * from './database/entity/feedback.entity';
 export * from './database/entity/feedbackMetadata.entity';
@@ -40,6 +41,8 @@ export * from './database/entity/payment_history.entity';
 export * from './database/entity/family_roles.entity';
 export * from './database/entity/calendar.entity';
 export * from './database/entity/category_event.entity';
+export * from './database/entity/utilities.entity';
+export * from './database/entity/utilities_type.entity';
 
 export * from './database/enum/login_type.enum';
 
