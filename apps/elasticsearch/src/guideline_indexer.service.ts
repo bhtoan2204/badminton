@@ -28,6 +28,9 @@ export class GuidelineIndexerService {
 
   async deleteGuideline(id_guide_item: number): Promise<void> {
     try {
+      if (id_guide_item === undefined) {
+        throw new Error('id_guide_item is undefined');
+      }
       await this.elasticSearchService.delete({
         index: this.index,
         id: id_guide_item.toString(),
