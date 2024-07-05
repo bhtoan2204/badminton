@@ -1,4 +1,4 @@
-import { Checklist } from '@app/common';
+import { Checklist, ChecklistType } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,7 +9,25 @@ export class ChecklistService {
   constructor(
     @InjectRepository(Checklist)
     private checklistRepository: Repository<Checklist>,
+    @InjectRepository(ChecklistType)
+    private checklistTypeRepository: Repository<ChecklistType>,
   ) {}
+
+  async getChecklistTypes() {
+    try {
+      const [data, total] = await this.checklistTypeRepository.findAndCount();
+      return {
+        data: data,
+        total: total,
+        message: 'Get checklist types successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
 
   async getChecklists(
     id_user: string,
@@ -22,6 +40,7 @@ export class ChecklistService {
         where: { id_family: id_family },
         skip: (page - 1) * itemsPerPage,
         take: itemsPerPage,
+        relations: ['family', 'checklistType'],
       });
 
       return {

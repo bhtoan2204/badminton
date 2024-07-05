@@ -10,6 +10,12 @@ export class ChecklistController {
     private readonly checklistService: ChecklistService,
   ) {}
 
+  @EventPattern('calendarClient/getChecklistTypes')
+  async getChecklistTypes(@Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.checklistService.getChecklistTypes();
+  }
+
   @EventPattern('calendarClient/getAllChecklist')
   async getChecklists(@Ctx() context: RmqContext, @Payload() data: any) {
     this.rmqService.ack(context);

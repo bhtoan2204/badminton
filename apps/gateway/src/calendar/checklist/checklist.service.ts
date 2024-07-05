@@ -9,6 +9,21 @@ export class ChecklistService {
     @Inject(CALENDAR_SERVICE) private readonly calendarClient: ClientProxy,
   ) {}
 
+  async getChecklistTypes() {
+    try {
+      const response = this.calendarClient
+        .send('calendarClient/getChecklistTypes', {})
+        .pipe(timeout(15000));
+      const data = await lastValueFrom(response);
+      return data;
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
   async getAllChecklist(
     id_user: string,
     id_family: number,

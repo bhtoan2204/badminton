@@ -165,17 +165,6 @@
         "tsConfigPath": "apps/shopping/tsconfig.app.json"
       }
     },
-    "invoice": {
-      "type": "application",
-      "root": "apps/invoice",
-      "entryFile": "src/main",
-      "sourceRoot": "./",
-      "compilerOptions": {
-        "tsConfigPath": "apps/invoice/tsconfig.app.json",
-        "assets": ["proto/*.proto"],
-        "watchAssets": true
-      }
-    },
     "background": {
       "type": "application",
       "root": "apps/background",

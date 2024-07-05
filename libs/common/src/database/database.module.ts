@@ -36,6 +36,7 @@ import { CategoryEvent } from './entity/category_event.entity';
 import { ShoppingListTypes } from './entity/shopping_list_type.entity';
 import { Utilities } from './entity/utilities.entity';
 import { UtilitiesType } from './entity/utilities_type.entity';
+import { ChecklistType } from './entity/checklist_type.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -64,6 +65,7 @@ import { UtilitiesType } from './entity/utilities_type.entity';
           },
           entities: [
             Checklist,
+            ChecklistType,
             PaymentHistory,
             Users,
             Family,

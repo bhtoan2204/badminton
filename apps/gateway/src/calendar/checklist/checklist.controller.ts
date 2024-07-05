@@ -36,6 +36,13 @@ export class ChecklistController {
   constructor(private readonly checkListService: ChecklistService) {}
 
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get checklist type' })
+  @Get('getChecklistTypes')
+  async getChecklistTypes() {
+    return this.checkListService.getChecklistTypes();
+  }
+
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all checklist of family' })
   @ApiQuery({ name: 'page', required: true, type: Number })
   @ApiQuery({ name: 'itemsPerPage', required: true, type: Number })
