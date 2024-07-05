@@ -8,11 +8,15 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Family } from './family.entity';
+import { ChecklistType } from './checklist_type.entity';
 
 @Entity('checklist')
 export class Checklist {
   @PrimaryGeneratedColumn()
   id_checklist: number;
+
+  @Column({ nullable: false })
+  id_checklist_type: number;
 
   @Column()
   id_family: number;
@@ -47,4 +51,8 @@ export class Checklist {
   @ManyToOne(() => Family, (family) => family.checklists)
   @JoinColumn({ name: 'id_family' })
   family: Family;
+
+  @ManyToOne(() => ChecklistType, (checklistType) => checklistType.checklists)
+  @JoinColumn({ name: 'id_checklist_type' })
+  checklistType: ChecklistType;
 }

@@ -7,6 +7,7 @@ export * from './grpc/grpc.service';
 export * from './database/database.module';
 
 export * from './database/entity/checklist.entity';
+export * from './database/entity/checklist_type.entity';
 export * from './database/entity/family.entity';
 export * from './database/entity/member_family.entity';
 export * from './database/entity/otp.entity';
