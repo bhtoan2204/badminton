@@ -7,6 +7,11 @@ export class CreateShoppingListDto {
   @IsNumber()
   id_family: number;
 
+  @ApiProperty({ description: 'id of shopping list type' })
+  @IsNotEmpty()
+  @IsNumber()
+  id_shopping_list_type: number;
+
   @ApiProperty({ description: 'title of shopping list' })
   @IsNotEmpty()
   @IsString()

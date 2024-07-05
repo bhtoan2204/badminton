@@ -28,7 +28,7 @@ import {
   JwtAuthGuard,
   MemberFamilyGuard,
   Permission,
-  PERMISSION_INVOICE,
+  PERMISSION_FINANCE,
 } from '../../utils';
 import { UtilitiesService } from './utilities.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -38,7 +38,7 @@ import { ImageFileInterceptor } from '../../utils/interceptor/imageFile.intercep
 @Controller('utilities')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
-@Permission([PERMISSION_INVOICE])
+@Permission([PERMISSION_FINANCE])
 export class UtilitiesController {
   constructor(private readonly utilitiesService: UtilitiesService) {}
 

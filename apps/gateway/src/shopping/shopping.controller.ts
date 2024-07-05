@@ -41,9 +41,10 @@ export class ShoppingController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get shopping item type' })
+  @ApiQuery({ name: 'search', required: false })
   @Get('getShoppingItemType')
-  async getShoppingItemType() {
-    return this.shoppingService.getShoppingItemType();
+  async getShoppingItemType(@Query('search') search: string) {
+    return this.shoppingService.getShoppingItemType(search);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -71,10 +72,11 @@ export class ShoppingController {
   @ApiOperation({ summary: 'Get shopping item' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
-  @Get('getShoppingItem/:id_list')
+  @Get('getShoppingItem/:id_family/:id_list')
   async getShoppingItem(
     @CurrentUser() currentUser,
     @Param('id_list') id_list: number,
+    @Param('id_family') id_family: number,
     @Query('page') page: number,
     @Query('itemsPerPage') itemsPerPage: number,
   ) {
@@ -83,6 +85,7 @@ export class ShoppingController {
     return this.shoppingService.getShoppingItem(
       currentUser.id_user,
       id_list,
+      id_family,
       page,
       itemsPerPage,
     );
@@ -96,6 +99,14 @@ export class ShoppingController {
     @Body() dto: CreateShoppingListDto,
   ) {
     return this.shoppingService.createShoppingList(currentUser.id_user, dto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get shopping list type' })
+  @ApiQuery({ name: 'search', required: false })
+  @Get('getShoppingListType')
+  async getShoppingListType(@Query('search') search: string) {
+    return this.shoppingService.getShoppingListType(search);
   }
 
   @HttpCode(HttpStatus.CREATED)

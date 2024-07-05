@@ -12,6 +12,11 @@ export class UpdateShoppingListDto {
   @IsNumber()
   id_family: number;
 
+  @ApiProperty({ description: 'id of shopping list type' })
+  @IsOptional()
+  @IsNumber()
+  id_shopping_list_type: number;
+
   @ApiProperty({ description: 'title' })
   @IsOptional()
   @IsString()

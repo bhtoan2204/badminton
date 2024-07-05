@@ -7,6 +7,7 @@ import {
   ShoppingItems,
   ShoppingItemTypes,
   ShoppingLists,
+  ShoppingListTypes,
 } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
@@ -28,7 +29,12 @@ import { SerperModule } from './serper/serper.module';
     }),
     RmqModule,
     DatabaseModule,
-    TypeOrmModule.forFeature([ShoppingItemTypes, ShoppingLists, ShoppingItems]),
+    TypeOrmModule.forFeature([
+      ShoppingItemTypes,
+      ShoppingLists,
+      ShoppingItems,
+      ShoppingListTypes,
+    ]),
     SerperModule,
   ],
   controllers: [ShoppingController],

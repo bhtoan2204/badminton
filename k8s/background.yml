@@ -31,6 +31,14 @@ spec:
           env:
             - name: NODE_ENV
               value: 'production'
+            - name: REDIS_HOST
+              value: 'redis'
+            - name: REDIS_PORT
+              value: '6379'
+            - name: RABBIT_MQ_URI
+              value: 'amqp://rabbitmq:Toan123456789@rabbitmq:5672'
+            - name: RABBIT_MQ_BACKGROUND_QUEUE
+              value: 'BACKGROUND'
 ---
 apiVersion: v1
 kind: Service

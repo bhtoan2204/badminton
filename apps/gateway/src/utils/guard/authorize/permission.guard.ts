@@ -1,7 +1,6 @@
 import {
   CanActivate,
   ExecutionContext,
-  HttpException,
   Inject,
   Injectable,
 } from '@nestjs/common';
@@ -23,6 +22,7 @@ export class PermissionGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<any> {
     try {
+      console.log('PermissionGuard');
       const request = context.switchToHttp().getRequest();
       const permissions = this.reflector.getAllAndOverride<string[]>(
         PERMISSION_KEY,
@@ -51,10 +51,8 @@ export class PermissionGuard implements CanActivate {
       await this.redisService.set(cacheKey, result.toString(), 'EX', 3600);
       return result;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      console.log('Failed at Permission Check', error);
+      return false;
     }
   }
 }

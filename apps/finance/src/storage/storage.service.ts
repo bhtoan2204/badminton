@@ -35,6 +35,18 @@ export class StorageService implements OnModuleInit {
     return await lastValueFrom(this.storageService.deleteImageExpense(request));
   }
 
+  async uploadImageUtility(
+    request: UploadFileRequest,
+  ): Promise<UploadFileResponse> {
+    return await lastValueFrom(this.storageService.uploadImageUtility(request));
+  }
+
+  async deleteImageUtility(
+    request: DeleteFileRequest,
+  ): Promise<DeleteFileResponse> {
+    return await lastValueFrom(this.storageService.deleteImageUtility(request));
+  }
+
   async readFile(request: ReadFileRequest): Promise<ReadFileResponse> {
     return await lastValueFrom(this.storageService.readFile(request));
   }

@@ -7,6 +7,7 @@ import { ExpenseditureModule } from './expensediture/expensediture.module';
 import { IncomeModule } from './income/income.module';
 import { AssetModule } from './asset/asset.module';
 import { APP_GUARD } from '@nestjs/core';
+import { UtilitiesModule } from './utilities/utilities.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { APP_GUARD } from '@nestjs/core';
     forwardRef(() => ExpenseditureModule),
     forwardRef(() => IncomeModule),
     forwardRef(() => AssetModule),
+    forwardRef(() => UtilitiesModule),
   ],
   controllers: [FinanceController],
   providers: [

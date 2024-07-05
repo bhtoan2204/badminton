@@ -13,28 +13,34 @@ export class FamilyTermCheckGuard {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const id_family =
-      request.body.id_family ||
-      request.params.id_family ||
-      request.query.id_family;
-    if (!id_family) {
-      return true;
+    try {
+      console.log('FamilyTermCheckGuard');
+      const request = context.switchToHttp().getRequest();
+      const id_family =
+        request.body.id_family ||
+        request.params.id_family ||
+        request.query.id_family;
+      if (!id_family) {
+        return true;
+      }
+
+      const cacheKey = `familyTermCheck:${id_family}`;
+      const cachedFamilyCheck = await this.redisService.get(cacheKey);
+
+      if (cachedFamilyCheck !== null) {
+        return cachedFamilyCheck === 'true';
+      }
+
+      const familyRequest$ = this.familyClient
+        .send('familyClient/termCheck', { id_family })
+        .pipe(timeout(15000));
+
+      const familyCheck = await lastValueFrom(familyRequest$);
+      await this.redisService.set(cacheKey, familyCheck, 'EX', 3600);
+      return familyCheck;
+    } catch (e) {
+      console.log('Failed at Family Term Check', e);
+      return false;
     }
-
-    const cacheKey = `familyTermCheck:${id_family}`;
-    const cachedFamilyCheck = await this.redisService.get(cacheKey);
-
-    if (cachedFamilyCheck !== null) {
-      return cachedFamilyCheck === 'true';
-    }
-
-    const familyRequest$ = this.familyClient
-      .send('familyClient/termCheck', { id_family })
-      .pipe(timeout(15000));
-
-    const familyCheck = await lastValueFrom(familyRequest$);
-    await this.redisService.set(cacheKey, familyCheck, 'EX', 3600);
-    return familyCheck;
   }
 }

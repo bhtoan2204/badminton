@@ -1,18 +1,18 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
-import { INVOICE_SERVICE } from '../../utils';
+import { FINANCE_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, timeout } from 'rxjs';
 
 @Injectable()
 export class UtilitiesService {
   constructor(
-    @Inject(INVOICE_SERVICE) private readonly utilitiesClient: ClientProxy,
+    @Inject(FINANCE_SERVICE) private readonly financeClient: ClientProxy,
   ) {}
 
   async getUtilityTypes() {
     try {
-      const response = this.utilitiesClient
-        .send('utilitiesClient/getUtilityTypes', {})
+      const response = this.financeClient
+        .send('financeClient/getUtilityTypes', {})
         .pipe(timeout(15000));
       return await lastValueFrom(response);
     } catch (error) {
@@ -30,8 +30,8 @@ export class UtilitiesService {
     itemsPerPage: number,
   ) {
     try {
-      const response = this.utilitiesClient
-        .send('utilitiesClient/getUtilities', {
+      const response = this.financeClient
+        .send('financeClient/getUtilities', {
           id_user,
           id_family,
           page,
@@ -53,8 +53,8 @@ export class UtilitiesService {
       console.log('id_user', id_user);
       console.log('id_family', id_family);
       console.log('id_utility', id_utility);
-      const response = this.utilitiesClient
-        .send('utilitiesClient/getUtility', {
+      const response = this.financeClient
+        .send('financeClient/getUtility', {
           id_user,
           id_family,
           id_utility,
@@ -71,8 +71,8 @@ export class UtilitiesService {
 
   async createUtility(id_user: string, dto: any, file) {
     try {
-      const response = this.utilitiesClient
-        .send('utilitiesClient/createUtility', { id_user, dto, file })
+      const response = this.financeClient
+        .send('financeClient/createUtility', { id_user, dto, file })
         .pipe(timeout(15000));
       return response;
     } catch (error) {
@@ -85,8 +85,8 @@ export class UtilitiesService {
 
   async updateUtility(id_user: string, dto: any, file) {
     try {
-      const response = this.utilitiesClient
-        .send('utilitiesClient/updateUtility', { id_user, dto, file })
+      const response = this.financeClient
+        .send('financeClient/updateUtility', { id_user, dto, file })
         .pipe(timeout(15000));
       return response;
     } catch (error) {
@@ -99,8 +99,8 @@ export class UtilitiesService {
 
   async deleteUtility(id_user: string, id_family: number, id_utility: number) {
     try {
-      const response = this.utilitiesClient
-        .send('utilitiesClient/deleteUtility', {
+      const response = this.financeClient
+        .send('financeClient/deleteUtility', {
           id_user,
           id_family,
           id_utility,

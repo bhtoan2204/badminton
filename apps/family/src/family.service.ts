@@ -50,6 +50,7 @@ export class FamilyService {
           relations: ['extra_package'],
         },
       );
+
       const extraPackageNames = familyExtraPackages.map(
         (fep) => fep.extra_package.name,
       );

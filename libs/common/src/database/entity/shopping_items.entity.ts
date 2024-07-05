@@ -1,9 +1,11 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { ShoppingItemTypes } from './shopping_item_types.entity';
 import { ShoppingLists } from './shopping_lists.entity';
@@ -50,4 +52,10 @@ export class ShoppingItems {
   @ManyToOne(() => ShoppingLists, (shoppingItem) => shoppingItem.shoppingItems)
   @JoinColumn({ name: 'id_list' })
   shoppingList: ShoppingLists;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 }

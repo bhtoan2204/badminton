@@ -14,7 +14,6 @@ import { EducationModule } from './education/education.module';
 import { HouseholdModule } from './household/household.module';
 import { FinanceModule } from './finance/finance.module';
 import { ShoppingModule } from './shopping/shopping.module';
-import { InvoiceModule } from './invoice/invoice.module';
 import { MailModule } from './mailer/mailer.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { BullModule } from '@nestjs/bull';
@@ -98,7 +97,6 @@ const globalModule = (module: DynamicModule) => {
     HouseholdModule,
     FinanceModule,
     ShoppingModule,
-    InvoiceModule,
     AdminModule,
   ],
 })

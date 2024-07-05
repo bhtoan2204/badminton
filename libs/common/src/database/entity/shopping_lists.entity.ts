@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Family } from './family.entity';
 import { ShoppingItems } from './shopping_items.entity';
+import { ShoppingListTypes } from './shopping_list_type.entity';
 
 @Entity('shopping_lists')
 export class ShoppingLists {
@@ -18,6 +19,9 @@ export class ShoppingLists {
 
   @Column()
   id_family: number;
+
+  @Column()
+  id_shopping_list_type: number;
 
   @Column('varchar', { length: 255, nullable: false })
   title: string;
@@ -37,6 +41,13 @@ export class ShoppingLists {
   @ManyToOne(() => Family, (family) => family.shoppingLists)
   @JoinColumn({ name: 'id_family' })
   family: Family;
+
+  @ManyToOne(
+    () => ShoppingListTypes,
+    (shopping_list) => shopping_list.shoppingLists,
+  )
+  @JoinColumn({ name: 'id_shopping_list_type' })
+  listType: ShoppingListTypes;
 
   @OneToMany(() => ShoppingItems, (shoppingItem) => shoppingItem.shoppingList)
   shoppingItems: ShoppingItems[];
