@@ -141,7 +141,6 @@ export class ExpenseditureController {
   ) {
     const fromDateObj = fromDate ? new Date(fromDate) : null;
     const toDateObj = toDate ? new Date(toDate) : null;
-    console.log(id_family, page, itemsPerPage, fromDateObj, toDateObj);
     return this.expenseService.getExpenseByDateRange(
       currentUser.id_user,
       id_family,

@@ -5,15 +5,15 @@ export class UpdateIncomeSourceDto {
   @ApiProperty({ description: 'id of income source' })
   @IsNotEmpty()
   @IsNumber()
-  id_income: number;
+  id_income_source: number;
 
   @ApiProperty({ description: 'Id of family' })
   @IsNotEmpty()
   @IsNumber()
   id_family: number;
 
-  @ApiProperty({ example: 'Robbery' })
+  @ApiProperty({ example: 'Ăn cướp mãi thôi' })
   @IsString()
   @IsNotEmpty()
-  name: string;
+  income_source_name: string;
 }

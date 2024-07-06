@@ -13,6 +13,11 @@ export class UpdateIncomeDto {
   @IsNumber()
   id_income: number;
 
+  @ApiProperty({ description: 'id of family' })
+  @IsNotEmpty()
+  @IsNumber()
+  id_family: number;
+
   @ApiProperty({ description: 'id of user who caused the income' })
   @IsOptional()
   @IsString()

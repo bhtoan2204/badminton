@@ -7,8 +7,8 @@ export class CreateIncomeSourceDto {
   @IsNumber()
   id_family: number;
 
-  @ApiProperty({ example: 'Robbery' })
+  @ApiProperty({ example: 'Đi ăn cướp' })
   @IsString()
   @IsNotEmpty()
-  name: string;
+  income_source_name: string;
 }
