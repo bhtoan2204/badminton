@@ -37,6 +37,10 @@ import { ShoppingListTypes } from './entity/shopping_list_type.entity';
 import { Utilities } from './entity/utilities.entity';
 import { UtilitiesType } from './entity/utilities_type.entity';
 import { ChecklistType } from './entity/checklist_type.entity';
+import { FinanceExpenditure } from './entity/finance_expenditure.entity';
+import { FinanceExpenditureType } from './entity/finance_expenditure_type.entity';
+import { FinanceIncome } from './entity/finance_income.entity';
+import { FinanceIncomeSource } from './entity/finance_income_source.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -98,6 +102,10 @@ import { ChecklistType } from './entity/checklist_type.entity';
             CategoryEvent,
             Utilities,
             UtilitiesType,
+            FinanceExpenditure,
+            FinanceExpenditureType,
+            FinanceIncome,
+            FinanceIncomeSource,
           ],
           // subscribers: [OrderSubscriber],
         };

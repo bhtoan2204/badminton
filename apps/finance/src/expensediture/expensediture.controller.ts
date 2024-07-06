@@ -67,13 +67,19 @@ export class ExpenseditureController {
     return this.expenseService.getExpenseditureType(
       data.id_user,
       data.id_family,
+      data.page,
+      data.itemsPerPage,
     );
   }
 
   @EventPattern('financeClient/createExpensediture')
   async createExpense(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.expenseService.createExpensediture(data.id_user, data.dto);
+    return this.expenseService.createExpensediture(
+      data.id_user,
+      data.dto,
+      data.file,
+    );
   }
 
   @EventPattern('financeClient/getExpenseditureById')
@@ -87,9 +93,19 @@ export class ExpenseditureController {
   }
 
   @EventPattern('financeClient/getExpenseByDateRange')
-  async getExpenseByDateRange(@Payload() data: any, @Ctx() context: RmqContext) {
+  async getExpenseByDateRange(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
     this.rmqService.ack(context);
-    return this.expenseService.getExpenseByDateRange(data.id_user, data.id_family, data.page, data.itemsPerPage, data.option);
+    return this.expenseService.getExpenseByDateRange(
+      data.id_user,
+      data.id_family,
+      data.fromDate,
+      data.toDate,
+      data.page,
+      data.itemsPerPage,
+    );
   }
 
   @EventPattern('financeClient/updateExpensediture')
@@ -105,17 +121,6 @@ export class ExpenseditureController {
       data.id_user,
       data.id_family,
       data.id_expenditure,
-    );
-  }
-
-  @EventPattern('financeClient/uploadImageExpense')
-  async uploadImageExpense(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return this.expenseService.uploadImageExpense(
-      data.id_user,
-      data.id_family,
-      data.id_expenditure,
-      data.file,
     );
   }
 }

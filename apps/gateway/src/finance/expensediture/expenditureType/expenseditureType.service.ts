@@ -2,15 +2,26 @@ import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { FINANCE_SERVICE } from '../../../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, timeout } from 'rxjs';
+import { CreateExpenseditureTypeDto } from './dto/createExpenseditureType.dto';
 
 @Injectable()
 export class ExpenseditureTypeService {
   constructor(@Inject(FINANCE_SERVICE) private financeClient: ClientProxy) {}
 
-  async getExpenseditureType(id_user: string, id_family: number) {
+  async getExpenseditureType(
+    id_user: string,
+    id_family: number,
+    page: number,
+    itemsPerPage: number,
+  ) {
     try {
       const response = this.financeClient
-        .send('financeClient/getExpenseditureType', { id_user, id_family })
+        .send('financeClient/getExpenseditureType', {
+          id_user,
+          id_family,
+          page,
+          itemsPerPage,
+        })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
@@ -22,7 +33,10 @@ export class ExpenseditureTypeService {
     }
   }
 
-  async createExpenseditureType(id_user: string, dto: any) {
+  async createExpenseditureType(
+    id_user: string,
+    dto: CreateExpenseditureTypeDto,
+  ) {
     try {
       const response = this.financeClient
         .send('financeClient/createExpenseditureType', { id_user, dto })

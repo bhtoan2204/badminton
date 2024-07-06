@@ -20,6 +20,10 @@ import { MemberFamily } from './member_family.entity';
 import { Order } from './order.entity';
 import { Calendar } from './calendar.entity';
 import { Utilities } from './utilities.entity';
+import { FinanceExpenditureType } from './finance_expenditure_type.entity';
+import { FinanceExpenditure } from './finance_expenditure.entity';
+import { FinanceIncomeSource } from './finance_income_source.entity';
+import { FinanceIncome } from './finance_income.entity';
 
 @Entity('family')
 export class Family {
@@ -95,4 +99,25 @@ export class Family {
 
   @OneToMany(() => Utilities, (utilities) => utilities.family)
   utilities: Utilities[];
+
+  @OneToMany(
+    () => FinanceExpenditureType,
+    (financeExpenditureType) => financeExpenditureType.family,
+  )
+  financeExpenditureTypes: FinanceExpenditureType[];
+
+  @OneToMany(
+    () => FinanceExpenditure,
+    (financeExpenditure) => financeExpenditure.family,
+  )
+  financeExpenditures: FinanceExpenditure[];
+
+  @OneToMany(
+    () => FinanceIncomeSource,
+    (financeIncomeSource) => financeIncomeSource.family,
+  )
+  financeIncomeSources: FinanceIncomeSource[];
+
+  @OneToMany(() => FinanceIncome, (financeIncome) => financeIncome.family)
+  financeIncomes: FinanceIncome[];
 }

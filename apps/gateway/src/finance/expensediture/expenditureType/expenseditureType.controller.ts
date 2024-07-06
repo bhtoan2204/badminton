@@ -8,9 +8,15 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../utils';
 import { ExpenseditureTypeService } from './expenseditureType.service';
 import { CurrentUser } from 'apps/gateway/src/utils';
@@ -26,14 +32,20 @@ export class ExpenseditureTypeController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get expenseditures' })
+  @ApiQuery({ name: 'page', type: Number })
+  @ApiQuery({ name: 'itemsPerPage', type: Number })
   @Get('getExpenseType/:id_family')
   async getExpenseType(
     @CurrentUser() currentUser,
     @Param('id_family') id_family: number,
+    @Query('page') page: number,
+    @Query('itemsPerPage') itemsPerPage: number,
   ) {
     return this.expenseTypeService.getExpenseditureType(
       currentUser.id_user,
       id_family,
+      page,
+      itemsPerPage,
     );
   }
 

@@ -5,7 +5,7 @@ export class UpdateExpenseditureTypeDto {
   @ApiProperty({ description: 'Id of expenditure type' })
   @IsNotEmpty()
   @IsNumber()
-  id_expense_type: number;
+  id_expenditure_type: number;
 
   @ApiProperty({ description: 'Id of family' })
   @IsNotEmpty()
@@ -15,5 +15,5 @@ export class UpdateExpenseditureTypeDto {
   @ApiProperty({ description: 'Name of the expenditure type' })
   @IsString()
   @IsNotEmpty()
-  name: string;
+  expense_type_name: string;
 }
