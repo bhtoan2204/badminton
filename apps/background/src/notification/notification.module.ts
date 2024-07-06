@@ -7,6 +7,8 @@ import {
   NotificationDataSchema,
   MemberFamily,
   DatabaseModule,
+  Users,
+  Family,
 } from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { NotificationProcessor } from './notification.processor';
@@ -19,7 +21,7 @@ import { BackgroundModule } from '../background.module';
     MongooseModule.forFeature([
       { name: NotificationData.name, schema: NotificationDataSchema },
     ]),
-    TypeOrmModule.forFeature([MemberFamily]),
+    TypeOrmModule.forFeature([MemberFamily, Users, Family]),
     DatabaseModule,
     forwardRef(() => BackgroundModule),
   ],

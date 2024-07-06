@@ -4,10 +4,16 @@ import { ClientProxy } from '@nestjs/microservices';
 import { TimeoutError, lastValueFrom, timeout } from 'rxjs';
 import { CreateExpenseDto } from './dto/createExpense.dto';
 import { UpdateExpenseDto } from './dto/updateExpense.dto';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { NotificationType } from '@app/common';
 
 @Injectable()
 export class ExpenseditureService {
-  constructor(@Inject(FINANCE_SERVICE) private financeClient: ClientProxy) {}
+  constructor(
+    @Inject(FINANCE_SERVICE) private financeClient: ClientProxy,
+    @InjectQueue('notifications') private readonly notificationsQueue: Queue,
+  ) {}
 
   async getExpenseByDate(id_user: string, id_family: number, date: Date) {
     try {
@@ -72,6 +78,7 @@ export class ExpenseditureService {
         })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
+
       return data;
     } catch (error) {
       if (error instanceof TimeoutError) {
@@ -120,6 +127,17 @@ export class ExpenseditureService {
         .send('financeClient/createExpensediture', { id_user, dto, file })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
+      await this.notificationsQueue.add('createNotificationFamily', {
+        id_family: dto.id_family,
+        notificationData: {
+          title: 'New Expenditure Created',
+          content: 'New Expenditure has been created',
+          type: NotificationType.EXPENSE,
+          id_family: dto.id_family,
+          id_target: data.id_expenditure_type,
+        },
+      });
+
       return data;
     } catch (error) {
       if (error instanceof TimeoutError) {
@@ -134,12 +152,21 @@ export class ExpenseditureService {
     dto: UpdateExpenseDto,
     file: Express.Multer.File,
   ) {
-    console.log(dto);
     try {
       const response = this.financeClient
         .send('financeClient/updateExpensediture', { id_user, dto, file })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
+      await this.notificationsQueue.add('createNotificationFamily', {
+        id_family: dto.id_family,
+        notificationData: {
+          title: 'Expenditure Updated',
+          content: 'Expenditure has been updated',
+          type: NotificationType.EXPENSE,
+          id_family: dto.id_family,
+          id_target: dto.id_expenditure,
+        },
+      });
       return data;
     } catch (error) {
       if (error instanceof TimeoutError) {
@@ -163,6 +190,16 @@ export class ExpenseditureService {
         })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
+      await this.notificationsQueue.add('createNotificationFamily', {
+        id_family,
+        notificationData: {
+          title: 'Expenditure deleted',
+          content: 'Expenditure has been deleted',
+          type: NotificationType.EXPENSE,
+          id_family,
+          id_target: id_expenditure,
+        },
+      });
       return data;
     } catch (error) {
       if (error instanceof TimeoutError) {

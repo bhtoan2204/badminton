@@ -48,6 +48,7 @@ export * from './database/entity/finance_expenditure.entity';
 export * from './database/entity/finance_expenditure_type.entity';
 export * from './database/entity/finance_income.entity';
 export * from './database/entity/finance_income_source.entity';
+export * from './database/entity/finance_assets.entity';
 
 export * from './database/enum/login_type.enum';
 

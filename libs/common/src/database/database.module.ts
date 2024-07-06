@@ -41,6 +41,7 @@ import { FinanceExpenditure } from './entity/finance_expenditure.entity';
 import { FinanceExpenditureType } from './entity/finance_expenditure_type.entity';
 import { FinanceIncome } from './entity/finance_income.entity';
 import { FinanceIncomeSource } from './entity/finance_income_source.entity';
+import { FinanceAssets } from './entity/finance_assets.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -106,6 +107,7 @@ import { FinanceIncomeSource } from './entity/finance_income_source.entity';
             FinanceExpenditureType,
             FinanceIncome,
             FinanceIncomeSource,
+            FinanceAssets,
           ],
           // subscribers: [OrderSubscriber],
         };

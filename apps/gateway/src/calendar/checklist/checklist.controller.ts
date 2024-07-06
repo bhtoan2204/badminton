@@ -23,6 +23,8 @@ import {
   FamilyTermCheckGuard,
   JwtAuthGuard,
   MemberFamilyGuard,
+  Permission,
+  PERMISSION_CALENDAR,
 } from '../../utils';
 import { ChecklistService } from './checklist.service';
 import { CreateChecklistDto } from './dto/createChecklist.dto';
@@ -32,6 +34,7 @@ import { UpdateChecklistDto } from './dto/updateChecklist.dto';
 @Controller('checklist')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
+@Permission([PERMISSION_CALENDAR])
 export class ChecklistController {
   constructor(private readonly checkListService: ChecklistService) {}
 
