@@ -9,13 +9,14 @@ export class GuidelineIndexerService {
 
   async indexGuideline(guideline: any): Promise<any> {
     try {
-      console.log(guideline);
+      if (guideline === undefined) {
+        throw new Error('Guideline is undefined');
+      }
       const data = await this.elasticSearchService.index({
         index: this.index,
         id: guideline.id_guide_item.toString(),
         body: guideline,
       });
-      console.log(data);
       return data;
     } catch (error) {
       console.error('Error indexing household', error);
