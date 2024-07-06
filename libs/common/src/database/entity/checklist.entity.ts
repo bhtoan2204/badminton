@@ -15,7 +15,7 @@ export class Checklist {
   @PrimaryGeneratedColumn()
   id_checklist: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, default: 1 })
   id_checklist_type: number;
 
   @Column()
