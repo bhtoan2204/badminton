@@ -9,8 +9,12 @@ export class GuidelineIndexerService {
 
   async indexGuideline(guideline: any): Promise<any> {
     try {
+      console.log('Indexing guideline', guideline);
       if (guideline === undefined) {
         throw new Error('Guideline is undefined');
+      }
+      if (guideline.id_guide_item === undefined) {
+        throw new Error('id_guide_item is undefined');
       }
       const data = await this.elasticSearchService.index({
         index: this.index,
@@ -37,7 +41,7 @@ export class GuidelineIndexerService {
         id: id_guide_item.toString(),
       });
     } catch (error) {
-      console.error('Error indexing household', error);
+      console.error('Error deleting household', error);
       throw new RpcException({
         message: error.message,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
