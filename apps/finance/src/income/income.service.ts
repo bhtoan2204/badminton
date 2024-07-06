@@ -1,27 +1,30 @@
+import { FinanceIncome, FinanceIncomeSource, MemberFamily } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { EntityManager } from 'typeorm';
-import { validate, version, NIL } from 'uuid';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Between, Repository } from 'typeorm';
 
 @Injectable()
 export class IncomeService {
-  constructor(private readonly entityManager: EntityManager) {}
-
-  convertStringToUUID(string: string): string {
-    if (validate(string) && version(string)) {
-      return string;
-    }
-    return NIL;
-  }
+  constructor(
+    @InjectRepository(FinanceIncome)
+    private financeIncomeRepository: Repository<FinanceIncome>,
+    @InjectRepository(FinanceIncomeSource)
+    private financeIncomeSourceRepository: Repository<FinanceIncomeSource>,
+    @InjectRepository(MemberFamily)
+    private readonly memberFamilyRepository: Repository<MemberFamily>,
+  ) {}
 
   async getIncomeSource(id_user: string, id_family: number) {
     try {
-      const query = 'SELECT * FROM f_get_finance_income_source($1, $2)';
-      const params = [id_user, id_family];
-      const data = await this.entityManager.query(query, params);
+      const [data, total] =
+        await this.financeIncomeSourceRepository.findAndCount({
+          where: { id_family: id_family },
+        });
       return {
-        data: data[0]?.f_get_finance_income_source || [],
-        message: 'Get income source',
+        data: data,
+        total: total,
+        message: 'Get income source successfully',
       };
     } catch (error) {
       throw new RpcException({
@@ -33,17 +36,14 @@ export class IncomeService {
 
   async createIncomeSource(id_user: string, dto: any) {
     try {
-      const { id_family, name } = dto;
-      const query = 'SELECT * FROM f_create_finance_income_source($1, $2, $3)';
-      const params = [id_user, id_family, name];
-      const data = await this.entityManager.query(query, params);
+      const { id_family, income_source_name } = dto;
+      const data = await this.financeIncomeSourceRepository.save({
+        id_family,
+        income_source_name,
+      });
       return {
-        data: {
-          id_family: id_family,
-          name: name,
-          id_income_source: data[0].f_create_finance_income_source,
-        },
-        message: 'Create income source',
+        data: data,
+        message: 'Create income source successfully',
       };
     } catch (error) {
       throw new RpcException({
@@ -55,18 +55,25 @@ export class IncomeService {
 
   async updateIncomeSource(id_user: string, dto: any) {
     try {
-      const { id_income, id_family, name } = dto;
-      const query =
-        'SELECT * FROM f_update_finance_income_source($1, $2, $3, $4)';
-      const params = [id_user, id_income, id_family, name];
-      await this.entityManager.query(query, params);
-      return {
-        data: {
-          id_income_source: id_income,
-          income_name: name,
-          id_family,
+      const { id_income_source, id_family, income_source_name } = dto;
+      const incomeSource = await this.financeIncomeSourceRepository.findOne({
+        where: {
+          id_income_source: id_income_source,
+          id_family: id_family,
         },
-        message: 'Update income source',
+      });
+      if (!incomeSource) {
+        throw new RpcException({
+          message: 'Income source not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      incomeSource.income_source_name = income_source_name;
+      const updatedIncomeSource =
+        await this.financeIncomeSourceRepository.save(incomeSource);
+      return {
+        data: updatedIncomeSource,
+        message: 'Update income source successfully',
       };
     } catch (error) {
       throw new RpcException({
@@ -82,12 +89,22 @@ export class IncomeService {
     id_income_source: number,
   ) {
     try {
-      const query = 'SELECT * FROM f_delete_finance_income_source($1, $2, $3)';
-      const params = [id_user, id_family, id_income_source];
-      await this.entityManager.query(query, params);
+      const incomeSource = await this.financeIncomeSourceRepository.findOne({
+        where: {
+          id_income_source: id_income_source,
+          id_family: id_family,
+        },
+      });
+      if (!incomeSource) {
+        throw new RpcException({
+          message: 'Income source not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      await this.financeIncomeSourceRepository.remove(incomeSource);
       return {
         data: 'Income source deleted successfully',
-        message: 'Delete income source',
+        message: 'Delete income source successfully',
       };
     } catch (error) {
       throw new RpcException({
@@ -96,14 +113,24 @@ export class IncomeService {
       });
     }
   }
+
   async getIncomeByDate(id_user: string, id_family: number, date: string) {
     try {
-      const query = 'SELECT * FROM f_get_income_by_date($1, $2, $3)';
-      const params = [id_user, id_family, date];
-      const data = await this.entityManager.query(query, params);
+      const startDate = new Date(date);
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(date);
+      endDate.setHours(23, 59, 59, 999);
+      const [data, count] = await this.financeIncomeRepository.findAndCount({
+        where: {
+          id_family,
+          income_date: Between(startDate, endDate),
+        },
+        relations: ['family', 'financeExpenditureType', 'users'],
+      });
       return {
         data: data,
-        message: 'Get income by date',
+        total: count,
+        message: 'Get expenditure by date',
       };
     } catch (error) {
       throw new RpcException({
@@ -115,12 +142,19 @@ export class IncomeService {
 
   async getIncomeByYear(id_user: string, id_family: number, year: number) {
     try {
-      const query = 'SELECT * FROM f_get_income_by_year($1, $2, $3)';
-      const params = [id_user, id_family, year];
-      const data = await this.entityManager.query(query, params);
+      const startDate = new Date(year, 0, 1);
+      const endDate = new Date(year, 11, 31);
+      const [data, count] = await this.financeIncomeRepository.findAndCount({
+        where: {
+          id_family,
+          income_date: Between(startDate, endDate),
+        },
+        relations: ['family', 'financeExpenditureType', 'users'],
+      });
       return {
-        data: data[0]?.f_get_income_by_year || [],
-        message: 'Get income by year',
+        data: data,
+        total: count,
+        message: 'Get expenditure by year',
       };
     } catch (error) {
       throw new RpcException({
@@ -137,12 +171,19 @@ export class IncomeService {
     year: number,
   ) {
     try {
-      const query = 'SELECT * FROM f_get_income_by_month($1, $2, $3, $4)';
-      const params = [id_user, id_family, month, year];
-      const data = await this.entityManager.query(query, params);
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
+      const [data, count] = await this.financeIncomeRepository.findAndCount({
+        where: {
+          id_family,
+          income_date: Between(startDate, endDate),
+        },
+        relations: ['family', 'financeExpenditureType', 'users'],
+      });
       return {
-        data: data[0]?.f_get_income_by_month || [],
-        message: 'Get income by month',
+        data: data,
+        total: count,
+        message: 'Get expenditure by month',
       };
     } catch (error) {
       throw new RpcException({
@@ -152,40 +193,33 @@ export class IncomeService {
     }
   }
 
-  async getIncome(
-    id_user: string,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
-  ) {
-    try {
-      const query = 'SELECT * FROM f_get_income($1, $2, $3, $4)';
-      const params = [id_user, id_family, page, itemsPerPage];
-      const data = await this.entityManager.query(query, params);
-      return {
-        data: data,
-        message: 'Get income',
-      };
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  }
   async getIncomeByDateRange(
     id_user: string,
     id_family: number,
     pageNumber: number,
     itemsPerPage: number,
-    option: number,
+    fromDate: Date,
+    toDate: Date,
   ) {
     try {
-      const query =
-        'SELECT * FROM f_get_income_with_pagination($1, $2, $3, $4, $5)';
-      const params = [id_user, id_family, option, pageNumber, itemsPerPage];
-      const data = await this.entityManager.query(query, params);
-      return data[0]?.f_get_income_with_pagination || [];
+      const option = {
+        where: {
+          id_family,
+        },
+        skip: (pageNumber - 1) * itemsPerPage,
+        take: itemsPerPage,
+        relations: ['family', 'financeIncomeSource', 'users'],
+      };
+      if (fromDate && toDate) {
+        option.where['income_date'] = Between(fromDate, toDate);
+      }
+      const [data, total] =
+        await this.financeIncomeRepository.findAndCount(option);
+      return {
+        data: data,
+        total: total,
+        message: 'Get income by date range',
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -196,12 +230,22 @@ export class IncomeService {
 
   async getIncomeById(id_user: string, id_family: number, id_income: number) {
     try {
-      const query = 'SELECT * FROM f_get_income_by_id($1, $2, $3)';
-      const params = [id_user, id_family, id_income];
-      const data = await this.entityManager.query(query, params);
+      const income = await this.financeIncomeRepository.findOne({
+        where: {
+          id_income: id_income,
+          id_family: id_family,
+        },
+        relations: ['family', 'financeIncomeSource', 'users'],
+      });
+      if (!income) {
+        throw new RpcException({
+          message: 'Income not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
       return {
-        data: data,
-        message: 'Get income by id',
+        data: income,
+        message: 'Get income by id successfully',
       };
     } catch (error) {
       throw new RpcException({
@@ -221,42 +265,48 @@ export class IncomeService {
         income_date,
         description,
       } = dto;
-      const query = 'SELECT * FROM f_create_income($1, $2, $3, $4, $5, $6, $7)';
-      const params = [
-        id_user,
+      const incomeSource = await this.financeIncomeSourceRepository.findOne({
+        where: {
+          id_income_source: id_income_source,
+          id_family: id_family,
+        },
+      });
+      if (!incomeSource) {
+        throw new RpcException({
+          message: 'Income source not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      const memberFamily = await this.memberFamilyRepository.findOne({
+        where: {
+          id_user: id_created_by,
+          id_family: id_family,
+        },
+      });
+      if (!memberFamily) {
+        throw new RpcException({
+          message: 'Member family not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      const newIncome = await this.financeIncomeRepository.create({
         id_family,
         id_created_by,
         id_income_source,
         amount,
         income_date,
         description,
-      ];
-      const data = await this.entityManager.query(query, params);
-      return {
-        data: data,
-        message: 'Create income',
-      };
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
-    }
-  }
 
-  async getStasticalIncome(id_user: string, id_family: number) {
-    try {
-      const query = 'SELECT * FROM f_get_statiscal_income($1, $2)';
-      const params = [this.convertStringToUUID(id_user), id_family];
-      const data = await this.entityManager.query(query, params);
+      await this.financeIncomeRepository.save(newIncome);
       return {
-        data: data,
-        message: 'Get statiscal income',
+        data: newIncome,
+        message: 'Create income successfully',
       };
     } catch (error) {
       throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error.message || 'Create income failed',
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -265,26 +315,68 @@ export class IncomeService {
     try {
       const {
         id_income,
+        id_family,
         id_created_by,
         id_income_source,
         amount,
         income_date,
         description,
       } = dto;
-      const query = 'SELECT * FROM f_update_income($1, $2, $3, $4, $5, $6, $7)';
-      const params = [
-        id_user,
-        id_income,
-        id_created_by,
-        id_income_source,
-        amount,
-        income_date,
-        description,
-      ];
-      const data = await this.entityManager.query(query, params);
+      const income = await this.financeIncomeRepository.findOne({
+        where: {
+          id_income: id_income,
+          id_family: id_family,
+        },
+      });
+      if (!income) {
+        throw new RpcException({
+          message: 'Income not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      if (id_created_by !== undefined) {
+        income.id_created_by = id_created_by;
+        const memberFamily = await this.memberFamilyRepository.findOne({
+          where: {
+            id_user: id_created_by,
+            id_family: id_family,
+          },
+        });
+        if (!memberFamily) {
+          throw new RpcException({
+            message: 'Member family not found',
+            statusCode: HttpStatus.NOT_FOUND,
+          });
+        }
+      }
+      if (id_income_source !== undefined) {
+        const incomeSource = await this.financeIncomeSourceRepository.findOne({
+          where: {
+            id_income_source: id_income_source,
+            id_family: id_family,
+          },
+        });
+        if (!incomeSource) {
+          throw new RpcException({
+            message: 'Income source not found',
+            statusCode: HttpStatus.NOT_FOUND,
+          });
+        }
+        income.id_income_source = id_income_source;
+      }
+      if (amount !== undefined) {
+        income.amount = amount;
+      }
+      if (income_date !== undefined) {
+        income.income_date = income_date;
+      }
+      if (description !== undefined) {
+        income.description = description;
+      }
+      const updatedIncome = await this.financeIncomeRepository.save(income);
       return {
-        data: data,
-        message: 'Update income',
+        data: updatedIncome,
+        message: 'Update income successfully',
       };
     } catch (error) {
       throw new RpcException({
@@ -296,19 +388,22 @@ export class IncomeService {
 
   async deleteIncome(id_user: string, id_family: number, id_income: number) {
     try {
-      const query = 'SELECT * FROM f_delete_income($1, $2, $3)';
-      const params = [id_user, id_family, id_income];
-      const data = await this.entityManager.query(query, params);
-      const isDeleted = data[0].f_delete_income;
-      if (!isDeleted) {
+      const income = await this.financeIncomeRepository.findOne({
+        where: {
+          id_income: id_income,
+          id_family: id_family,
+        },
+      });
+      if (!income) {
         throw new RpcException({
-          message: 'Failed to delete income, maybe the income is not found',
+          message: 'Income not found',
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
+      await this.financeIncomeRepository.remove(income);
       return {
         data: 'Income deleted successfully',
-        message: 'Delete income',
+        message: 'Delete income successfully',
       };
     } catch (error) {
       throw new RpcException({

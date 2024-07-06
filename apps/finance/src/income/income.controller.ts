@@ -65,16 +65,6 @@ export class IncomeController {
       data.year,
     );
   }
-  @EventPattern('financeClient/getIncome')
-  async getIncome(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return this.incomeService.getIncome(
-      data.id_user,
-      data.id_family,
-      data.page,
-      data.itemsPerPage,
-    );
-  }
 
   @EventPattern('financeClient/getIncomeById')
   async getIncomeById(@Payload() data: any, @Ctx() context: RmqContext) {
@@ -94,7 +84,8 @@ export class IncomeController {
       data.id_family,
       data.page,
       data.itemsPerPage,
-      data.option,
+      data.fromDate,
+      data.toDate,
     );
   }
 

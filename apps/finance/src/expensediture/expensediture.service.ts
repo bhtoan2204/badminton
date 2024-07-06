@@ -6,7 +6,7 @@ import {
 } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { Between, EntityManager, Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { validate, version, NIL } from 'uuid';
 import { StorageService } from '../storage/storage.service';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,7 +14,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class ExpenseditureService {
   constructor(
-    private readonly entityManager: EntityManager,
     private readonly storageService: StorageService,
     @InjectRepository(FinanceExpenditure)
     private readonly financeExpenditureRepository: Repository<FinanceExpenditure>,
@@ -256,11 +255,18 @@ export class ExpenseditureService {
     id_expenditure: number,
   ) {
     try {
-      const query = 'SELECT * FROM f_get_expenditure_by_id($1, $2, $3)';
-      const params = [id_user, id_family, id_expenditure];
-      const data = await this.entityManager.query(query, params);
+      const expenditure = await this.financeExpenditureRepository.findOne({
+        where: { id_expenditure, id_family },
+        relations: ['family', 'financeExpenditureType', 'users'],
+      });
+      if (!expenditure) {
+        throw new RpcException({
+          message: 'Expenditure not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
       return {
-        data: data,
+        data: expenditure,
         message: 'Get expenditure by id',
       };
     } catch (error) {

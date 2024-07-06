@@ -13,7 +13,10 @@ export class CreateIncomeDto {
   @IsNumber()
   id_family: number;
 
-  @ApiProperty({ description: 'id of user who caused the income' })
+  @ApiProperty({
+    description: 'id of user who caused the income',
+    example: 'bd94ba3a-b046-4a05-a260-890913e09df9',
+  })
   @IsNotEmpty()
   @IsString()
   id_created_by: string;
@@ -28,10 +31,9 @@ export class CreateIncomeDto {
   @IsNumber()
   amount: number;
 
-  @ApiProperty({ description: 'date of income' })
-  @IsNotEmpty()
+  @ApiProperty({ description: 'date of income', default: new Date() })
   @IsDateString()
-  income_date: Date;
+  income_date: string;
 
   @ApiProperty({ description: 'description of income' })
   @IsOptional()

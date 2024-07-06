@@ -7,31 +7,6 @@ import { TimeoutError, lastValueFrom, timeout } from 'rxjs';
 export class IncomeService {
   constructor(@Inject(FINANCE_SERVICE) private financeClient: ClientProxy) {}
 
-  async getIncome(
-    id_user: string,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
-  ) {
-    try {
-      const response = this.financeClient
-        .send('financeClient/getIncome', {
-          id_user,
-          id_family,
-          page,
-          itemsPerPage,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
-    } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
-    }
-  }
-
   async getIncomeByDate(id_user: string, id_family: number, date: string) {
     try {
       const response = this.financeClient
@@ -102,10 +77,24 @@ export class IncomeService {
     }
   }
 
-  async getIncomeByDateRange(id_user: string, id_family: number,  page: number, itemsPerPage: number,  option: number) {
+  async getIncomeByDateRange(
+    id_user: string,
+    id_family: number,
+    page: number,
+    itemsPerPage: number,
+    fromDate: Date,
+    toDate: Date,
+  ) {
     try {
       const response = this.financeClient
-        .send('financeClient/getIncomeByDateRange', { id_user, id_family, page, itemsPerPage, option })
+        .send('financeClient/getIncomeByDateRange', {
+          id_user,
+          id_family,
+          page,
+          itemsPerPage,
+          fromDate,
+          toDate,
+        })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;
