@@ -11,7 +11,7 @@ import { Checklist, ChecklistType, DatabaseModule } from '@app/common';
     DatabaseModule,
     TypeOrmModule.forFeature([Checklist, ChecklistType]),
   ],
-  controllers: [ChecklistController, ChecklistType],
+  controllers: [ChecklistController],
   providers: [ChecklistService],
 })
 export class ChecklistModule {}
