@@ -44,6 +44,10 @@ export * from './database/entity/calendar.entity';
 export * from './database/entity/category_event.entity';
 export * from './database/entity/utilities.entity';
 export * from './database/entity/utilities_type.entity';
+export * from './database/entity/finance_expenditure.entity';
+export * from './database/entity/finance_expenditure_type.entity';
+export * from './database/entity/finance_income.entity';
+export * from './database/entity/finance_income_source.entity';
 
 export * from './database/enum/login_type.enum';
 

@@ -12,6 +12,8 @@ import { EducationProgress } from './education_progress.entity';
 import { MemberFamily } from './member_family.entity';
 import { Feedback } from './feedback.entity';
 import { Order } from './order.entity';
+import { FinanceExpenditure } from './finance_expenditure.entity';
+import { FinanceIncome } from './finance_income.entity';
 
 @Entity('users')
 export class Users {
@@ -87,4 +89,13 @@ export class Users {
 
   @OneToMany(() => Order, (order) => order.users)
   orders: Order[];
+
+  @OneToMany(
+    () => FinanceExpenditure,
+    (finance_expenditure) => finance_expenditure.users,
+  )
+  financeExpenditures: FinanceExpenditure[];
+
+  @OneToMany(() => FinanceIncome, (financeIncome) => financeIncome.users)
+  financeIncomes: FinanceIncome[];
 }

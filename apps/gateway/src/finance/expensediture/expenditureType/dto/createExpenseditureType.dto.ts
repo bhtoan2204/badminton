@@ -10,5 +10,5 @@ export class CreateExpenseditureTypeDto {
   @ApiProperty({ description: 'Name of the expenditure type' })
   @IsString()
   @IsNotEmpty()
-  name: string;
+  expense_type_name: string;
 }

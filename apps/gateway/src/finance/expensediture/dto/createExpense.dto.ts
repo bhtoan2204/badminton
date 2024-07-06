@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
 } from 'class-validator';
 
 export class CreateExpenseDto {
@@ -13,15 +14,18 @@ export class CreateExpenseDto {
   @IsNumber()
   id_family: number;
 
-  @ApiProperty({ description: 'id of user who caused the income' })
+  @ApiProperty({
+    description: 'id of user who caused the income',
+    default: 'bd94ba3a-b046-4a05-a260-890913e09df9',
+  })
   @IsNotEmpty()
-  @IsString()
+  @IsUUID()
   id_created_by: string;
 
   @ApiProperty({ description: 'id of expense type' })
   @IsNotEmpty()
   @IsNumber()
-  id_expense_type: number;
+  id_expenditure_type: number;
 
   @ApiProperty({ description: 'amount of expense' })
   @IsNotEmpty()
@@ -29,7 +33,6 @@ export class CreateExpenseDto {
   amount: number;
 
   @ApiProperty({ description: 'date of expense' })
-  @IsNotEmpty()
   @IsDateString()
   expenditure_date: Date;
 

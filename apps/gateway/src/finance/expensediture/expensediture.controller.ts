@@ -31,10 +31,10 @@ import {
   Permission,
   PERMISSION_FINANCE,
 } from '../../utils';
-import { CreateExpenseDto } from './dto/createExpense.dto';
-import { UpdateExpenseDto } from './dto/updateExpense.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../../utils/interceptor/imageFile.interceptor';
+import { createExpenditureSchema } from './dto/createExpense.schema';
+import { updateExpenseSchema } from './dto/updateExpense.schema';
 
 @ApiTags('Expensediture')
 @Controller('finance/expensediture')
@@ -45,14 +45,14 @@ export class ExpenseditureController {
   constructor(private readonly expenseService: ExpenseditureService) {}
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get expenseditures by day' })
+  @ApiOperation({ summary: 'Get expenseditures by date' })
   @ApiParam({ name: 'id_family', required: true })
-  @ApiQuery({ name: 'date', required: false })
+  @ApiQuery({ name: 'date', required: false, type: Date })
   @Get('getExpenseByDate/:id_family')
   async getExpenseByDate(
     @CurrentUser() currentUser,
     @Param('id_family') id_family: number,
-    @Query('date') date: string,
+    @Query('date') date: Date,
   ) {
     return this.expenseService.getExpenseByDate(
       currentUser.id_user,
@@ -116,96 +116,108 @@ export class ExpenseditureController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get statiscal expenseditures' })
   @Get('getExpenseByDateRange/:id_family')
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'itemsPerPage', required: false, type: Number })
-  @ApiQuery({ name: 'option', required: false, type: Number })
+  @ApiQuery({ name: 'page', required: true, type: Number })
+  @ApiQuery({ name: 'itemsPerPage', required: true, type: Number })
+  @ApiQuery({
+    name: 'fromDate',
+    required: false,
+    type: String,
+    description: 'Timestamp in milliseconds',
+  })
+  @ApiQuery({
+    name: 'toDate',
+    required: false,
+    type: String,
+    description: 'Timestamp in milliseconds',
+  })
   @ApiParam({ name: 'id_family', required: true, type: Number })
   async getExpenseByDateRange(
     @CurrentUser() currentUser,
     @Param('id_family') id_family: number,
     @Query('page') page: number,
     @Query('itemsPerPage') itemsPerPage: number,
-    @Query('option') option: number,
+    @Query('fromDate') fromDate: string,
+    @Query('toDate') toDate: string,
   ) {
+    const fromDateObj = fromDate ? new Date(fromDate) : null;
+    const toDateObj = toDate ? new Date(toDate) : null;
+    console.log(id_family, page, itemsPerPage, fromDateObj, toDateObj);
     return this.expenseService.getExpenseByDateRange(
       currentUser.id_user,
       id_family,
       page,
       itemsPerPage,
-      option,
+      fromDateObj,
+      toDateObj,
     );
   }
 
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create expensediture' })
-  @Post('createExpense')
-  async createExpense(
-    @CurrentUser() currentUser,
-    @Body() dto: CreateExpenseDto,
-  ) {
-    return this.expenseService.createExpensediture(currentUser.id_user, dto);
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Update expensediture' })
-  @Put('updateExpense')
-  async updateExpense(
-    @CurrentUser() currentUser,
-    @Body() dto: UpdateExpenseDto,
-  ) {
-    return this.expenseService.updateExpensediture(currentUser.id_user, dto);
-  }
-
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete expensediture' })
-  @Delete('deleteExpense/:id_family/:id_income')
-  async deleteExpense(
-    @CurrentUser() currentUser,
-    @Param('id_income') id_income: number,
-    @Param('id_family') id_family: number,
-  ) {
-    return this.expenseService.deleteExpensediture(
-      currentUser.id_user,
-      id_family,
-      id_income,
-    );
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Upload image to expense' })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        expenseImg: {
-          type: 'string',
-          format: 'binary',
-          description: 'The image of the expense (optional)',
-        },
-      },
-    },
-  })
-  @ApiParam({ name: 'id_expenditure', required: true, type: Number })
-  @ApiParam({ name: 'id_family', required: true, type: Number })
+  @ApiBody({ schema: createExpenditureSchema })
   @UseInterceptors(
     FileInterceptor(
       'expenseImg',
       new ImageFileInterceptor().createMulterOptions(),
     ),
   )
-  @Post('uploadImageExpense/:id_family/:id_expenditure')
-  async uploadImageExpense(
+  @Post('createExpense')
+  async createExpense(
     @CurrentUser() currentUser,
-    @Param('id_family') id_family: number,
-    @Param('id_expenditure') id_expenditure: number,
+    @Body()
+    dto: {
+      id_family: number;
+      id_expenditure_type: number;
+      amount: number;
+      description: string;
+      expenditure_date: Date;
+      id_created_by: string;
+    },
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.expenseService.uploadImageExpense(
+    return this.expenseService.createExpensediture(
+      currentUser.id_user,
+      dto,
+      file,
+    );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update expensediture' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ schema: updateExpenseSchema })
+  @UseInterceptors(
+    FileInterceptor(
+      'expenseImg',
+      new ImageFileInterceptor().createMulterOptions(),
+    ),
+  )
+  @Put('updateExpense')
+  async updateExpense(
+    @CurrentUser() currentUser,
+    @Body() dto: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.expenseService.updateExpensediture(
+      currentUser.id_user,
+      dto,
+      file,
+    );
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete expensediture' })
+  @Delete('deleteExpense/:id_family/:id_expenditure')
+  async deleteExpense(
+    @CurrentUser() currentUser,
+    @Param('id_expenditure') id_expenditure: number,
+    @Param('id_family') id_family: number,
+  ) {
+    return this.expenseService.deleteExpensediture(
       currentUser.id_user,
       id_family,
       id_expenditure,
-      file,
     );
   }
 }
