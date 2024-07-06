@@ -144,10 +144,7 @@ export class ChatService {
         !conversationForCount ||
         conversationForCount.conversations.length === 0
       ) {
-        throw new RpcException({
-          message: 'Conversation not found',
-          statusCode: HttpStatus.NOT_FOUND,
-        });
+        return [];
       }
       const totalMessages =
         conversationForCount.conversations[0].messages.length;

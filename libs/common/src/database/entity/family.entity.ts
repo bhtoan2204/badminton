@@ -24,6 +24,7 @@ import { FinanceExpenditureType } from './finance_expenditure_type.entity';
 import { FinanceExpenditure } from './finance_expenditure.entity';
 import { FinanceIncomeSource } from './finance_income_source.entity';
 import { FinanceIncome } from './finance_income.entity';
+import { FinanceAssets } from './finance_assets.entity';
 
 @Entity('family')
 export class Family {
@@ -120,4 +121,7 @@ export class Family {
 
   @OneToMany(() => FinanceIncome, (financeIncome) => financeIncome.family)
   financeIncomes: FinanceIncome[];
+
+  @OneToMany(() => FinanceAssets, (financeAssets) => financeAssets.family)
+  financeAssets: FinanceAssets[];
 }

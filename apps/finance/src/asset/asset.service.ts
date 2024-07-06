@@ -1,10 +1,15 @@
+import { FinanceAssets } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { EntityManager } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AssetService {
-  constructor(private readonly entityManager: EntityManager) {}
+  constructor(
+    @InjectRepository(FinanceAssets)
+    private assetRepository: Repository<FinanceAssets>,
+  ) {}
 
   async getAsset(
     id_user: string,
@@ -13,10 +18,17 @@ export class AssetService {
     itemsPerPage: number,
   ) {
     try {
-      const query = 'SELECT * FROM f_get_asset($1, $2, $3, $4)';
-      const param = [id_user, id_family, page, itemsPerPage];
-      const data = await this.entityManager.query(query, param);
-      return data;
+      const [data, total] = await this.assetRepository.findAndCount({
+        where: { id_family: id_family },
+        skip: (page - 1) * itemsPerPage,
+        take: itemsPerPage,
+        relations: ['family'],
+      });
+      return {
+        data: data,
+        total: total,
+        message: 'Get asset successfully',
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -28,18 +40,16 @@ export class AssetService {
   async createAsset(id_user: string, dto: any) {
     const { id_family, name, description, value, purchase_date } = dto;
     try {
-      const query = 'SELECT * FROM f_create_asset($1, $2, $3, $4, $5, $6)';
-      const param = [
-        id_user,
+      const newAssets = await this.assetRepository.create({
         id_family,
         name,
         description,
         value,
         purchase_date,
-      ];
-      const data = await this.entityManager.query(query, param);
+      });
+      await this.assetRepository.save(newAssets);
       return {
-        data: data[0],
+        data: newAssets,
         message: 'Asset created',
       };
     } catch (error) {
@@ -54,19 +64,26 @@ export class AssetService {
     const { id_asset, id_family, name, description, value, purchase_date } =
       dto;
     try {
-      const query = 'SELECT * FROM f_update_asset($1, $2, $3, $4, $5, $6, $7)';
-      const param = [
-        id_user,
-        id_asset,
-        id_family,
-        name,
-        description,
-        value,
-        purchase_date,
-      ];
-      const data = await this.entityManager.query(query, param);
+      const updateAsset = await this.assetRepository.findOne({
+        where: {
+          id_asset: id_asset,
+          id_family: id_family,
+        },
+      });
+      if (!updateAsset) {
+        throw new RpcException({
+          message: 'Asset not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      if (name !== undefined) updateAsset.name = name;
+      if (description !== undefined) updateAsset.description = description;
+      if (value !== undefined) updateAsset.value = value;
+      if (purchase_date !== undefined)
+        updateAsset.purchase_date = purchase_date;
+      await this.assetRepository.save(updateAsset);
       return {
-        data: data[0],
+        data: updateAsset,
         message: 'Asset updated',
       };
     } catch (error) {
@@ -79,11 +96,20 @@ export class AssetService {
 
   async deleteAsset(id_user: string, id_family, id_asset: number) {
     try {
-      const query = 'SELECT * FROM f_delete_asset($1, $2, $3)';
-      const param = [id_user, id_family, id_asset];
-      const data = await this.entityManager.query(query, param);
+      const asset = await this.assetRepository.findOne({
+        where: {
+          id_asset: id_asset,
+          id_family: id_family,
+        },
+      });
+      if (!asset) {
+        throw new RpcException({
+          message: 'Asset not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      await this.assetRepository.delete(asset);
       return {
-        data: data[0].f_delete_asset,
         message: 'Asset deleted',
       };
     } catch (error) {
