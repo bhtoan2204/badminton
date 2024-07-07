@@ -49,7 +49,7 @@ export class UsersController {
 
   @HttpCode(HttpStatus.OK)
   @Put('banUser')
-  async banUser(@Body('userId') dto: BanUserDto) {
+  async banUser(@Body() dto: BanUserDto) {
     return this.usersService.banUser(dto.id_user);
   }
 }
