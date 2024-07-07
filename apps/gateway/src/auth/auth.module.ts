@@ -1,5 +1,5 @@
 import { RmqModule } from '@app/common';
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AuthApiController } from './auth.controller';
 import { AuthApiService } from './auth.service';
 import {
@@ -11,12 +11,12 @@ import {
   GoogleStrategy,
   FacebookStrategy,
 } from '../utils';
-import { FirebaseModule } from './firebase/firebase.module';
+// import { FirebaseModule } from './firebase/firebase.module';
 
 @Module({
   imports: [
     RmqModule.register({ name: AUTH_SERVICE }),
-    forwardRef(() => FirebaseModule),
+    // forwardRef(() => FirebaseModule),
   ],
   controllers: [AuthApiController],
   providers: [
