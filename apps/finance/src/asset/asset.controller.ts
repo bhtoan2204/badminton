@@ -24,13 +24,21 @@ export class AssetController {
   @EventPattern('financeClient/createAsset')
   async createAsset(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.assetService.createAsset(data.id_user, data.dto);
+    return await this.assetService.createAsset(
+      data.id_user,
+      data.dto,
+      data.file,
+    );
   }
 
   @EventPattern('financeClient/updateAsset')
   async updateAsset(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.assetService.updateAsset(data.id_user, data.dto);
+    return await this.assetService.updateAsset(
+      data.id_user,
+      data.dto,
+      data.file,
+    );
   }
 
   @EventPattern('financeClient/deleteAsset')

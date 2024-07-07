@@ -23,7 +23,7 @@ export class FinanceAssets {
   @Column('text', { default: '', nullable: true })
   description: string;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'bigint' })
   value: number;
 
   @Column('date', { default: () => 'CURRENT_DATE' })

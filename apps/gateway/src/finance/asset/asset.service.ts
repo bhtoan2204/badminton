@@ -39,10 +39,14 @@ export class AssetService {
     }
   }
 
-  async createAsset(id_user: string, dto: CreateAssetDto) {
+  async createAsset(
+    id_user: string,
+    dto: CreateAssetDto,
+    file: Express.Multer.File,
+  ) {
     try {
       const response = this.financeClient
-        .send('financeClient/createAsset', { id_user, dto })
+        .send('financeClient/createAsset', { id_user, dto, file })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       await this.notificationsQueue.add('createNotificationFamily', {
@@ -64,10 +68,14 @@ export class AssetService {
     }
   }
 
-  async updateAsset(id_user: string, dto: UpdateAssetDto) {
+  async updateAsset(
+    id_user: string,
+    dto: UpdateAssetDto,
+    file: Express.Multer.File,
+  ) {
     try {
       const response = this.financeClient
-        .send('financeClient/updateAsset', { id_user, dto })
+        .send('financeClient/updateAsset', { id_user, dto, file })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       await this.notificationsQueue.add('createNotificationFamily', {

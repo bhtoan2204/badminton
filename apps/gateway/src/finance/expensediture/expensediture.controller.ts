@@ -33,8 +33,8 @@ import {
 } from '../../utils';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../../utils/interceptor/imageFile.interceptor';
-import { createExpenditureSchema } from './dto/createExpense.schema';
-import { updateExpenseSchema } from './dto/updateExpense.schema';
+import { createExpenditureSchema } from './schema/createExpense.schema';
+import { updateExpenseSchema } from './schema/updateExpense.schema';
 
 @ApiTags('Expensediture')
 @Controller('finance/expensediture')
