@@ -69,6 +69,12 @@ export class ChatService {
         const user = userMap[convo.receiverId];
         return {
           ...convo,
+          receiver: {
+            receiverId: user.id_user,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            avatar: user.avatar,
+          },
           latestMessage: {
             ...convo.latestMessage,
             receiver: {
