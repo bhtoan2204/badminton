@@ -252,6 +252,54 @@ export class UserService {
     }
   }
 
+  async getUserInfoByEmail(email: string) {
+    try {
+      const [data, total] = await this.userRepository.findAndCount({
+        where: { email: email },
+      });
+      if (total === 0) {
+        throw new RpcException({
+          message: 'User not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      return {
+        data: data,
+        total: total,
+        message: 'Get user info by email successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getUserInfoByPhone(phone: string) {
+    try {
+      const [data, total] = await this.userRepository.findAndCount({
+        where: { phone: phone },
+      });
+      if (total === 0) {
+        throw new RpcException({
+          message: 'User not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      return {
+        data: data,
+        total: total,
+        message: 'Get user info by phone successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
   async sendUserConfirmation(dto) {
     const { userInfo, email } = dto;
     try {

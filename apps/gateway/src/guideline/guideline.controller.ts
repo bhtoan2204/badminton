@@ -40,11 +40,11 @@ import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor
 @ApiTags('Guideline')
 @Controller('guideline')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
-@Permission([PERMISSION_GUIDELINE])
 export class GuidelineController {
   constructor(private readonly guidelineService: GuidelineService) {}
 
+  @UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
+  @Permission([PERMISSION_GUIDELINE])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all guideline' })
   @Get('getAllGuideline/:id_family')
@@ -69,6 +69,8 @@ export class GuidelineController {
     );
   }
 
+  @UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
+  @Permission([PERMISSION_GUIDELINE])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get guideline detail' })
   @Get('getGuideline/:id_family/:id_guideline')
@@ -94,6 +96,8 @@ export class GuidelineController {
     );
   }
 
+  @UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
+  @Permission([PERMISSION_GUIDELINE])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Create a guideline' })
   @Post('createGuideline')
@@ -104,6 +108,8 @@ export class GuidelineController {
     return this.guidelineService.createGuideline(currentUser.id_user, dto);
   }
 
+  @UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
+  @Permission([PERMISSION_GUIDELINE])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update a guideline' })
   @Put('updateGuideline')
@@ -114,6 +120,8 @@ export class GuidelineController {
     return this.guidelineService.updateGuideline(currentUser.id_user, dto);
   }
 
+  @UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
+  @Permission([PERMISSION_GUIDELINE])
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a guideline' })
   @Delete('deleteGuideline/:id_family/:id_guideline')
@@ -129,6 +137,8 @@ export class GuidelineController {
     );
   }
 
+  @UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
+  @Permission([PERMISSION_GUIDELINE])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get step' })
   @Get('getStep/:id_family/:id_guideline')
@@ -154,6 +164,8 @@ export class GuidelineController {
     );
   }
 
+  @UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
+  @Permission([PERMISSION_GUIDELINE])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Add step' })
   @ApiConsumes('multipart/form-data')
@@ -203,6 +215,8 @@ export class GuidelineController {
     return this.guidelineService.addStep(currentUser.id_user, dto, file);
   }
 
+  @UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
+  @Permission([PERMISSION_GUIDELINE])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Insert step' })
   @ApiConsumes('multipart/form-data')
@@ -257,8 +271,10 @@ export class GuidelineController {
     return this.guidelineService.insertStep(currentUser.id_user, dto, file);
   }
 
+  @UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
+  @Permission([PERMISSION_GUIDELINE])
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Insert step' })
+  @ApiOperation({ summary: 'Update step' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -317,6 +333,8 @@ export class GuidelineController {
     return this.guidelineService.updateStep(currentUser.id_user, dto, file);
   }
 
+  @UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
+  @Permission([PERMISSION_GUIDELINE])
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete step' })
   @Delete('deleteStep/:id_family/:id_guideline/:index')
@@ -334,6 +352,8 @@ export class GuidelineController {
     );
   }
 
+  @UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)
+  @Permission([PERMISSION_GUIDELINE])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Mark shared' })
   @Put('markShared/:id_family/:id_guideline')
@@ -374,5 +394,17 @@ export class GuidelineController {
       text,
       sort,
     );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get shared guideline by ID' })
+  @Get('getSharedGuidelineById/:id_guideline')
+  @ApiParam({
+    name: 'id_guideline',
+    required: true,
+    description: 'The ID of the guideline',
+  })
+  async getSharedGuidelineById(@Param('id_guideline') id_guideline: number) {
+    return this.guidelineService.getSharedGuidelineById(id_guideline);
   }
 }

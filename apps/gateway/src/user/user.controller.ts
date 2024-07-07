@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -6,6 +7,7 @@ import {
   HttpStatus,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -15,6 +17,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -29,6 +32,7 @@ import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { CheckOTPDto } from './dto/checkOtp.dto';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import * as validator from 'validator';
 
 @ApiTags('User')
 @Controller('user')
@@ -124,5 +128,26 @@ export class UserController {
   @Post('validateEmail')
   async validateEmail(@CurrentUser() user, @Body() data: ValidateEmailDto) {
     return this.userService.validateEmail(user, data);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get User Info by email' })
+  @ApiQuery({ name: 'email', required: true })
+  @UseGuards(JwtAuthGuard)
+  @Get('getUserInfoByEmail')
+  async getUserInfoByEmail(@Query('email') email: string) {
+    if (!validator.isEmail(email)) {
+      throw new BadRequestException('Invalid email format');
+    }
+    return this.userService.getUserInfoByEmail(email);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get User Info by phone' })
+  @ApiQuery({ name: 'phone', required: true })
+  @UseGuards(JwtAuthGuard)
+  @Get('getUserInfoByPhone')
+  async getUserInfoByPhone(@Query('phone') phone: string) {
+    return this.userService.getUserInfoByPhone(phone);
   }
 }

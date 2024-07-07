@@ -333,4 +333,18 @@ export class GuidelineService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async getSharedGuidelineById(id_guideline: number) {
+    try {
+      const response = this.guidelineClient
+        .send('guidelineClient/getSharedGuidelineById', { id_guideline })
+        .pipe(timeout(15000));
+      return await lastValueFrom(response);
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }
