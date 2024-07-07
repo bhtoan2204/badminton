@@ -369,6 +369,7 @@ export class GuidelineController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get shared guideline' })
   @Get('getSharedGuideline')
@@ -396,6 +397,7 @@ export class GuidelineController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get shared guideline by ID' })
   @Get('getSharedGuidelineById/:id_guideline')
