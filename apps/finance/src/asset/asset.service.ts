@@ -135,7 +135,7 @@ export class AssetService {
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
-      await this.assetRepository.delete(asset);
+      await this.assetRepository.remove(asset);
       return {
         message: 'Asset deleted',
       };

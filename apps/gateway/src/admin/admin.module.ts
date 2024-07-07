@@ -11,6 +11,8 @@ import { CacheModule, CacheStoreFactory } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as redisStore from 'cache-manager-redis-store';
 import { FeedbackModule } from './feedback/feedback.module';
+import { UsersModule } from './users/users.module';
+import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { FeedbackModule } from './feedback/feedback.module';
     forwardRef(() => DatafetcherModule),
     forwardRef(() => PackageModule),
     forwardRef(() => FeedbackModule),
+    forwardRef(() => UsersModule),
+    forwardRef(() => RoleModule),
     RmqModule.register({ name: ELASTICSEARCH_SERVICE }),
     CacheModule.registerAsync({
       imports: [ConfigModule],

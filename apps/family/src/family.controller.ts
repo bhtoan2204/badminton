@@ -139,4 +139,49 @@ export class FamilyController {
     this.rmqService.ack(context);
     return this.familyService.assignFamilyRole(data.dto);
   }
+
+  @EventPattern('familyClient/getAllRole')
+  async getAllRole(
+    @Payload()
+    data: {
+      page: number;
+      itemsPerPage: number;
+      search: string;
+      sortBy: string;
+      sortDesc: boolean;
+    },
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    return this.familyService.getAllRole(
+      data.page,
+      data.itemsPerPage,
+      data.search,
+      data.sortBy,
+      data.sortDesc,
+    );
+  }
+
+  @EventPattern('familyClient/createRole')
+  async createRole(
+    @Payload() data: { role_name_vn: string; role_name_en: string },
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    return this.familyService.createRole(data);
+  }
+
+  @EventPattern('familyClient/updateRole')
+  async updateRole(
+    @Payload()
+    data: {
+      id_family_role: number;
+      role_name_vn: string;
+      role_name_en: string;
+    },
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    return this.familyService.updateRole(data);
+  }
 }

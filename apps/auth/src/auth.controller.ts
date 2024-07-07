@@ -76,4 +76,22 @@ export class AuthController {
     this.rmqService.ack(context);
     return await this.authService.deleteFCMToken(data.userId, data.fcmToken);
   }
+
+  @EventPattern('authClient/getUsersAdmin')
+  async handleGetUsersAdmin(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.authService.getUsersAdmin(
+      data.page,
+      data.itemsPerPage,
+      data.search,
+      data.sortBy,
+      data.sortDesc,
+    );
+  }
+
+  @EventPattern('authClient/banUser')
+  async handleBanUser(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.authService.banUser(data.id_user);
+  }
 }

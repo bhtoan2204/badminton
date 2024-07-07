@@ -137,4 +137,17 @@ export class ChatGateway implements OnModuleInit {
       console.error('Error emitting notification:', error.message);
     }
   }
+
+  async emitLogoutToUser(userId: string) {
+    try {
+      const receiverSocketIds: string[] = await this.cacheManager.get(userId);
+      if (receiverSocketIds) {
+        for (const socketId of receiverSocketIds) {
+          this.server.to(socketId).emit('onLogout', { logout: true });
+        }
+      }
+    } catch (error) {
+      console.error('Error emitting logout:', error.message);
+    }
+  }
 }

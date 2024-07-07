@@ -34,6 +34,7 @@ export class AuthApiController {
   @ApiOperation({ summary: 'Local Login' })
   @UseGuards(LocalAuthGuard)
   @Post('local/login')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async localLogin(@Req() request: any, @Body() loginDto: LoginDto) {
     return this.authService.localLogin(request.user);
   }

@@ -12,3 +12,14 @@ export class ChatProcessor {
     this.chatGateway.emitNotificationToUser(id_user, notification);
   }
 }
+
+@Processor('auth')
+export class AuthProcessor {
+  constructor(private readonly chatGateway: ChatGateway) {}
+
+  @Process('logoutUser')
+  async handleNotification(job: Job) {
+    const { id_user } = job.data;
+    this.chatGateway.emitLogoutToUser(id_user);
+  }
+}

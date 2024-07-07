@@ -72,6 +72,9 @@ export class Users {
   @Column('date', { nullable: true })
   birthdate: Date;
 
+  @Column('boolean', { nullable: false, default: false })
+  is_banned: boolean;
+
   @OneToMany(() => Family, (family) => family.owner_id)
   families: Family[];
 
