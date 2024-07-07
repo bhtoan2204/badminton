@@ -115,6 +115,41 @@ export class IncomeService {
     }
   }
 
+  async getIncomeByDateRange(
+    id_user: string,
+    id_family: number,
+    pageNumber: number,
+    itemsPerPage: number,
+    fromDate: Date,
+    toDate: Date,
+  ) {
+    try {
+      const option = {
+        where: {
+          id_family,
+        },
+        skip: (pageNumber - 1) * itemsPerPage,
+        take: itemsPerPage,
+        relations: ['family', 'financeIncomeSource', 'users'],
+      };
+      if (fromDate && toDate) {
+        option.where['income_date'] = Between(fromDate, toDate);
+      }
+      const [data, total] =
+        await this.financeIncomeRepository.findAndCount(option);
+      return {
+        data: data,
+        total: total,
+        message: 'Get income by date range',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
   async getIncomeByDate(id_user: string, id_family: number, date: string) {
     try {
       const startDate = new Date(date);

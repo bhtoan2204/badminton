@@ -29,6 +29,9 @@ export class FinanceAssets {
   @Column('date', { default: () => 'CURRENT_DATE' })
   purchase_date: Date;
 
+  @Column('text', { nullable: true, default: null })
+  image_url: string;
+
   @CreateDateColumn()
   created_at: Date;
 

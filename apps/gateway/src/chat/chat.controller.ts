@@ -28,6 +28,10 @@ import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor
 import { VideoFileInterceptor } from '../utils/interceptor/videoFile.interceptor';
 import { NewFamilyMessageDto } from './dto/newFamilyMessage.dto';
 import { RmqService } from '@app/common';
+import { SendImageMessageSchema } from './schema/sendImageMessage.schema';
+import { SendVideoMessageSchema } from './schema/sendVideoMessage.schema';
+import { SendFamilyImageSchema } from './schema/sendFamilyImage.schema';
+import { SendFamilyVideoSchema } from './schema/sendFamilyVideo.schema';
 
 @ApiTags('Chat')
 @Controller('chat')
@@ -52,22 +56,7 @@ export class ChatController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Send text message' })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        image: {
-          type: 'string',
-          format: 'binary',
-          description: 'The image of the expense (optional)',
-        },
-        receiverId: {
-          type: 'string',
-          description: 'The ID of the receiver',
-        },
-      },
-    },
-  })
+  @ApiBody({ schema: SendImageMessageSchema })
   @UseInterceptors(
     FileInterceptor('image', new ImageFileInterceptor().createMulterOptions()),
   )
@@ -89,22 +78,7 @@ export class ChatController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Send video message' })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        video: {
-          type: 'string',
-          format: 'binary',
-          description: 'The video of the expense (optional)',
-        },
-        receiverId: {
-          type: 'string',
-          description: 'The ID of the receiver',
-        },
-      },
-    },
-  })
+  @ApiBody({ schema: SendVideoMessageSchema })
   @UseInterceptors(
     FileInterceptor('video', new VideoFileInterceptor().createMulterOptions()),
   )
@@ -138,22 +112,7 @@ export class ChatController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Send family image message' })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        image: {
-          type: 'string',
-          format: 'binary',
-          description: 'The image of the expense (optional)',
-        },
-        familyId: {
-          type: 'string',
-          description: 'The ID of the receiver',
-        },
-      },
-    },
-  })
+  @ApiBody({ schema: SendFamilyImageSchema })
   @UseInterceptors(
     FileInterceptor('image', new ImageFileInterceptor().createMulterOptions()),
   )
@@ -175,22 +134,7 @@ export class ChatController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Send family video message' })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        video: {
-          type: 'string',
-          format: 'binary',
-          description: 'The video of the expense (optional)',
-        },
-        familyId: {
-          type: 'string',
-          description: 'The ID of the receiver',
-        },
-      },
-    },
-  })
+  @ApiBody({ schema: SendFamilyVideoSchema })
   @UseInterceptors(
     FileInterceptor('video', new VideoFileInterceptor().createMulterOptions()),
   )
@@ -209,7 +153,6 @@ export class ChatController {
     return data;
   }
 
-  // --------------------------------------------------------------
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all chats' })
   @Get('getUsersChat/:index')
