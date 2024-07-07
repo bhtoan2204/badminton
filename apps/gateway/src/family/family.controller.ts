@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Param,
   Post,
   Put,
   Query,
@@ -18,7 +17,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
-  ApiParam,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { FamilyService } from './family.service';
@@ -98,12 +97,18 @@ export class FamilyController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all member infomation of specified family' })
+  @ApiQuery({ name: 'search', required: false })
   @Get('getAllMember')
   async getAllMember(
     @Query('id_family') id_family: number,
     @CurrentUser() currentUser,
+    @Query('search') search: string,
   ) {
-    return this.familyService.getAllMember(currentUser.id_user, id_family);
+    return this.familyService.getAllMember(
+      currentUser.id_user,
+      id_family,
+      search,
+    );
   }
 
   @HttpCode(HttpStatus.OK)

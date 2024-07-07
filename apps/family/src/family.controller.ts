@@ -34,11 +34,15 @@ export class FamilyController {
 
   @EventPattern('familyClient/getAllMember')
   async getAllMember(
-    @Payload() data: { id_user; id_family },
+    @Payload() data: { id_user; id_family; search: string },
     @Ctx() context: RmqContext,
   ) {
     this.rmqService.ack(context);
-    return this.familyService.getAllMember(data.id_user, data.id_family);
+    return this.familyService.getAllMember(
+      data.id_user,
+      data.id_family,
+      data.search,
+    );
   }
 
   @EventPattern('familyClient/createFamily')

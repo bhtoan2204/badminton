@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { EntityManager, Repository } from 'typeorm';
+import { Brackets, EntityManager, Repository } from 'typeorm';
 import { RpcException } from '@nestjs/microservices';
 import { StorageService } from './storage/storage.service';
 import {
@@ -113,12 +113,25 @@ export class FamilyService {
     }
   }
 
-  async getAllMember(id_user: string, id_family: number) {
+  async getAllMember(id_user: string, id_family: number, search: string) {
     try {
-      const members = await this.memberFamilyRepository.find({
-        where: { id_family },
-        relations: ['user', 'familyRoles'],
-      });
+      const query = this.memberFamilyRepository
+        .createQueryBuilder('member')
+        .leftJoinAndSelect('member.user', 'user')
+        .leftJoinAndSelect('member.familyRoles', 'familyRoles')
+        .where('member.id_family = :id_family', { id_family });
+
+      if (search) {
+        query.andWhere(
+          new Brackets((qb) => {
+            qb.where('user.firstname LIKE :search', {
+              search: `%${search}%`,
+            }).orWhere('user.lastname LIKE :search', { search: `%${search}%` });
+          }),
+        );
+      }
+
+      const members = await query.getMany();
 
       return {
         data: members,
