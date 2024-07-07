@@ -42,10 +42,6 @@ export class GuidelineIndexerService {
       });
     } catch (error) {
       console.error('Error deleting household', error);
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
     }
   }
 
