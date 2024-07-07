@@ -25,6 +25,7 @@ export class AssetService {
         skip: (page - 1) * itemsPerPage,
         take: itemsPerPage,
         relations: ['family'],
+        order: { created_at: 'DESC' },
       });
       return {
         data: data,

@@ -51,10 +51,11 @@ export class HouseholdService {
   ) {
     try {
       const [data, total] = await this.householdItemsRepository.findAndCount({
-        where: { id_family },
+        where: { id_family: id_family },
         take: itemsPerPage,
         skip: (page - 1) * itemsPerPage,
         relations: ['category', 'room'],
+        order: { created_at: 'DESC' },
       });
       return {
         data,

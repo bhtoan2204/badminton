@@ -162,6 +162,7 @@ export class IncomeService {
           income_date: Between(startDate, endDate),
         },
         relations: ['family', 'financeExpenditureType', 'users'],
+        order: { created_at: 'DESC' },
       });
       return {
         data: data,

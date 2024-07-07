@@ -23,6 +23,7 @@ export class RoomService {
         where: { id_family },
         take: itemsPerPage,
         skip: (page - 1) * itemsPerPage,
+        order: { created_at: 'DESC' },
       });
       return {
         data,

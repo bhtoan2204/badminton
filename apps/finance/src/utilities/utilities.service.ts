@@ -35,7 +35,7 @@ export class UtilitiesService {
   async getUtilities(id_family: number, page: number, itemsPerPage: number) {
     try {
       const [data, total] = await this.utilitiesRepository.findAndCount({
-        where: { id_family },
+        where: { id_family: id_family },
         order: { created_at: 'DESC' },
         skip: (page - 1) * itemsPerPage,
         take: itemsPerPage,
