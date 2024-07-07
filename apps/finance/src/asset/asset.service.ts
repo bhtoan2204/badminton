@@ -1,14 +1,16 @@
-import { FinanceAssets } from '@app/common';
+import { FinanceAssets, UploadFileRequest } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class AssetService {
   constructor(
     @InjectRepository(FinanceAssets)
     private assetRepository: Repository<FinanceAssets>,
+    private readonly storageService: StorageService,
   ) {}
 
   async getAsset(
@@ -37,15 +39,28 @@ export class AssetService {
     }
   }
 
-  async createAsset(id_user: string, dto: any) {
+  async createAsset(id_user: string, dto: any, file: any) {
     const { id_family, name, description, value, purchase_date } = dto;
     try {
+      let fileUrl = null;
+      if (file) {
+        const filename =
+          'asset_' + id_user + '_' + Date.now() + '_' + file.originalname;
+        const params: UploadFileRequest = {
+          file: new Uint8Array(file.buffer.data),
+          fileName: filename,
+        };
+        const uploadImageData =
+          await this.storageService.uploadImageExpense(params);
+        fileUrl = uploadImageData.fileUrl;
+      }
       const newAssets = await this.assetRepository.create({
         id_family,
         name,
         description,
         value,
         purchase_date,
+        image_url: fileUrl,
       });
       await this.assetRepository.save(newAssets);
       return {
@@ -60,7 +75,7 @@ export class AssetService {
     }
   }
 
-  async updateAsset(id_user: string, dto: any) {
+  async updateAsset(id_user: string, dto: any, file: any) {
     const { id_asset, id_family, name, description, value, purchase_date } =
       dto;
     try {
@@ -75,6 +90,17 @@ export class AssetService {
           message: 'Asset not found',
           statusCode: HttpStatus.NOT_FOUND,
         });
+      }
+      if (file) {
+        const filename =
+          'asset_' + id_user + '_' + Date.now() + '_' + file.originalname;
+        const params: UploadFileRequest = {
+          file: new Uint8Array(file.buffer.data),
+          fileName: filename,
+        };
+        const uploadImageData =
+          await this.storageService.uploadImageExpense(params);
+        updateAsset.image_url = uploadImageData.fileUrl;
       }
       if (name !== undefined) updateAsset.name = name;
       if (description !== undefined) updateAsset.description = description;

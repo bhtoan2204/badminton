@@ -9,10 +9,14 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiQuery,
   ApiTags,
@@ -26,8 +30,10 @@ import {
   Permission,
   PERMISSION_FINANCE,
 } from '../../utils';
-import { CreateAssetDto } from './dto/createAsset.dto';
-import { UpdateAssetDto } from './dto/updateAsset.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageFileInterceptor } from '../../utils/interceptor/imageFile.interceptor';
+import { UpdateAssetSchema } from './schema/updateAsset.schema';
+import { CreateAssetSchema } from './schema/createAsset.schema';
 
 @ApiTags('Asset')
 @Controller('finance/asset')
@@ -60,16 +66,49 @@ export class AssetController {
 
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create Asset' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ schema: CreateAssetSchema })
+  @UseInterceptors(
+    FileInterceptor('image', new ImageFileInterceptor().createMulterOptions()),
+  )
   @Post('createAsset')
-  async createAsset(@CurrentUser() currentUser, @Body() dto: CreateAssetDto) {
-    return this.expenseService.createAsset(currentUser.id_user, dto);
+  async createAsset(
+    @CurrentUser() currentUser,
+    @Body()
+    dto: {
+      id_family: number;
+      name: string;
+      value: number;
+      description: string;
+      purchase_date: Date;
+    },
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.expenseService.createAsset(currentUser.id_user, dto, file);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update Asset' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ schema: UpdateAssetSchema })
+  @UseInterceptors(
+    FileInterceptor('image', new ImageFileInterceptor().createMulterOptions()),
+  )
   @Put('updateAsset')
-  async updateAsset(@CurrentUser() currentUser, @Body() dto: UpdateAssetDto) {
-    return this.expenseService.updateAsset(currentUser.id_user, dto);
+  async updateAsset(
+    @CurrentUser() currentUser,
+    @Body()
+    dto: {
+      id_family: number;
+      id_asset: number;
+      name: string;
+      value: number;
+      description: string;
+      purchase_date: Date;
+    },
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.expenseService.updateAsset(currentUser.id_user, dto, file);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)

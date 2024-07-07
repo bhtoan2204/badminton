@@ -27,6 +27,9 @@ service StorageService {
 
   rpc uploadImageRoom(UploadFileRequest) returns (UploadFileResponse);
   rpc deleteImageRoom(DeleteFileRequest) returns (DeleteFileResponse);
+
+  rpc uploadImageAsset(UploadFileRequest) returns (UploadFileResponse);
+  rpc deleteImageAsset(DeleteFileRequest) returns (DeleteFileResponse);
 }
 
 message UploadFileRequest {

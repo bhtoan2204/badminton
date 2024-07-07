@@ -111,4 +111,16 @@ export class FilesController implements StorageServiceController {
   ): Promise<DeleteFileResponse> {
     return await this.filesService.deleteFile(request, 'room');
   }
+
+  async uploadImageAsset(
+    request: UploadFileRequest,
+  ): Promise<UploadFileResponse> {
+    return await this.filesService.uploadFile(request, 'asset');
+  }
+
+  async deleteImageAsset(
+    request: DeleteFileRequest,
+  ): Promise<DeleteFileResponse> {
+    return await this.filesService.deleteFile(request, 'asset');
+  }
 }
