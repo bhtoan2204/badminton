@@ -24,6 +24,16 @@ export class UpdateChecklistDto {
   id_family: number;
 
   @ApiProperty({
+    type: Number,
+    description: 'ID of Checklist type',
+    required: true,
+    example: 1,
+  })
+  @IsOptional()
+  @IsNumber()
+  id_checklist_type: number;
+
+  @ApiProperty({
     type: String,
     description: 'Name of checklist',
     required: true,
