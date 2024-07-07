@@ -169,4 +169,40 @@ export class UserService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async getUserInfoByEmail(email: string) {
+    try {
+      const source = this.authClient
+        .send('authClient/getUserInfoByEmail', { email })
+        .pipe(timeout(15000));
+      const result = await lastValueFrom(source);
+      return result;
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async getUserInfoByPhone(phone: string) {
+    try {
+      const source = this.authClient
+        .send('authClient/getUserInfoByPhone', { phone })
+        .pipe(timeout(15000));
+      const result = await lastValueFrom(source);
+      return result;
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }

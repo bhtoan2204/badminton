@@ -52,6 +52,24 @@ export class UserController {
     return await this.userService.validateEmail(data);
   }
 
+  @EventPattern('authClient/getUserInfoByEmail')
+  async handleGetUserInfoByEmail(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    return await this.userService.getUserInfoByEmail(data.email);
+  }
+
+  @EventPattern('authClient/getUserInfoByPhone')
+  async handleGetUserInfoByPhone(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    return await this.userService.getUserInfoByPhone(data.phone);
+  }
+
   @EventPattern('mailClient/sendUserConfirmation')
   async sendUserConfirmation(@Payload() dto: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);

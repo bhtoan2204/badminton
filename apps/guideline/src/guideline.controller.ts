@@ -124,4 +124,15 @@ export class GuidelineController {
       data.sort,
     );
   }
+
+  @EventPattern('guidelineClient/getSharedGuidelineById')
+  async getSharedGuidelineById(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    return await this.guidelineService.getSharedGuidelineById(
+      data.id_guideline,
+    );
+  }
 }

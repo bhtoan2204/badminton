@@ -461,4 +461,28 @@ export class GuidelineService {
       });
     }
   }
+
+  async getSharedGuidelineById(id_guideline: number) {
+    try {
+      const guideline = await this.guideItemsRepository.findOne({
+        where: { id_guide_item: id_guideline, is_shared: true },
+        relations: ['family'],
+      });
+      if (!guideline) {
+        throw new RpcException({
+          message: 'Guide item not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      return {
+        message: 'Success',
+        data: guideline,
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
 }
