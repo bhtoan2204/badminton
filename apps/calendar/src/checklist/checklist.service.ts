@@ -41,6 +41,7 @@ export class ChecklistService {
         skip: (page - 1) * itemsPerPage,
         take: itemsPerPage,
         relations: ['family', 'checklistType'],
+        order: { created_at: 'DESC' },
       });
 
       return {

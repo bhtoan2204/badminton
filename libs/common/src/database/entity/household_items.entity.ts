@@ -1,10 +1,12 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Family } from './family.entity';
 import { HouseholdItemCategories } from './household_item_categories.entity';
@@ -34,6 +36,12 @@ export class HouseholdItems {
 
   @Column({ nullable: true })
   id_room: number | null;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 
   @ManyToOne(() => Family, (family) => family.householdItems)
   @JoinColumn({ name: 'id_family' })

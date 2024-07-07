@@ -54,7 +54,7 @@ export class ShoppingService {
     try {
       const [data, total] = await this.shoppingListsRepository.findAndCount({
         where: { id_family: id_family },
-        order: { id_list: 'DESC' },
+        order: { created_at: 'DESC' },
         skip: (page - 1) * itemsPerPage,
         take: itemsPerPage,
         relations: ['listType'],

@@ -25,6 +25,7 @@ export class CalendarService {
     try {
       const [data, total] = await this.categoryEventRepository.findAndCount({
         where: { id_family },
+        order: { created_at: 'DESC' },
       });
       return {
         message: 'Success',
@@ -119,6 +120,7 @@ export class CalendarService {
       const [data, total] = await this.calendarRepository.findAndCount({
         where: { id_family },
         relations: ['categoryEvent', 'family'],
+        order: { created_at: 'DESC' },
       });
       return {
         message: 'Success',
