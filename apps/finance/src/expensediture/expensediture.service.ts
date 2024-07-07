@@ -10,6 +10,7 @@ import { Between, Repository } from 'typeorm';
 import { validate, version, NIL } from 'uuid';
 import { StorageService } from '../storage/storage.service';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DailyData, MonthlyData } from './expensediture.interface';
 
 @Injectable()
 export class ExpenseditureService {
@@ -169,17 +170,48 @@ export class ExpenseditureService {
     try {
       const startDate = new Date(year, month - 1, 1);
       const endDate = new Date(year, month, 0);
-      const [data, count] =
-        await this.financeExpenditureRepository.findAndCount({
-          where: {
-            id_family,
-            expenditure_date: Between(startDate, endDate),
-          },
-          relations: ['family', 'financeExpenditureType', 'users'],
+
+      const rawData = await this.financeExpenditureRepository
+        .createQueryBuilder('fe')
+        .select('EXTRACT(DAY FROM fe.expenditure_date)', 'day')
+        .addSelect('fe.id_expenditure_type', 'id_expense_type')
+        .addSelect('fet.expense_type_name', 'expense_type_name')
+        .addSelect('SUM(fe.amount)', 'total_amount')
+        .where('fe.id_family = :id_family', { id_family })
+        .andWhere('fe.expenditure_date BETWEEN :startDate AND :endDate', {
+          startDate,
+          endDate,
+        })
+        .leftJoin('fe.financeExpenditureType', 'fet')
+        .groupBy(
+          'EXTRACT(DAY FROM fe.expenditure_date), fe.id_expenditure_type, fet.expense_type_name',
+        )
+        .orderBy('EXTRACT(DAY FROM fe.expenditure_date)', 'ASC')
+        .getRawMany();
+
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const dailyData: DailyData[] = Array.from(
+        { length: daysInMonth },
+        (_, i) => ({
+          day: i + 1,
+          total: 0,
+          categories: [],
+        }),
+      );
+
+      rawData.forEach((data) => {
+        const dayIndex = parseInt(data.day, 10) - 1;
+        dailyData[dayIndex].total += parseFloat(data.total_amount);
+        dailyData[dayIndex].categories.push({
+          name: data.expense_type_name,
+          amount: parseFloat(data.total_amount),
+          id_expense_type: parseInt(data.id_expense_type, 10),
         });
+      });
+
       return {
-        data: data,
-        total: count,
+        data: dailyData,
+        total: rawData.length,
         message: 'Get expenditure by month',
       };
     } catch (error) {
@@ -189,21 +221,49 @@ export class ExpenseditureService {
       });
     }
   }
+
   async getExpenseByYear(id_user: string, id_family: number, year: number) {
     try {
       const startDate = new Date(year, 0, 1);
       const endDate = new Date(year, 11, 31);
-      const [data, count] =
-        await this.financeExpenditureRepository.findAndCount({
-          where: {
-            id_family,
-            expenditure_date: Between(startDate, endDate),
-          },
-          relations: ['family', 'financeExpenditureType', 'users'],
+
+      const rawData = await this.financeExpenditureRepository
+        .createQueryBuilder('fe')
+        .select('EXTRACT(MONTH FROM fe.expenditure_date)', 'month')
+        .addSelect('fe.id_expenditure_type', 'id_expense_type')
+        .addSelect('fet.expense_type_name', 'expense_type_name')
+        .addSelect('SUM(fe.amount)', 'total_amount')
+        .where('fe.id_family = :id_family', { id_family })
+        .andWhere('fe.expenditure_date BETWEEN :startDate AND :endDate', {
+          startDate,
+          endDate,
+        })
+        .leftJoin('fe.financeExpenditureType', 'fet')
+        .groupBy(
+          'EXTRACT(MONTH FROM fe.expenditure_date), fe.id_expenditure_type, fet.expense_type_name',
+        )
+        .orderBy('EXTRACT(MONTH FROM fe.expenditure_date)', 'ASC')
+        .getRawMany();
+
+      const monthlyData: MonthlyData[] = Array.from({ length: 12 }, (_, i) => ({
+        month: i + 1,
+        total: 0,
+        categories: [],
+      }));
+
+      rawData.forEach((data) => {
+        const monthIndex = parseInt(data.month, 10) - 1;
+        monthlyData[monthIndex].total += parseFloat(data.total_amount);
+        monthlyData[monthIndex].categories.push({
+          name: data.expense_type_name,
+          amount: parseFloat(data.total_amount),
+          id_expense_type: parseInt(data.id_expense_type, 10),
         });
+      });
+
       return {
-        data: data,
-        total: count,
+        data: monthlyData,
+        total: rawData.length,
         message: 'Get expenditure by year',
       };
     } catch (error) {
