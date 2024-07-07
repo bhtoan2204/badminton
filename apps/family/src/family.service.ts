@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { Brackets, EntityManager, Repository } from 'typeorm';
+import { Brackets, EntityManager, Like, Repository } from 'typeorm';
 import { RpcException } from '@nestjs/microservices';
 import { StorageService } from './storage/storage.service';
 import {
@@ -414,6 +414,85 @@ export class FamilyService {
       const data = await this.memberFamilyRepository.save(memberFamily);
       return {
         message: 'Role assigned',
+        data: data,
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getAllRole(
+    page: number,
+    itemsPerPage: number,
+    search: string,
+    sortBy: string,
+    sortDesc: boolean,
+  ) {
+    const option = {
+      take: itemsPerPage,
+      skip: (page - 1) * itemsPerPage,
+    };
+    if (search) {
+      option['where'] = [
+        { role_name_vn: Like(`%${search}%`) },
+        { role_name_en: Like(`%${search}%`) },
+      ];
+    }
+    if (sortBy && sortDesc) {
+      option['order'] = { [sortBy]: sortDesc ? 'DESC' : 'ASC' };
+    }
+    const [data, total] = await this.familyRolesRepository.findAndCount(option);
+    return {
+      data,
+      total,
+      message: 'Get roles successfully',
+    };
+  }
+
+  async createRole(dto: { role_name_vn: string; role_name_en: string }) {
+    try {
+      const { role_name_vn, role_name_en } = dto;
+      const newRole = this.familyRolesRepository.create({
+        role_name_vn,
+        role_name_en,
+      });
+      const data = await this.familyRolesRepository.save(newRole);
+      return {
+        message: 'Role created',
+        data: data,
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async updateRole(dto: {
+    id_family_role: number;
+    role_name_vn: string;
+    role_name_en: string;
+  }) {
+    try {
+      const { id_family_role, role_name_vn, role_name_en } = dto;
+      const role = await this.familyRolesRepository.findOne({
+        where: { id_family_role },
+      });
+      if (!role) {
+        throw new RpcException({
+          message: 'Role not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      if (dto.role_name_vn) role.role_name_vn = role_name_vn;
+      if (dto.role_name_en) role.role_name_en = role_name_en;
+      const data = await this.familyRolesRepository.save(role);
+      return {
+        message: 'Role updated',
         data: data,
       };
     } catch (error) {

@@ -13,7 +13,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisClientOptions } from 'redis';
 import { BullModule } from '@nestjs/bull';
-import { ChatProcessor } from './chat.processor';
+import { AuthProcessor, ChatProcessor } from './chat.processor';
 import { NotificationModule } from './notification/notification.module';
 
 @Module({
@@ -48,6 +48,12 @@ import { NotificationModule } from './notification/notification.module';
     NotificationModule,
   ],
   controllers: [ChatController],
-  providers: [ChatGateway, WsJwtStrategy, ChatService, ChatProcessor],
+  providers: [
+    ChatGateway,
+    WsJwtStrategy,
+    ChatService,
+    ChatProcessor,
+    AuthProcessor,
+  ],
 })
 export class ChatModule {}

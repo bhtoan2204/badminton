@@ -84,6 +84,11 @@ const globalModule = (module: DynamicModule) => {
         name: 'notifications',
       }),
     ),
+    globalModule(
+      BullModule.registerQueue({
+        name: 'auth',
+      }),
+    ),
     AuthApiModule,
     UserModule,
     PaymentModule,

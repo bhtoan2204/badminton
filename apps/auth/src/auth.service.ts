@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { FirebaseService, LoginType, Users } from '@app/common';
 import { RpcException } from '@nestjs/microservices';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TokenPayload } from './interface/tokenPayload.interface';
 
@@ -50,6 +50,12 @@ export class AuthService {
           },
         });
       } else {
+        if (user.is_banned === true) {
+          throw new RpcException({
+            message: 'User is banned',
+            statusCode: HttpStatus.UNAUTHORIZED,
+          });
+        }
         return user;
       }
     } catch (error) {
@@ -92,6 +98,12 @@ export class AuthService {
           },
         });
       } else {
+        if (user.is_banned === true) {
+          throw new RpcException({
+            message: 'User is banned',
+            statusCode: HttpStatus.UNAUTHORIZED,
+          });
+        }
         return user;
       }
     } catch (error) {
@@ -297,6 +309,13 @@ export class AuthService {
       });
     }
 
+    if (user.is_banned === true) {
+      throw new RpcException({
+        message: 'User is banned',
+        statusCode: HttpStatus.UNAUTHORIZED,
+      });
+    }
+
     const Query = 'SELECT * FROM compare_passwords($1,$2)';
     const param = [inputPassword, user.password];
     const result = await this.entityManager.query(Query, param);
@@ -331,6 +350,71 @@ export class AuthService {
       throw new RpcException({
         message: error.message,
         statusCode: 404,
+      });
+    }
+  }
+
+  async getUsersAdmin(
+    page: number,
+    itemsPerPage: number,
+    search: string,
+    sortBy: string,
+    sortDesc: boolean,
+  ) {
+    try {
+      const option = {
+        take: itemsPerPage,
+        skip: (page - 1) * itemsPerPage,
+      };
+      if (search) {
+        option['where'] = [
+          { email: Like(`%${search}%`) },
+          { first_name: Like(`%${search}%`) },
+          { last_name: Like(`%${search}%`) },
+        ];
+      }
+      if (sortBy && sortDesc) {
+        option['order'] = { [sortBy]: sortDesc ? 'DESC' : 'ASC' };
+      }
+      const [data, total] = await this.userRepository.findAndCount(option);
+      return {
+        data,
+        total,
+        message: 'Get users successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async banUser(id_user: string) {
+    try {
+      const user = await this.userRepository.findOne({ where: { id_user } });
+      if (!user) {
+        throw new RpcException({
+          message: 'User not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      if (user.isadmin === true) {
+        throw new RpcException({
+          message: 'Cannot ban an admin user',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+      user.is_banned = true;
+      const data = await this.userRepository.save(user);
+      return {
+        data: data,
+        message: 'User banned successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
