@@ -54,9 +54,7 @@ export class ChatService {
         ])
         .exec();
       const results = await mongoQuery;
-      const receiverIds = results.map(
-        (convo) => convo.latestMessage.receiverId,
-      );
+      const receiverIds = results.map((convo) => convo.receiverId);
       const usersPromise = this.usersRepository.find({
         where: {
           id_user: In(receiverIds),
@@ -68,7 +66,7 @@ export class ChatService {
         return map;
       }, {});
       const populatedResults = results.map((convo) => {
-        const user = userMap[convo.latestMessage.receiverId];
+        const user = userMap[convo.receiverId];
         return {
           ...convo,
           latestMessage: {
