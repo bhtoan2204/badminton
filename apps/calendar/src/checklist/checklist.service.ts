@@ -57,10 +57,20 @@ export class ChecklistService {
   }
 
   async createChecklist(id_user: string, dto: any) {
-    const { id_family, task_name, description, due_date } = dto;
-
+    const { id_family, id_checklist_type, task_name, description, due_date } =
+      dto;
+    const checklistType = await this.checklistTypeRepository.findOne({
+      where: { id_checklist_type },
+    });
+    if (!checklistType) {
+      throw new RpcException({
+        message: 'Checklist type not found',
+        statusCode: HttpStatus.NOT_FOUND,
+      });
+    }
     const checklist = new Checklist();
     checklist.id_family = id_family;
+    checklist.id_checklist_type = id_checklist_type;
     checklist.task_name = task_name;
     checklist.description = description;
     checklist.due_date = due_date;
@@ -80,7 +90,14 @@ export class ChecklistService {
   }
 
   async updateChecklist(id_user: string, dto: any) {
-    const { id_checklist, id_family, task_name, description, due_date } = dto;
+    const {
+      id_checklist,
+      id_checklist_type,
+      id_family,
+      task_name,
+      description,
+      due_date,
+    } = dto;
     try {
       const checklist = await this.checklistRepository.findOne({
         where: { id_checklist, id_family },
@@ -90,6 +107,18 @@ export class ChecklistService {
           message: 'Checklist not found',
           statusCode: HttpStatus.NOT_FOUND,
         });
+      }
+      if (id_checklist_type !== undefined) {
+        const checklistType = await this.checklistTypeRepository.findOne({
+          where: { id_checklist_type },
+        });
+        if (!checklistType) {
+          throw new RpcException({
+            message: 'Checklist type not found',
+            statusCode: HttpStatus.NOT_FOUND,
+          });
+        }
+        checklist.id_checklist_type = id_checklist_type;
       }
       if (task_name !== undefined) {
         checklist.task_name = task_name;

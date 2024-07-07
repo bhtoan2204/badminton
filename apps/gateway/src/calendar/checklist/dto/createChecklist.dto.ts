@@ -19,6 +19,16 @@ export class CreateChecklistDto {
   id_family: number;
 
   @ApiProperty({
+    type: Number,
+    description: 'ID of user',
+    required: true,
+    example: 1,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  id_checklist_type: number;
+
+  @ApiProperty({
     type: String,
     description: 'Name of checklist',
     required: true,
