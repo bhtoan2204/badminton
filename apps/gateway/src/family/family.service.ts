@@ -46,10 +46,10 @@ export class FamilyService {
     }
   }
 
-  async getAllMember(id_user: string, id_family: any) {
+  async getAllMember(id_user: string, id_family: number, search: string) {
     try {
       const response = this.familyClient
-        .send('familyClient/getAllMember', { id_user, id_family })
+        .send('familyClient/getAllMember', { id_user, id_family, search })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
       return data;

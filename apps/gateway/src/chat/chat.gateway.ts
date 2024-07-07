@@ -20,7 +20,6 @@ interface TokenPayload {
 })
 export class ChatGateway implements OnModuleInit {
   @WebSocketServer() server: Server;
-  // socketMap = new Map<string, string[]>();
 
   constructor(
     private readonly jwtService: JwtService,

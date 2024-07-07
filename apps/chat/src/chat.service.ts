@@ -12,6 +12,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { StorageService } from './storage/storage.service';
 import { Brackets, EntityManager, In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Types } from 'mongoose';
 
 const limit = 30;
 
@@ -308,6 +309,7 @@ export class ChatService {
         });
       }
       const newMessage = {
+        _id: new Types.ObjectId(),
         senderId: id_user,
         receiverId: messageData.receiverId,
         type: 'text',
@@ -344,6 +346,7 @@ export class ChatService {
   ): Promise<any> {
     try {
       const newMessage = {
+        _id: new Types.ObjectId(),
         senderId: id_user,
         type: 'text',
         content: messageData.message,
@@ -407,6 +410,7 @@ export class ChatService {
       fileUrl = uploadImageData.fileUrl;
 
       const newMessage = {
+        _id: new Types.ObjectId(),
         senderId: id_user,
         type: 'photo',
         content: fileUrl,
@@ -460,6 +464,7 @@ export class ChatService {
       fileUrl = uploadImageData.fileUrl;
 
       const newMessage = {
+        _id: new Types.ObjectId(),
         senderId: id_user,
         type: 'video',
         content: fileUrl,
@@ -545,6 +550,7 @@ export class ChatService {
       fileUrl = uploadImageData.fileUrl;
 
       const newMessage = {
+        _id: new Types.ObjectId(),
         senderId: id_user,
         receiverId: receiverId,
         type: 'photo',
@@ -597,6 +603,7 @@ export class ChatService {
       fileUrl = uploadImageData.fileUrl;
 
       const newMessage = {
+        _id: new Types.ObjectId(),
         senderId: id_user,
         receiverId: receiverId,
         type: 'video',
