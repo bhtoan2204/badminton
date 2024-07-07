@@ -3,6 +3,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
+import { DailyIncomeData, MonthlyIncomeData } from './income.interface';
 
 @Injectable()
 export class IncomeService {
@@ -144,17 +145,48 @@ export class IncomeService {
     try {
       const startDate = new Date(year, 0, 1);
       const endDate = new Date(year, 11, 31);
-      const [data, count] = await this.financeIncomeRepository.findAndCount({
-        where: {
-          id_family,
-          income_date: Between(startDate, endDate),
-        },
-        relations: ['family', 'financeExpenditureType', 'users'],
+
+      const rawData = await this.financeIncomeRepository
+        .createQueryBuilder('fi')
+        .select('EXTRACT(MONTH FROM fi.income_date)', 'month')
+        .addSelect('fi.id_income_source', 'id_income_source')
+        .addSelect('fis.income_source_name', 'income_source_name')
+        .addSelect('SUM(fi.amount)', 'total_amount')
+        .where('fi.id_family = :id_family', { id_family })
+        .andWhere('fi.income_date BETWEEN :startDate AND :endDate', {
+          startDate,
+          endDate,
+        })
+        .leftJoin('fi.financeIncomeSource', 'fis')
+        .groupBy(
+          'EXTRACT(MONTH FROM fi.income_date), fi.id_income_source, fis.income_source_name',
+        )
+        .orderBy('EXTRACT(MONTH FROM fi.income_date)', 'ASC')
+        .getRawMany();
+
+      const monthlyIncomeData: MonthlyIncomeData[] = Array.from(
+        { length: 12 },
+        (_, i) => ({
+          month: i + 1,
+          total: 0,
+          categories: [],
+        }),
+      );
+
+      rawData.forEach((data) => {
+        const monthIndex = parseInt(data.month, 10) - 1;
+        monthlyIncomeData[monthIndex].total += parseFloat(data.total_amount);
+        monthlyIncomeData[monthIndex].categories.push({
+          name: data.income_source_name,
+          amount: parseFloat(data.total_amount),
+          id_income_source: parseInt(data.id_income_source, 10),
+        });
       });
+
       return {
-        data: data,
-        total: count,
-        message: 'Get expenditure by year',
+        data: monthlyIncomeData,
+        total: rawData.length,
+        message: 'Get income by year',
       };
     } catch (error) {
       throw new RpcException({
@@ -173,52 +205,49 @@ export class IncomeService {
     try {
       const startDate = new Date(year, month - 1, 1);
       const endDate = new Date(year, month, 0);
-      const [data, count] = await this.financeIncomeRepository.findAndCount({
-        where: {
-          id_family,
-          income_date: Between(startDate, endDate),
-        },
-        relations: ['family', 'financeExpenditureType', 'users'],
-      });
-      return {
-        data: data,
-        total: count,
-        message: 'Get expenditure by month',
-      };
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  }
 
-  async getIncomeByDateRange(
-    id_user: string,
-    id_family: number,
-    pageNumber: number,
-    itemsPerPage: number,
-    fromDate: Date,
-    toDate: Date,
-  ) {
-    try {
-      const option = {
-        where: {
-          id_family,
-        },
-        skip: (pageNumber - 1) * itemsPerPage,
-        take: itemsPerPage,
-        relations: ['family', 'financeIncomeSource', 'users'],
-      };
-      if (fromDate && toDate) {
-        option.where['income_date'] = Between(fromDate, toDate);
-      }
-      const [data, total] =
-        await this.financeIncomeRepository.findAndCount(option);
+      const rawData = await this.financeIncomeRepository
+        .createQueryBuilder('fi')
+        .select('EXTRACT(DAY FROM fi.income_date)', 'day')
+        .addSelect('fi.id_income_source', 'id_income_source')
+        .addSelect('fis.income_source_name', 'income_source_name')
+        .addSelect('SUM(fi.amount)', 'total_amount')
+        .where('fi.id_family = :id_family', { id_family })
+        .andWhere('fi.income_date BETWEEN :startDate AND :endDate', {
+          startDate,
+          endDate,
+        })
+        .leftJoin('fi.financeIncomeSource', 'fis')
+        .groupBy(
+          'EXTRACT(DAY FROM fi.income_date), fi.id_income_source, fis.income_source_name',
+        )
+        .orderBy('EXTRACT(DAY FROM fi.income_date)', 'ASC')
+        .getRawMany();
+
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const dailyIncomeData: DailyIncomeData[] = Array.from(
+        { length: daysInMonth },
+        (_, i) => ({
+          day: i + 1,
+          total: 0,
+          categories: [],
+        }),
+      );
+
+      rawData.forEach((data) => {
+        const dayIndex = parseInt(data.day, 10) - 1;
+        dailyIncomeData[dayIndex].total += parseFloat(data.total_amount);
+        dailyIncomeData[dayIndex].categories.push({
+          name: data.income_source_name,
+          amount: parseFloat(data.total_amount),
+          id_income_source: parseInt(data.id_income_source, 10),
+        });
+      });
+
       return {
-        data: data,
-        total: total,
-        message: 'Get income by date range',
+        data: dailyIncomeData,
+        total: rawData.length,
+        message: 'Get income by month',
       };
     } catch (error) {
       throw new RpcException({
