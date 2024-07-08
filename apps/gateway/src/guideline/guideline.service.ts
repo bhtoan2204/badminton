@@ -314,7 +314,8 @@ export class GuidelineService {
     page: number,
     itemsPerPage: number,
     text: string,
-    sort: string,
+    sortBy?: string,
+    sortDirection?: 'asc' | 'desc' | 'none',
   ) {
     try {
       const response = this.elasticsearchClient
@@ -322,7 +323,8 @@ export class GuidelineService {
           page,
           itemsPerPage,
           text,
-          sort,
+          sortBy,
+          sortDirection,
         })
         .pipe(timeout(15000));
       return await lastValueFrom(response);

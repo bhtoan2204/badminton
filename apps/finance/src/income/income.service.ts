@@ -164,9 +164,11 @@ export class IncomeService {
         relations: ['family', 'financeIncomeSource', 'users'],
         order: { created_at: 'DESC' },
       });
+      const sum = data.reduce((acc, cur) => acc + cur.amount, 0) || 0;
       return {
         data: data,
         total: count,
+        sum: sum,
         message: 'Get expenditure by date',
       };
     } catch (error) {

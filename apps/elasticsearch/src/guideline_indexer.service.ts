@@ -48,11 +48,12 @@ export class GuidelineIndexerService {
   async searchGuideline(query: {
     text: string;
     page: number;
-    itemsPerPage;
-    sort: 'asc' | 'desc' | 'none';
+    itemsPerPage: number;
+    sortBy?: string;
+    sortDirection?: 'asc' | 'desc' | 'none';
   }): Promise<any> {
     try {
-      const { text, page, itemsPerPage, sort } = query;
+      const { text, page, itemsPerPage, sortBy, sortDirection } = query;
       const option: any = {
         index: this.index,
         body: {
@@ -78,11 +79,11 @@ export class GuidelineIndexerService {
           },
         };
       }
-      if (sort !== 'none' && sort !== undefined) {
+      if (sortBy && sortDirection) {
         option.body.sort = [
           {
-            title: {
-              order: sort,
+            [sortBy]: {
+              order: sortDirection,
             },
           },
         ];
