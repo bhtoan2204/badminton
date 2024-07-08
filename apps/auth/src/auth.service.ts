@@ -374,8 +374,8 @@ export class AuthService {
       if (search) {
         option['where'] = [
           { email: Like(`%${search}%`) },
-          { first_name: Like(`%${search}%`) },
-          { last_name: Like(`%${search}%`) },
+          { firstname: Like(`%${search}%`) },
+          { lastname: Like(`%${search}%`) },
         ];
       }
       if (sortBy && sortDesc) {
