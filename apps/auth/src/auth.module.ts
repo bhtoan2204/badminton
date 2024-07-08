@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import {
   FirebaseService,
   GlobalJwtModule,
+  RefreshToken,
   RmqModule,
   Users,
 } from '@app/common';
@@ -41,7 +42,7 @@ import { RefreshTokenModule } from './refreshToken/refreshToken.module';
     AuthModule,
     RefreshTokenModule,
     RmqModule,
-    TypeOrmModule.forFeature([Users]),
+    TypeOrmModule.forFeature([Users, RefreshToken]),
     GlobalJwtModule,
     UserModule,
   ],

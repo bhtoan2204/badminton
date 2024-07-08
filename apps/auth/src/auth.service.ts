@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { FirebaseService, LoginType, Users } from '@app/common';
+import { FirebaseService, LoginType, RefreshToken, Users } from '@app/common';
 import { RpcException } from '@nestjs/microservices';
 import { EntityManager, Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +11,8 @@ import { TokenPayload } from './interface/tokenPayload.interface';
 export class AuthService {
   constructor(
     @InjectRepository(Users) private userRepository: Repository<Users>,
+    @InjectRepository(RefreshToken)
+    private refreshTokenRepository: Repository<RefreshToken>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly entityManager: EntityManager,
@@ -156,9 +158,11 @@ export class AuthService {
       refreshTokenExpiresIn,
     } = await this.getTokens(payload);
     try {
-      const query = 'SELECT * FROM f_generate_refresh_token ($1, $2)';
-      const parameters = [payload.id_user, refreshToken];
-      await this.entityManager.query(query, parameters);
+      const newRefreshToken = new RefreshToken();
+      newRefreshToken.id_user = payload.id_user;
+      newRefreshToken.refresh_token = refreshToken;
+      newRefreshToken.expired_at = new Date(refreshTokenExpiresIn * 1000);
+      await this.refreshTokenRepository.save(newRefreshToken);
     } catch (err) {
       throw new RpcException({
         message: err.message,
@@ -182,9 +186,11 @@ export class AuthService {
       refreshTokenExpiresIn,
     } = await this.getTokens(user);
     try {
-      const query = 'SELECT * FROM f_generate_refresh_token($1, $2)';
-      const parameters = [user.id_user, refreshToken];
-      await this.entityManager.query(query, parameters);
+      const newRefreshToken = new RefreshToken();
+      newRefreshToken.id_user = user.id_user;
+      newRefreshToken.refresh_token = refreshToken;
+      newRefreshToken.expired_at = new Date(refreshTokenExpiresIn * 1000);
+      await this.refreshTokenRepository.save(newRefreshToken);
     } catch (err) {
       throw new RpcException({
         message: err.message,
@@ -208,9 +214,11 @@ export class AuthService {
       refreshTokenExpiresIn,
     } = await this.getTokens(user);
     try {
-      const query = 'SELECT * FROM f_generate_refresh_token ($1, $2)';
-      const parameters = [user.id_user, refreshToken];
-      await this.entityManager.query(query, parameters);
+      const newRefreshToken = new RefreshToken();
+      newRefreshToken.id_user = user.id_user;
+      newRefreshToken.refresh_token = refreshToken;
+      newRefreshToken.expired_at = new Date(refreshTokenExpiresIn * 1000);
+      await this.refreshTokenRepository.save(newRefreshToken);
     } catch (err) {
       throw new RpcException({
         message: err.message,
@@ -225,6 +233,7 @@ export class AuthService {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async refreshToken(payload: Users, deletedRefreshToken: string) {
     const {
       accessToken,
@@ -233,16 +242,11 @@ export class AuthService {
       refreshTokenExpiresIn,
     } = await this.getTokens(payload);
     try {
-      const genereateQuery = 'SELECT * FROM f_generate_refresh_token ($1, $2)';
-      const generateTokenParameters = [payload.id_user, refreshToken];
-      const deleteQuery = 'SELECT * FROM f_delete_refresh_token ($1)';
-      const deleteTokenParameters = [deletedRefreshToken];
-
-      const promises = [
-        this.entityManager.query(genereateQuery, generateTokenParameters),
-        this.entityManager.query(deleteQuery, deleteTokenParameters),
-      ];
-      await Promise.all(promises);
+      const newRefreshToken = new RefreshToken();
+      newRefreshToken.id_user = payload.id_user;
+      newRefreshToken.refresh_token = refreshToken;
+      newRefreshToken.expired_at = new Date(refreshTokenExpiresIn * 1000);
+      await this.refreshTokenRepository.save(newRefreshToken);
     } catch (err) {
       throw new RpcException({
         message: err.message,
@@ -257,11 +261,12 @@ export class AuthService {
     };
   }
 
-  async logout(refreshToken) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async logout(refreshToken: string) {
     try {
-      const query = 'SELECT * FROM f_delete_refresh_token ($1)';
-      const parameters = [refreshToken];
-      await this.entityManager.query(query, parameters);
+      // const query = 'SELECT * FROM f_delete_refresh_token ($1)';
+      // const parameters = [refreshToken];
+      // await this.entityManager.query(query, parameters);
       return {
         message: 'Logout successfully',
       };
