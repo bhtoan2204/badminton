@@ -63,6 +63,6 @@ export class UsersController {
   @ApiQuery({ name: 'limit', required: true, type: Number })
   @Get('getTopUsersLogin')
   async getTopUsers(@Query('limit') limit: number) {
-    return this.usersService.getTopUsers();
+    return this.usersService.getTopUsers(limit);
   }
 }
