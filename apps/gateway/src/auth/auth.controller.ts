@@ -15,6 +15,7 @@ import { LoginDto } from './dto/login.dto';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import {
+  AdminAuthGuard,
   FacebookAuthGuard,
   GoogleAuthGuard,
   JwtRefreshGuard,
@@ -36,6 +37,15 @@ export class AuthApiController {
   @Post('local/login')
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async localLogin(@Req() request: any, @Body() loginDto: LoginDto) {
+    return this.authService.localLogin(request.user);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Admin login' })
+  @UseGuards(AdminAuthGuard)
+  @Post('admin/login')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async adminLogin(@Req() request: any, @Body() loginDto: LoginDto) {
     return this.authService.localLogin(request.user);
   }
 

@@ -54,4 +54,34 @@ export class UsersService {
       throw new HttpException(error, error.statusCode);
     }
   }
+
+  async unbanUser(id_user: string) {
+    try {
+      const source = this.authClient
+        .send('authClient/unbanUser', { id_user })
+        .pipe(timeout(15000));
+      const data = await lastValueFrom(source);
+      return data;
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
+
+  async getTopUsers(limit: number) {
+    try {
+      const source = this.authClient
+        .send('authClient/getTopUsersLogin', { limit })
+        .pipe(timeout(15000));
+      const data = await lastValueFrom(source);
+      return data;
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        throw new HttpException('Timeout', 408);
+      }
+      throw new HttpException(error, error.statusCode);
+    }
+  }
 }

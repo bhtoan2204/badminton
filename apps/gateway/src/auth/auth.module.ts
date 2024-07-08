@@ -10,6 +10,7 @@ import {
   RefreshStrategy,
   GoogleStrategy,
   FacebookStrategy,
+  AdminStrategy,
 } from '../utils';
 // import { FirebaseModule } from './firebase/firebase.module';
 
@@ -23,6 +24,7 @@ import {
     AuthApiService,
     LocalStrategy,
     JwtStrategy,
+    AdminStrategy,
     RefreshStrategy,
     GoogleStrategy,
     FacebookStrategy,

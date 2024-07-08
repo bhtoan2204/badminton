@@ -418,4 +418,27 @@ export class AuthService {
       });
     }
   }
+
+  async unbanUser(id_user: string) {
+    try {
+      const user = await this.userRepository.findOne({ where: { id_user } });
+      if (!user) {
+        throw new RpcException({
+          message: 'User not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      user.is_banned = false;
+      const data = await this.userRepository.save(user);
+      return {
+        data: data,
+        message: 'User unbanned successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
 }
