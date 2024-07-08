@@ -111,7 +111,11 @@ export class ExpenseditureController {
   @EventPattern('financeClient/updateExpensediture')
   async updateExpense(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.expenseService.updateExpensediture(data.id_user, data.dto);
+    return this.expenseService.updateExpensediture(
+      data.id_user,
+      data.dto,
+      data.file,
+    );
   }
 
   @EventPattern('financeClient/deleteExpensediture')

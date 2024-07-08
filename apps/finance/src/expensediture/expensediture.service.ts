@@ -434,6 +434,7 @@ export class ExpenseditureService {
       expenditure_date: Date;
       id_created_by: string;
     },
+    file: any,
   ) {
     try {
       const dto: any = this.transformEmptyStringsToNull(Dto);
@@ -448,8 +449,6 @@ export class ExpenseditureService {
         id_created_by,
       } = dto;
 
-      console.log(dto);
-
       const expenditure = await this.financeExpenditureRepository.findOne({
         where: { id_expenditure, id_family },
       });
@@ -459,6 +458,18 @@ export class ExpenseditureService {
           message: 'Expenditure not found',
           statusCode: HttpStatus.NOT_FOUND,
         });
+      }
+
+      if (file) {
+        const filename =
+          'expense_' + id_user + '_' + Date.now() + '_' + file.originalname;
+        const params: UploadFileRequest = {
+          file: new Uint8Array(file.buffer.data),
+          fileName: filename,
+        };
+        const uploadImageData =
+          await this.storageService.uploadImageExpense(params);
+        expenditure.image_url = uploadImageData.fileUrl;
       }
 
       if (id_expenditure_type !== undefined) {

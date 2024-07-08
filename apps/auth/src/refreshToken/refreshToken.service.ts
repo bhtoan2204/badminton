@@ -20,12 +20,14 @@ export class RefreshTokenService {
         .addSelect('user.email', 'email')
         .addSelect('user.firstname', 'firstname')
         .addSelect('user.lastname', 'lastname')
+        .addSelect('user.avatar', 'avatar')
         .addSelect('MAX(refreshToken.created_at)', 'last_login')
         .leftJoin(Users, 'user', 'user.id_user = refreshToken.id_user')
         .groupBy('refreshToken.id_user')
         .addGroupBy('user.email')
         .addGroupBy('user.firstname')
         .addGroupBy('user.lastname')
+        .addGroupBy('user.avatar')
         .orderBy('login_count', 'DESC')
         .limit(limit)
         .getRawMany();
@@ -38,6 +40,7 @@ export class RefreshTokenService {
           firstname: user.firstname,
           lastname: user.lastname,
           lastLogin: user.last_login,
+          avatar: user.avatar,
         })),
         message: 'Top user login retrieved successfully',
       };
