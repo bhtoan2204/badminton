@@ -52,4 +52,17 @@ export class UsersController {
   async banUser(@Body() dto: BanUserDto) {
     return this.usersService.banUser(dto.id_user);
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Put('unbanUser')
+  async unbanUser(@Body() dto: BanUserDto) {
+    return this.usersService.unbanUser(dto.id_user);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiQuery({ name: 'limit', required: true, type: Number })
+  @Get('getTopUsersLogin')
+  async getTopUsers(@Query('limit') limit: number) {
+    return this.usersService.getTopUsers();
+  }
 }

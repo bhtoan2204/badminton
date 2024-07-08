@@ -12,6 +12,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import * as Joi from 'joi';
 import { UserModule } from './user/user.module';
+import { RefreshTokenModule } from './refreshToken/refreshToken.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { UserModule } from './user/user.module';
     }),
     DatabaseModule,
     AuthModule,
+    RefreshTokenModule,
     RmqModule,
     TypeOrmModule.forFeature([Users]),
     GlobalJwtModule,

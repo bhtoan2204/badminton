@@ -13,16 +13,19 @@ export class RefreshToken {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('varchar')
+  @Column('varchar', { select: false })
   refresh_token: string;
 
-  @ManyToOne(() => Users)
-  @JoinColumn({ name: 'id_user' })
-  id_user: Users;
+  @Column('uuid')
+  id_user: string;
 
   @CreateDateColumn()
   created_at: Date;
 
   @Column('timestamp')
   expired_at: Date;
+
+  @ManyToOne(() => Users, (user) => user.refreshTokens, { nullable: false })
+  @JoinColumn({ name: 'id_user' })
+  user: Users;
 }

@@ -14,6 +14,7 @@ import { Feedback } from './feedback.entity';
 import { Order } from './order.entity';
 import { FinanceExpenditure } from './finance_expenditure.entity';
 import { FinanceIncome } from './finance_income.entity';
+import { RefreshToken } from './refresh_token.entity';
 
 @Entity('users')
 export class Users {
@@ -101,4 +102,7 @@ export class Users {
 
   @OneToMany(() => FinanceIncome, (financeIncome) => financeIncome.users)
   financeIncomes: FinanceIncome[];
+
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+  refreshTokens: RefreshToken[];
 }
