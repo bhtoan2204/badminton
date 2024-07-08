@@ -376,8 +376,9 @@ export class GuidelineController {
   @ApiQuery({ name: 'page', required: false, type: String })
   @ApiQuery({ name: 'itemsPerPage', required: false, type: String })
   @ApiQuery({ name: 'text', required: false, type: String })
+  @ApiQuery({ name: 'sortBy', required: false, type: String })
   @ApiQuery({
-    name: 'sort',
+    name: 'sortDirection',
     required: false,
     type: String,
     enum: ['asc', 'desc', 'none'],
@@ -387,13 +388,15 @@ export class GuidelineController {
     @Query('page') page: number,
     @Query('itemsPerPage') itemsPerPage: number,
     @Query('text') text: string,
-    @Query('sort') sort: 'asc' | 'desc' | 'none' = 'none',
+    @Query('sortBy') sortBy: string,
+    @Query('sortDirection') sortDirection: 'asc' | 'desc' | 'none' = 'none',
   ) {
     return this.guidelineService.getSharedGuideline(
       page,
       itemsPerPage,
       text,
-      sort,
+      sortBy,
+      sortDirection,
     );
   }
 

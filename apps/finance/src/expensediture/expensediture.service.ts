@@ -149,9 +149,12 @@ export class ExpenseditureService {
           relations: ['family', 'financeExpenditureType', 'users'],
           order: { created_at: 'DESC' },
         });
+      const sum =
+        data.map((expense) => expense.amount).reduce((a, b) => a + b, 0) || 0;
       return {
         data: data,
         total: count,
+        sum: sum,
         message: 'Get expenditure by date',
       };
     } catch (error) {
