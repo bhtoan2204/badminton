@@ -135,36 +135,47 @@ export class ChatService {
     index: number,
   ): Promise<any[]> {
     try {
-      const limit = 20; // Số lượng tin nhắn mỗi lần lấy
-      const skip = index * limit; // Số lượng tin nhắn cần bỏ qua
+      const skip = index * limit;
 
-      const userConversation = await this.userConversationsRepository.findOne(
-        { userId: senderId },
-        { conversations: 1 },
-      );
+      const conversation = await this.userConversationsRepository
+        .aggregate([
+          {
+            $match: {
+              userId: senderId,
+              'conversations.receiverId': receiverId,
+            },
+          },
+          { $unwind: '$conversations' },
+          { $match: { 'conversations.receiverId': receiverId } },
+          {
+            $project: {
+              messages: '$conversations.messages',
+              totalMessages: { $size: '$conversations.messages' },
+            },
+          },
+          {
+            $project: {
+              messages: {
+                $slice: [
+                  '$messages',
+                  { $subtract: ['$totalMessages', skip + limit] },
+                  limit,
+                ],
+              },
+            },
+          },
+        ])
+        .exec();
 
-      if (!userConversation || userConversation.conversations.length === 0) {
+      if (
+        !conversation ||
+        conversation.length === 0 ||
+        conversation[0].messages.length === 0
+      ) {
         return [];
       }
 
-      const lastConversation = userConversation.conversations.find(
-        (conv) => conv.receiverId === receiverId,
-      );
-
-      if (!lastConversation || lastConversation.messages.length === 0) {
-        return [];
-      }
-
-      const totalMessages = lastConversation.messages.length;
-
-      if (skip >= totalMessages) {
-        return [];
-      }
-
-      const start = Math.max(totalMessages - skip - limit, 0);
-      const end = totalMessages - skip;
-      const messages = lastConversation.messages.slice(start, end).reverse();
-
+      const messages = conversation[0].messages.reverse();
       return messages;
     } catch (error) {
       throw new RpcException({
