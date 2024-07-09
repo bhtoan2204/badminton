@@ -1,9 +1,8 @@
 import { RmqModule } from '@app/common';
 import { Module, forwardRef } from '@nestjs/common';
-import { CALENDAR_SERVICE, FAMILY_SERVICE, PermissionGuard } from '../utils';
+import { CALENDAR_SERVICE, FAMILY_SERVICE } from '../utils';
 import { CalendarController } from './calendar.controller';
 import { CalendarService } from './calendar.service';
-import { APP_GUARD } from '@nestjs/core';
 import { ChecklistModule } from './checklist/checklist.module';
 
 @Module({
@@ -13,13 +12,7 @@ import { ChecklistModule } from './checklist/checklist.module';
     forwardRef(() => ChecklistModule),
   ],
   controllers: [CalendarController],
-  providers: [
-    CalendarService,
-    {
-      provide: APP_GUARD,
-      useClass: PermissionGuard,
-    },
-  ],
+  providers: [CalendarService],
   exports: [RmqModule],
 })
 export class CalendarModule {}

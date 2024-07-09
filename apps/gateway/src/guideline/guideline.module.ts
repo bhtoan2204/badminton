@@ -4,11 +4,9 @@ import {
   ELASTICSEARCH_SERVICE,
   FAMILY_SERVICE,
   GUIDELINE_SERVICE,
-  PermissionGuard,
 } from '../utils';
 import { GuidelineController } from './guideline.controller';
 import { GuidelineService } from './guideline.service';
-import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -17,12 +15,6 @@ import { APP_GUARD } from '@nestjs/core';
     RmqModule.register({ name: ELASTICSEARCH_SERVICE }),
   ],
   controllers: [GuidelineController],
-  providers: [
-    GuidelineService,
-    {
-      provide: APP_GUARD,
-      useClass: PermissionGuard,
-    },
-  ],
+  providers: [GuidelineService],
 })
 export class GuidelineModule {}

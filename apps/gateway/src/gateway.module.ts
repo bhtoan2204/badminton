@@ -9,7 +9,7 @@ import { CrawlerModule } from './crawler/crawler.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { UserModule } from './user/user.module';
 import { GuidelineModule } from './guideline/guideline.module';
-import { AppLoggerMiddleware } from './utils';
+import { AppLoggerMiddleware, PermissionGuard } from './utils';
 import { EducationModule } from './education/education.module';
 import { HouseholdModule } from './household/household.module';
 import { FinanceModule } from './finance/finance.module';
@@ -18,6 +18,7 @@ import { MailModule } from './mailer/mailer.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { BullModule } from '@nestjs/bull';
 import * as Joi from 'joi';
+import { APP_GUARD } from '@nestjs/core';
 
 const globalModule = (module: DynamicModule) => {
   module.global = true;
@@ -103,6 +104,12 @@ const globalModule = (module: DynamicModule) => {
     FinanceModule,
     ShoppingModule,
     AdminModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard,
+    },
   ],
 })
 export class GatewayModule {
