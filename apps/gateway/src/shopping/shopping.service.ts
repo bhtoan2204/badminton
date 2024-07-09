@@ -85,7 +85,7 @@ export class ShoppingService {
         .send('shoppingClient/createShoppingList', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Shopping List',
@@ -125,7 +125,7 @@ export class ShoppingService {
         .send('shoppingClient/createShoppingItem', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Shopping Item',
@@ -150,7 +150,7 @@ export class ShoppingService {
         .send('shoppingClient/updateShoppingList', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'Shopping List Updated',
@@ -175,7 +175,7 @@ export class ShoppingService {
         .send('shoppingClient/updateShoppingItem', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'Shopping Item Updated',
@@ -208,7 +208,7 @@ export class ShoppingService {
         })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
           title: 'Shopping List Deleted',
@@ -243,7 +243,7 @@ export class ShoppingService {
         })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
           title: 'Shopping Item Deleted',

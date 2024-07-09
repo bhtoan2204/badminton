@@ -61,7 +61,7 @@ export class ChecklistService {
         .send('calendarClient/createChecklist', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Checklist created',
@@ -86,7 +86,7 @@ export class ChecklistService {
         .send('calendarClient/updateChecklist', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'Checklist updated',
@@ -119,7 +119,7 @@ export class ChecklistService {
         })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
           title: 'Checklist deleted',

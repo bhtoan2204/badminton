@@ -66,7 +66,7 @@ export class GuidelineService {
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
 
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Guideline',
@@ -93,7 +93,7 @@ export class GuidelineService {
         .send('guidelineClient/update_guideline', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'Guideline Updated',
@@ -126,7 +126,7 @@ export class GuidelineService {
         })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: id_family,
         notificationData: {
           title: 'Guideline Deleted',
@@ -169,7 +169,7 @@ export class GuidelineService {
         .send('guidelineClient/add_step', { id_user, dto, file })
         .pipe(timeout(10000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Step',
@@ -198,7 +198,7 @@ export class GuidelineService {
         .send('guidelineClient/insert_step', { id_user, dto, file })
         .pipe(timeout(10000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Step',
@@ -227,7 +227,7 @@ export class GuidelineService {
         .send('guidelineClient/update_step', { id_user, dto, file })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'Step Updated',
@@ -262,7 +262,7 @@ export class GuidelineService {
         })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: id_family,
         notificationData: {
           title: 'Step Deleted',
@@ -291,7 +291,7 @@ export class GuidelineService {
         })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: id_family,
         notificationData: {
           title: 'Guideline Shared',

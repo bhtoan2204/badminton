@@ -119,7 +119,7 @@ export class IncomeService {
         .send('financeClient/createIncome', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Income created',
@@ -144,7 +144,7 @@ export class IncomeService {
         .send('financeClient/updateIncome', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'Income updated',
@@ -169,7 +169,7 @@ export class IncomeService {
         .send('financeClient/deleteIncome', { id_user, id_family, id_income })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
           title: 'Income deleted',

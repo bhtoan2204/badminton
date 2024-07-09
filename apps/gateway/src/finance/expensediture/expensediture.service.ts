@@ -127,7 +127,7 @@ export class ExpenseditureService {
         .send('financeClient/createExpensediture', { id_user, dto, file })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Expenditure Created',
@@ -157,7 +157,7 @@ export class ExpenseditureService {
         .send('financeClient/updateExpensediture', { id_user, dto, file })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'Expenditure Updated',
@@ -190,7 +190,7 @@ export class ExpenseditureService {
         })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
           title: 'Expenditure deleted',
