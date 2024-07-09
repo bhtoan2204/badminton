@@ -39,7 +39,7 @@ export class UtilitiesService {
         order: { created_at: 'DESC' },
         skip: (page - 1) * itemsPerPage,
         take: itemsPerPage,
-        relations: ['utilitiesType', 'family'],
+        relations: ['utilitiesType'],
       });
       return {
         data,
@@ -58,7 +58,7 @@ export class UtilitiesService {
     try {
       const data = await this.utilitiesRepository.findOne({
         where: { id_family, id_utility },
-        relations: ['utilitiesType', 'family'],
+        relations: ['utilitiesType'],
       });
       if (!data) {
         throw new RpcException({

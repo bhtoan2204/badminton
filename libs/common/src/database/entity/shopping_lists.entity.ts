@@ -5,12 +5,19 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Family } from './family.entity';
 import { ShoppingItems } from './shopping_items.entity';
 import { ShoppingListTypes } from './shopping_list_type.entity';
+import { FinanceExpenditure } from './finance_expenditure.entity';
+
+export enum ShoppingListsStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+}
 
 @Entity('shopping_lists')
 export class ShoppingLists {
@@ -23,14 +30,21 @@ export class ShoppingLists {
   @Column()
   id_shopping_list_type: number;
 
+  @Column({ nullable: true, default: null })
+  id_expenditure: number;
+
   @Column('varchar', { length: 255, nullable: false })
   title: string;
 
   @Column('varchar', { nullable: true })
   description: string;
 
-  @Column('varchar', { length: 255, nullable: true })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: ShoppingListsStatus,
+    default: ShoppingListsStatus.IN_PROGRESS,
+  })
+  status: ShoppingListsStatus;
 
   @CreateDateColumn()
   created_at: Date;
@@ -51,4 +65,8 @@ export class ShoppingLists {
 
   @OneToMany(() => ShoppingItems, (shoppingItem) => shoppingItem.shoppingList)
   shoppingItems: ShoppingItems[];
+
+  @OneToOne(() => FinanceExpenditure)
+  @JoinColumn({ name: 'id_expenditure' })
+  expenditure: FinanceExpenditure;
 }

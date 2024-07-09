@@ -31,6 +31,7 @@ export class FeedbackService {
     search: string,
     sortBy: string,
     sortDesc: boolean,
+    rate: number,
   ) {
     try {
       const response = this.paymentClient
@@ -40,6 +41,7 @@ export class FeedbackService {
           search,
           sortBy,
           sortDesc,
+          rate,
         })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);

@@ -119,7 +119,7 @@ export class CalendarService {
     try {
       const [data, total] = await this.calendarRepository.findAndCount({
         where: { id_family },
-        relations: ['categoryEvent', 'family'],
+        relations: ['categoryEvent'],
         order: { created_at: 'DESC' },
       });
       return {
@@ -135,7 +135,7 @@ export class CalendarService {
     }
   }
 
-  async getEventOnDate(id_user: string, dto) {
+  async getEventOnDate(id_user: string, dto: any) {
     try {
       const { id_family, date } = dto;
       const dateStart = new Date(date);
@@ -146,7 +146,7 @@ export class CalendarService {
           id_family,
           time_start: And(MoreThanOrEqual(dateStart), LessThanOrEqual(dateEnd)),
         },
-        relations: ['categoryEvent', 'family'],
+        relations: ['categoryEvent'],
       });
       return {
         message: 'Success',
@@ -168,7 +168,7 @@ export class CalendarService {
     try {
       const data = await this.calendarRepository.findOne({
         where: { id_calendar, id_family },
-        relations: ['categoryEvent', 'family'],
+        relations: ['categoryEvent'],
       });
       if (!data) {
         throw new RpcException({

@@ -43,7 +43,6 @@ export class ExpenseditureService {
           where: { id_family },
           skip: (page - 1) * itemsPerPage,
           take: itemsPerPage,
-          relations: ['family'],
         });
       return {
         data: data,
@@ -146,7 +145,7 @@ export class ExpenseditureService {
             id_family,
             expenditure_date: Between(startDate, endDate),
           },
-          relations: ['family', 'financeExpenditureType', 'users'],
+          relations: ['financeExpenditureType', 'users'],
           order: { created_at: 'DESC' },
         });
       const sum =
@@ -293,7 +292,7 @@ export class ExpenseditureService {
         },
         skip: (pageNumber - 1) * itemsPerPage,
         take: itemsPerPage,
-        relations: ['family', 'financeExpenditureType', 'users'],
+        relations: ['financeExpenditureType', 'users'],
       };
       if (fromDate && toDate) {
         option.where['expenditure_date'] = Between(fromDate, toDate);
@@ -321,7 +320,7 @@ export class ExpenseditureService {
     try {
       const expenditure = await this.financeExpenditureRepository.findOne({
         where: { id_expenditure, id_family },
-        relations: ['family', 'financeExpenditureType', 'users'],
+        relations: ['financeExpenditureType', 'users'],
       });
       if (!expenditure) {
         throw new RpcException({

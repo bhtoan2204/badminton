@@ -79,6 +79,7 @@ export class PaymentController {
       data.search,
       data.sortBy,
       data.sortDesc,
+      data.rate,
     );
   }
 

@@ -130,7 +130,7 @@ export class IncomeService {
         },
         skip: (pageNumber - 1) * itemsPerPage,
         take: itemsPerPage,
-        relations: ['family', 'financeIncomeSource', 'users'],
+        relations: ['financeIncomeSource', 'users'],
       };
       if (fromDate && toDate) {
         option.where['income_date'] = Between(fromDate, toDate);
@@ -161,7 +161,7 @@ export class IncomeService {
           id_family,
           income_date: Between(startDate, endDate),
         },
-        relations: ['family', 'financeIncomeSource', 'users'],
+        relations: ['financeIncomeSource', 'users'],
         order: { created_at: 'DESC' },
       });
       const sum = data.reduce((acc, cur) => acc + cur.amount, 0) || 0;
@@ -302,7 +302,7 @@ export class IncomeService {
           id_income: id_income,
           id_family: id_family,
         },
-        relations: ['family', 'financeIncomeSource', 'users'],
+        relations: ['financeIncomeSource', 'users'],
       });
       if (!income) {
         throw new RpcException({

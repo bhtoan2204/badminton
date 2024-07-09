@@ -43,6 +43,10 @@ import { FinanceIncome } from './entity/finance_income.entity';
 import { FinanceIncomeSource } from './entity/finance_income_source.entity';
 import { FinanceAssets } from './entity/finance_assets.entity';
 import { RefreshToken } from './entity/refresh_token.entity';
+import { FamilySubscriber } from './subcriber/family.subcriber';
+import { UtilitiesSubcriber } from './subcriber/utilities.subcriber';
+import { ShoppingListSubscriber } from './subcriber/shoppingList.subcriber';
+import { ShoppingItemSubscriber } from './subcriber/shoppingItems.subcriber';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -117,6 +121,12 @@ import { RefreshToken } from './entity/refresh_token.entity';
       inject: [ConfigService],
     }),
   ],
-  providers: [OrderSubscriber],
+  providers: [
+    OrderSubscriber,
+    FamilySubscriber,
+    UtilitiesSubcriber,
+    ShoppingListSubscriber,
+    ShoppingItemSubscriber,
+  ],
 })
 export class DatabaseModule {}

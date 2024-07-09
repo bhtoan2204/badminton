@@ -4,11 +4,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UtilitiesType } from './utilities_type.entity';
 import { Family } from './family.entity';
+import { FinanceExpenditure } from './finance_expenditure.entity';
 
 @Entity('utilities')
 export class Utilities {
@@ -30,6 +32,9 @@ export class Utilities {
   @Column({ nullable: false, default: 0 })
   value: number;
 
+  @Column({ nullable: true, default: null })
+  id_expenditure: number;
+
   @CreateDateColumn()
   created_at: Date;
 
@@ -43,4 +48,8 @@ export class Utilities {
   @ManyToOne(() => Family, (family) => family.utilities)
   @JoinColumn({ name: 'id_family' })
   family: Family;
+
+  @OneToOne(() => FinanceExpenditure)
+  @JoinColumn({ name: 'id_expenditure' })
+  expenditure: FinanceExpenditure;
 }
