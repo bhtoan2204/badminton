@@ -136,57 +136,35 @@ export class ChatService {
   ): Promise<any[]> {
     try {
       const skip = index * limit;
-      const conversationForCount =
-        await this.userConversationsRepository.findOne(
-          {
-            userId: senderId,
-            'conversations.receiverId': receiverId,
-          },
-          { 'conversations.$': 1 },
-        );
 
-      if (
-        !conversationForCount ||
-        conversationForCount.conversations.length === 0
-      ) {
+      const userConversation = await this.userConversationsRepository.findOne(
+        { userId: senderId },
+        { conversations: 1 },
+      );
+
+      if (!userConversation || userConversation.conversations.length === 0) {
         return [];
       }
-      const totalMessages =
-        conversationForCount.conversations[0].messages.length;
+
+      const lastConversation = userConversation.conversations.find(
+        (conv) => conv.receiverId === receiverId,
+      );
+
+      if (!lastConversation || lastConversation.messages.length === 0) {
+        return [];
+      }
+
+      const totalMessages = lastConversation.messages.length;
 
       if (skip >= totalMessages) {
         return [];
       }
+
       const messagesPosition = Math.max(totalMessages - skip - limit, 0);
-      const conversation = await this.userConversationsRepository
-        .aggregate([
-          {
-            $match: {
-              userId: senderId,
-              'conversations.receiverId': receiverId,
-            },
-          },
-          { $unwind: '$conversations' },
-          { $match: { 'conversations.receiverId': receiverId } },
-          {
-            $project: {
-              messages: {
-                $slice: ['$conversations.messages', messagesPosition, limit],
-              },
-            },
-          },
-        ])
-        .exec();
+      const messages = lastConversation.messages
+        .slice(messagesPosition, totalMessages)
+        .reverse();
 
-      if (
-        !conversation ||
-        conversation.length === 0 ||
-        conversation[0].messages.length === 0
-      ) {
-        return [];
-      }
-
-      const messages = conversation[0].messages.reverse();
       return messages;
     } catch (error) {
       throw new RpcException({
