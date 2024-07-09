@@ -135,7 +135,8 @@ export class ChatService {
     index: number,
   ): Promise<any[]> {
     try {
-      const skip = index * limit;
+      const limit = 20; // Số lượng tin nhắn mỗi lần lấy
+      const skip = index * limit; // Số lượng tin nhắn cần bỏ qua
 
       const userConversation = await this.userConversationsRepository.findOne(
         { userId: senderId },
@@ -160,10 +161,9 @@ export class ChatService {
         return [];
       }
 
-      const messagesPosition = Math.max(totalMessages - skip - limit, 0);
-      const messages = lastConversation.messages
-        .slice(messagesPosition, totalMessages)
-        .reverse();
+      const start = Math.max(totalMessages - skip - limit, 0);
+      const end = totalMessages - skip;
+      const messages = lastConversation.messages.slice(start, end).reverse();
 
       return messages;
     } catch (error) {
