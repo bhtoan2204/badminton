@@ -1,12 +1,11 @@
 import { RmqModule } from '@app/common';
 import { Module, forwardRef } from '@nestjs/common';
-import { FAMILY_SERVICE, FINANCE_SERVICE, PermissionGuard } from '../utils';
+import { FAMILY_SERVICE, FINANCE_SERVICE } from '../utils';
 import { FinanceService } from './finance.service';
 import { FinanceController } from './finance.controller';
 import { ExpenseditureModule } from './expensediture/expensediture.module';
 import { IncomeModule } from './income/income.module';
 import { AssetModule } from './asset/asset.module';
-import { APP_GUARD } from '@nestjs/core';
 import { UtilitiesModule } from './utilities/utilities.module';
 
 @Module({
@@ -19,13 +18,7 @@ import { UtilitiesModule } from './utilities/utilities.module';
     forwardRef(() => UtilitiesModule),
   ],
   controllers: [FinanceController],
-  providers: [
-    FinanceService,
-    {
-      provide: APP_GUARD,
-      useClass: PermissionGuard,
-    },
-  ],
+  providers: [FinanceService],
   exports: [RmqModule],
 })
 export class FinanceModule {}
