@@ -30,6 +30,7 @@ export class FeedbackController {
   @ApiQuery({ name: 'search', required: false, type: String })
   @ApiQuery({ name: 'sortBy', required: false, type: String })
   @ApiQuery({ name: 'sortDesc', required: false, type: Boolean })
+  @ApiQuery({ name: 'rate', required: false, type: Number })
   @Get()
   async getFeedback(@Query() query: any) {
     return this.feedbackService.getFeedback(
@@ -38,6 +39,7 @@ export class FeedbackController {
       query.search,
       query.sortBy,
       query.sortDesc,
+      query.rate,
     );
   }
 }

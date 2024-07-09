@@ -94,7 +94,7 @@ export class ShoppingService {
         order: { created_at: 'DESC' },
         skip: (page - 1) * itemsPerPage,
         take: itemsPerPage,
-        relations: ['itemType', 'shoppingList'],
+        relations: ['itemType'],
       });
       return {
         data: data,
@@ -189,16 +189,35 @@ export class ShoppingService {
 
   async updateShoppingList(id_user: string, dto: any) {
     try {
-      const { id_list, title, description } = dto;
-      const shoppingList = await this.shoppingListsRepository.findOne(id_list);
+      const { id_list, title, description, status, id_shopping_list_type } =
+        dto;
+      const shoppingList = await this.shoppingListsRepository.findOne({
+        where: { id_list: id_list },
+      });
       if (!shoppingList) {
         throw new RpcException({
           message: 'Shopping list not found',
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
+
+      if (id_shopping_list_type) {
+        const shoppingListType = await this.shoppingListTypesRepository.findOne(
+          {
+            where: { id_shopping_list_type: id_shopping_list_type },
+          },
+        );
+        if (!shoppingListType) {
+          throw new RpcException({
+            message: 'Shopping list type not found',
+            statusCode: HttpStatus.NOT_FOUND,
+          });
+        }
+        shoppingList.id_shopping_list_type = id_shopping_list_type;
+      }
       if (title) shoppingList.title = title;
       if (description) shoppingList.description = description;
+      if (status) shoppingList.status = status;
       const data = await this.shoppingListsRepository.save(shoppingList);
       return {
         data: data,

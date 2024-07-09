@@ -1,5 +1,12 @@
+import { ShoppingListsStatus } from '@app/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class UpdateShoppingListDto {
   @ApiProperty({ description: 'id of list' })
@@ -26,4 +33,13 @@ export class UpdateShoppingListDto {
   @IsOptional()
   @IsString()
   description: string;
+
+  @ApiProperty({
+    type: 'enum',
+    enum: ShoppingListsStatus,
+    description: 'Status of checklist',
+  })
+  @IsOptional()
+  @IsEnum(ShoppingListsStatus)
+  status: ShoppingListsStatus;
 }

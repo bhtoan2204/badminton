@@ -3,6 +3,7 @@ import {
   EntitySubscriberInterface,
   UpdateEvent,
   DataSource,
+  Repository,
 } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Order, OrderStatus, PackageType, PaymentHistory } from '@app/common';
@@ -11,8 +12,10 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 @EventSubscriber()
 export class OrderSubscriber implements EntitySubscriberInterface<Order> {
+  paymentHistoryRepo: Repository<PaymentHistory>;
   constructor(@InjectDataSource() private readonly dataSource: DataSource) {
     this.dataSource.subscribers.push(this);
+    this.paymentHistoryRepo = this.dataSource.getRepository(PaymentHistory);
   }
 
   listenTo() {
@@ -28,9 +31,7 @@ export class OrderSubscriber implements EntitySubscriberInterface<Order> {
       entity.status !== databaseEntity.status &&
       entity.status === OrderStatus.SUCCESS
     ) {
-      const paymentHistoryRepo = this.dataSource.getRepository(PaymentHistory);
-
-      const paymentHistory = paymentHistoryRepo.create({
+      const paymentHistory = this.paymentHistoryRepo.create({
         id_user: (entity as Order).id_user,
         id_order: (entity as Order).id_order,
         amount: (entity as Order).price,
@@ -38,7 +39,7 @@ export class OrderSubscriber implements EntitySubscriberInterface<Order> {
         payment_method: (entity as Order).method,
       });
 
-      await paymentHistoryRepo.save(paymentHistory);
+      await this.paymentHistoryRepo.save(paymentHistory);
     }
   }
 

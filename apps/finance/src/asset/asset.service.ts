@@ -24,7 +24,6 @@ export class AssetService {
         where: { id_family: id_family },
         skip: (page - 1) * itemsPerPage,
         take: itemsPerPage,
-        relations: ['family'],
         order: { created_at: 'DESC' },
       });
       return {

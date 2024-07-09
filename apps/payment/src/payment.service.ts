@@ -522,8 +522,31 @@ export class PaymentService {
           message: 'Feedback fetched successfully',
         };
       }
+      const totalFeedbacksByRating = await this.feedbackRepository
+        .createQueryBuilder('feedback')
+        .select('feedback.rating', 'rating')
+        .addSelect('COUNT(feedback.rating)', 'count')
+        .where('feedback.rating BETWEEN :minRating AND :maxRating', {
+          minRating: 1,
+          maxRating: 5,
+        })
+        .groupBy('feedback.rating')
+        .getRawMany();
+      const feedbackCounts = {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      };
+
+      totalFeedbacksByRating.forEach((item) => {
+        feedbackCounts[item.rating] = parseInt(item.count, 10);
+      });
+
       return {
         data: result,
+        totalFeedbacksByRating: totalFeedbacksByRating,
         message: 'Feedback fetched successfully',
       };
     } catch (error) {
@@ -562,6 +585,7 @@ export class PaymentService {
     search: string,
     sortBy: string,
     sortDesc: boolean,
+    rate: number,
   ) {
     try {
       const query = this.feedbackRepository
@@ -583,16 +607,15 @@ export class PaymentService {
         );
       }
 
+      if (rate) {
+        query.andWhere('feedbacks.rating = :rate', { rate: rate });
+      }
+
       if (sortBy && sortDesc !== undefined) {
         query.orderBy(`feedbacks.${sortBy}`, sortDesc ? 'DESC' : 'ASC');
       }
 
       const [data, total] = await query.getManyAndCount();
-      return {
-        data: data,
-        total: total,
-        message: 'Feedback fetched successfully',
-      };
       return {
         data: data,
         total: total,

@@ -19,10 +19,10 @@ export class FinanceExpenditure {
   @Column('int', { nullable: false })
   id_family: number;
 
-  @Column('int', { nullable: false })
+  @Column('int', { nullable: true })
   id_expenditure_type: number;
 
-  @Column('uuid', { nullable: false })
+  @Column('uuid', { nullable: true })
   id_created_by: string;
 
   @Column('int', { nullable: false, default: 0 })

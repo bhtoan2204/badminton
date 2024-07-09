@@ -40,7 +40,7 @@ export class ChecklistService {
         where: { id_family: id_family },
         skip: (page - 1) * itemsPerPage,
         take: itemsPerPage,
-        relations: ['family', 'checklistType'],
+        relations: ['checklistType'],
         order: { created_at: 'DESC' },
       });
 
@@ -98,6 +98,7 @@ export class ChecklistService {
       task_name,
       description,
       due_date,
+      is_completed,
     } = dto;
     try {
       const checklist = await this.checklistRepository.findOne({
@@ -129,6 +130,9 @@ export class ChecklistService {
       }
       if (due_date !== undefined) {
         checklist.due_date = due_date;
+      }
+      if (is_completed !== undefined) {
+        checklist.is_completed = is_completed;
       }
       const updatedChecklist = await this.checklistRepository.save(checklist);
       return {

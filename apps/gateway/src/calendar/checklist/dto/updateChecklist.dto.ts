@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsDateString,
   IsNotEmpty,
   IsNumber,
@@ -61,4 +62,14 @@ export class UpdateChecklistDto {
   @IsOptional()
   @IsDateString()
   due_date: string;
+
+  @ApiProperty({
+    type: Boolean,
+    description: 'Status of checklist',
+    required: true,
+    example: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  is_completed: boolean;
 }
