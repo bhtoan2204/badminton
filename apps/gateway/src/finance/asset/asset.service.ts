@@ -49,7 +49,7 @@ export class AssetService {
         .send('financeClient/createAsset', { id_user, dto, file })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'Asset Created',
@@ -78,7 +78,7 @@ export class AssetService {
         .send('financeClient/updateAsset', { id_user, dto, file })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'Asset Updated',
@@ -103,7 +103,7 @@ export class AssetService {
         .send('financeClient/deleteAsset', { id_user, id_family, id_asset })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
           title: 'Asset Deleted',

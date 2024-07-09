@@ -51,7 +51,7 @@ export class ChatService {
         message,
       });
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationUser', {
+      this.notificationsQueue.add('createNotificationUser', {
         id_user: message.receiverId,
         notificationData: {
           title: 'New message',
@@ -77,7 +77,7 @@ export class ChatService {
         message,
       });
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: message.familyId,
         notificationData: {
           title: 'New message',
@@ -103,7 +103,7 @@ export class ChatService {
         { id_user, message: familyId, file },
       );
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: familyId,
         notificationData: {
           title: 'New message',
@@ -129,7 +129,7 @@ export class ChatService {
         { id_user, familyId, file },
       );
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: familyId,
         notificationData: {
           title: 'New message',
@@ -156,7 +156,7 @@ export class ChatService {
         file,
       });
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationUser', {
+      this.notificationsQueue.add('createNotificationUser', {
         id_user: receiverId,
         notificationData: {
           title: 'New message',
@@ -183,7 +183,7 @@ export class ChatService {
         file,
       });
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationUser', {
+      this.notificationsQueue.add('createNotificationUser', {
         id_user: receiverId,
         notificationData: {
           title: 'New message',

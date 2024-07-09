@@ -26,7 +26,7 @@ spec:
           command: ['node', 'dist/apps/chat/src/main.js']
           resources:
             limits:
-              cpu: '50m'
+              cpu: '100m'
               memory: '256Mi'
           env:
             - name: NODE_ENV

@@ -73,7 +73,7 @@ export class HouseholdService {
         .send('householdClient/createItem', { id_user, dto, file })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Household Item Created',
@@ -98,7 +98,7 @@ export class HouseholdService {
         .send('householdClient/updateItem', { id_user, dto, file })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'Household Item Updated',
@@ -123,7 +123,7 @@ export class HouseholdService {
         .send('householdClient/inputDurableItem', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Durable Item Changed',
@@ -148,7 +148,7 @@ export class HouseholdService {
         .send('householdClient/inputConsumableItem', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Consumable Item Changed',
@@ -173,7 +173,7 @@ export class HouseholdService {
         .send('householdClient/deleteItem', { id_user, id_family, id_item })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
           title: 'Household Item Deleted',

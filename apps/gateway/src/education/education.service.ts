@@ -21,7 +21,7 @@ export class EducationService {
         .send('educationClient/createEducationProgress', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Education Progress',
@@ -101,7 +101,7 @@ export class EducationService {
         .send('educationClient/updateDetailEducationProgress', { id_user, dto })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'Education Progress Updated',
@@ -134,7 +134,7 @@ export class EducationService {
         })
         .pipe(timeout(15000));
       const data = await lastValueFrom(response);
-      await this.notificationsQueue.add('createNotificationFamily', {
+      this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
           title: 'Education Progress Deleted',
