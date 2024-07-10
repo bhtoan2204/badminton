@@ -137,8 +137,10 @@ export class IncomeService {
       }
       const [data, total] =
         await this.financeIncomeRepository.findAndCount(option);
+      const sum = data.reduce((acc, cur) => acc + cur.amount, 0) || 0;
       return {
         data: data,
+        sum: sum,
         total: total,
         message: 'Get income by date range',
       };

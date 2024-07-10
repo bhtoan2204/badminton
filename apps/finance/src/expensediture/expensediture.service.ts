@@ -299,9 +299,12 @@ export class ExpenseditureService {
       }
       const [data, total] =
         await this.financeExpenditureRepository.findAndCount(option);
+      const sum =
+        data.map((expense) => expense.amount).reduce((a, b) => a + b, 0) || 0;
       return {
         data: data,
         total: total,
+        sum: sum,
         message: 'Get expenditure by date range',
       };
     } catch (error) {

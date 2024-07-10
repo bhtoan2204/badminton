@@ -1,8 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { CrawlerModule } from './crawler.module';
-import { RmqService } from '@app/common';
+import { initTracing, RmqService } from '@app/common';
 
 async function bootstrap() {
+  await initTracing('crawler');
   const app = await NestFactory.create(CrawlerModule);
   const rmqService = app.get<RmqService>(RmqService);
   app.connectMicroservice(rmqService.getOptions('CRAWLER'));

@@ -91,7 +91,7 @@ pipeline {
                                 echo "First deployment, skipping rollout restart"; \
                             else \
                                 for deployment in \$DEPLOYMENTS; do \
-                                    if [[ "\$deployment" != "rabbitmq-deployment" && "\$deployment" != "redis-deployment" ]]; then \
+                                    if [[ "\$deployment" != "rabbitmq-deployment" && "\$deployment" != "redis-deployment" && "\$deployment" != "jaeger-deployment" ]]; then \
                                         kubectl rollout restart deployment/\$deployment; \
                                     fi; \
                                 done \
