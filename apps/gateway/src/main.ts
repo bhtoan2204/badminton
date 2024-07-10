@@ -5,8 +5,10 @@ import { ConfigService } from '@nestjs/config';
 import { setupSwagger } from './utils';
 import * as session from 'express-session';
 import * as cors from 'cors';
+import { initTracing } from '@app/common';
 
 async function bootstrap() {
+  await initTracing('gateway');
   const app = await NestFactory.create(GatewayModule);
   app.useGlobalPipes(new ValidationPipe());
   const configService = app.get(ConfigService);
