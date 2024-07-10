@@ -49,7 +49,10 @@ export class ChatController {
   @Post('sendMessage')
   async sendMessage(@CurrentUser() user, @Body() dto: NewMessageDto) {
     const data = await this.chatService.saveMessage(user.id_user, dto);
-    this.chatGateway.emitMessageToUser(dto.receiverId, data);
+    await Promise.all([
+      this.chatGateway.emitMessageToUser(dto.receiverId, data),
+      this.chatGateway.emitMessageToUser(user.id_user, data),
+    ]);
     return data;
   }
 
@@ -71,7 +74,10 @@ export class ChatController {
       dto.receiverId,
       file,
     );
-    this.chatGateway.emitMessageToUser(dto.receiverId, data);
+    await Promise.all([
+      this.chatGateway.emitMessageToUser(dto.receiverId, data),
+      this.chatGateway.emitMessageToUser(user.id_user, data),
+    ]);
     return data;
   }
 
@@ -93,7 +99,10 @@ export class ChatController {
       dto.receiverId,
       file,
     );
-    this.chatGateway.emitMessageToUser(dto.receiverId, data);
+    await Promise.all([
+      this.chatGateway.emitMessageToUser(dto.receiverId, data),
+      this.chatGateway.emitMessageToUser(user.id_user, data),
+    ]);
     return data;
   }
 
