@@ -24,10 +24,6 @@ spec:
         - name: background
           image: mjkundta/background:<TAG>
           command: ['node', 'dist/apps/background/src/main.js']
-          resources:
-            limits:
-              cpu: '100m'
-              memory: '256Mi'
           env:
             - name: NODE_ENV
               value: 'production'

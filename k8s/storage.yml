@@ -26,10 +26,6 @@ spec:
           command: ['node', 'dist/apps/storage/src/main.js']
           ports:
             - containerPort: 50000
-          resources:
-            limits:
-              cpu: '50m'
-              memory: '256Mi'
           env:
             - name: NODE_ENV
               value: 'production'

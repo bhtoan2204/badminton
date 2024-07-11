@@ -43,7 +43,7 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-    - port: 16686
+    - port: 80
       targetPort: 16686
   selector:
     app: jaeger
