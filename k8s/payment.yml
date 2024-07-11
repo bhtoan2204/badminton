@@ -24,10 +24,6 @@ spec:
         - name: payment
           image: mjkundta/payment:<TAG>
           command: ['node', 'dist/apps/payment/src/main.js']
-          resources:
-            limits:
-              cpu: '50m'
-              memory: '256Mi'
           env:
             - name: NODE_ENV
               value: 'production'

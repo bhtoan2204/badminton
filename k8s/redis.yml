@@ -19,10 +19,6 @@ spec:
           image: redis:latest
           ports:
             - containerPort: 6379
-          resources:
-            limits:
-              memory: '512Mi'
-              cpu: '100m'
           volumeMounts:
             - name: redis-storage
               mountPath: /data

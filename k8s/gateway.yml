@@ -50,10 +50,6 @@ spec:
           command: ['node', 'dist/apps/gateway/src/main.js']
           ports:
             - containerPort: 8080
-          resources:
-            limits:
-              cpu: '150m'
-              memory: '512Mi'
           env:
             - name: NODE_ENV
               value: 'production'
@@ -76,10 +72,6 @@ spec:
               subPath: filebeat.yml
             - name: log-volume
               mountPath: /src/logs
-          resources:
-            limits:
-              cpu: '50m'
-              memory: '128Mi'
           securityContext:
             runAsUser: 0
       volumes:
