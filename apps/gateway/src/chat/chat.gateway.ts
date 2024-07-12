@@ -113,10 +113,7 @@ export class ChatGateway implements OnModuleInit {
           const receiverSocketIds: string[] =
             (await this.cacheManager.get(receiverId)) || [];
           receiverSocketIds.forEach((socketId) => {
-            this.server.to(socketId).emit('onNewFamilyMessage', {
-              ...message,
-              familyId: id_family,
-            });
+            this.server.to(socketId).emit('onNewFamilyMessage', message);
           });
         }),
       );

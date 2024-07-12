@@ -87,7 +87,7 @@ export class ChatService {
           id_target: message.familyId,
         },
       });
-      return { id_family: message.familyId, ...data };
+      return { familyId: message.familyId, ...data };
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
@@ -113,7 +113,7 @@ export class ChatService {
           id_target: familyId,
         },
       });
-      return { id_family: familyId, ...data };
+      return { familyId: familyId, ...data };
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
@@ -139,7 +139,7 @@ export class ChatService {
           id_target: familyId,
         },
       });
-      return { id_family: familyId, ...data };
+      return { familyId: familyId, ...data };
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);

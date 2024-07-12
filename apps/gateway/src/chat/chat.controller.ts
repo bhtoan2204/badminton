@@ -133,7 +133,7 @@ export class ChatController {
   ) {
     const data = await this.chatService.saveFamilyImageMessage(
       user.id_user,
-      dto.familyId,
+      parseInt(dto.familyId),
       file,
     );
     this.chatGateway.emitFamilyMessageToUser(user.id_user, dto.familyId, data);
@@ -155,7 +155,7 @@ export class ChatController {
   ) {
     const data = await this.chatService.saveFamilyVideoMessage(
       user.id_user,
-      dto.familyId,
+      parseInt(dto.familyId),
       file,
     );
     this.chatGateway.emitFamilyMessageToUser(user.id_user, dto.familyId, data);
