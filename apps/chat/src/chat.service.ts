@@ -137,35 +137,73 @@ export class ChatService {
     try {
       const skip = index * limit;
 
-      const conversation = await this.userConversationsRepository
-        .aggregate([
-          {
-            $match: {
-              userId: senderId,
-              'conversations.receiverId': receiverId,
-            },
-          },
-          { $unwind: '$conversations' },
-          { $match: { 'conversations.receiverId': receiverId } },
-          {
-            $project: {
-              messages: '$conversations.messages',
-              totalMessages: { $size: '$conversations.messages' },
-            },
-          },
-          {
-            $project: {
-              messages: {
-                $slice: [
-                  '$messages',
-                  { $subtract: ['$totalMessages', skip + limit] },
-                  limit,
-                ],
+      // const conversation = await this.userConversationsRepository
+      //   .aggregate([
+      //     {
+      //       $match: {
+      //         userId: senderId,
+      //         'conversations.receiverId': receiverId,
+      //       },
+      //     },
+      //     { $unwind: '$conversations' },
+      //     { $match: { 'conversations.receiverId': receiverId } },
+      //     {
+      //       $project: {
+      //         messages: '$conversations.messages',
+      //         totalMessages: { $size: '$conversations.messages' },
+      //       },
+      //     },
+      //     {
+      //       $project: {
+      //         messages: {
+      //           $slice: [
+      //             '$messages',
+      //             { $subtract: ['$totalMessages', skip + limit] },
+      //             limit,
+      //           ],
+      //         },
+      //       },
+      //     },
+      //   ])
+      //   .exec();
+
+      const [receiverInfo, senderInfo, conversation] = await Promise.all([
+        this.usersRepository.findOne({
+          where: { id_user: receiverId },
+        }),
+        this.usersRepository.findOne({
+          where: { id_user: senderId },
+        }),
+        this.userConversationsRepository
+          .aggregate([
+            {
+              $match: {
+                userId: senderId,
+                'conversations.receiverId': receiverId,
               },
             },
-          },
-        ])
-        .exec();
+            { $unwind: '$conversations' },
+            { $match: { 'conversations.receiverId': receiverId } },
+            {
+              $project: {
+                messages: '$conversations.messages',
+                totalMessages: { $size: '$conversations.messages' },
+              },
+            },
+            {
+              $project: {
+                messages: {
+                  $slice: [
+                    '$messages',
+                    { $subtract: ['$totalMessages', skip + limit] },
+                    limit,
+                  ],
+                },
+              },
+            },
+          ])
+          .exec(),
+      ]);
 
       if (
         !conversation ||
@@ -174,9 +212,15 @@ export class ChatService {
       ) {
         return [];
       }
-
       const messages = conversation[0].messages.reverse();
-      return messages;
+      const results = messages.map((message) => {
+        return {
+          ...message,
+          receiverInfo,
+          senderInfo,
+        };
+      });
+      return results;
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -311,20 +355,28 @@ export class ChatService {
         timestamp: new Date(),
       };
 
-      await Promise.all([
-        this.updateConversationWithExistOne(
-          id_user,
-          messageData.receiverId,
-          newMessage,
-        ),
-        this.updateConversationWithExistOne(
-          messageData.receiverId,
-          id_user,
-          newMessage,
-        ),
-      ]);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const [updateReceiver, updateSender, receiverInfo, senderInfo] =
+        await Promise.all([
+          this.updateConversationWithExistOne(
+            id_user,
+            messageData.receiverId,
+            newMessage,
+          ),
+          this.updateConversationWithExistOne(
+            messageData.receiverId,
+            id_user,
+            newMessage,
+          ),
+          this.usersRepository.findOne({
+            where: { id_user: messageData.receiverId },
+          }),
+          this.usersRepository.findOne({
+            where: { id_user: id_user },
+          }),
+        ]);
 
-      return newMessage;
+      return { receiverInfo, senderInfo, ...newMessage };
     } catch (error) {
       throw new RpcException({
         message: error.message || 'An error occurred while saving the message.',
@@ -362,8 +414,10 @@ export class ChatService {
           { new: true, upsert: true },
         )
         .exec();
-
-      return newMessage;
+      const senderInfo = await this.usersRepository.findOne({
+        where: { id_user: id_user },
+      });
+      return { senderInfo, ...newMessage };
     } catch (error) {
       const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
       const message =
@@ -419,7 +473,10 @@ export class ChatService {
         )
         .exec();
 
-      return newMessage;
+      const senderInfo = await this.usersRepository.findOne({
+        where: { id_user: id_user },
+      });
+      return { senderInfo, ...newMessage };
     } catch (error) {
       const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
       const message =
@@ -473,7 +530,10 @@ export class ChatService {
         )
         .exec();
 
-      return newMessage;
+      const senderInfo = await this.usersRepository.findOne({
+        where: { id_user: id_user },
+      });
+      return { senderInfo, ...newMessage };
     } catch (error) {
       const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
       const message =
@@ -552,12 +612,20 @@ export class ChatService {
         timestamp: new Date(),
       };
 
-      await Promise.all([
-        this.updateOrCreateConversation(id_user, receiverId, newMessage),
-        this.updateOrCreateConversation(receiverId, id_user, newMessage),
-      ]);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const [updateReceiver, updateSender, receiverInfo, senderInfo] =
+        await Promise.all([
+          this.updateOrCreateConversation(id_user, receiverId, newMessage),
+          this.updateOrCreateConversation(receiverId, id_user, newMessage),
+          this.usersRepository.findOne({
+            where: { id_user: receiverId },
+          }),
+          this.usersRepository.findOne({
+            where: { id_user },
+          }),
+        ]);
 
-      return newMessage;
+      return { receiverInfo, senderInfo, ...newMessage };
     } catch (error) {
       const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
       const message =
@@ -605,12 +673,20 @@ export class ChatService {
         timestamp: new Date(),
       };
 
-      await Promise.all([
-        this.updateOrCreateConversation(id_user, receiverId, newMessage),
-        this.updateOrCreateConversation(receiverId, id_user, newMessage),
-      ]);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const [updateReceiver, updateSender, receiverInfo, senderInfo] =
+        await Promise.all([
+          this.updateOrCreateConversation(id_user, receiverId, newMessage),
+          this.updateOrCreateConversation(receiverId, id_user, newMessage),
+          this.usersRepository.findOne({
+            where: { id_user: receiverId },
+          }),
+          this.usersRepository.findOne({
+            where: { id_user },
+          }),
+        ]);
 
-      return newMessage;
+      return { receiverInfo, senderInfo, ...newMessage };
     } catch (error) {
       const statusCode = error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
       const message =
