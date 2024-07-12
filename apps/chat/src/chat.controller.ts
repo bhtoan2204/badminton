@@ -64,7 +64,12 @@ export class ChatController {
 
   @EventPattern('chatClient/sendFamilyImageMessage')
   async saveFamilyImageMessage(
-    @Payload() data: any,
+    @Payload()
+    data: {
+      id_user: string;
+      familyId: number;
+      file: Express.Multer.File;
+    },
     @Ctx() context: RmqContext,
   ) {
     this.rmqService.ack(context);

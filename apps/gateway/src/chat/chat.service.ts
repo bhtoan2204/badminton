@@ -87,7 +87,7 @@ export class ChatService {
           id_target: message.familyId,
         },
       });
-      return data;
+      return { id_family: message.familyId, ...data };
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
@@ -100,7 +100,7 @@ export class ChatService {
     try {
       const response = this.chatClient.send(
         'chatClient/sendFamilyImageMessage',
-        { id_user, message: familyId, file },
+        { id_user, familyId, file },
       );
       const data = await lastValueFrom(response);
       this.notificationsQueue.add('createNotificationFamily', {
@@ -113,7 +113,7 @@ export class ChatService {
           id_target: familyId,
         },
       });
-      return data;
+      return { id_family: familyId, ...data };
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
@@ -139,7 +139,7 @@ export class ChatService {
           id_target: familyId,
         },
       });
-      return data;
+      return { id_family: familyId, ...data };
     } catch (error) {
       if (error.name === 'TimeoutError') {
         throw new HttpException('Timeout', 408);
