@@ -25,7 +25,6 @@ export class AdminStrategy extends PassportStrategy(Strategy, 'admin') {
         .send('authClient/validateUser', { email, password })
         .pipe(timeout(15000));
       const user$ = await lastValueFrom(userRequest$);
-      console.log(user$);
       if (user$.isadmin) {
         return user$;
       } else {
