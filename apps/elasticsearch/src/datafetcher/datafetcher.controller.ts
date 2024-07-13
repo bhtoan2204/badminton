@@ -27,28 +27,4 @@ export class DatafetcherController {
     this.rmqService.ack(context);
     return this.datafetcherService.getRevenueLast6Months();
   }
-
-  @EventPattern('datafetcherClient/getListOrders')
-  async getListOrders(
-    @Ctx() context: RmqContext,
-    @Payload()
-    payload: {
-      page: number;
-      itemsPerPage: number;
-      search: string;
-      sortBy: string;
-      sortDirection: 'ASC' | 'DESC' | null;
-      type: 'ALL' | 'MAIN' | 'EXTRA' | 'COMBO';
-    },
-  ) {
-    this.rmqService.ack(context);
-    return this.datafetcherService.getListOrders(
-      payload.page,
-      payload.itemsPerPage,
-      payload.search,
-      payload.sortBy,
-      payload.sortDirection,
-      payload.type,
-    );
-  }
 }

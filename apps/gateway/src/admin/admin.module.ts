@@ -5,7 +5,7 @@ import { RabbitMqModule } from './rabbitmq/rabbitmq.module';
 import { PostgresqlModule } from './postgresql/datastats.module';
 import { DatafetcherModule } from './datafetcher/datafetcher.module';
 import { RmqModule } from '@app/common';
-import { ELASTICSEARCH_SERVICE } from '../utils';
+import { ELASTICSEARCH_SERVICE, PAYMENT_SERVICE } from '../utils';
 import { PackageModule } from './package/package.module';
 import { CacheModule, CacheStoreFactory } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -26,6 +26,7 @@ import { RoleModule } from './role/role.module';
     forwardRef(() => UsersModule),
     forwardRef(() => RoleModule),
     RmqModule.register({ name: ELASTICSEARCH_SERVICE }),
+    RmqModule.register({ name: PAYMENT_SERVICE }),
     CacheModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
