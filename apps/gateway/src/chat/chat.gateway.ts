@@ -141,7 +141,9 @@ export class ChatGateway implements OnModuleInit {
       const receiverSocketIds: string[] = await this.cacheManager.get(userId);
       if (receiverSocketIds) {
         for (const socketId of receiverSocketIds) {
-          this.server.to(socketId).emit('onLogout', { logout: true });
+          this.server
+            .to(socketId)
+            .emit('onLogout', { logout: true, id_user: userId });
         }
       }
     } catch (error) {

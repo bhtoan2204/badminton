@@ -470,6 +470,65 @@ export class PaymentService {
     }
   }
 
+  async getListOrders(
+    page: number,
+    itemsPerPage: number,
+    search: string | null,
+    sortBy: string | null,
+    sortDirection: 'ASC' | 'DESC' | null,
+    type: 'ALL' | 'MAIN' | 'EXTRA' | 'COMBO',
+  ) {
+    try {
+      const queryBuilder = this.orderRepository
+        .createQueryBuilder('order')
+        .leftJoinAndSelect('order.users', 'users')
+        .leftJoinAndSelect('order.family', 'family')
+        .leftJoinAndSelect('order.packageMain', 'packageMain')
+        .leftJoinAndSelect('order.packageExtra', 'packageExtra')
+        .leftJoinAndSelect('order.packageCombo', 'packageCombo')
+        .skip((page - 1) * itemsPerPage)
+        .take(itemsPerPage);
+
+      if (search) {
+        queryBuilder.andWhere(
+          `order.method LIKE :search 
+          OR users.email LIKE :search 
+          OR users.phone LIKE :search 
+          OR family.name LIKE :search 
+          OR family.description LIKE :search`,
+          { search: `%${search}%` },
+        );
+      }
+
+      if (sortBy && sortDirection) {
+        queryBuilder.orderBy(`order.${sortBy}`, sortDirection);
+      }
+
+      if (type !== 'ALL') {
+        if (type === 'MAIN') {
+          queryBuilder.andWhere('order.id_package_main IS NOT NULL');
+        } else if (type === 'EXTRA') {
+          queryBuilder.andWhere('order.id_package_extra IS NOT NULL');
+        } else if (type === 'COMBO') {
+          queryBuilder.andWhere('order.id_package_combo IS NOT NULL');
+        }
+      }
+
+      const [data, total] = await queryBuilder.getManyAndCount();
+
+      return {
+        data,
+        total,
+        message: 'Get list orders successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error.message || 'Internal server error',
+      });
+    }
+  }
+
   async createFeedback(id_user: string, dto: any) {
     try {
       const { comment, rating } = dto;
@@ -498,6 +557,76 @@ export class PaymentService {
       return {
         data: savedFeedback,
         message: 'Feedback created successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async calculateTotalRevenue(
+    startDate: string,
+    endDate: string,
+  ): Promise<number> {
+    const queryResult = await this.orderRepository
+      .createQueryBuilder('order')
+      .select('SUM(order.price) AS total_revenue')
+      .where('order.status = :status', { status: OrderStatus.SUCCESS })
+      .andWhere('order.created_at >= :startDate', { startDate })
+      .andWhere('order.created_at <= :endDate', { endDate })
+      .getRawOne();
+
+    return queryResult.total_revenue || 0;
+  }
+
+  async getOrderStatistics(data: {
+    startDate: string;
+    endDate: string;
+    interval: number;
+  }) {
+    const { startDate, endDate, interval } = data;
+
+    try {
+      const intervalResults = [];
+      const startMoment = moment(startDate);
+      const endMoment = moment(endDate);
+      const totalDuration = endMoment.diff(startMoment, 'seconds');
+      const intervalDuration = totalDuration / interval;
+      const promises = [];
+      for (let i = 0; i < interval; i++) {
+        const start = startMoment
+          .clone()
+          .add(intervalDuration * i, 'seconds')
+          .format('YYYY-MM-DD HH:mm:ss');
+        const end = startMoment
+          .clone()
+          .add(intervalDuration * (i + 1), 'seconds')
+          .format('YYYY-MM-DD HH:mm:ss');
+
+        const queryPromise = this.orderRepository
+          .createQueryBuilder('order')
+          .select('COUNT(order.id_order) AS total_orders')
+          .addSelect('SUM(order.price) AS total_revenue')
+          .where('order.status = :status', { status: OrderStatus.SUCCESS })
+          .andWhere('order.created_at >= :startDate', { startDate: start })
+          .andWhere('order.created_at < :endDate', { endDate: end })
+          .getRawOne()
+          .then((queryResult) => ({
+            startDate: start,
+            endDate: end,
+            total_orders: parseInt(queryResult.total_orders) || 0,
+            total_revenue: parseInt(queryResult.total_revenue) || 0,
+          }));
+
+        promises.push(queryPromise);
+      }
+      const results = await Promise.all(promises);
+      intervalResults.push(...results);
+      return {
+        data: intervalResults,
+        message: 'Order statistics fetched successfully',
       };
     } catch (error) {
       throw new RpcException({
@@ -612,9 +741,10 @@ export class PaymentService {
       }
 
       if (sortBy && sortDesc !== undefined) {
-        query.orderBy(`feedbacks.${sortBy}`, sortDesc ? 'DESC' : 'ASC');
+        const order = sortDesc === true ? 'DESC' : 'ASC';
+        query.orderBy(`feedbacks.${sortBy}`, order);
       }
-
+      console.log(query.getSql());
       const [data, total] = await query.getManyAndCount();
       return {
         data: data,

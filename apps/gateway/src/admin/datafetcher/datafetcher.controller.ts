@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -6,6 +7,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -14,6 +16,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Admin, AdminGuard, JwtAuthGuard } from '../../utils';
 import { GetListOrdersDto } from './dto/getListOrders.dto';
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
+import { GetOrderStatisticsDto } from './dto/getOrderStatistics.dto';
 
 @ApiTags('Admin Datafetcher')
 @Controller()
@@ -52,5 +55,16 @@ export class DatafetcherController {
   @Post('listOrders')
   async getListOrders(@Body() body: GetListOrdersDto) {
     return this.datafetcherService.getListOrders(body);
+  }
+
+  @ApiOperation({ summary: 'Get order statistics' })
+  @HttpCode(HttpStatus.OK)
+  @Get('orderStatistics')
+  async getOrderStatistics(@Query() query: GetOrderStatisticsDto) {
+    query.interval = parseInt(query.interval as string);
+    if (query.interval > 50) {
+      throw new BadRequestException('Interval must be less than 50');
+    }
+    return this.datafetcherService.getOrderStatistics(query);
   }
 }

@@ -64,6 +64,40 @@ export class PaymentController {
     );
   }
 
+  @EventPattern('paymentClient/getListOrders')
+  async getListOrders(
+    @Ctx() context: RmqContext,
+    @Payload()
+    payload: {
+      page: number;
+      itemsPerPage: number;
+      search: string;
+      sortBy: string;
+      sortDirection: 'ASC' | 'DESC' | null;
+      type: 'ALL' | 'MAIN' | 'EXTRA' | 'COMBO';
+    },
+  ) {
+    this.rmqService.ack(context);
+    return this.paymentService.getListOrders(
+      payload.page,
+      payload.itemsPerPage,
+      payload.search,
+      payload.sortBy,
+      payload.sortDirection,
+      payload.type,
+    );
+  }
+
+  @EventPattern('paymentClient/getOrderStatistics')
+  async getOrderStatistics(
+    @Ctx() context: RmqContext,
+    @Payload() data: { startDate: string; endDate: string; interval: number },
+  ) {
+    this.rmqService.ack(context);
+    console.log(data);
+    return this.paymentService.getOrderStatistics(data);
+  }
+
   @EventPattern('paymentClient/createFeedback')
   async createFeedback(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
