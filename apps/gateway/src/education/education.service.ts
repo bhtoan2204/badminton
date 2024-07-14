@@ -45,9 +45,11 @@ export class EducationService {
 
   async getAllEducationProgress(
     id_user: string,
-    pageNumber,
-    itemsPerPage,
-    id_family,
+    pageNumber: number,
+    itemsPerPage: number,
+    id_family: number,
+    search: string,
+    member_id: string,
   ) {
     try {
       const response = this.educationClient
@@ -56,6 +58,8 @@ export class EducationService {
           pageNumber,
           itemsPerPage,
           id_family,
+          search,
+          member_id,
         })
         .pipe(timeout(15000));
       return await lastValueFrom(response);

@@ -33,6 +33,8 @@ export class EducationController {
       data.pageNumber,
       data.itemsPerPage,
       data.id_family,
+      data.search,
+      data.member_id,
     );
   }
 
