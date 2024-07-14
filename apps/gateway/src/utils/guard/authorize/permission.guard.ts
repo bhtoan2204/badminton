@@ -36,20 +36,42 @@ export class PermissionGuard implements CanActivate {
       if (!id_family || !permissions || permissions.length === 0) {
         return true;
       }
-      const cacheKey = `permissionCheck:${id_family}:${permissions.join(',')}`;
+      const cacheResults = await Promise.all(
+        permissions.map(async (permission) => {
+          const cacheKey = `permissionCheck:${id_family}:${permission}`;
+          const cachedResult = await this.redisService.get(cacheKey);
+          return { permission, cachedResult };
+        }),
+      );
+      const missingPermissions = cacheResults
+        .filter((result) => result.cachedResult === null)
+        .map((result) => result.permission);
 
-      const cachedResult = await this.redisService.get(cacheKey);
+      if (missingPermissions.length > 0) {
+        const checkIsPermission = this.familyClient
+          .send('familyClient/checkExtraPackage', {
+            id_family,
+            permissions: missingPermissions,
+          })
+          .pipe(timeout(15000));
+        const result = await lastValueFrom(checkIsPermission);
 
-      if (cachedResult !== null) {
-        return cachedResult === 'true';
+        await Promise.all(
+          missingPermissions.map(async (permission) => {
+            const cacheKey = `permissionCheck:${id_family}:${permission}`;
+            await this.redisService.set(
+              cacheKey,
+              result.toString(),
+              'EX',
+              3600,
+            );
+          }),
+        );
+
+        return result;
       }
 
-      const checkIsPermission = this.familyClient
-        .send('familyClient/checkExtraPackage', { id_family, permissions })
-        .pipe(timeout(15000));
-      const result = await lastValueFrom(checkIsPermission);
-      await this.redisService.set(cacheKey, result.toString(), 'EX', 3600);
-      return result;
+      return !cacheResults.some((result) => result.cachedResult !== 'true');
     } catch (error) {
       console.log('Failed at Permission Check', error);
       return false;

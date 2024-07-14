@@ -177,6 +177,11 @@ export class PaymentService {
 
     order.status = OrderStatus.SUCCESS;
     await this.orderRepository.save(order);
+    const familyExtraPackages = await this.familyExtraRepository.create({
+      id_family: order.id_family,
+      id_extra_package: 4,
+    });
+    await this.familyExtraRepository.save(familyExtraPackages);
   }
 
   private async handleMainPackage(order: Order) {
