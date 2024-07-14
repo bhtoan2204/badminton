@@ -108,15 +108,22 @@ export class ChatService {
     if (conversationExists) {
       return this.userConversationsRepository.findOneAndUpdate(
         { userId, 'conversations.receiverId': partnerId },
-        { $push: { 'conversations.$.messages': newMessage } },
+        {
+          $push: {
+            'conversations.$.messages': { $each: [newMessage], $position: 0 },
+          },
+        },
         { new: true },
       );
     } else {
       return this.userConversationsRepository.findOneAndUpdate(
         { userId },
         {
-          $addToSet: {
-            conversations: { receiverId: partnerId, messages: [newMessage] },
+          $push: {
+            conversations: {
+              $each: [{ receiverId: partnerId, messages: [newMessage] }],
+              $position: 0,
+            },
           },
         },
         { upsert: true, new: true },
@@ -137,82 +144,38 @@ export class ChatService {
     try {
       const skip = index * limit;
 
-      // const conversation = await this.userConversationsRepository
-      //   .aggregate([
-      //     {
-      //       $match: {
-      //         userId: senderId,
-      //         'conversations.receiverId': receiverId,
-      //       },
-      //     },
-      //     { $unwind: '$conversations' },
-      //     { $match: { 'conversations.receiverId': receiverId } },
-      //     {
-      //       $project: {
-      //         messages: '$conversations.messages',
-      //         totalMessages: { $size: '$conversations.messages' },
-      //       },
-      //     },
-      //     {
-      //       $project: {
-      //         messages: {
-      //           $slice: [
-      //             '$messages',
-      //             { $subtract: ['$totalMessages', skip + limit] },
-      //             limit,
-      //           ],
-      //         },
-      //       },
-      //     },
-      //   ])
-      //   .exec();
-
-      const [receiverInfo, senderInfo, conversation] = await Promise.all([
+      const [receiverInfo, senderInfo, conversations] = await Promise.all([
         this.usersRepository.findOne({
           where: { id_user: receiverId },
         }),
         this.usersRepository.findOne({
           where: { id_user: senderId },
         }),
-        this.userConversationsRepository
-          .aggregate([
-            {
-              $match: {
-                userId: senderId,
-                'conversations.receiverId': receiverId,
+        this.userConversationsRepository.aggregate([
+          {
+            $match: {
+              userId: senderId,
+              'conversations.receiverId': receiverId,
+            },
+          },
+          { $unwind: '$conversations' },
+          { $match: { 'conversations.receiverId': receiverId } },
+          {
+            $project: {
+              messages: '$conversations.messages',
+              totalMessages: { $size: '$conversations.messages' },
+            },
+          },
+          {
+            $project: {
+              messages: {
+                $slice: ['$messages', skip, limit],
               },
             },
-            { $unwind: '$conversations' },
-            { $match: { 'conversations.receiverId': receiverId } },
-            {
-              $project: {
-                messages: '$conversations.messages',
-                totalMessages: { $size: '$conversations.messages' },
-              },
-            },
-            {
-              $project: {
-                messages: {
-                  $slice: [
-                    '$messages',
-                    { $subtract: ['$totalMessages', skip + limit] },
-                    limit,
-                  ],
-                },
-              },
-            },
-          ])
-          .exec(),
+          },
+        ]),
       ]);
-
-      if (
-        !conversation ||
-        conversation.length === 0 ||
-        conversation[0].messages.length === 0
-      ) {
-        return [];
-      }
-      const messages = conversation[0].messages.reverse();
+      const messages = conversations[0].messages;
       const results = messages.map((message) => {
         return {
           ...message,
@@ -542,35 +505,6 @@ export class ChatService {
     }
   }
 
-  async updateOrCreateConversation(
-    userId: string,
-    partnerId: string,
-    newMessage: any,
-  ) {
-    const conversationExists = await this.userConversationsRepository.findOne({
-      userId,
-      'conversations.receiverId': partnerId,
-    });
-
-    if (conversationExists) {
-      return this.userConversationsRepository.findOneAndUpdate(
-        { userId, 'conversations.receiverId': partnerId },
-        { $push: { 'conversations.$.messages': newMessage } },
-        { new: true },
-      );
-    } else {
-      return this.userConversationsRepository.findOneAndUpdate(
-        { userId },
-        {
-          $addToSet: {
-            conversations: { receiverId: partnerId, messages: [newMessage] },
-          },
-        },
-        { upsert: true, new: true },
-      );
-    }
-  }
-
   async saveImageMessage(
     id_user: string,
     receiverId: string,
@@ -615,8 +549,8 @@ export class ChatService {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [updateReceiver, updateSender, receiverInfo, senderInfo] =
         await Promise.all([
-          this.updateOrCreateConversation(id_user, receiverId, newMessage),
-          this.updateOrCreateConversation(receiverId, id_user, newMessage),
+          this.updateConversationWithExistOne(id_user, receiverId, newMessage),
+          this.updateConversationWithExistOne(receiverId, id_user, newMessage),
           this.usersRepository.findOne({
             where: { id_user: receiverId },
           }),
@@ -676,8 +610,8 @@ export class ChatService {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [updateReceiver, updateSender, receiverInfo, senderInfo] =
         await Promise.all([
-          this.updateOrCreateConversation(id_user, receiverId, newMessage),
-          this.updateOrCreateConversation(receiverId, id_user, newMessage),
+          this.updateConversationWithExistOne(id_user, receiverId, newMessage),
+          this.updateConversationWithExistOne(receiverId, id_user, newMessage),
           this.usersRepository.findOne({
             where: { id_user: receiverId },
           }),
