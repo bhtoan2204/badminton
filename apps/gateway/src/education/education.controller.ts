@@ -56,12 +56,16 @@ export class EducationController {
   @ApiQuery({ name: 'page', required: false, type: String })
   @ApiQuery({ name: 'itemsPerPage', required: false, type: String })
   @ApiQuery({ name: 'id_family', required: true, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'id_user', required: false, type: String })
   @Get('getAll')
   async getAllEducationProgress(
     @CurrentUser() currentUser,
     @Query('page') page,
     @Query('itemsPerPage') itemsPerPage,
     @Query('id_family') id_family,
+    @Query('search') search,
+    @Query('id_user') id_user,
   ) {
     const pageNumber = parseInt(page, 10) || 1;
     const itemsPerPageNumber = parseInt(itemsPerPage, 10) || 10;
@@ -70,6 +74,8 @@ export class EducationController {
       pageNumber,
       itemsPerPageNumber,
       id_family,
+      search,
+      id_user,
     );
   }
 

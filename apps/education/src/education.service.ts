@@ -2,7 +2,7 @@ import { EducationProgress, Subjects } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { Brackets, EntityManager, Repository } from 'typeorm';
 
 @Injectable()
 export class EducationService {
@@ -41,33 +41,43 @@ export class EducationService {
     pageNumber: number,
     itemsPerPage: number,
     id_family: number,
+    search: string,
+    member_id: string,
   ) {
     try {
-      const [data, total] = await this.educationProgressRepository.findAndCount(
-        {
-          where: { id_family: id_family },
-          relations: ['subjects', 'user'],
-          take: itemsPerPage,
-          skip: (pageNumber - 1) * itemsPerPage,
-        },
-      );
-      const transformedData = data.map((educationProgress) => {
-        const { user, ...rest } = educationProgress;
-        const transformedUser = {
-          firstname: user.firstname,
-          lastname: user.lastname,
-          avatar: user.avatar,
-          genre: user.genre,
-          birthdate: user.birthdate,
-        };
-        return {
-          ...rest,
-          user: transformedUser,
-        };
-      });
+      const queryBuilder = this.educationProgressRepository
+        .createQueryBuilder('educationProgress')
+        .leftJoinAndSelect('educationProgress.subjects', 'subjects')
+        .leftJoinAndSelect('educationProgress.user', 'user')
+        .where('educationProgress.id_family = :id_family', { id_family })
+        .skip((pageNumber - 1) * itemsPerPage)
+        .take(itemsPerPage);
+      if (search) {
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            qb.where('educationProgress.title LIKE :search', {
+              search: `%${search}%`,
+            })
+              .orWhere('educationProgress.progress_notes LIKE :search', {
+                search: `%${search}%`,
+              })
+              .orWhere('educationProgress.school_info LIKE :search', {
+                search: `%${search}%`,
+              });
+          }),
+        );
+      }
+      if (member_id) {
+        queryBuilder.andWhere('educationProgress.id_user = :member_id', {
+          member_id,
+        });
+      }
+
+      const [data, total] = await queryBuilder.getManyAndCount();
+
       return {
         message: 'Success',
-        data: transformedData,
+        data: data,
         total: total,
       };
     } catch (error) {
@@ -91,20 +101,29 @@ export class EducationService {
         },
         relations: ['subjects', 'user'],
       });
-      const { user, ...rest } = data;
-      const transformedUser = {
-        firstname: user.firstname,
-        lastname: user.lastname,
-        avatar: user.avatar,
-        genre: user.genre,
-        birthdate: user.birthdate,
-      };
+
+      if (!data) {
+        throw new RpcException({
+          message: 'Education progress not found',
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        });
+      }
+      const [successfulSubjects, totalSubject] = data.subjects.reduce(
+        (acc, curr) => {
+          if (curr.status === 'successful') {
+            acc[0]++;
+          }
+          acc[1]++;
+          return acc;
+        },
+        [0, 0],
+      );
+
       return {
         message: 'Success',
-        data: {
-          ...rest,
-          user: transformedUser,
-        },
+        data: data,
+        total_subject: totalSubject,
+        successful_subject: successfulSubjects,
       };
     } catch (error) {
       throw new RpcException({
