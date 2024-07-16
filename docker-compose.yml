@@ -104,19 +104,6 @@ services:
     volumes:
       - .:/usr/src/app
 
-  crawler:
-    image: mjkundta/crawler:latest
-    build:
-      context: .
-      dockerfile: ./apps/crawler/Dockerfile
-      target: development
-    command: npm run start:dev crawler
-    depends_on:
-      - auth
-    restart: on-failure
-    volumes:
-      - .:/usr/src/app
-
   calendar:
     image: mjkundta/calendar:latest
     build:

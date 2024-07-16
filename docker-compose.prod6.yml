@@ -1,17 +1,5 @@
 version: '3.8'
 services:
-  crawler:
-    image: mjkundta/crawler:${TAG}
-    build:
-      context: .
-      dockerfile: ./apps/crawler/Dockerfile
-      target: production
-    command: node dist/apps/crawler/src/main
-    restart: on-failure
-    env_file: './apps/crawler/.env.production'
-    mem_limit: 2g
-    cpu_shares: 1024
-
   education:
     image: mjkundta/education:${TAG}
     build:
