@@ -44,14 +44,29 @@ export class RmqService {
     };
   }
 
-  async callService(client: ClientProxy, pattern: string, data: any) {
-    const response = client.send(pattern, data).pipe(timeout(15000));
+  async callService(
+    client: ClientProxy,
+    pattern: string,
+    data: any,
+    timeoutValue: number = 15000,
+  ) {
+    const response = client.send(pattern, data).pipe(timeout(timeoutValue));
     return await lastValueFrom(response);
   }
 
-  async send(client: ClientProxy, pattern: string, data: any) {
+  async send(
+    client: ClientProxy,
+    pattern: string,
+    data: any,
+    timeoutValue?: number,
+  ) {
     try {
-      return await this.circuitBreaker.fire(client, pattern, data);
+      return await this.circuitBreaker.fire(
+        client,
+        pattern,
+        data,
+        timeoutValue,
+      );
     } catch (error) {
       throw new HttpException(error.message, error.status || 500);
     }
