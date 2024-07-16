@@ -1,19 +1,22 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { FINANCE_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class UtilitiesService {
   constructor(
     @Inject(FINANCE_SERVICE) private readonly financeClient: ClientProxy,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getUtilityTypes() {
     try {
-      const response = this.financeClient
-        .send('financeClient/getUtilityTypes', {})
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getUtilityTypes',
+        {},
+      );
     } catch (error) {
       throw new HttpException(
         error.message,
@@ -29,16 +32,11 @@ export class UtilitiesService {
     itemsPerPage: number,
   ) {
     try {
-      const response = this.financeClient
-        .send('financeClient/getUtilities', {
-          id_user,
-          id_family,
-          page,
-          itemsPerPage,
-        })
-        .pipe(timeout(15000));
-
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getUtilities',
+        { id_user, id_family, page, itemsPerPage },
+      );
     } catch (error) {
       throw new HttpException(
         error.message,
@@ -49,17 +47,11 @@ export class UtilitiesService {
 
   async getUtility(id_user: string, id_family: number, id_utility: number) {
     try {
-      console.log('id_user', id_user);
-      console.log('id_family', id_family);
-      console.log('id_utility', id_utility);
-      const response = this.financeClient
-        .send('financeClient/getUtility', {
-          id_user,
-          id_family,
-          id_utility,
-        })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getUtility',
+        { id_user, id_family, id_utility },
+      );
     } catch (error) {
       throw new HttpException(
         error.message,
@@ -70,10 +62,11 @@ export class UtilitiesService {
 
   async createUtility(id_user: string, dto: any, file) {
     try {
-      const response = this.financeClient
-        .send('financeClient/createUtility', { id_user, dto, file })
-        .pipe(timeout(15000));
-      return response;
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/createUtility',
+        { id_user, dto, file },
+      );
     } catch (error) {
       throw new HttpException(
         error.message,
@@ -84,10 +77,11 @@ export class UtilitiesService {
 
   async updateUtility(id_user: string, dto: any, file) {
     try {
-      const response = this.financeClient
-        .send('financeClient/updateUtility', { id_user, dto, file })
-        .pipe(timeout(15000));
-      return response;
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/updateUtility',
+        { id_user, dto, file },
+      );
     } catch (error) {
       throw new HttpException(
         error.message,
@@ -98,14 +92,11 @@ export class UtilitiesService {
 
   async deleteUtility(id_user: string, id_family: number, id_utility: number) {
     try {
-      const response = this.financeClient
-        .send('financeClient/deleteUtility', {
-          id_user,
-          id_family,
-          id_utility,
-        })
-        .pipe(timeout(15000));
-      return response;
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/deleteUtility',
+        { id_user, id_family, id_utility },
+      );
     } catch (error) {
       throw new HttpException(
         error.message,
