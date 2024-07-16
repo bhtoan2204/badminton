@@ -1,11 +1,10 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { CHAT_SERVICE, FAMILY_SERVICE } from '../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { NewMessageDto } from './dto/newMessage.dto';
-import { NotificationType } from '@app/common';
+import { NotificationType, RmqService } from '@app/common';
 import { NewFamilyMessageDto } from './dto/newFamilyMessage.dto';
 
 @Injectable()
@@ -14,43 +13,46 @@ export class ChatService {
     @Inject(CHAT_SERVICE) private readonly chatClient: ClientProxy,
     @Inject(FAMILY_SERVICE) private readonly familyClient: ClientProxy,
     @InjectQueue('notifications') private readonly notificationsQueue: Queue,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getUsersChat(id_user: string, index: number) {
     try {
-      const response = this.chatClient
-        .send('chatClient/getUsersChat', { id_user, index })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.chatClient,
+        'chatClient/getUsersChat',
+        { id_user, index },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getMessages(sender_id: string, receiver_id: string, index: number) {
     try {
-      const response = this.chatClient
-        .send('chatClient/getMessages', { sender_id, receiver_id, index })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.chatClient,
+        'chatClient/getMessages',
+        { sender_id, receiver_id, index },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async saveMessage(id_user: string, message: NewMessageDto) {
     try {
-      const response = this.chatClient.send('chatClient/sendMessage', {
-        id_user,
-        message,
-      });
-      const data = await lastValueFrom(response);
+      const data = await await this.rmqService.send(
+        this.chatClient,
+        'chatClient/sendMessage',
+        { id_user, message },
+      );
       this.notificationsQueue.add('createNotificationUser', {
         id_user: message.receiverId,
         notificationData: {
@@ -63,20 +65,20 @@ export class ChatService {
       });
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async saveFamilyMessage(id_user: string, message: NewFamilyMessageDto) {
     try {
-      const response = this.chatClient.send('chatClient/sendFamilyMessage', {
-        id_user,
-        message,
-      });
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.chatClient,
+        'chatClient/sendFamilyMessage',
+        { id_user, message },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: message.familyId,
         notificationData: {
@@ -89,20 +91,20 @@ export class ChatService {
       });
       return { familyId: message.familyId, ...data };
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async saveFamilyImageMessage(id_user: string, familyId: number, file: any) {
     try {
-      const response = this.chatClient.send(
+      const data = await this.rmqService.send(
+        this.chatClient,
         'chatClient/sendFamilyImageMessage',
         { id_user, familyId, file },
       );
-      const data = await lastValueFrom(response);
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: familyId,
         notificationData: {
@@ -115,20 +117,20 @@ export class ChatService {
       });
       return { familyId: familyId, ...data };
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async saveFamilyVideoMessage(id_user: string, familyId: number, file: any) {
     try {
-      const response = this.chatClient.send(
+      const data = await this.rmqService.send(
+        this.chatClient,
         'chatClient/sendFamilyVideoMessage',
         { id_user, familyId, file },
       );
-      const data = await lastValueFrom(response);
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: familyId,
         notificationData: {
@@ -141,21 +143,20 @@ export class ChatService {
       });
       return { familyId: familyId, ...data };
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async saveImageMessage(id_user: string, receiverId: string, file: any) {
     try {
-      const response = this.chatClient.send('chatClient/sendImageMessage', {
-        id_user,
-        receiverId,
-        file,
-      });
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.chatClient,
+        'chatClient/sendImageMessage',
+        { id_user, receiverId, file },
+      );
       this.notificationsQueue.add('createNotificationUser', {
         id_user: receiverId,
         notificationData: {
@@ -168,21 +169,20 @@ export class ChatService {
       });
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async saveVideoMessage(id_user: string, receiverId: string, file: any) {
     try {
-      const response = this.chatClient.send('chatClient/sendVideoMessage', {
-        id_user,
-        receiverId,
-        file,
-      });
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.chatClient,
+        'chatClient/sendVideoMessage',
+        { id_user, receiverId, file },
+      );
       this.notificationsQueue.add('createNotificationUser', {
         id_user: receiverId,
         notificationData: {
@@ -195,73 +195,76 @@ export class ChatService {
       });
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getFamilyChats(id_user: string) {
     try {
-      const listFamilyId = this.familyClient
-        .send('familyClient/getAllFamily', id_user)
-        .pipe(timeout(15000));
-      const family = await lastValueFrom(listFamilyId);
+      const family = await this.rmqService.send(
+        this.familyClient,
+        'familyClient/getAllFamily',
+        id_user,
+      );
       const familyId = family.map((item: any) => item.id_family);
-      const response = this.chatClient
-        .send('chatClient/getFamilyChats', { familyId })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.chatClient,
+        'chatClient/getFamilyChats',
+        { familyId },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getFamilyMessages(id_user: string, id_family: number, index: number) {
     try {
-      const response = this.chatClient
-        .send('chatClient/getFamilyMessages', { id_user, id_family, index })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.chatClient,
+        'chatClient/getFamilyMessages',
+        { id_user, id_family, index },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getListReceiverId(id_user: string, id_family: number) {
     try {
-      const response = this.familyClient.send('familyClient/getIdsMember', {
-        id_user,
-        id_family,
-      });
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.familyClient,
+        'familyClient/getIdsMember',
+        { id_user, id_family },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async markSeen(id_user: string, receiver_id: string) {
     try {
-      const response = this.chatClient.send('chatClient/markSeenMessage', {
-        id_user,
-        receiver_id,
-      });
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.chatClient,
+        'chatClient/markSeenMessage',
+        { id_user, receiver_id },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -271,32 +274,31 @@ export class ChatService {
     id_message: string,
   ) {
     try {
-      const response = this.chatClient.send('chatClient/removeMessage', {
-        id_user,
-        receiver_id,
-        id_message,
-      });
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.chatClient,
+        'chatClient/removeMessage',
+        { id_user, receiver_id, id_message },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getLinkedUser(id_user: string, search: string) {
     try {
-      const response = this.chatClient.send('chatClient/getLinkedUser', {
-        id_user,
-        search,
-      });
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.chatClient,
+        'chatClient/getLinkedUser',
+        { id_user, search },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

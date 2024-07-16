@@ -1,10 +1,9 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { SHOPPING_SERVICE } from '../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { TimeoutError, lastValueFrom, timeout } from 'rxjs';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { NotificationType } from '@app/common';
+import { NotificationType, RmqService } from '@app/common';
 import { CreateShoppingItemDto } from './dto/createShoppingItem.dto';
 import { UpdateShoppingItemDto } from './dto/updateShoppingItem.dto';
 
@@ -13,19 +12,21 @@ export class ShoppingService {
   constructor(
     @Inject(SHOPPING_SERVICE) private readonly shoppingClient: ClientProxy,
     @InjectQueue('notifications') private readonly notificationsQueue: Queue,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getShoppingItemType(search: string) {
     try {
-      const response = this.shoppingClient
-        .send('shoppingClient/getShoppingItemType', { search })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.shoppingClient,
+        'shoppingClient/getShoppingItemType',
+        { search },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -36,20 +37,21 @@ export class ShoppingService {
     itemsPerPage: number,
   ) {
     try {
-      const response = this.shoppingClient
-        .send('shoppingClient/getShoppingList', {
+      return await this.rmqService.send(
+        this.shoppingClient,
+        'shoppingClient/getShoppingList',
+        {
           id_user,
           id_family,
           page,
           itemsPerPage,
-        })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+        },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -61,30 +63,32 @@ export class ShoppingService {
     itemsPerPage: number,
   ) {
     try {
-      const response = this.shoppingClient
-        .send('shoppingClient/getShoppingItem', {
+      return await this.rmqService.send(
+        this.shoppingClient,
+        'shoppingClient/getShoppingItem',
+        {
           id_user,
           id_list,
           id_family,
           page,
           itemsPerPage,
-        })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+        },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async createShoppingList(id_user: string, dto: any) {
     try {
-      const response = this.shoppingClient
-        .send('shoppingClient/createShoppingList', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.shoppingClient,
+        'shoppingClient/createShoppingList',
+        { id_user, dto },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -95,36 +99,37 @@ export class ShoppingService {
           id_target: data.data.id_list,
         },
       });
-
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getShoppingListType(search: string) {
     try {
-      const response = this.shoppingClient
-        .send('shoppingClient/getShoppingListType', { search })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.shoppingClient,
+        'shoppingClient/getShoppingListType',
+        { search },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async createShoppingItem(id_user: string, dto: CreateShoppingItemDto) {
     try {
-      const response = this.shoppingClient
-        .send('shoppingClient/createShoppingItem', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.shoppingClient,
+        'shoppingClient/createShoppingItem',
+        { id_user, dto },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -137,19 +142,20 @@ export class ShoppingService {
       });
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async updateShoppingList(id_user: string, dto: any) {
     try {
-      const response = this.shoppingClient
-        .send('shoppingClient/updateShoppingList', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.shoppingClient,
+        'shoppingClient/updateShoppingList',
+        { id_user, dto },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -162,19 +168,20 @@ export class ShoppingService {
       });
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async updateShoppingItem(id_user: string, dto: UpdateShoppingItemDto) {
     try {
-      const response = this.shoppingClient
-        .send('shoppingClient/updateShoppingItem', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.shoppingClient,
+        'shoppingClient/updateShoppingItem',
+        { id_user, dto },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -187,10 +194,10 @@ export class ShoppingService {
       });
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -200,14 +207,15 @@ export class ShoppingService {
     id_list: number,
   ) {
     try {
-      const response = this.shoppingClient
-        .send('shoppingClient/deleteShoppingList', {
+      const data = await this.rmqService.send(
+        this.shoppingClient,
+        'shoppingClient/deleteShoppingList',
+        {
           id_user,
           id_family,
           id_list,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+        },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
@@ -220,10 +228,10 @@ export class ShoppingService {
       });
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -234,15 +242,16 @@ export class ShoppingService {
     id_item: number,
   ) {
     try {
-      const response = this.shoppingClient
-        .send('shoppingClient/deleteShoppingItem', {
+      const data = await this.rmqService.send(
+        this.shoppingClient,
+        'shoppingClient/deleteShoppingItem',
+        {
           id_user,
           id_list,
           id_item,
           id_family,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+        },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
@@ -255,10 +264,10 @@ export class ShoppingService {
       });
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -269,20 +278,21 @@ export class ShoppingService {
     id_item: number,
   ) {
     try {
-      const response = this.shoppingClient
-        .send('shoppingClient/getSuggestions', {
+      return await this.rmqService.send(
+        this.shoppingClient,
+        'shoppingClient/getSuggestions',
+        {
           id_user,
           id_family,
           id_list,
           id_item,
-        })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+        },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

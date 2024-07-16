@@ -1,10 +1,9 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { CALENDAR_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { NotificationType } from '@app/common';
+import { NotificationType, RmqService } from '@app/common';
 import { CreateChecklistDto } from './dto/createChecklist.dto';
 import { UpdateChecklistDto } from './dto/updateChecklist.dto';
 
@@ -13,20 +12,21 @@ export class ChecklistService {
   constructor(
     @Inject(CALENDAR_SERVICE) private readonly calendarClient: ClientProxy,
     @InjectQueue('notifications') private readonly notificationsQueue: Queue,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getChecklistTypes() {
     try {
-      const response = this.calendarClient
-        .send('calendarClient/getChecklistTypes', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/getChecklistTypes',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -37,30 +37,26 @@ export class ChecklistService {
     itemsPerPage: number,
   ) {
     try {
-      const response = this.calendarClient
-        .send('calendarClient/getAllChecklist', {
-          id_user,
-          id_family,
-          page,
-          itemsPerPage,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/getAllChecklist',
+        { id_user, id_family, page, itemsPerPage },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async createChecklist(id_user: string, dto: CreateChecklistDto) {
     try {
-      const response = this.calendarClient
-        .send('calendarClient/createChecklist', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/createChecklist',
+        { id_user, dto },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -73,19 +69,20 @@ export class ChecklistService {
       });
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async updateChecklist(id_user: string, dto: UpdateChecklistDto) {
     try {
-      const response = this.calendarClient
-        .send('calendarClient/updateChecklist', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/updateChecklist',
+        { id_user, dto },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -98,10 +95,10 @@ export class ChecklistService {
       });
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -111,14 +108,11 @@ export class ChecklistService {
     id_family: number,
   ) {
     try {
-      const response = this.calendarClient
-        .send('calendarClient/deleteChecklist', {
-          id_user,
-          id_checklist,
-          id_family,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/deleteChecklist',
+        { id_user, id_checklist, id_family },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
@@ -131,10 +125,10 @@ export class ChecklistService {
       });
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

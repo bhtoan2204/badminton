@@ -4,13 +4,14 @@ import { ClientProxy } from '@nestjs/microservices';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-facebook';
 import { AUTH_SERVICE } from '../../../utils';
-import { lastValueFrom, timeout } from 'rxjs';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
   constructor(
     @Inject(AUTH_SERVICE) private authClient: ClientProxy,
     private readonly configService: ConfigService,
+    private readonly rmqService: RmqService,
   ) {
     super({
       clientID: configService.get<string>('FACEBOOK_CLIENT_ID'),
@@ -34,10 +35,14 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     profile: Profile,
   ): Promise<any> {
     try {
-      const source = this.authClient
-        .send('authClient/facebook_login', { accessToken, profile })
-        .pipe(timeout(15000));
-      return await lastValueFrom(source);
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/facebook_login',
+        {
+          accessToken,
+          profile,
+        },
+      );
     } catch (error) {
       throw new UnauthorizedException(error.message);
     }

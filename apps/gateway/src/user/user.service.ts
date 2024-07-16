@@ -4,205 +4,208 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common';
-import { lastValueFrom, timeout } from 'rxjs';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 import { CreateAccountDto } from './dto/createAccount.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { AUTH_SERVICE } from '../utils';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class UserService {
-  constructor(@Inject(AUTH_SERVICE) private authClient: ClientProxy) {}
+  constructor(
+    @Inject(AUTH_SERVICE) private authClient: ClientProxy,
+    private readonly rmqService: RmqService,
+  ) {}
 
   async createAccount(dto: CreateAccountDto) {
     try {
-      const source = this.authClient
-        .send('authClient/create_account', dto)
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(source);
-      return data;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/create_account',
+        dto,
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async checkPhone(phone: string) {
     try {
-      const source = this.authClient
-        .send('authClient/check_phone', { phone })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(source);
-      return data;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/check_phone',
+        { phone },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getProfile(currentUser) {
     try {
-      const source = this.authClient
-        .send('authClient/get_profile', currentUser)
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(source);
-      return data;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/get_profile',
+        currentUser,
+      );
     } catch (error) {
       if (error instanceof ConflictException) {
         throw error;
       }
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async changePassword(currentUser, data: ChangePasswordDto) {
     try {
-      const source = this.authClient
-        .send('authClient/change_password', { currentUser, data })
-        .pipe(timeout(15000));
-      const result = await lastValueFrom(source);
-      return result;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/change_password',
+        { currentUser, data },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async forgotPassword(data: any) {
     try {
-      const source = this.authClient
-        .send('authClient/forgot_password', data)
-        .pipe(timeout(15000));
-      const result = await lastValueFrom(source);
-      return result;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/forgot_password',
+        data,
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async checkOTP(data: any) {
     try {
-      const source = this.authClient
-        .send('authClient/check_otp', data)
-        .pipe(timeout(15000));
-      const result = await lastValueFrom(source);
-      return result;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/check_otp',
+        data,
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async resetPassword(data: any) {
     try {
-      const source = this.authClient
-        .send('authClient/reset_password', data)
-        .pipe(timeout(15000));
-      const result = await lastValueFrom(source);
-      return result;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/reset_password',
+        data,
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async updateProfile(user, data) {
     try {
-      const source = this.authClient
-        .send('authClient/update_profile', { user, data })
-        .pipe(timeout(15000));
-      const result = await lastValueFrom(source);
-      return result;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/update_profile',
+        { user, data },
+      );
     } catch (error) {
       if (error instanceof ConflictException) {
         throw error;
       }
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async changeAvatar(currentUser, file: Express.Multer.File) {
     try {
-      const source = this.authClient
-        .send('authClient/change_avatar', { currentUser, file })
-        .pipe(timeout(10000));
-      const result = await lastValueFrom(source);
-      return result;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/change_avatar',
+        { currentUser, file },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async validateEmail(currentUser, data) {
     try {
-      const source = this.authClient
-        .send('authClient/validate_email', { currentUser, data })
-        .pipe(timeout(15000));
-      const result = await lastValueFrom(source);
-      return result;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/validate_email',
+        { currentUser, data },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getUserInfoByEmail(email: string) {
     try {
-      const source = this.authClient
-        .send('authClient/getUserInfoByEmail', { email })
-        .pipe(timeout(15000));
-      const result = await lastValueFrom(source);
-      return result;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/getUserInfoByEmail',
+        { email },
+      );
     } catch (error) {
       if (error instanceof ConflictException) {
         throw error;
       }
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getUserInfoByPhone(phone: string) {
     try {
-      const source = this.authClient
-        .send('authClient/getUserInfoByPhone', { phone })
-        .pipe(timeout(15000));
-      const result = await lastValueFrom(source);
-      return result;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/getUserInfoByPhone',
+        { phone },
+      );
     } catch (error) {
       if (error instanceof ConflictException) {
         throw error;
       }
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

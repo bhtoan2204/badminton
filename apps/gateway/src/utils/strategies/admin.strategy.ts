@@ -2,12 +2,15 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
 import { AUTH_SERVICE } from '..';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class AdminStrategy extends PassportStrategy(Strategy, 'admin') {
-  constructor(@Inject(AUTH_SERVICE) private authClient: ClientProxy) {
+  constructor(
+    @Inject(AUTH_SERVICE) private authClient: ClientProxy,
+    private readonly rmqService: RmqService,
+  ) {
     super({
       usernameField: 'email',
       passwordField: 'password',
@@ -21,10 +24,11 @@ export class AdminStrategy extends PassportStrategy(Strategy, 'admin') {
 
   private async validateUser(email: string, password: string) {
     try {
-      const userRequest$ = this.authClient
-        .send('authClient/validateUser', { email, password })
-        .pipe(timeout(15000));
-      const user$ = await lastValueFrom(userRequest$);
+      const user$ = await this.rmqService.send(
+        this.authClient,
+        'authClient/validateUser',
+        { email, password },
+      );
       if (user$.isadmin) {
         return user$;
       } else {

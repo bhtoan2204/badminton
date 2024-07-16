@@ -2,11 +2,10 @@ import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { CALENDAR_SERVICE } from '../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateCalendarDto } from './dto/createCalendar.dto';
-import { lastValueFrom, timeout } from 'rxjs';
 import { UpdateCalendarDto } from './dto/updateCalendar.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { NotificationType } from '@app/common';
+import { NotificationType, RmqService } from '@app/common';
 import { CreateCategoryEventDto } from './dto/createCategoryEvent.dto';
 
 @Injectable()
@@ -14,29 +13,31 @@ export class CalendarService {
   constructor(
     @Inject(CALENDAR_SERVICE) private readonly calendarClient: ClientProxy,
     @InjectQueue('notifications') private readonly notificationsQueue: Queue,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getAllCategoryEvent(id_user: string, id_family: number) {
     try {
-      const response = this.calendarClient
-        .send('calendarClient/getAllCategoryEvent', { id_user, id_family })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/getAllCategoryEvent',
+        { id_user, id_family },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async createCategoryEvent(id_user: string, dto: CreateCategoryEventDto) {
     try {
-      const response = this.calendarClient
-        .send('calendarClient/createCategoryEvent', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.callService(
+        this.calendarClient,
+        'calendarClient/createCategoryEvent',
+        { id_user, dto },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -49,25 +50,25 @@ export class CalendarService {
       });
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async updateCategoryEvent(id_user: string, dto: any) {
     try {
-      const response = this.calendarClient
-        .send('calendarClient/updateCategoryEvent', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/updateCategoryEvent',
+        { id_user, dto },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -77,35 +78,31 @@ export class CalendarService {
     id_category_event: number,
   ) {
     try {
-      const response = this.calendarClient
-        .send('calendarClient/deleteCategoryEvent', {
-          id_user,
-          id_family,
-          id_category_event,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/deleteCategoryEvent',
+        { id_user, id_family, id_category_event },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getAllCalendar(id_user: string, id_family: number) {
     try {
-      const response = this.calendarClient
-        .send('calendarClient/getAllCalendar', { id_user, id_family })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/getAllCalendar',
+        { id_user, id_family },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -115,29 +112,26 @@ export class CalendarService {
     id_family: number,
   ) {
     try {
-      const response = this.calendarClient
-        .send('calendarClient/getCalendarDetail', {
-          id_user,
-          id_calendar,
-          id_family,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/getCategoryEventByCalendar',
+        { id_user, id_calendar, id_family },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async createCalendar(id_user: string, dto: CreateCalendarDto) {
     try {
-      const response = this.calendarClient
-        .send('calendarClient/createCalendar', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/createCalendar',
+        { id_user, dto },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -150,25 +144,25 @@ export class CalendarService {
       });
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async updateCalendar(id_user: string, dto: UpdateCalendarDto) {
     try {
-      const response = this.calendarClient
-        .send('calendarClient/updateCalendar', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/getCategoryEventByCalendar',
+        { id_user, id_calendar: dto.id_calendar, id_family: dto.id_family },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -178,20 +172,16 @@ export class CalendarService {
     id_family: number,
   ) {
     try {
-      const response = this.calendarClient
-        .send('calendarClient/deleteCalendar', {
-          id_user,
-          id_calendar,
-          id_family,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/deleteCalendar',
+        { id_user, id_calendar, id_family },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

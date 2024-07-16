@@ -1,10 +1,9 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { FINANCE_SERVICE } from '../../../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { NotificationType } from '@app/common';
+import { NotificationType, RmqService } from '@app/common';
 import { UpdateIncomeSourceDto } from './dto/updateIncomeSource.dto';
 
 @Injectable()
@@ -12,29 +11,31 @@ export class IncomeSourceService {
   constructor(
     @Inject(FINANCE_SERVICE) private financeClient: ClientProxy,
     @InjectQueue('notifications') private readonly notificationsQueue: Queue,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getIncomeSource(id_user: string, id_family: number) {
     try {
-      const response = this.financeClient
-        .send('financeClient/getIncomeSource', { id_user, id_family })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getIncomeSource',
+        { id_user, id_family },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async createIncomeSource(id_user: string, dto: any) {
     try {
-      const response = this.financeClient
-        .send('financeClient/createIncomeSource', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.financeClient,
+        'financeClient/createIncomeSource',
+        { id_user, dto },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -47,19 +48,20 @@ export class IncomeSourceService {
       });
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async updateIncomeSource(id_user: string, dto: UpdateIncomeSourceDto) {
     try {
-      const response = this.financeClient
-        .send('financeClient/updateIncomeSource', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.financeClient,
+        'financeClient/updateIncomeSource',
+        { id_user, dto },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -72,10 +74,10 @@ export class IncomeSourceService {
       });
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -85,14 +87,15 @@ export class IncomeSourceService {
     id_income_source: number,
   ) {
     try {
-      const response = this.financeClient
-        .send('financeClient/deleteIncomeSource', {
+      const data = await this.rmqService.send(
+        this.financeClient,
+        'financeClient/deleteIncomeSource',
+        {
           id_user,
           id_family,
           id_income_source,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+        },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: id_family,
         notificationData: {
@@ -105,10 +108,10 @@ export class IncomeSourceService {
       });
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

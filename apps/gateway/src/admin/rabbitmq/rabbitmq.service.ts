@@ -1,98 +1,99 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { ELASTICSEARCH_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class RabbitMqService {
   constructor(
     @Inject(ELASTICSEARCH_SERVICE) private elasticsearchClient: ClientProxy,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getQueues(): Promise<any> {
     try {
-      const response = this.elasticsearchClient
-        .send('rabbitMqClient/getQueues', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'rabbitMqClient/getQueues',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
   async getQueueDetails(queueName: string): Promise<any> {
     try {
-      const response = this.elasticsearchClient
-        .send('rabbitMqClient/getQueueDetail', { queueName })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'rabbitMqClient/getQueueDetail',
+        { queueName },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getNode(): Promise<any> {
     try {
-      const response = this.elasticsearchClient
-        .send('rabbitMqClient/getNode', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'rabbitMqClient/getNode',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getNodeStatistics(nodeName: string): Promise<any> {
     try {
-      const response = this.elasticsearchClient
-        .send('rabbitMqClient/getNodeStatistics', { nodeName })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'rabbitMqClient/getNodeStatistics',
+        { nodeName },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
   async getLogs(limit: number, offset: number): Promise<any> {
     try {
-      const response = this.elasticsearchClient
-        .send('rabbitMqClient/getLogs', { limit, offset })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'rabbitMqClient/getLogs',
+        { limit, offset },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
   async healthCheck(): Promise<any> {
     try {
-      const response = this.elasticsearchClient
-        .send('rabbitMqClient/healthCheck', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'rabbitMqClient/healthCheck',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

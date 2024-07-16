@@ -1,54 +1,57 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
 import { AUTH_SERVICE } from '../utils';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class AuthApiService {
-  constructor(@Inject(AUTH_SERVICE) private authClient: ClientProxy) {}
+  constructor(
+    @Inject(AUTH_SERVICE) private authClient: ClientProxy,
+    private readonly rmqService: RmqService,
+  ) {}
 
   async localLogin(currentUser) {
     try {
-      const source = this.authClient
-        .send('authClient/local/login', currentUser)
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(source);
-      return data;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/local/login',
+        currentUser,
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async refreshToken(currentUser, refreshToken) {
     try {
-      const source = this.authClient
-        .send('authClient/refresh_token', { currentUser, refreshToken })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(source);
-      return data;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/refresh_token',
+        { currentUser, refreshToken },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async logout(refreshToken) {
     try {
-      const source = this.authClient
-        .send('authClient/logout', refreshToken)
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(source);
-      return data;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/logout',
+        refreshToken,
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

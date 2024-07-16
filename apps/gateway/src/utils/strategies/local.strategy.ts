@@ -2,12 +2,15 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-import { lastValueFrom, timeout } from 'rxjs';
 import { AUTH_SERVICE } from '../../utils';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
-  constructor(@Inject(AUTH_SERVICE) private authClient: ClientProxy) {
+  constructor(
+    @Inject(AUTH_SERVICE) private authClient: ClientProxy,
+    private readonly rmqService: RmqService,
+  ) {
     super({
       usernameField: 'email',
       passwordField: 'password',
@@ -21,10 +24,11 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
 
   private async validateUser(email: string, password: string) {
     try {
-      const userValidation$ = this.authClient
-        .send('authClient/validateUser', { email, password })
-        .pipe(timeout(15000));
-      return await lastValueFrom(userValidation$);
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/validateUser',
+        { email, password },
+      );
     } catch (err) {
       throw new UnauthorizedException(err.message);
     }

@@ -1,13 +1,14 @@
+import { RmqService } from '@app/common';
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ELASTICSEARCH_SERVICE } from 'apps/gateway/src/utils';
-import { lastValueFrom, timeout } from 'rxjs';
 
 @Injectable()
 export class PackageComboService {
   constructor(
     @Inject(ELASTICSEARCH_SERVICE)
     private readonly elasticsearchClient: ClientProxy,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getPackagesCombo(
@@ -18,70 +19,61 @@ export class PackageComboService {
     sortDesc: boolean,
   ): Promise<any> {
     try {
-      const response = this.elasticsearchClient
-        .send('elasticsearchClient/getPackagesCombo', {
-          page,
-          itemsPerPage,
-          search,
-          sortBy,
-          sortDesc,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'elasticsearchClient/getPackagesCombo',
+        { page, itemsPerPage, search, sortBy, sortDesc },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async createPackageCombo(dto: any): Promise<any> {
     try {
-      const response = this.elasticsearchClient
-        .send('elasticsearchClient/createPackageCombo', dto)
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'elasticsearchClient/createPackageCombo',
+        dto,
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async updatePackageCombo(id_combo_package: number, dto: any): Promise<any> {
     try {
-      const response = this.elasticsearchClient
-        .send('elasticsearchClient/updatePackageCombo', {
-          id_combo_package,
-          dto,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'elasticsearchClient/updatePackageCombo',
+        { id_combo_package, dto },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async deletePackageCombo(id_combo_package: number): Promise<any> {
     try {
-      const response = this.elasticsearchClient
-        .send('elasticsearchClient/deletePackageCombo', { id_combo_package })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'elasticsearchClient/deletePackageCombo',
+        { id_combo_package },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

@@ -1,56 +1,58 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PAYMENT_SERVICE } from '../utils';
-import { lastValueFrom, timeout } from 'rxjs';
 import { VerifyOrderDTO } from './dto/verifyOrder.dto';
-import { PackageType } from '@app/common';
+import { PackageType, RmqService } from '@app/common';
 
 @Injectable()
 export class PaymentService {
-  constructor(@Inject(PAYMENT_SERVICE) private paymentClient: ClientProxy) {}
+  constructor(
+    @Inject(PAYMENT_SERVICE) private paymentClient: ClientProxy,
+    private readonly rmqService: RmqService,
+  ) {}
 
   async getMainPackage() {
     try {
-      const response = this.paymentClient
-        .send('paymentClient/getMainPackage', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/getMainPackage',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getExtraPackage() {
     try {
-      const response = this.paymentClient
-        .send('paymentClient/getExtraPackage', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/getExtraPackage',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getComboPackage() {
     try {
-      const response = this.paymentClient
-        .send('paymentClient/getComboPackage', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/getComboPackage',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -67,105 +69,106 @@ export class PaymentService {
       if (id_combo_package) {
         packageType = PackageType.COMBO;
       }
-      const response = this.paymentClient
-        .send('paymentClient/placeOrder', { id_user, order, packageType, ip })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/placeOrder',
+        { id_user, order, packageType, ip },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async get_method() {
     try {
-      const response = this.paymentClient
-        .send('paymentClient/get_method', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/get_method',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
+
   async getOrder(id_user: string, page: number, itemsPerPage: number) {
     try {
-      const response = this.paymentClient
-        .send('paymentClient/getOrder', { id_user, page, itemsPerPage })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/getOrder',
+        { id_user, page, itemsPerPage },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getAvailableFunction(id_user: string, id_family: number) {
     try {
-      const response = this.paymentClient
-        .send('paymentClient/getAvailableFunction', { id_user, id_family })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/getAvailableFunction',
+        { id_user, id_family },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
-  async generateVnpay(id_user, order, ip) {
+  async generateVnpay(id_user: string, order: any, ip: string) {
     try {
-      const response = this.paymentClient
-        .send('paymentClient/generateVnpay', { id_user, ip, order })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/generateVnpay',
+        { id_user, ip, order },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async checkOrderReturn(id_user: string, dto: VerifyOrderDTO) {
     try {
-      const response = this.paymentClient
-        .send('paymentClient/verifyOrder', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/verifyOrder',
+        { id_user, dto },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async paymentHistory(id_user: string, page: number, itemsPerPage: number) {
     try {
-      const response = this.paymentClient
-        .send('paymentClient/paymentHistory', { id_user, page, itemsPerPage })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/paymentHistory',
+        { id_user, page, itemsPerPage },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

@@ -1,11 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { TimeoutError, lastValueFrom, timeout } from 'rxjs';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { EDUCATION_SERVICE } from '../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { UpdateEducationDto } from './dto/updateEducation.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { NotificationType } from '@app/common';
+import { NotificationType, RmqService } from '@app/common';
 import { CreateEducationDto } from './dto/createEducation.dto';
 
 @Injectable()
@@ -13,14 +12,16 @@ export class EducationService {
   constructor(
     @Inject(EDUCATION_SERVICE) private educationClient: ClientProxy,
     @InjectQueue('notifications') private readonly notificationsQueue: Queue,
+    private readonly rmqService: RmqService,
   ) {}
 
   async createEducationProgress(id_user: string, dto: CreateEducationDto) {
     try {
-      const response = this.educationClient
-        .send('educationClient/createEducationProgress', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.educationClient,
+        'educationClient/createEducationProgress',
+        { id_user, dto },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -33,13 +34,10 @@ export class EducationService {
       });
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -52,25 +50,23 @@ export class EducationService {
     member_id: string,
   ) {
     try {
-      const response = this.educationClient
-        .send('educationClient/getAllEducationProgress', {
+      return this.rmqService.send(
+        this.educationClient,
+        'educationClient/getAllEducationProgress',
+        {
           id_user,
           pageNumber,
           itemsPerPage,
           id_family,
           search,
           member_id,
-        })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+        },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -80,19 +76,16 @@ export class EducationService {
     id_education_progress: number,
   ) {
     try {
-      const response = this.educationClient
-        .send('educationClient/getDetailEducationProgress', {
-          id_user,
-          id_family,
-          id_education_progress,
-        })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.educationClient,
+        'educationClient/getDetailEducationProgress',
+        { id_user, id_family, id_education_progress },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -101,10 +94,11 @@ export class EducationService {
     dto: UpdateEducationDto,
   ) {
     try {
-      const response = this.educationClient
-        .send('educationClient/updateDetailEducationProgress', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.educationClient,
+        'educationClient/updateDetailEducationProgress',
+        { id_user, dto },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -117,10 +111,10 @@ export class EducationService {
       });
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -130,14 +124,11 @@ export class EducationService {
     id_education_progress: number,
   ) {
     try {
-      const response = this.educationClient
-        .send('educationClient/deleteEducationProgress', {
-          id_user,
-          id_family,
-          id_education_progress,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.educationClient,
+        'educationClient/deleteEducationProgress',
+        { id_user, id_family, id_education_progress },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
@@ -150,10 +141,10 @@ export class EducationService {
       });
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

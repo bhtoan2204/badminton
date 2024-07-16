@@ -1,56 +1,57 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
 import { ELASTICSEARCH_SERVICE } from '../../utils';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class SearchService {
   constructor(
     @Inject(ELASTICSEARCH_SERVICE) private elasticsearchClient: ClientProxy,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getLogsCount() {
     try {
-      const response = this.elasticsearchClient
-        .send('elasticsearchClient/getLogsCount', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'elasticsearchClient/getLogsCount',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getLogs(dto: any) {
     try {
-      const response = this.elasticsearchClient
-        .send('elasticsearchClient/getLogs', dto)
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'elasticsearchClient/getLogs',
+        dto,
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getLogsCountByTimeRange(dto: any) {
     try {
-      const response = this.elasticsearchClient
-        .send('elasticsearchClient/getLogsCountByTimeRange', dto)
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'elasticsearchClient/getLogsCountByTimeRange',
+        dto,
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

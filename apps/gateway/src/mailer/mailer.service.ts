@@ -1,37 +1,42 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { AUTH_SERVICE } from '../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class MailService {
-  constructor(@Inject(AUTH_SERVICE) private mailerClient: ClientProxy) {}
+  constructor(
+    @Inject(AUTH_SERVICE) private mailerClient: ClientProxy,
+    private readonly rmqService: RmqService,
+  ) {}
 
   async sendUserConfirmation(userInfo: any, email: string) {
     try {
-      const response = this.mailerClient
-        .send('mailClient/sendUserConfirmation', { userInfo, email })
-        .pipe(timeout(8000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.mailerClient,
+        'mailClient/sendUserConfirmation',
+        { userInfo, email },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
-  async sendInvitation(id_user, id_family) {
+  async sendInvitation(id_user: string, id_family: number) {
     try {
-      const response = this.mailerClient
-        .send('mailClient/sendInvitation', { id_user, id_family })
-        .pipe(timeout(8000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.mailerClient,
+        'mailClient/sendInvitation',
+        { id_user, id_family },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

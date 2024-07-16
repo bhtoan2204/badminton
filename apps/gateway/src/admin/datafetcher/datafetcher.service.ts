@@ -1,88 +1,89 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { ELASTICSEARCH_SERVICE, PAYMENT_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
 import { GetOrderStatisticsDto } from './dto/getOrderStatistics.dto';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class DatafetcherService {
   constructor(
     @Inject(ELASTICSEARCH_SERVICE) private elasticsearchClient: ClientProxy,
     @Inject(PAYMENT_SERVICE) private paymentClient: ClientProxy,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getIpData(ip: string) {
     try {
-      const response = this.elasticsearchClient
-        .send('datafetcherClient/getIpData', { ip })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'datafetcherClient/getIpData',
+        { ip },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getSummary() {
     try {
-      const response = this.elasticsearchClient
-        .send('datafetcherClient/getSummary', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'datafetcherClient/getSummary/getSummary',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getRevenueLast6Months() {
     try {
-      const response = this.elasticsearchClient
-        .send('datafetcherClient/getRevenueLast6Months', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'datafetcherClient/getRevenueLast6Months',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getListOrders(dto: any) {
     try {
-      const response = this.paymentClient
-        .send('paymentClient/getListOrders', dto)
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/getListOrders',
+        dto,
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getOrderStatistics(dto: GetOrderStatisticsDto) {
     try {
-      const response = this.paymentClient
-        .send('paymentClient/getOrderStatistics', dto)
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/getOrderStatistics',
+        dto,
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

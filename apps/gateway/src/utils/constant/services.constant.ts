@@ -3,7 +3,6 @@ export const PAYMENT_SERVICE = 'PAYMENT';
 export const FAMILY_SERVICE = 'FAMILY';
 export const CHAT_SERVICE = 'CHAT';
 export const ROLE_SERVICE = 'ROLE';
-export const CRAWLER_SERVICE = 'CRAWLER';
 export const CALENDAR_SERVICE = 'CALENDAR';
 export const GUIDELINE_SERVICE = 'GUIDELINE';
 export const EDUCATION_SERVICE = 'EDUCATION';

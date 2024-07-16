@@ -1,10 +1,36 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { RmqOptions, Transport, RmqContext } from '@nestjs/microservices';
-
+import {
+  RmqOptions,
+  Transport,
+  RmqContext,
+  ClientProxy,
+} from '@nestjs/microservices';
+import * as CircuitBreaker from 'opossum';
+import { lastValueFrom, timeout } from 'rxjs';
 @Injectable()
 export class RmqService {
-  constructor(private readonly configService: ConfigService) {}
+  private circuitBreaker: CircuitBreaker;
+
+  constructor(private readonly configService: ConfigService) {
+    const options = {
+      timeout: 30000, // If our function takes longer than 30 seconds, trigger a failure
+      errorThresholdPercentage: 50, // When 50% of requests fail, trip the circuit
+      resetTimeout: 30000, // After 30 seconds, try again.
+    };
+
+    this.circuitBreaker = new CircuitBreaker(
+      this.callService.bind(this),
+      options,
+    );
+
+    this.circuitBreaker.fallback((client: any, pattern: string) => {
+      throw new HttpException(
+        `Service ${client.options.queue} unavailable: ${pattern}`,
+        503,
+      );
+    });
+  }
 
   getOptions(queue: string, noAck = false): RmqOptions {
     return {
@@ -16,6 +42,19 @@ export class RmqService {
         persistent: true,
       },
     };
+  }
+
+  async callService(client: ClientProxy, pattern: string, data: any) {
+    const response = client.send(pattern, data).pipe(timeout(15000));
+    return await lastValueFrom(response);
+  }
+
+  async send(client: ClientProxy, pattern: string, data: any) {
+    try {
+      return await this.circuitBreaker.fire(client, pattern, data);
+    } catch (error) {
+      throw new HttpException(error.message, error.status || 500);
+    }
   }
 
   ack(context: RmqContext) {

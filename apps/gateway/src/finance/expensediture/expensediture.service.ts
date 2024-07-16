@@ -1,66 +1,61 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { FINANCE_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { TimeoutError, lastValueFrom, timeout } from 'rxjs';
 import { CreateExpenseDto } from './dto/createExpense.dto';
 import { UpdateExpenseDto } from './dto/updateExpense.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { NotificationType } from '@app/common';
+import { NotificationType, RmqService } from '@app/common';
 
 @Injectable()
 export class ExpenseditureService {
   constructor(
     @Inject(FINANCE_SERVICE) private financeClient: ClientProxy,
     @InjectQueue('notifications') private readonly notificationsQueue: Queue,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getExpenseByDate(id_user: string, id_family: number, date: Date) {
     try {
-      const response = this.financeClient
-        .send('financeClient/getExpenseByDate', { id_user, id_family, date })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getExpenseByDate',
+        { id_user, id_family, date },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getExpenseByMonth(id_user: string, id_family, month, year) {
     try {
-      const response = this.financeClient
-        .send('financeClient/getExpenseByMonth', {
-          id_user,
-          id_family,
-          month,
-          year,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getExpenseByMonth',
+        { id_user, id_family, month, year },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
   async getExpenseByYear(id_user: string, id_family, year) {
     try {
-      const response = this.financeClient
-        .send('financeClient/getExpenseByYear', { id_user, id_family, year })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getExpenseByYear',
+        { id_user, id_family, year },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -70,21 +65,16 @@ export class ExpenseditureService {
     id_expenditure: number,
   ) {
     try {
-      const response = this.financeClient
-        .send('financeClient/getExpenseditureById', {
-          id_user,
-          id_family,
-          id_expenditure,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-
-      return data;
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getExpenseditureById',
+        { id_user, id_family, id_expenditure },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -97,23 +87,16 @@ export class ExpenseditureService {
     toDate: Date | null,
   ) {
     try {
-      const response = this.financeClient
-        .send('financeClient/getExpenseByDateRange', {
-          id_user,
-          id_family,
-          fromDate,
-          toDate,
-          page,
-          itemsPerPage,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getExpenseByDateRange',
+        { id_user, id_family, fromDate, toDate, page, itemsPerPage },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -123,10 +106,11 @@ export class ExpenseditureService {
     file: Express.Multer.File,
   ) {
     try {
-      const response = this.financeClient
-        .send('financeClient/createExpensediture', { id_user, dto, file })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.financeClient,
+        'financeClient/createExpensediture',
+        { id_user, dto, file },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -140,10 +124,10 @@ export class ExpenseditureService {
 
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -153,10 +137,11 @@ export class ExpenseditureService {
     file: Express.Multer.File,
   ) {
     try {
-      const response = this.financeClient
-        .send('financeClient/updateExpensediture', { id_user, dto, file })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.financeClient,
+        'financeClient/updateExpensediture',
+        { id_user, dto, file },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -169,10 +154,10 @@ export class ExpenseditureService {
       });
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -182,14 +167,11 @@ export class ExpenseditureService {
     id_expenditure: number,
   ) {
     try {
-      const response = this.financeClient
-        .send('financeClient/deleteExpensediture', {
-          id_user,
-          id_family,
-          id_expenditure,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.financeClient,
+        'financeClient/deleteExpensediture',
+        { id_user, id_family, id_expenditure },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
@@ -202,10 +184,10 @@ export class ExpenseditureService {
       });
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

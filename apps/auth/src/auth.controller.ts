@@ -50,12 +50,9 @@ export class AuthController {
   }
 
   @EventPattern('authClient/validateUserId')
-  async handleValidateUserId(
-    @Payload() id_user: string,
-    @Ctx() context: RmqContext,
-  ) {
+  async handleValidateUserId(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.authService.validateUserId(id_user);
+    return await this.authService.validateUserId(data.id_user);
   }
 
   @EventPattern('authClient/validateUser')
