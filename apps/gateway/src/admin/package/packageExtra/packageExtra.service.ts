@@ -1,13 +1,14 @@
+import { RmqService } from '@app/common';
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ELASTICSEARCH_SERVICE } from 'apps/gateway/src/utils';
-import { lastValueFrom, timeout } from 'rxjs';
 
 @Injectable()
 export class PackageExtraService {
   constructor(
     @Inject(ELASTICSEARCH_SERVICE)
     private readonly elasticsearchClient: ClientProxy,
+    private readonly rmqService: RmqService,
   ) {}
   async getPackagesExtra(
     search: string,
@@ -15,35 +16,31 @@ export class PackageExtraService {
     sortDesc: boolean,
   ): Promise<any> {
     try {
-      const response = this.elasticsearchClient
-        .send('elasticsearchClient/getExtraPackage', {
-          search,
-          sortBy,
-          sortDesc,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'elasticsearchClient/getExtraPackage',
+        { search, sortBy, sortDesc },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async updatePackageExtra(dto: any): Promise<any> {
     try {
-      const response = this.elasticsearchClient
-        .send('elasticsearchClient/updateExtraPackage', dto)
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'elasticsearchClient/updateExtraPackage',
+        dto,
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

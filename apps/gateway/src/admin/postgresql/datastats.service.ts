@@ -1,41 +1,42 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { ELASTICSEARCH_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class PostgresqlService {
   constructor(
     @Inject(ELASTICSEARCH_SERVICE) private elasticsearchClient: ClientProxy,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getPostgresqlStat() {
     try {
-      const response = this.elasticsearchClient
-        .send('datastatsClient/getPostgresqlStat', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'datastatsClient/getPostgresqlStat',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getMongooseStat() {
     try {
-      const response = this.elasticsearchClient
-        .send('datastatsClient/getMongooseStat', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'datastatsClient/getMongooseStat',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

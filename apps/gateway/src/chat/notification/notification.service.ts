@@ -1,7 +1,7 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { FAMILY_SERVICE, BACKGROUND_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class NotificationService {
@@ -9,48 +9,51 @@ export class NotificationService {
     @Inject(BACKGROUND_SERVICE)
     private readonly notificationClient: ClientProxy,
     @Inject(FAMILY_SERVICE) private readonly familyClient: ClientProxy,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getNotifications(id_user: string, index: number) {
     try {
-      const response = this.notificationClient
-        .send('backgroundClient/getNotifications', { id_user, index })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.notificationClient,
+        'backgroundClient/getNotifications',
+        { id_user, index },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async markRead(id_user: string, id_notification: string) {
     try {
-      const response = this.notificationClient
-        .send('backgroundClient/markRead', { id_user, id_notification })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.notificationClient,
+        'backgroundClient/markRead',
+        { id_user, id_notification },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getListReceiverId(id_user: string, id_family: number) {
     try {
-      const response = this.familyClient.send('familyClient/getIdsMember', {
-        id_user,
-        id_family,
-      });
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.notificationClient,
+        'familyClient/getIdsMember',
+        { id_user, id_family },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

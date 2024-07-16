@@ -5,13 +5,14 @@ import { WsException } from '@nestjs/websockets';
 import { Strategy } from 'passport-jwt';
 import { AUTH_SERVICE } from '../../constant/services.constant';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class WsJwtStrategy extends PassportStrategy(Strategy, 'ws-jwt') {
   constructor(
     @Inject(AUTH_SERVICE) private authClient: ClientProxy,
     private readonly configService: ConfigService,
+    private readonly rmqService: RmqService,
   ) {
     super({
       jwtFromRequest: (req) => {
@@ -27,12 +28,12 @@ export class WsJwtStrategy extends PassportStrategy(Strategy, 'ws-jwt') {
   }
 
   async validate(payload: any) {
-    const userRequest$ = this.authClient
-      .send('authClient/validateUserId', payload.id_user)
-      .pipe(timeout(15000));
     try {
-      const user = await lastValueFrom(userRequest$);
-      return user;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/validateUserId',
+        { id_user: payload.id_user },
+      );
     } catch (err) {
       throw new UnauthorizedException(err.message);
     }

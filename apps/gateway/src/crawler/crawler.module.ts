@@ -1,11 +1,11 @@
 import { RmqModule } from '@app/common';
 import { Module } from '@nestjs/common';
-import { CRAWLER_SERVICE } from '../utils';
+import { BACKGROUND_SERVICE } from '../utils';
 import { CrawlerController } from './crawler.controller';
 import { CrawlerService } from './crawler.service';
 
 @Module({
-  imports: [RmqModule.register({ name: CRAWLER_SERVICE })],
+  imports: [RmqModule.register({ name: BACKGROUND_SERVICE })],
   controllers: [CrawlerController],
   providers: [CrawlerService],
 })

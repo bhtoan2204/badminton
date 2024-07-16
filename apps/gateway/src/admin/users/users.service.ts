@@ -1,15 +1,16 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { AUTH_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class UsersService {
   constructor(
     @Inject(AUTH_SERVICE) private authClient: ClientProxy,
     @InjectQueue('auth') private readonly authQueue: Queue,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getUsers(
@@ -20,68 +21,64 @@ export class UsersService {
     sortDesc: boolean,
   ) {
     try {
-      const source = this.authClient
-        .send('authClient/getUsersAdmin', {
-          page,
-          itemsPerPage,
-          search,
-          sortBy,
-          sortDesc,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(source);
-      return data;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/getUsersAdmin',
+        { page, itemsPerPage, search, sortBy, sortDesc },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async banUser(id_user: string) {
     try {
-      const source = this.authClient
-        .send('authClient/banUser', { id_user })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(source);
+      const data = await this.rmqService.send(
+        this.authClient,
+        'authClient/banUser',
+        { id_user },
+      );
       await this.authQueue.add('logoutUser', { id_user: id_user });
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async unbanUser(id_user: string) {
     try {
-      const source = this.authClient
-        .send('authClient/unbanUser', { id_user })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(source);
+      const data = await this.rmqService.send(
+        this.authClient,
+        'authClient/unbanUser',
+        { id_user },
+      );
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getTopUsers(limit: number) {
     try {
-      const source = this.authClient
-        .send('authClient/getTopUsersLogin', { limit })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(source);
-      return data;
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/getTopUsersLogin',
+        { limit },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

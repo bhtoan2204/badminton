@@ -1,10 +1,9 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { FINANCE_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { TimeoutError, lastValueFrom, timeout } from 'rxjs';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { NotificationType } from '@app/common';
+import { NotificationType, RmqService } from '@app/common';
 import { UpdateIncomeDto } from './dto/updateIncome.dto';
 
 @Injectable()
@@ -12,20 +11,21 @@ export class IncomeService {
   constructor(
     @Inject(FINANCE_SERVICE) private financeClient: ClientProxy,
     @InjectQueue('notifications') private readonly notificationsQueue: Queue,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getIncomeByDate(id_user: string, id_family: number, date: string) {
     try {
-      const response = this.financeClient
-        .send('financeClient/getIncomeByDate', { id_user, id_family, date })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getIncomeByDate',
+        { id_user, id_family, date },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -36,51 +36,46 @@ export class IncomeService {
     year: number,
   ) {
     try {
-      const response = this.financeClient
-        .send('financeClient/getIncomeByMonth', {
-          id_user,
-          id_family,
-          month,
-          year,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getIncomeByMonth',
+        { id_user, id_family, month, year },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getIncomeByYear(id_user: string, id_family: number, year: number) {
     try {
-      const response = this.financeClient
-        .send('financeClient/getIncomeByYear', { id_user, id_family, year })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getIncomeByYear',
+        { id_user, id_family, year },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getIncomeById(id_user: string, id_family: number, id_income: number) {
     try {
-      const response = this.financeClient
-        .send('financeClient/getIncomeById', { id_user, id_family, id_income })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getIncomeById',
+        { id_user, id_family, id_income },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -93,32 +88,26 @@ export class IncomeService {
     toDate: Date,
   ) {
     try {
-      const response = this.financeClient
-        .send('financeClient/getIncomeByDateRange', {
-          id_user,
-          id_family,
-          page,
-          itemsPerPage,
-          fromDate,
-          toDate,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getIncomeByDateRange',
+        { id_user, id_family, page, itemsPerPage, fromDate, toDate },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async createIncome(id_user: string, dto: any) {
     try {
-      const response = this.financeClient
-        .send('financeClient/createIncome', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.financeClient,
+        'financeClient/createIncome',
+        { id_user, dto },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -131,19 +120,20 @@ export class IncomeService {
       });
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async updateIncome(id_user: string, dto: UpdateIncomeDto) {
     try {
-      const response = this.financeClient
-        .send('financeClient/updateIncome', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.financeClient,
+        'financeClient/updateIncome',
+        { id_user, dto },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -156,19 +146,20 @@ export class IncomeService {
       });
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async deleteIncome(id_user: string, id_family: number, id_income: number) {
     try {
-      const response = this.financeClient
-        .send('financeClient/deleteIncome', { id_user, id_family, id_income })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.financeClient,
+        'financeClient/deleteIncome',
+        { id_user, id_family, id_income },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
@@ -181,10 +172,10 @@ export class IncomeService {
       });
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

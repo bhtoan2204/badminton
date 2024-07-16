@@ -17,6 +17,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationModule } from './notification/notification.module';
+import { RssModule } from './rss/rss.module';
+import { BankModule } from './bank/bank.module';
 
 const globalModule = (module: DynamicModule) => {
   module.global = true;
@@ -62,6 +64,8 @@ const globalModule = (module: DynamicModule) => {
     DatabaseModule,
     TypeOrmModule.forFeature([Family, MemberFamily, Checklist, Calendar]),
     forwardRef(() => NotificationModule),
+    forwardRef(() => RssModule),
+    forwardRef(() => BankModule),
   ],
   providers: [BackgroundService],
   exports: [RmqModule],

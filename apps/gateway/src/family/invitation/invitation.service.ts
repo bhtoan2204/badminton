@@ -1,61 +1,63 @@
-import { HttpException, Inject, Injectable } from "@nestjs/common";
-import { ClientProxy } from "@nestjs/microservices";
-import { FAMILY_SERVICE } from "../../utils";
-import { lastValueFrom, timeout } from "rxjs";
-import { InjectRedis } from "@nestjs-modules/ioredis";
-import Redis from "ioredis";
+import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { FAMILY_SERVICE } from '../../utils';
+import { InjectRedis } from '@nestjs-modules/ioredis';
+import Redis from 'ioredis';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class InvitationService {
   constructor(
     @Inject(FAMILY_SERVICE) private familyClient: ClientProxy,
-    @InjectRedis() private readonly redisService: Redis
+    @InjectRedis() private readonly redisService: Redis,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getInvitationCode(id_user: string, id_family: number) {
     try {
-      const response = this.familyClient
-        .send('familyClient/getInvitationCode', { id_user, id_family })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.familyClient,
+        'familyClient/getInvitationCode',
+        { id_user, id_family },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async generateInvitation(id_user: string, id_family: number) {
     try {
-      const response = this.familyClient
-        .send('familyClient/generateInvitation', { id_user, id_family })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.familyClient,
+        'familyClient/getInvitationCode',
+        { id_user, id_family },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async handleInvitation(id_user: string, id_family: number, code: string) {
     try {
-      const response = this.familyClient
-        .send('familyClient/handleInvitation', { id_user, id_family, code })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.familyClient,
+        'familyClient/handleInvitation',
+        { id_user, id_family, code },
+      );
       const cacheKey = `familyCheck:${id_family}:${id_user}`;
       await this.redisService.del(cacheKey);
       return data;
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

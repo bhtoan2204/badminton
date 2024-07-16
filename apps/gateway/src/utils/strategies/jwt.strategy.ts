@@ -2,11 +2,11 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 import { AUTH_SERVICE } from '../../utils';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -14,6 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     @Inject(AUTH_SERVICE) private authClient: ClientProxy,
     private readonly configService: ConfigService,
     @InjectRedis() private readonly redisService: Redis,
+    private readonly rmqService: RmqService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -33,10 +34,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       if (cachedUser) {
         return JSON.parse(cachedUser);
       }
-      const userRequest$ = this.authClient
-        .send('authClient/validateUserId', payload.id_user)
-        .pipe(timeout(15000));
-      const user = await lastValueFrom(userRequest$);
+      const user = await this.rmqService.send(
+        this.authClient,
+        'authClient/validateUserId',
+        { id_user: payload.id_user },
+      );
       await this.redisService.set(cacheKey, JSON.stringify(user), 'EX', 3600); // Cache for 1 hour
       return user;
     } catch (err) {

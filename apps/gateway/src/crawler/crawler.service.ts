@@ -1,23 +1,28 @@
-import { HttpException, Inject, Injectable } from '@nestjs/common';
-import { CRAWLER_SERVICE } from '../utils';
+import { Injectable, HttpException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
+import { BACKGROUND_SERVICE } from '../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class CrawlerService {
-  constructor(@Inject(CRAWLER_SERVICE) private crawlerClient: ClientProxy) {}
+  constructor(
+    @Inject(BACKGROUND_SERVICE) private crawlerClient: ClientProxy,
+    private readonly rmqService: RmqService,
+  ) {}
 
   async getCategoriesNews() {
     try {
-      const response = this.crawlerClient
-        .send('crawlerClient/getCategoriesNews', {})
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.crawlerClient,
+        'crawlerClient/getCategoriesNews',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -27,33 +32,35 @@ export class CrawlerService {
     itemsPerPage: number,
   ) {
     try {
-      const response = this.crawlerClient
-        .send('crawlerClient/getNews', {
+      return await this.rmqService.send(
+        this.crawlerClient,
+        'crawlerClient/getNews',
+        {
           id_article_category,
           page,
           itemsPerPage,
-        })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+        },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async scrapeInterestRatesLocalBank() {
     try {
-      const response = this.crawlerClient
-        .send('crawlerClient/scrapeInterestRatesLocalBank', {})
-        .pipe(timeout(20000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.crawlerClient,
+        'crawlerClient/scrapeInterestRatesLocalBank',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

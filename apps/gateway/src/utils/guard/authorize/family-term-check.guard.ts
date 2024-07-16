@@ -3,13 +3,14 @@ import { FAMILY_SERVICE } from '../../constant/services.constant';
 import { ClientProxy } from '@nestjs/microservices';
 import Redis from 'ioredis';
 import { InjectRedis } from '@nestjs-modules/ioredis';
-import { lastValueFrom, timeout } from 'rxjs';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class FamilyTermCheckGuard {
   constructor(
     @Inject(FAMILY_SERVICE) private familyClient: ClientProxy,
     @InjectRedis() private readonly redisService: Redis,
+    private readonly rmqService: RmqService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -31,11 +32,11 @@ export class FamilyTermCheckGuard {
         return cachedFamilyCheck === 'true';
       }
 
-      const familyRequest$ = this.familyClient
-        .send('familyClient/termCheck', { id_family })
-        .pipe(timeout(15000));
-
-      const familyCheck = await lastValueFrom(familyRequest$);
+      const familyCheck = await this.rmqService.send(
+        this.familyClient,
+        'familyClient/termCheck',
+        { id_family },
+      );
       await this.redisService.set(cacheKey, familyCheck, 'EX', 3600);
       return familyCheck;
     } catch (e) {

@@ -6,15 +6,16 @@ import {
 } from '@nestjs/common';
 import { FAMILY_SERVICE } from '../../constant/services.constant';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class MemberFamilyGuard implements CanActivate {
   constructor(
     @Inject(FAMILY_SERVICE) private familyClient: ClientProxy,
     @InjectRedis() private readonly redisService: Redis,
+    private readonly rmqService: RmqService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -33,11 +34,12 @@ export class MemberFamilyGuard implements CanActivate {
     if (cachedResult) {
       return cachedResult === 'true';
     }
-    const familyRequest$ = this.familyClient
-      .send('familyClient/checkIsMember', { id_family, id_user })
-      .pipe(timeout(15000));
 
-    const familyCheck = await lastValueFrom(familyRequest$);
+    const familyCheck = await this.rmqService.send(
+      this.familyClient,
+      'familyClient/checkIsMember',
+      { id_family, id_user },
+    );
     await this.redisService.set(cacheKey, familyCheck.toString(), 'EX', 3600);
     return familyCheck;
   }

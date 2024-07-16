@@ -5,12 +5,12 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { lastValueFrom, timeout } from 'rxjs';
 import { PERMISSION_KEY } from '../../decorator/permission.decorator';
 import { FAMILY_SERVICE } from '../../constant/services.constant';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
@@ -18,6 +18,7 @@ export class PermissionGuard implements CanActivate {
     private reflector: Reflector,
     @Inject(FAMILY_SERVICE) private familyClient: ClientProxy,
     @InjectRedis() private readonly redisService: Redis,
+    private readonly rmqService: RmqService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<any> {
@@ -48,13 +49,11 @@ export class PermissionGuard implements CanActivate {
         .map((result) => result.permission);
 
       if (missingPermissions.length > 0) {
-        const checkIsPermission = this.familyClient
-          .send('familyClient/checkExtraPackage', {
-            id_family,
-            permissions: missingPermissions,
-          })
-          .pipe(timeout(15000));
-        const result = await lastValueFrom(checkIsPermission);
+        const result = await this.rmqService.send(
+          this.familyClient,
+          'familyClient/checkExtraPackage',
+          { id_family, permissions: missingPermissions },
+        );
 
         await Promise.all(
           missingPermissions.map(async (permission) => {

@@ -1,18 +1,18 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { FINANCE_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateAssetDto } from './dto/createAsset.dto';
-import { TimeoutError, lastValueFrom, timeout } from 'rxjs';
 import { UpdateAssetDto } from './dto/updateAsset.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { NotificationType } from '@app/common';
+import { NotificationType, RmqService } from '@app/common';
 
 @Injectable()
 export class AssetService {
   constructor(
     @Inject(FINANCE_SERVICE) private financeClient: ClientProxy,
     @InjectQueue('notifications') private readonly notificationsQueue: Queue,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getAsset(
@@ -22,20 +22,21 @@ export class AssetService {
     itemsPerPage: number,
   ) {
     try {
-      const response = this.financeClient
-        .send('financeClient/getAsset', {
+      return await this.rmqService.send(
+        this.financeClient,
+        'financeClient/getAsset',
+        {
           id_user,
           id_family,
           page,
           itemsPerPage,
-        })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+        },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -45,10 +46,11 @@ export class AssetService {
     file: Express.Multer.File,
   ) {
     try {
-      const response = this.financeClient
-        .send('financeClient/createAsset', { id_user, dto, file })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.financeClient,
+        'financeClient/createAsset',
+        { id_user, dto, file },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -61,10 +63,10 @@ export class AssetService {
       });
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -74,10 +76,11 @@ export class AssetService {
     file: Express.Multer.File,
   ) {
     try {
-      const response = this.financeClient
-        .send('financeClient/updateAsset', { id_user, dto, file })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.financeClient,
+        'financeClient/updateAsset',
+        { id_user, dto, file },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
@@ -90,19 +93,20 @@ export class AssetService {
       });
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async deleteAsset(id_user: string, id_family, id_asset: number) {
     try {
-      const response = this.financeClient
-        .send('financeClient/deleteAsset', { id_user, id_family, id_asset })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
+      const data = await this.rmqService.send(
+        this.financeClient,
+        'financeClient/deleteAsset',
+        { id_user, id_family, id_asset },
+      );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
@@ -115,10 +119,10 @@ export class AssetService {
       });
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

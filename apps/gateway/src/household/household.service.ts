@@ -1,31 +1,32 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { HOUSEHOLD_SERVICE } from '../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { TimeoutError, lastValueFrom, timeout } from 'rxjs';
 import { InputDurableItemDto } from './dto/inputDurableItem.dto';
 import { InputConsumableItemDto } from './dto/inputConsumableItem.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { NotificationType } from '@app/common';
+import { NotificationType, RmqService } from '@app/common';
 
 @Injectable()
 export class HouseholdService {
   constructor(
     @Inject(HOUSEHOLD_SERVICE) private householdClient: ClientProxy,
     @InjectQueue('notifications') private readonly notificationsQueue: Queue,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getCategory() {
     try {
-      const response = this.householdClient
-        .send('householdClient/getCategory', {})
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.householdClient,
+        'householdClient/getCategory',
+        {},
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -36,44 +37,43 @@ export class HouseholdService {
     itemsPerPage: number,
   ) {
     try {
-      const response = this.householdClient
-        .send('householdClient/getItem', {
-          id_user,
-          id_family,
-          page,
-          itemsPerPage,
-        })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.householdClient,
+        'householdClient/getItem',
+        { id_user, id_family, page, itemsPerPage },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getItemDetail(id_user: string, id_family: number, id_item: number) {
     try {
-      const response = this.householdClient
-        .send('householdClient/getItemDetail', { id_user, id_family, id_item })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.householdClient,
+        'householdClient/getItemDetail',
+        { id_user, id_family, id_item },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async createItem(id_user: string, dto: any, file: Express.Multer.File) {
     try {
-      const response = this.householdClient
-        .send('householdClient/createItem', { id_user, dto, file })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      this.notificationsQueue.add('createNotificationFamily', {
+      const data = await this.rmqService.send(
+        this.householdClient,
+        'householdClient/createItem',
+        { id_user, dto, file },
+      );
+
+      await this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Household Item Created',
@@ -83,22 +83,25 @@ export class HouseholdService {
           id_target: data.data.id_household_item,
         },
       });
+
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async updateItem(id_user: string, dto: any, file: Express.Multer.File) {
     try {
-      const response = this.householdClient
-        .send('householdClient/updateItem', { id_user, dto, file })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      this.notificationsQueue.add('createNotificationFamily', {
+      const data = await this.rmqService.send(
+        this.householdClient,
+        'householdClient/updateItem',
+        { id_user, dto, file },
+      );
+
+      await this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'Household Item Updated',
@@ -108,22 +111,25 @@ export class HouseholdService {
           id_target: dto.id_item,
         },
       });
+
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async inputDurableItem(id_user: string, dto: InputDurableItemDto) {
     try {
-      const response = this.householdClient
-        .send('householdClient/inputDurableItem', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      this.notificationsQueue.add('createNotificationFamily', {
+      const data = await this.rmqService.send(
+        this.householdClient,
+        'householdClient/inputDurableItem',
+        { id_user, dto },
+      );
+
+      await this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Durable Item Changed',
@@ -133,22 +139,25 @@ export class HouseholdService {
           id_target: data.data.id_household_item,
         },
       });
+
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async inputConsumableItem(id_user: string, dto: InputConsumableItemDto) {
     try {
-      const response = this.householdClient
-        .send('householdClient/inputConsumableItem', { id_user, dto })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      this.notificationsQueue.add('createNotificationFamily', {
+      const data = await this.rmqService.send(
+        this.householdClient,
+        'householdClient/inputConsumableItem',
+        { id_user, dto },
+      );
+
+      await this.notificationsQueue.add('createNotificationFamily', {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Consumable Item Changed',
@@ -158,22 +167,25 @@ export class HouseholdService {
           id_target: data.data.id_household_item,
         },
       });
+
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async deleteItem(id_user: string, id_family: number, id_item: number) {
     try {
-      const response = this.householdClient
-        .send('householdClient/deleteItem', { id_user, id_family, id_item })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      this.notificationsQueue.add('createNotificationFamily', {
+      const data = await this.rmqService.send(
+        this.householdClient,
+        'householdClient/deleteItem',
+        { id_user, id_family, id_item },
+      );
+
+      await this.notificationsQueue.add('createNotificationFamily', {
         id_family,
         notificationData: {
           title: 'Household Item Deleted',
@@ -183,26 +195,28 @@ export class HouseholdService {
           id_target: id_item,
         },
       });
+
       return data;
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
   async getLowConditionItem(id_user: string, id_family: number) {
     try {
-      const response = this.householdClient
-        .send('householdClient/getLowConditionItem', { id_user, id_family })
-        .pipe(timeout(15000));
-      return await lastValueFrom(response);
+      return await this.rmqService.send(
+        this.householdClient,
+        'householdClient/getLowConditionItem',
+        { id_user, id_family },
+      );
     } catch (error) {
-      if (error instanceof TimeoutError) {
-        throw new HttpException('Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

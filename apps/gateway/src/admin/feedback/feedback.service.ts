@@ -1,27 +1,28 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { PAYMENT_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
+import { RmqService } from '@app/common';
 
 @Injectable()
 export class FeedbackService {
   constructor(
     @Inject(PAYMENT_SERVICE)
     private readonly paymentClient: ClientProxy,
+    private readonly rmqService: RmqService,
   ) {}
 
   async getCountAndAverageRatingFeedback() {
     try {
-      const response = this.paymentClient
-        .send('paymentClient/getCountAndAverageRatingFeedback', {})
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/getCountAndAverageRatingFeedback',
+        {},
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 
@@ -34,23 +35,23 @@ export class FeedbackService {
     rate: number,
   ) {
     try {
-      const response = this.paymentClient
-        .send('paymentClient/getFeedback', {
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/getFeedback',
+        {
           page,
           itemsPerPage,
           search,
           sortBy,
           sortDesc,
           rate,
-        })
-        .pipe(timeout(15000));
-      const data = await lastValueFrom(response);
-      return data;
+        },
+      );
     } catch (error) {
-      if (error.name === 'TimeoutError') {
-        throw new HttpException('Timeout', 408);
-      }
-      throw new HttpException(error, error.statusCode);
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
     }
   }
 }

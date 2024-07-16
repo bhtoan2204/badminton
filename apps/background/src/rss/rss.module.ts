@@ -1,7 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { RssController } from './rss.controller';
 import { RssService } from './rss.service';
-import { CrawlerModule } from '../crawler.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   Article,
@@ -11,10 +10,11 @@ import {
 } from '@app/common';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { BackgroundModule } from '../background.module';
 
 @Module({
   imports: [
-    forwardRef(() => CrawlerModule),
+    forwardRef(() => BackgroundModule),
     DatabaseModule,
     TypeOrmModule.forFeature([Article, ArticleCategory, Enclosure]),
     BullModule.forRootAsync({
