@@ -130,6 +130,7 @@ export class ChatService {
         this.chatClient,
         'chatClient/sendFamilyVideoMessage',
         { id_user, familyId, file },
+        60000,
       );
       this.notificationsQueue.add('createNotificationFamily', {
         id_family: familyId,
@@ -182,6 +183,7 @@ export class ChatService {
         this.chatClient,
         'chatClient/sendVideoMessage',
         { id_user, receiverId, file },
+        60000,
       );
       this.notificationsQueue.add('createNotificationUser', {
         id_user: receiverId,
