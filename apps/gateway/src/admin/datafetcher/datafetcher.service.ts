@@ -31,7 +31,7 @@ export class DatafetcherService {
     try {
       return await this.rmqService.send(
         this.elasticsearchClient,
-        'datafetcherClient/getSummary/getSummary',
+        'datafetcherClient/getSummary',
         {},
       );
     } catch (error) {
