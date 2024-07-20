@@ -1,4 +1,4 @@
-import { Injectable, HttpException } from '@nestjs/common';
+import { Injectable, HttpException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   RmqOptions,
@@ -8,15 +8,18 @@ import {
 } from '@nestjs/microservices';
 import * as CircuitBreaker from 'opossum';
 import { lastValueFrom, timeout } from 'rxjs';
+import { catchError, retry } from 'rxjs/operators';
+
 @Injectable()
 export class RmqService {
   private circuitBreaker: CircuitBreaker;
+  private readonly logger = new Logger(RmqService.name);
 
   constructor(private readonly configService: ConfigService) {
     const options = {
-      timeout: 30000, // If our function takes longer than 30 seconds, trigger a failure
-      errorThresholdPercentage: 50, // When 50% of requests fail, trip the circuit
-      resetTimeout: 30000, // After 30 seconds, try again.
+      timeout: 30000,
+      errorThresholdPercentage: 50,
+      resetTimeout: 10000,
     };
 
     this.circuitBreaker = new CircuitBreaker(
@@ -24,7 +27,20 @@ export class RmqService {
       options,
     );
 
+    this.circuitBreaker.on('open', () =>
+      this.logger.warn('Circuit breaker opened'),
+    );
+    this.circuitBreaker.on('halfOpen', () =>
+      this.logger.log('Circuit breaker half-open'),
+    );
+    this.circuitBreaker.on('close', () =>
+      this.logger.log('Circuit breaker closed'),
+    );
+
     this.circuitBreaker.fallback((client: any, pattern: string) => {
+      this.logger.error(
+        `Fallback triggered for service ${client.options.queue} and pattern ${pattern}`,
+      );
       throw new HttpException(
         `Service ${client.options.queue} unavailable: ${pattern}`,
         503,
@@ -50,7 +66,14 @@ export class RmqService {
     data: any,
     timeoutValue: number = 15000,
   ) {
-    const response = client.send(pattern, data).pipe(timeout(timeoutValue));
+    const response = client.send(pattern, data).pipe(
+      timeout(timeoutValue),
+      retry(2), // Retry twice before failing
+      catchError((err) => {
+        this.logger.error(`Error in callService: ${err.message}`, err.stack);
+        throw err;
+      }),
+    );
     return await lastValueFrom(response);
   }
 
@@ -68,6 +91,7 @@ export class RmqService {
         timeoutValue,
       );
     } catch (error) {
+      this.logger.error(`Error in send method: ${error.message}`, error.stack);
       throw new HttpException(error.message, error.status || 500);
     }
   }
