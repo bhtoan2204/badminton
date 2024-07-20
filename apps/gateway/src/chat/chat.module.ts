@@ -1,11 +1,6 @@
-import { GlobalJwtModule, RmqModule } from '@app/common';
+import { GlobalJwtModule } from '@app/common';
 import { Module } from '@nestjs/common';
-import {
-  AUTH_SERVICE,
-  CHAT_SERVICE,
-  FAMILY_SERVICE,
-  WsJwtStrategy,
-} from '../utils';
+import { WsJwtStrategy } from '../utils';
 import { ChatGateway } from './chat.gateway';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
@@ -18,9 +13,6 @@ import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
-    RmqModule.register({ name: CHAT_SERVICE }),
-    RmqModule.register({ name: AUTH_SERVICE }),
-    RmqModule.register({ name: FAMILY_SERVICE }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

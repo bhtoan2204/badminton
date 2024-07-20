@@ -33,7 +33,7 @@ export class CalendarService {
 
   async createCategoryEvent(id_user: string, dto: CreateCategoryEventDto) {
     try {
-      const data = await this.rmqService.callService(
+      const data = await this.rmqService.send(
         this.calendarClient,
         'calendarClient/createCategoryEvent',
         { id_user, dto },

@@ -68,7 +68,7 @@ export class RmqService {
   ) {
     const response = client.send(pattern, data).pipe(
       timeout(timeoutValue),
-      retry(2), // Retry twice before failing
+      retry(2),
       catchError((err) => {
         this.logger.error(`Error in callService: ${err.message}`, err.stack);
         throw err;

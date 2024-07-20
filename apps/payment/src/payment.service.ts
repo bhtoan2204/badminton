@@ -207,7 +207,6 @@ export class PaymentService {
         .add(mainPackage.duration_months, 'months')
         .toDate();
       const newFamily = await this.familyRepository.save(family);
-      console.log(newFamily);
       const memberFamily = new MemberFamily();
       memberFamily.id_user = order.id_user;
       memberFamily.role = FamilyRole.OWNER;
@@ -373,7 +372,6 @@ export class PaymentService {
         order.id_package_extra = null;
       }
       order.price = price;
-      console.log(order);
       await this.orderRepository.save(order);
 
       return `${this.vnpUrl}?${qs.stringify(sortedVnpParams, { encode: false })}`;
@@ -768,7 +766,6 @@ export class PaymentService {
         const order = sortDesc === true ? 'DESC' : 'ASC';
         query.orderBy(`feedbacks.${sortBy}`, order);
       }
-      console.log(query.getSql());
       const [data, total] = await query.getManyAndCount();
       return {
         data: data,

@@ -362,8 +362,6 @@ export class UserService {
       if (!email) {
         const query = 'SELECT * FROM f_check_otp_by_phone($1, $2)';
         const parameters = [phone, code];
-        console.log('phone', phone);
-        console.log('otp', code);
         const result = await this.entityManager.query(query, parameters);
         const isValid = result[0].f_check_otp_by_phone;
         return isValid
@@ -399,7 +397,6 @@ export class UserService {
         const parameters = [phone, code];
         const result = await this.entityManager.query(query, parameters);
         const isReset = result[0].f_check_otp_by_phone;
-        console.log('isReset', isReset);
         if (isReset) {
           const resetQuery = 'SELECT * FROM f_reset_password_by_phone($1, $2)';
           const resetParams = [phone, password];
@@ -425,8 +422,6 @@ export class UserService {
         if (isReset) {
           const resetQuery = 'SELECT * FROM f_reset_password_by_email($1, $2)';
           const resetParams = [email, password];
-          const data = await this.entityManager.query(resetQuery, resetParams);
-          console.log(data);
           const deleteOtpQuery = 'SELECT * FROM f_delete_otp_by_email($1)';
           const deleteOtpParams = [phone];
           await this.entityManager.query(deleteOtpQuery, deleteOtpParams);
