@@ -589,7 +589,6 @@ export class ChatService {
       const fileExtension = file.originalname;
       const fileName =
         'chat_' + id_user + '_' + Date.now() + '_' + fileExtension;
-      console.log('fileName', fileName);
       const params: UploadFileRequest = {
         file: new Uint8Array(file.buffer.data),
         fileName: fileName,

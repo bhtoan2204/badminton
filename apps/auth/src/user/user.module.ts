@@ -45,5 +45,3 @@ import { StorageModule } from '../storage/storage.module';
   exports: [UserService, RmqModule],
 })
 export class UserModule {}
-
-console.log(join(__dirname, '..', 'templates/'));

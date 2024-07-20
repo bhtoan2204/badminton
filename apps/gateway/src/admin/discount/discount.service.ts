@@ -20,6 +20,7 @@ export class DiscountService {
         dto,
       );
     } catch (error) {
+      console.log(error);
       throw new HttpException(
         error.message,
         error.statusCode || error.status || 500,

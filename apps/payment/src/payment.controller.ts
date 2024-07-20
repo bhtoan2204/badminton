@@ -94,7 +94,6 @@ export class PaymentController {
     @Payload() data: { startDate: string; endDate: string; interval: number },
   ) {
     this.rmqService.ack(context);
-    console.log(data);
     return this.paymentService.getOrderStatistics(data);
   }
 
