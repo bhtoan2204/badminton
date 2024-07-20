@@ -13,6 +13,7 @@ import * as redisStore from 'cache-manager-redis-store';
 import { FeedbackModule } from './feedback/feedback.module';
 import { UsersModule } from './users/users.module';
 import { RoleModule } from './role/role.module';
+import { DiscountModule } from './discount/discount.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { RoleModule } from './role/role.module';
     forwardRef(() => FeedbackModule),
     forwardRef(() => UsersModule),
     forwardRef(() => RoleModule),
+    forwardRef(() => DiscountModule),
     RmqModule.register({ name: ELASTICSEARCH_SERVICE }),
     RmqModule.register({ name: PAYMENT_SERVICE }),
     CacheModule.registerAsync({

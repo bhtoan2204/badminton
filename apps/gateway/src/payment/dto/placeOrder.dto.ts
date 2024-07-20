@@ -119,4 +119,9 @@ export class PlaceOrderDto {
   @IsNotEmpty()
   @IsString()
   bankCode: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  code: string;
 }
