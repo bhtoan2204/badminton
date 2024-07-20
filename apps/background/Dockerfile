@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 RUN npm install -g npm@10.8.0
-RUN npm install --ignore-scripts --legacy-peer-deps
+RUN npm install --ignore-scripts
 
 COPY libs ./libs
 COPY proto ./proto
@@ -34,7 +34,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install --only=production --ignore-scripts --legacy-peer-deps
+RUN npm install --only=production --ignore-scripts
 
 RUN adduser -D nonroot && chown -R nonroot:nonroot /usr/src/app
 
