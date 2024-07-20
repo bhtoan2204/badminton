@@ -37,26 +37,15 @@ export class RmqService {
       this.logger.log('Circuit breaker closed'),
     );
 
-    this.circuitBreaker.fallback(
-      (
-        client: any,
-        pattern: string,
-        data: any,
-        timeoutValue: number,
-        error: any,
-      ) => {
-        this.logger.error(
-          `Fallback triggered for service ${client.options.queue} and pattern ${pattern}`,
-        );
-        console.log(error);
-        throw new HttpException(error.message, error.status || 500);
-
-        // throw new HttpException(
-        //   `Service ${client.options.queue} unavailable: ${pattern}`,
-        //   503,
-        // );
-      },
-    );
+    this.circuitBreaker.fallback((client: any, pattern: string) => {
+      this.logger.error(
+        `Fallback triggered for service ${client.options.queue} and pattern ${pattern}`,
+      );
+      throw new HttpException(
+        `Service ${client.options.queue} unavailable: ${pattern}`,
+        503,
+      );
+    });
   }
 
   getOptions(queue: string, noAck = false): RmqOptions {
@@ -77,20 +66,15 @@ export class RmqService {
     data: any,
     timeoutValue: number = 15000,
   ) {
-    try {
-      const response = client.send(pattern, data).pipe(
-        timeout(timeoutValue),
-        retry(2), // Retry twice before failing
-        // catchError((err) => {
-        //   this.logger.error(`Error in callService: ${err.message}`, err.stack);
-        //   throw err;
-        // }),
-      );
-      return await lastValueFrom(response);
-    } catch (error) {
-      this.logger.error(`Error in callService: ${error.message}`, error.stack);
-      throw new HttpException(error.message, error.status || 500);
-    }
+    const response = client.send(pattern, data).pipe(
+      timeout(timeoutValue),
+      retry(2),
+      catchError((err) => {
+        this.logger.error(`Error in callService: ${err.message}`, err.stack);
+        throw err;
+      }),
+    );
+    return await lastValueFrom(response);
   }
 
   async send(
@@ -108,7 +92,7 @@ export class RmqService {
       );
     } catch (error) {
       this.logger.error(`Error in send method: ${error.message}`, error.stack);
-      throw error;
+      throw new HttpException(error.message, error.status || 500);
     }
   }
 

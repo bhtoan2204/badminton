@@ -13,7 +13,6 @@ export class DiscountService {
 
   async addDiscount(dto: any): Promise<any> {
     try {
-      console.log(dto);
       const { code, percentage, expired_at } = dto;
       const discount = await this.discountRepository.findOne({
         where: { code },
@@ -33,7 +32,8 @@ export class DiscountService {
     } catch (error) {
       throw new RpcException({
         message: error.message || 'Internal server error',
-        statusCode: error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        statusCode:
+          error.status || error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }

@@ -4,8 +4,6 @@ import { ProxyModule } from './proxy/proxy.module';
 import { RabbitMqModule } from './rabbitmq/rabbitmq.module';
 import { PostgresqlModule } from './postgresql/datastats.module';
 import { DatafetcherModule } from './datafetcher/datafetcher.module';
-import { RmqModule } from '@app/common';
-import { ELASTICSEARCH_SERVICE, PAYMENT_SERVICE } from '../utils';
 import { PackageModule } from './package/package.module';
 import { CacheModule, CacheStoreFactory } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -27,8 +25,6 @@ import { DiscountModule } from './discount/discount.module';
     forwardRef(() => UsersModule),
     forwardRef(() => RoleModule),
     forwardRef(() => DiscountModule),
-    RmqModule.register({ name: ELASTICSEARCH_SERVICE }),
-    RmqModule.register({ name: PAYMENT_SERVICE }),
     CacheModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -40,6 +36,6 @@ import { DiscountModule } from './discount/discount.module';
       inject: [ConfigService],
     }),
   ],
-  exports: [RmqModule, CacheModule],
+  exports: [CacheModule],
 })
 export class AdminModule {}
