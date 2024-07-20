@@ -5,14 +5,23 @@ import { ConfigService } from '@nestjs/config';
 import { setupSwagger } from './utils';
 import * as session from 'express-session';
 import * as cors from 'cors';
-import { initTracing } from '@app/common';
+import {
+  initTracing,
+  SentryExceptionFilter,
+  SentryModule,
+  SentryService,
+} from '@app/common';
 
 async function bootstrap() {
   await initTracing('gateway');
   const app = await NestFactory.create(GatewayModule);
   app.useGlobalPipes(new ValidationPipe());
   const configService = app.get(ConfigService);
-
+  if (configService.get<string>('NODE_ENV') === 'production') {
+    app.select(SentryModule);
+    const sentryService = app.get(SentryService);
+    app.useGlobalFilters(new SentryExceptionFilter(sentryService));
+  }
   app.setGlobalPrefix('api/v1');
 
   setupSwagger(app);

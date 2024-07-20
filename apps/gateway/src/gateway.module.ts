@@ -19,6 +19,7 @@ import { RedisModule } from '@nestjs-modules/ioredis';
 import { BullModule } from '@nestjs/bull';
 import * as Joi from 'joi';
 import { APP_GUARD } from '@nestjs/core';
+import { SentryModule } from '@app/common';
 
 const globalModule = (module: DynamicModule) => {
   module.global = true;
@@ -90,6 +91,7 @@ const globalModule = (module: DynamicModule) => {
         name: 'auth',
       }),
     ),
+    ...(process.env.NODE_ENV === 'production' ? [SentryModule] : []),
     AuthApiModule,
     UserModule,
     PaymentModule,

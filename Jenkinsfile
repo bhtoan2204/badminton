@@ -80,10 +80,10 @@ pipeline {
                             sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
                             'find ./k8s -type f -name "*.yml" -print0 | xargs -0 sed -i "s/<TAG>/${COMMIT_ID}/g"'
                         """
-                        // sh """
-                        //     sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
-                        //     'kubectl apply -f ./k8s'
-                        // """
+                        sh """
+                            sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
+                            'kubectl apply -f ./k8s'
+                        """
                         // sh """
                         //     sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
                         //     'DEPLOYMENTS=\$(kubectl get deployments --no-headers -o custom-columns=\":metadata.name\") && \

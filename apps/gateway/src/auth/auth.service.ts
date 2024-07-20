@@ -2,6 +2,7 @@ import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { AUTH_SERVICE } from '../utils';
 import { RmqService } from '@app/common';
+import * as Sentry from '@sentry/nestjs';
 
 @Injectable()
 export class AuthApiService {
@@ -18,6 +19,7 @@ export class AuthApiService {
         currentUser,
       );
     } catch (error) {
+      Sentry.captureException(error);
       throw new HttpException(
         error.message,
         error.statusCode || error.status || 500,

@@ -6,6 +6,10 @@ export * from './grpc/grpc.service';
 
 export * from './database/database.module';
 
+export * from './sentry/sentry.module';
+export * from './sentry/sentry-exception.filter';
+export * from './sentry/sentry.service';
+
 export * from './database/entity/checklist.entity';
 export * from './database/entity/checklist_type.entity';
 export * from './database/entity/family.entity';

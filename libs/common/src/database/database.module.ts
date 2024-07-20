@@ -27,7 +27,6 @@ import { FeedbackMetadata } from './entity/feedbackMetadata.entity';
 import { Order } from './entity/order.entity';
 import { ArticleCategory } from './entity/article_category.entity';
 import { Article } from './entity/article.entity';
-import * as Joi from 'joi';
 import { Enclosure } from './entity/enclosure.entity';
 import { OrderSubscriber } from './subcriber/order.subcriber';
 import { FamilyRoles } from './entity/family_roles.entity';
@@ -47,6 +46,8 @@ import { FamilySubscriber } from './subcriber/family.subcriber';
 import { UtilitiesSubcriber } from './subcriber/utilities.subcriber';
 import { ShoppingListSubscriber } from './subcriber/shoppingList.subcriber';
 import { ShoppingItemSubscriber } from './subcriber/shoppingItems.subcriber';
+import * as Joi from 'joi';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
