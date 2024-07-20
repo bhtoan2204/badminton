@@ -47,6 +47,7 @@ import { UtilitiesSubcriber } from './subcriber/utilities.subcriber';
 import { ShoppingListSubscriber } from './subcriber/shoppingList.subcriber';
 import { ShoppingItemSubscriber } from './subcriber/shoppingItems.subcriber';
 import * as Joi from 'joi';
+import { Discount } from './entity/discount.entity';
 
 @Module({
   imports: [
@@ -115,6 +116,7 @@ import * as Joi from 'joi';
             FinanceIncomeSource,
             FinanceAssets,
             RefreshToken,
+            Discount,
           ],
           // subscribers: [OrderSubscriber],
         };
