@@ -40,15 +40,20 @@ export class DataStatsService {
       const collectionStats = [];
       const collections = await db.collections();
       for (const collectionInfo of collections) {
-        const stats = await db.command({
-          collStats: collectionInfo.collectionName,
-          scale: 1,
-          verbose: false,
+        const isView = await db.command({
+          listCollections: 1,
+          filter: { name: collectionInfo.collectionName },
         });
-        delete stats.indexDetails;
-        collectionStats.push(stats);
+        if (isView.cursor.firstBatch[0].type !== 'view') {
+          const stats = await db.command({
+            collStats: collectionInfo.collectionName,
+            scale: 1,
+            verbose: false,
+          });
+          delete stats.indexDetails;
+          collectionStats.push(stats);
+        }
       }
-
       return collectionStats;
     } catch (error) {
       throw new RpcException({
