@@ -32,3 +32,5 @@ export * from './strategies/refresh.strategy';
 export * from './strategies/oauth.strategy/facebook.strategy';
 export * from './strategies/oauth.strategy/google.strategy';
 export * from './strategies/admin.strategy';
+
+export * from './filter/http-exception.filter';

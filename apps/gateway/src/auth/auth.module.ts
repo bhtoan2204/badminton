@@ -1,10 +1,8 @@
-import { RmqModule } from '@app/common';
 import { Module } from '@nestjs/common';
 import { AuthApiController } from './auth.controller';
 import { AuthApiService } from './auth.service';
 import {
   SessionSerializer,
-  AUTH_SERVICE,
   LocalStrategy,
   JwtStrategy,
   RefreshStrategy,
@@ -12,13 +10,9 @@ import {
   FacebookStrategy,
   AdminStrategy,
 } from '../utils';
-// import { FirebaseModule } from './firebase/firebase.module';
 
 @Module({
-  imports: [
-    RmqModule.register({ name: AUTH_SERVICE }),
-    // forwardRef(() => FirebaseModule),
-  ],
+  imports: [],
   controllers: [AuthApiController],
   providers: [
     AuthApiService,
@@ -30,6 +24,5 @@ import {
     FacebookStrategy,
     SessionSerializer,
   ],
-  exports: [RmqModule],
 })
 export class AuthApiModule {}

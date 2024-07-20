@@ -9,7 +9,24 @@ import { CrawlerModule } from './crawler/crawler.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { UserModule } from './user/user.module';
 import { GuidelineModule } from './guideline/guideline.module';
-import { AppLoggerMiddleware, PermissionGuard } from './utils';
+import {
+  AppLoggerMiddleware,
+  AUTH_SERVICE,
+  BACKGROUND_SERVICE,
+  CALENDAR_SERVICE,
+  CHAT_SERVICE,
+  EDUCATION_SERVICE,
+  ELASTICSEARCH_SERVICE,
+  FAMILY_SERVICE,
+  FINANCE_SERVICE,
+  GUIDELINE_SERVICE,
+  HOUSEHOLD_SERVICE,
+  INVOICE_SERVICE,
+  PAYMENT_SERVICE,
+  PermissionGuard,
+  ROLE_SERVICE,
+  SHOPPING_SERVICE,
+} from './utils';
 import { EducationModule } from './education/education.module';
 import { HouseholdModule } from './household/household.module';
 import { FinanceModule } from './finance/finance.module';
@@ -19,7 +36,7 @@ import { RedisModule } from '@nestjs-modules/ioredis';
 import { BullModule } from '@nestjs/bull';
 import * as Joi from 'joi';
 import { APP_GUARD } from '@nestjs/core';
-import { SentryModule } from '@app/common';
+import { RmqModule, SentryModule } from '@app/common';
 
 const globalModule = (module: DynamicModule) => {
   module.global = true;
@@ -81,6 +98,20 @@ const globalModule = (module: DynamicModule) => {
       }),
       inject: [ConfigService],
     }),
+    globalModule(RmqModule.register({ name: AUTH_SERVICE })),
+    globalModule(RmqModule.register({ name: PAYMENT_SERVICE })),
+    globalModule(RmqModule.register({ name: FAMILY_SERVICE })),
+    globalModule(RmqModule.register({ name: CHAT_SERVICE })),
+    globalModule(RmqModule.register({ name: ROLE_SERVICE })),
+    globalModule(RmqModule.register({ name: CALENDAR_SERVICE })),
+    globalModule(RmqModule.register({ name: GUIDELINE_SERVICE })),
+    globalModule(RmqModule.register({ name: EDUCATION_SERVICE })),
+    globalModule(RmqModule.register({ name: ELASTICSEARCH_SERVICE })),
+    globalModule(RmqModule.register({ name: HOUSEHOLD_SERVICE })),
+    globalModule(RmqModule.register({ name: FINANCE_SERVICE })),
+    globalModule(RmqModule.register({ name: SHOPPING_SERVICE })),
+    globalModule(RmqModule.register({ name: INVOICE_SERVICE })),
+    globalModule(RmqModule.register({ name: BACKGROUND_SERVICE })),
     globalModule(
       BullModule.registerQueue({
         name: 'notifications',
