@@ -1,5 +1,5 @@
 import { Discount } from '@app/common';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -13,7 +13,17 @@ export class DiscountService {
 
   async addDiscount(dto: any): Promise<any> {
     try {
+      console.log(dto);
       const { code, percentage, expired_at } = dto;
+      const discount = await this.discountRepository.findOne({
+        where: { code },
+      });
+      if (discount) {
+        throw new BadRequestException({
+          message: 'Discount code already exists',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
       const newDiscount = this.discountRepository.create({
         code,
         percentage,
@@ -22,8 +32,8 @@ export class DiscountService {
       return await this.discountRepository.save(newDiscount);
     } catch (error) {
       throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error.message || 'Internal server error',
+        statusCode: error.status || HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
@@ -57,9 +67,8 @@ export class DiscountService {
           statusCode: HttpStatus.BAD_REQUEST,
         });
       }
-      if (code) discount.code = code;
-      if (percentage) discount.percentage = percentage;
-      if (expired_at) discount.expired_at = expired_at;
+      discount.percentage = percentage || discount.percentage;
+      discount.expired_at = expired_at || discount.expired_at;
       return await this.discountRepository.save(discount);
     } catch (error) {
       throw new RpcException({

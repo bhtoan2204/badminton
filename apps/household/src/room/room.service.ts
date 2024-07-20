@@ -89,7 +89,6 @@ export class RoomService {
         const uploadImageData =
           await this.storageService.uploadImageHousehold(params);
         fileUrl = uploadImageData.fileUrl;
-        console.log(fileUrl);
         room.room_image = fileUrl;
       }
       if (room_name) room.room_name = room_name;

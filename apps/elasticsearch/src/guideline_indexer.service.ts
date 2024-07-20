@@ -9,7 +9,6 @@ export class GuidelineIndexerService {
 
   async indexGuideline(guideline: any): Promise<any> {
     try {
-      console.log('Indexing guideline', guideline);
       if (guideline === undefined) {
         throw new Error('Guideline is undefined');
       }

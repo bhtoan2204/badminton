@@ -40,7 +40,6 @@ export class FamilyTermCheckGuard {
       await this.redisService.set(cacheKey, familyCheck, 'EX', 3600);
       return familyCheck;
     } catch (e) {
-      console.log('Failed at Family Term Check', e);
       return false;
     }
   }

@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class CreateDiscountDto {
   @ApiProperty()
@@ -10,6 +17,8 @@ export class CreateDiscountDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
+  @Min(0)
+  @Max(100)
   percentage: number;
 
   @ApiProperty()

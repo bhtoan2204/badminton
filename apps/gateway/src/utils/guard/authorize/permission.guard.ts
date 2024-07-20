@@ -72,7 +72,6 @@ export class PermissionGuard implements CanActivate {
 
       return !cacheResults.some((result) => result.cachedResult !== 'true');
     } catch (error) {
-      console.log('Failed at Permission Check', error);
       return false;
     }
   }
