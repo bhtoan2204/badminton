@@ -3,6 +3,7 @@ import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 import {
   DatabaseModule,
+  Discount,
   Family,
   FamilyExtraPackages,
   Feedback,
@@ -18,6 +19,7 @@ import {
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { DiscountModule } from './discount/discount.module';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     }),
     RmqModule,
     DatabaseModule,
+    DiscountModule,
     TypeOrmModule.forFeature([
       PackageMain,
       PackageExtra,
@@ -45,6 +48,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       MemberFamily,
       FamilyExtraPackages,
       PaymentHistory,
+      Discount,
     ]),
   ],
   controllers: [PaymentController],

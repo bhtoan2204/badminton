@@ -6,8 +6,9 @@ import { sortObject } from './utils';
 import * as moment from 'moment';
 import * as crypto from 'crypto';
 import * as qs from 'qs';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import {
+  Discount,
   Family,
   FamilyExtraPackages,
   FamilyRole,
@@ -54,7 +55,8 @@ export class PaymentService {
     private memberFamilyRepository: Repository<MemberFamily>,
     @InjectRepository(PaymentHistory)
     private paymentHistoryRepository: Repository<PaymentHistory>,
-    @InjectDataSource() private readonly dataSource: DataSource,
+    @InjectRepository(Discount)
+    private discountRepository: Repository<Discount>,
   ) {
     this.vnpTmnCode = this.configService.get<string>('VNPAY_TMN_CODE');
     this.vnpHashSecret = this.configService.get<string>('VNPAY_HASH_SECRET');
@@ -395,6 +397,7 @@ export class PaymentService {
       id_combo_package,
       id_family,
       bankCode,
+      code,
     } = order;
 
     try {
@@ -405,6 +408,21 @@ export class PaymentService {
         throw new RpcException({
           message: 'Family not found',
           statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      const discount = await this.discountRepository.findOne({
+        where: { code },
+      });
+      if (!discount) {
+        throw new RpcException({
+          message: 'Discount not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      if (discount.expired_at < new Date()) {
+        throw new RpcException({
+          message: 'Discount code expired',
+          statusCode: HttpStatus.BAD_REQUEST,
         });
       }
       const order_id = crypto.randomUUID();
@@ -457,13 +475,14 @@ export class PaymentService {
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
+      const discountPrice = price - price * (discount.percentage / 100);
       return this.generateOrderLink(
         id_package,
         packageType,
         id_user,
         id_family,
         order_id,
-        price,
+        discountPrice,
         ip,
         bankCode,
       );
