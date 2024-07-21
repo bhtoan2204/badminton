@@ -385,15 +385,15 @@ export class GuidelineController {
     description: 'asc: ascending, desc: descending, none: no sort',
   })
   async getSharedGuideline(
-    @Query('page') page: number,
-    @Query('itemsPerPage') itemsPerPage: number,
+    @Query('page') page: string,
+    @Query('itemsPerPage') itemsPerPage: string,
     @Query('text') text: string,
     @Query('sortBy') sortBy: string,
     @Query('sortDirection') sortDirection: 'asc' | 'desc' | 'none' = 'none',
   ) {
     return this.guidelineService.getSharedGuideline(
-      page,
-      itemsPerPage,
+      parseInt(page) || 1,
+      parseInt(itemsPerPage) || 10,
       text,
       sortBy,
       sortDirection,

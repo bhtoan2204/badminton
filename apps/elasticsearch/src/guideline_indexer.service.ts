@@ -88,14 +88,16 @@ export class GuidelineIndexerService {
         ];
       }
 
-      const data = await this.elasticSearchService.search(option);
+      const data: any = await this.elasticSearchService.search(option);
       if (data && data.hits && data.hits.hits) {
         return {
           data: data.hits.hits.map((hit) => hit._source),
+          total: data.hits.total.value,
         };
       } else {
         return {
           data: [],
+          total: 0,
         };
       }
     } catch (error) {

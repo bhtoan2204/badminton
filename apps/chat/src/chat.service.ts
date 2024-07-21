@@ -177,6 +177,13 @@ export class ChatService {
       ]);
       const messages = conversations[0].messages;
       const results = messages.map((message) => {
+        if (message.senderId !== senderId) {
+          return {
+            ...message,
+            receiverInfo: senderInfo,
+            senderInfo: receiverInfo,
+          };
+        }
         return {
           ...message,
           receiverInfo,
