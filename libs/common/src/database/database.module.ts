@@ -56,7 +56,10 @@ import { Discount } from './entity/discount.entity';
       validationSchema: Joi.object({
         DATABASE_URL: Joi.string().required(),
       }),
-      envFilePath: './libs/.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './libs/.env.production'
+          : './libs/.env',
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
