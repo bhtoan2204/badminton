@@ -46,6 +46,8 @@ export class EducationProgress {
   @JoinColumn({ name: 'id_user' })
   user: Users;
 
-  @OneToMany(() => Subjects, (subject) => subject.educationProgress)
+  @OneToMany(() => Subjects, (subject) => subject.educationProgress, {
+    cascade: ['remove'],
+  })
   subjects: Subjects[];
 }

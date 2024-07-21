@@ -1,6 +1,13 @@
-import { Inject, OnModuleInit, UnauthorizedException } from '@nestjs/common';
+import {
+  Inject,
+  OnModuleInit,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ConnectedSocket,
+  MessageBody,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
@@ -9,6 +16,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ChatService } from './chat.service';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { WsCurrentUser, WsJwtAuthGuard } from '../utils';
 
 interface TokenPayload {
   id_user: string;
@@ -149,5 +157,85 @@ export class ChatGateway implements OnModuleInit {
     } catch (error) {
       console.error('Error emitting logout:', error.message);
     }
+  }
+
+  @SubscribeMessage('joinRoom')
+  @UseGuards(WsJwtAuthGuard)
+  handleJoinRoom(
+    @WsCurrentUser() currentUser,
+    @MessageBody() roomId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    console.log(currentUser);
+    client.join(roomId);
+    this.server
+      .to(roomId)
+      .emit('userJoined', { clientId: client.id, user: currentUser });
+    console.log(
+      `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) joined room ${roomId}`,
+    );
+  }
+
+  @SubscribeMessage('leaveRoom')
+  handleLeaveRoom(
+    @WsCurrentUser() currentUser,
+    @MessageBody() roomId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    client.leave(roomId);
+    this.server
+      .to(roomId)
+      .emit('userLeft', { clientId: client.id, user: currentUser });
+    console.log(
+      `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) left room ${roomId}`,
+    );
+  }
+
+  @SubscribeMessage('offer')
+  handleOffer(
+    @WsCurrentUser() currentUser,
+    @MessageBody() data: { roomId: string; offer: RTCSessionDescriptionInit },
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.server.to(data.roomId).emit('offer', {
+      clientId: client.id,
+      offer: data.offer,
+      user: currentUser,
+    });
+    console.log(
+      `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) sent offer to room ${data.roomId}`,
+    );
+  }
+
+  @SubscribeMessage('answer')
+  handleAnswer(
+    @WsCurrentUser() currentUser,
+    @MessageBody() data: { roomId: string; answer: RTCSessionDescriptionInit },
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.server.to(data.roomId).emit('answer', {
+      clientId: client.id,
+      answer: data.answer,
+      user: currentUser,
+    });
+    console.log(
+      `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) sent answer to room ${data.roomId}`,
+    );
+  }
+
+  @SubscribeMessage('ice-candidate')
+  handleIceCandidate(
+    @WsCurrentUser() currentUser,
+    @MessageBody() data: { roomId: string; candidate: RTCIceCandidateInit },
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.server.to(data.roomId).emit('ice-candidate', {
+      clientId: client.id,
+      candidate: data.candidate,
+      user: currentUser,
+    });
+    console.log(
+      `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) sent ICE candidate to room ${data.roomId}`,
+    );
   }
 }

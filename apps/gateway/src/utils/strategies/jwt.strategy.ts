@@ -39,7 +39,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         'authClient/validateUserId',
         { id_user: payload.id_user },
       );
-      await this.redisService.set(cacheKey, JSON.stringify(user), 'EX', 3600); // Cache for 1 hour
+      await this.redisService.set(cacheKey, JSON.stringify(user), 'EX', 3600);
       return user;
     } catch (err) {
       throw new UnauthorizedException(err.message);

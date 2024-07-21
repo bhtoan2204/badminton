@@ -24,13 +24,13 @@ export class Subjects {
   @Column('json', { nullable: true })
   component_scores: { component_name: string; score: number }[];
 
-  @Column('int', { nullable: true, default: null })
+  @Column('float', { nullable: true, default: null })
   midterm_score: number;
 
-  @Column('int', { nullable: true, default: null })
+  @Column('float', { nullable: true, default: null })
   final_score: number;
 
-  @Column('int', { nullable: true, default: null })
+  @Column('float', { nullable: true, default: null })
   bonus_score: number;
 
   @Column('varchar', { nullable: true, default: 'in_progress' })

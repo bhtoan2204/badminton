@@ -32,7 +32,7 @@ import { SendImageMessageSchema } from './schema/sendImageMessage.schema';
 import { SendVideoMessageSchema } from './schema/sendVideoMessage.schema';
 import { SendFamilyImageSchema } from './schema/sendFamilyImage.schema';
 import { SendFamilyVideoSchema } from './schema/sendFamilyVideo.schema';
-
+import { v4 as uuidv4 } from 'uuid';
 @ApiTags('Chat')
 @Controller('chat')
 @ApiBearerAuth()
@@ -269,9 +269,15 @@ export class ChatController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get Linked User' })
   @ApiQuery({ name: 'search', required: false, description: 'Search string' })
-  @UseGuards(JwtAuthGuard)
   @Get('getLinkedUser')
   async getLinkedUser(@CurrentUser() user, @Param('search') search: string) {
     return this.chatService.getLinkedUser(user.id_user, search);
+  }
+
+  @ApiOperation({ summary: 'Create a new video call room' })
+  @Post('createRoom')
+  async createRoom() {
+    const roomId = uuidv4();
+    return { roomId };
   }
 }

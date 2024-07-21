@@ -108,6 +108,7 @@ export class EducationService {
           statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         });
       }
+      data.subjects.sort((a, b) => a.id_subject - b.id_subject);
       const [successfulSubjects, totalSubject] = data.subjects.reduce(
         (acc, curr) => {
           if (curr.status === 'successful') {
@@ -669,6 +670,7 @@ export class EducationService {
         data: data,
       };
     } catch (error) {
+      console.log(error);
       throw new RpcException({
         message: error.message,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
