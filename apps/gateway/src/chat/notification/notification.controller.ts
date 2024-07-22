@@ -53,4 +53,11 @@ export class NotificationController {
       id_notification,
     );
   }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Mark all read' })
+  @Get('markAllRead')
+  async markAllRead(@CurrentUser() currentUser) {
+    return this.notificationService.markAllRead(currentUser.id_user);
+  }
 }

@@ -24,20 +24,22 @@ export class NotificationService {
 
   async getNotification(id_user: string, index: number) {
     try {
-      const notification = await this.notificationRepository
-        .aggregate([
-          { $match: { id_user: id_user } },
-          { $unwind: '$notificationArr' },
-          { $sort: { 'notificationArr._id': -1 } },
-          { $skip: index * limit },
-          { $limit: limit },
-          {
-            $group: {
-              _id: '$_id',
-              notificationArr: { $push: '$notificationArr' },
-            },
+      const notificationPipeline = [
+        { $match: { id_user: id_user } },
+        { $unwind: '$notificationArr' },
+        { $sort: { 'notificationArr._id': -1 } },
+        { $skip: index * limit },
+        { $limit: limit },
+        {
+          $group: {
+            _id: '$_id',
+            notificationArr: { $push: '$notificationArr' },
           },
-        ])
+        },
+      ];
+
+      const notification = await this.notificationRepository
+        .aggregate(notificationPipeline)
         .exec();
 
       const notificationArr = notification[0]?.notificationArr || [];
@@ -81,7 +83,23 @@ export class NotificationService {
         }
       });
 
-      return notificationArr;
+      const unreadCountPipeline = [
+        { $match: { id_user: id_user } },
+        { $unwind: '$notificationArr' },
+        { $match: { 'notificationArr.isRead': false } },
+        { $count: 'unreadCount' },
+      ];
+
+      const unreadCountResult = await this.notificationRepository
+        .aggregate(unreadCountPipeline)
+        .exec();
+
+      const unreadCount = unreadCountResult[0]?.unreadCount || 0;
+
+      return {
+        data: notificationArr,
+        unreadCount: unreadCount,
+      };
     } catch (error) {
       throw new RpcException({
         statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
@@ -186,6 +204,23 @@ export class NotificationService {
     } catch (error) {
       throw new RpcException({
         statusCode: HttpStatus.NOT_FOUND,
+        message: error.message,
+      });
+    }
+  }
+
+  async markAllRead(id_user: string) {
+    try {
+      await this.notificationRepository.updateMany(
+        { id_user: id_user, 'notificationArr.isRead': false },
+        { $set: { 'notificationArr.$[elem].isRead': true } },
+        { arrayFilters: [{ 'elem.isRead': false }] },
+      );
+
+      return { message: 'All notifications marked as read' };
+    } catch (error) {
+      throw new RpcException({
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
         message: error.message,
       });
     }

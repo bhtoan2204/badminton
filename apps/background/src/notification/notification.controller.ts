@@ -27,4 +27,10 @@ export class NotificationController {
       data.id_notification,
     );
   }
+
+  @EventPattern('backgroundClient/markAllRead')
+  async markAllRead(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return await this.notificationService.markAllRead(data.id_user);
+  }
 }

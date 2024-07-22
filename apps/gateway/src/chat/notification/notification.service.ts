@@ -42,6 +42,21 @@ export class NotificationService {
     }
   }
 
+  async markAllRead(id_user: string) {
+    try {
+      return await this.rmqService.send(
+        this.notificationClient,
+        'backgroundClient/markAllRead',
+        { id_user },
+      );
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
+    }
+  }
+
   async getListReceiverId(id_user: string, id_family: number) {
     try {
       return await this.rmqService.send(
