@@ -55,7 +55,9 @@ export class AssetService {
         id_family: dto.id_family,
         notificationData: {
           title: 'Asset Created',
+          title_vn: 'Tài sản mới',
           content: 'New asset has been created in your family',
+          content_vn: 'Tài sản mới đã được tạo trong gia đình của bạn',
           type: NotificationType.ASSET,
           id_family: dto.id_family,
           id_target: data.id_asset,
@@ -85,7 +87,9 @@ export class AssetService {
         id_family: dto.id_family,
         notificationData: {
           title: 'Asset Updated',
+          title_vn: 'Tài sản đã được cập nhật',
           content: 'Asset has been updated in your family',
+          content_vn: 'Tài sản đã được cập nhật trong gia đình của bạn',
           type: NotificationType.ASSET,
           id_family: dto.id_family,
           id_target: dto.id_asset,
@@ -111,7 +115,9 @@ export class AssetService {
         id_family,
         notificationData: {
           title: 'Asset Deleted',
+          title_vn: 'Tài sản đã bị xóa',
           content: 'Asset has been deleted in your family',
+          content_vn: 'Tài sản đã bị xóa trong gia đình của bạn',
           type: NotificationType.ASSET,
           id_family,
           id_target: id_asset,

@@ -77,7 +77,9 @@ export class HouseholdService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Household Item Created',
+          title_vn: 'Vật dụng mới được tạo',
           content: 'New Household Item has been created',
+          content_vn: 'Vật dụng mới đã được tạo',
           type: NotificationType.HOUSEHOLD,
           id_family: dto.id_family,
           id_target: data.data.id_household_item,
@@ -105,7 +107,9 @@ export class HouseholdService {
         id_family: dto.id_family,
         notificationData: {
           title: 'Household Item Updated',
+          title_vn: 'Vật dụng đã được cập nhật',
           content: 'Household Item has been updated',
+          content_vn: 'Vật dụng đã được cập nhật',
           type: NotificationType.HOUSEHOLD,
           id_family: dto.id_family,
           id_target: dto.id_item,
@@ -133,7 +137,9 @@ export class HouseholdService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Durable Item Changed',
+          title_vn: 'Vật dụng không tiêu thụ mới đã được nhập',
           content: 'New Durable Item has been inputted',
+          content_vn: 'Vật dụng không tiêu thụ mới đã được nhập',
           type: NotificationType.HOUSEHOLD,
           id_family: dto.id_family,
           id_target: data.data.id_household_item,
@@ -161,7 +167,9 @@ export class HouseholdService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Consumable Item Changed',
+          title_vn: 'Vật dụng tiêu dùng mới đã được nhập',
           content: 'New Consumable Item has been inputted',
+          content_vn: 'Vật dụng tiêu dùng mới đã được nhập',
           type: NotificationType.HOUSEHOLD,
           id_family: dto.id_family,
           id_target: data.data.id_household_item,
@@ -189,7 +197,9 @@ export class HouseholdService {
         id_family,
         notificationData: {
           title: 'Household Item Deleted',
+          title_vn: 'Vật dụng đã được xóa',
           content: 'Household Item has been deleted',
+          content_vn: 'Vật dụng đã được xóa',
           type: NotificationType.HOUSEHOLD,
           id_family,
           id_target: id_item,

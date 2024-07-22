@@ -83,7 +83,9 @@ export class ChatService {
         id_family: message.familyId,
         notificationData: {
           title: 'New message',
+          title_vn: 'Tin nhắn mới',
           content: message.message,
+          content_vn: message.message,
           type: NotificationType.CHAT,
           id_family: message.familyId,
           id_target: message.familyId,
@@ -109,7 +111,9 @@ export class ChatService {
         id_family: familyId,
         notificationData: {
           title: 'New message',
+          title_vn: 'Tin nhắn mới',
           content: 'You have received an image message',
+          content_vn: 'Bạn đã nhận được một hình ảnh',
           type: NotificationType.CHAT,
           id_family: familyId,
           id_target: familyId,
@@ -136,7 +140,9 @@ export class ChatService {
         id_family: familyId,
         notificationData: {
           title: 'New message',
+          title_vn: 'Tin nhắn mới',
           content: 'You have received a video message',
+          content_vn: 'Bạn đã nhận được một video',
           type: NotificationType.CHAT,
           id_family: familyId,
           id_target: familyId,

@@ -54,7 +54,9 @@ export class ExpenseditureTypeService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Expenditure Type',
+          title_vn: 'Loại chi tiêu mới',
           content: 'New Expenditure Type has been created',
+          content_vn: 'Loại chi tiêu mới đã được tạo',
           type: NotificationType.EXPENSE_TYPE,
           id_family: dto.id_family,
           id_target: data.id_expenditure_type,
@@ -83,7 +85,9 @@ export class ExpenseditureTypeService {
         id_family: dto.id_family,
         notificationData: {
           title: 'Expenditure Type updated',
+          title_vn: 'Loại chi tiêu đã được cập nhật',
           content: 'Expenditure Type has been updated',
+          content_vn: 'Loại chi tiêu đã được cập nhật',
           type: NotificationType.EXPENSE_TYPE,
           id_family: dto.id_family,
           id_target: dto.id_expenditure_type,
@@ -113,7 +117,9 @@ export class ExpenseditureTypeService {
         id_family: id_family,
         notificationData: {
           title: 'Expenditure Type deleted',
+          title_vn: 'Loại chi tiêu đã bị xóa',
           content: 'Expenditure Type has been deleted',
+          content_vn: 'Loại chi tiêu đã bị xóa',
           type: NotificationType.EXPENSE_TYPE,
           id_family: id_family,
           id_target: id_expenditure_type,

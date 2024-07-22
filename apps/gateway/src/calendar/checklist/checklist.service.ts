@@ -61,7 +61,9 @@ export class ChecklistService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Checklist created',
+          title_vn: 'Danh sách công việc mới được tạo',
           content: 'New Checklist has been created',
+          content_vn: 'Danh sách công việc mới đã được tạo',
           type: NotificationType.CHECKLIST,
           id_family: dto.id_family,
           id_target: data.id_checklist,
@@ -87,7 +89,9 @@ export class ChecklistService {
         id_family: dto.id_family,
         notificationData: {
           title: 'Checklist updated',
+          title_vn: 'Danh sách công việc đã được cập nhật',
           content: 'Checklist has been updated',
+          content_vn: 'Danh sách công việc đã được cập nhật',
           type: NotificationType.CHECKLIST,
           id_family: dto.id_family,
           id_target: dto.id_checklist,
@@ -117,7 +121,9 @@ export class ChecklistService {
         id_family,
         notificationData: {
           title: 'Checklist deleted',
+          title_vn: 'Danh sách công việc đã bị xóa',
           content: 'Checklist has been deleted',
+          content_vn: 'Danh sách công việc đã bị xóa',
           type: NotificationType.CHECKLIST,
           id_family,
           id_target: id_checklist,

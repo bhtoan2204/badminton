@@ -112,7 +112,9 @@ export class IncomeService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Income created',
+          title_vn: 'Thu nhập mới được tạo',
           content: 'New Income has been created',
+          content_vn: 'Thu nhập mới đã được tạo',
           type: NotificationType.INCOME,
           id_family: dto.id_family,
           id_target: data.id_income,
@@ -138,7 +140,9 @@ export class IncomeService {
         id_family: dto.id_family,
         notificationData: {
           title: 'Income updated',
+          title_vn: 'Thu nhập đã được cập nhật',
           content: 'Income has been updated',
+          content_vn: 'Thu nhập đã được cập nhật',
           type: NotificationType.INCOME,
           id_family: dto.id_family,
           id_target: dto.id_income,
@@ -164,7 +168,9 @@ export class IncomeService {
         id_family,
         notificationData: {
           title: 'Income deleted',
+          title_vn: 'Thu nhập đã bị xóa',
           content: 'Income has been deleted',
+          content_vn: 'Thu nhập đã bị xóa',
           type: NotificationType.INCOME,
           id_family,
           id_target: id_income,

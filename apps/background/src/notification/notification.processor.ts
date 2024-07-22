@@ -8,7 +8,9 @@ import { Repository } from 'typeorm';
 
 export interface NotificationDataInterface {
   title: string;
+  title_vn: string;
   content: string;
+  content_vn: string;
   type: NotificationType;
   id_family?: number;
   id_target: string | number;

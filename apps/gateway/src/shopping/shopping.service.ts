@@ -93,7 +93,9 @@ export class ShoppingService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Shopping List',
+          title_vn: 'Danh sách mua sắm mới',
           content: 'New Shopping List has been created',
+          content_vn: 'Danh sách mua sắm mới đã được tạo',
           type: NotificationType.SHOPPING_LIST,
           id_family: dto.id_family,
           id_target: data.data.id_list,
@@ -134,7 +136,9 @@ export class ShoppingService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Shopping Item',
+          title_vn: 'Mặt hàng mua sắm mới',
           content: 'New Shopping Item has been created',
+          content_vn: 'Mặt hàng mua sắm mới đã được tạo',
           type: NotificationType.SHOPPING_ITEM,
           id_family: dto.id_family,
           id_target: data.data.id_item,
@@ -160,7 +164,9 @@ export class ShoppingService {
         id_family: dto.id_family,
         notificationData: {
           title: 'Shopping List Updated',
+          title_vn: 'Danh sách mua sắm đã được cập nhật',
           content: 'Shopping List has been updated',
+          content_vn: 'Danh sách mua sắm đã được cập nhật',
           type: NotificationType.SHOPPING_LIST,
           id_family: dto.id_family,
           id_target: dto.id_list,
@@ -186,7 +192,9 @@ export class ShoppingService {
         id_family: dto.id_family,
         notificationData: {
           title: 'Shopping Item Updated',
+          title_vn: 'Mặt hàng mua sắm đã được cập nhật',
           content: 'Shopping Item has been updated',
+          content_vn: 'Mặt hàng mua sắm đã được cập nhật',
           type: NotificationType.SHOPPING_ITEM,
           id_family: dto.id_family,
           id_target: dto.id_item,
@@ -220,7 +228,9 @@ export class ShoppingService {
         id_family,
         notificationData: {
           title: 'Shopping List Deleted',
+          title_vn: 'Danh sách mua sắm đã bị xóa',
           content: 'Shopping List has been deleted',
+          content_vn: 'Danh sách mua sắm đã bị xóa',
           type: NotificationType.SHOPPING_LIST,
           id_family,
           id_target: id_list,
@@ -256,7 +266,9 @@ export class ShoppingService {
         id_family,
         notificationData: {
           title: 'Shopping Item Deleted',
+          title_vn: 'Mặt hàng mua sắm đã bị xóa',
           content: 'Shopping Item has been deleted',
+          content_vn: 'Mặt hàng mua sắm đã bị xóa',
           type: NotificationType.SHOPPING_ITEM,
           id_family,
           id_target: id_item,

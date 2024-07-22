@@ -139,7 +139,9 @@ export class NotificationService {
           const notificationDetail = {
             _id: new Types.ObjectId(),
             title: notificationData.title,
+            title_vn: notificationData.title_vn,
             content: notificationData.content,
+            content_vn: notificationData.content_vn,
             type: notificationData.type,
             id_family,
             id_target: notificationData.id_target,

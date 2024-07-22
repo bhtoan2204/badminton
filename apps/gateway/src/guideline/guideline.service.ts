@@ -64,7 +64,9 @@ export class GuidelineService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Guideline',
+          title_vn: 'Hướng dẫn mới',
           content: 'New Guideline has been created',
+          content_vn: 'Hướng dẫn mới đã được tạo',
           type: NotificationType.GUIDELINE,
           id_family: dto.id_family,
           id_target: data.data.id_guide_item,
@@ -92,7 +94,9 @@ export class GuidelineService {
         id_family: dto.id_family,
         notificationData: {
           title: 'Guideline Updated',
+          title_vn: 'Hướng dẫn đã được cập nhật',
           content: 'Guideline has been updated',
+          content_vn: 'Hướng dẫn đã được cập nhật',
           type: NotificationType.GUIDELINE,
           id_family: dto.id_family,
           id_target: dto.id_guideline,
@@ -124,7 +128,9 @@ export class GuidelineService {
         id_family,
         notificationData: {
           title: 'Guideline Deleted',
+          title_vn: 'Hướng dẫn đã bị xóa',
           content: 'Guideline has been deleted',
+          content_vn: 'Hướng dẫn đã bị xóa',
           type: NotificationType.GUIDELINE,
           id_family,
           id_target: null,
@@ -171,7 +177,9 @@ export class GuidelineService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Step',
+          title_vn: 'Bước mới',
           content: 'New Step has been added',
+          content_vn: 'Bước mới đã được thêm',
           type: NotificationType.GUIDELINE,
           id_family: dto.id_family,
           id_target: dto.id_guideline,
@@ -203,7 +211,9 @@ export class GuidelineService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Step',
+          title_vn: 'Bước mới',
           content: 'New Step has been added',
+          content_vn: 'Bước mới đã được thêm',
           type: NotificationType.GUIDELINE,
           id_family: dto.id_family,
           id_target: dto.id_guideline,
@@ -235,7 +245,9 @@ export class GuidelineService {
         id_family: dto.id_family,
         notificationData: {
           title: 'Step Updated',
+          title_vn: 'Bước đã được cập nhật',
           content: 'Step has been updated',
+          content_vn: 'Bước đã được cập nhật',
           type: NotificationType.GUIDELINE,
           id_family: dto.id_family,
           id_target: dto.id_guideline,
@@ -268,7 +280,9 @@ export class GuidelineService {
         id_family,
         notificationData: {
           title: 'Step Deleted',
+          title_vn: 'Bước đã bị xóa',
           content: 'Step has been deleted',
+          content_vn: 'Bước đã bị xóa',
           type: NotificationType.GUIDELINE,
           id_family,
           id_target: id_guideline,
@@ -296,7 +310,9 @@ export class GuidelineService {
         id_family,
         notificationData: {
           title: 'Guideline Shared',
+          title_vn: 'Hướng dẫn đã được chia sẻ',
           content: 'Guideline has been shared',
+          content_vn: 'Hướng dẫn đã được chia sẻ ra cộng đồng ',
           type: NotificationType.GUIDELINE,
           id_family,
           id_target: id_guideline,

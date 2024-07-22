@@ -40,7 +40,9 @@ export class IncomeSourceService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Income Source created',
+          title_vn: 'Nguồn thu nhập mới được tạo',
           content: 'New Income Source has been created',
+          content_vn: 'Nguồn thu nhập mới đã được tạo',
           type: NotificationType.INCOME_SOURCE,
           id_family: dto.id_family,
           id_target: data.id_income_source,
@@ -66,7 +68,9 @@ export class IncomeSourceService {
         id_family: dto.id_family,
         notificationData: {
           title: 'Income Source updated',
+          title_vn: 'Nguồn thu nhập đã được cập nhật',
           content: 'Income Source has been updated',
+          content_vn: 'Nguồn thu nhập đã được cập nhật',
           type: NotificationType.INCOME_SOURCE,
           id_family: dto.id_family,
           id_target: dto.id_income_source,
@@ -100,7 +104,9 @@ export class IncomeSourceService {
         id_family: id_family,
         notificationData: {
           title: 'Income Source deleted',
+          title_vn: 'Nguồn thu nhập đã bị xóa',
           content: 'Income Source has been deleted',
+          content_vn: 'Nguồn thu nhập đã bị xóa',
           type: NotificationType.INCOME_SOURCE,
           id_family: id_family,
           id_target: id_income_source,

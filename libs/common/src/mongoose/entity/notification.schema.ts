@@ -35,7 +35,13 @@ class NotificationDetail {
   title: string;
 
   @Prop({ required: true })
+  title_vn: string;
+
+  @Prop({ required: true })
   content: string;
+
+  @Prop({ required: true })
+  content_vn: string;
 
   @Prop({ required: true, enum: NotificationType })
   type: NotificationType;

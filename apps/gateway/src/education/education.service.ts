@@ -26,7 +26,9 @@ export class EducationService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Education Progress',
+          title_vn: 'Tiến trình học vụ mới',
           content: 'New education progress has been added to the family',
+          content_vn: 'Tiến trình học vụ mới đã được thêm vào gia đình',
           type: NotificationType.EDUCATION,
           id_family: dto.id_family,
           id_target: data.data.id_education_progress,
@@ -103,7 +105,9 @@ export class EducationService {
         id_family: dto.id_family,
         notificationData: {
           title: 'Education Progress Updated',
+          title_vn: 'Tiến trình học vụ đã được cập nhật',
           content: 'An education progress has been updated in the family',
+          content_vn: 'Tiến trình học vụ đã được cập nhật',
           type: NotificationType.EDUCATION,
           id_family: dto.id_family,
           id_target: dto.id_education_progress,
@@ -133,7 +137,9 @@ export class EducationService {
         id_family,
         notificationData: {
           title: 'Education Progress Deleted',
+          title_vn: 'Tiến trình học vụ đã bị xóa',
           content: 'An education progress has been deleted in the family',
+          content_vn: 'Tiến trình học vụ đã bị xóa',
           type: NotificationType.EDUCATION,
           id_family,
           id_target: id_education_progress,

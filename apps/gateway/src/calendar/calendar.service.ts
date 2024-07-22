@@ -42,7 +42,9 @@ export class CalendarService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Category Event',
+          title_vn: 'Loại sự kiện mới',
           content: 'New Category Event has been created',
+          content_vn: 'Loại sự kiện mới đã được tạo',
           type: NotificationType.CALENDAR,
           id_family: dto.id_family,
           id_target: data[0].id_category_event,
@@ -136,7 +138,9 @@ export class CalendarService {
         id_family: dto.id_family,
         notificationData: {
           title: 'New Calendar Event Created',
+          title_vn: 'Sự kiện mới đã được tạo',
           content: 'New Category Event has been created',
+          content_vn: 'Sự kiện mới đã được tạo',
           type: NotificationType.CALENDAR,
           id_family: dto.id_family,
           id_target: data.data.id_calendar,
