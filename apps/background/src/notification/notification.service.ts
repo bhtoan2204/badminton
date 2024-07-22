@@ -95,11 +95,14 @@ export class NotificationService {
     notificationData: NotificationDataInterface,
   ) {
     try {
-      const { title, content, type, id_target } = notificationData;
+      const { title, content, type, id_target, title_vn, content_vn } =
+        notificationData;
       const notificationDetail = {
         _id: new Types.ObjectId(),
         title,
+        title_vn,
         content,
+        content_vn,
         type,
         id_family: null,
         id_target,

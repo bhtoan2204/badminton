@@ -20,6 +20,9 @@ export class FinanceIncomeSource {
   @Column({ type: 'varchar', length: 255 })
   income_source_name: string;
 
+  @Column({ type: 'varchar', length: 255 })
+  income_source_name_vn: string;
+
   @ManyToOne(() => Family, (family) => family.financeIncomeSources)
   @JoinColumn({ name: 'id_family' })
   family: Family;

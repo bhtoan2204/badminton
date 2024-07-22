@@ -17,6 +17,9 @@ export class FinanceExpenditureType {
   @Column({ type: 'varchar', length: 255 })
   expense_type_name: string;
 
+  @Column({ type: 'varchar', length: 255 })
+  expense_type_name_vn: string;
+
   @Column({ type: 'int' })
   id_family: number;
 
