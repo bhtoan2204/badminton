@@ -9,5 +9,3 @@ services:
     command: node dist/apps/education/src/main
     restart: on-failure
     env_file: './apps/education/.env.production'
-    mem_limit: 2g
-    cpu_shares: 1024

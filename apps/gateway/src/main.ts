@@ -11,6 +11,7 @@ import {
   SentryModule,
   SentryService,
 } from '@app/common';
+import { WebsocketAdapter } from './utils/websocket/websocket-adapter';
 
 async function bootstrap() {
   await initTracing('gateway');
@@ -32,6 +33,12 @@ async function bootstrap() {
       methods: 'GET, POST, PUT, DELETE, PATCH',
       allowedHeaders: 'Content-Type, Authorization',
       credentials: true,
+    }),
+  );
+
+  app.useWebSocketAdapter(
+    new WebsocketAdapter(app, {
+      origin: configService.get('FRONTEND_URL'),
     }),
   );
 

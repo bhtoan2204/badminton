@@ -9,8 +9,6 @@ services:
     command: node dist/apps/family/src/main
     restart: on-failure
     env_file: './apps/family/.env.production'
-    mem_limit: 2g
-    cpu_shares: 1024
 
   # invoice:
   #   image: mjkundta/invoice:${TAG}

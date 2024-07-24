@@ -9,8 +9,6 @@ services:
     command: node dist/apps/calendar/src/main
     restart: on-failure
     env_file: './apps/calendar/.env.production'
-    mem_limit: 2g
-    cpu_shares: 1024
 
   guideline:
     image: mjkundta/guideline:${TAG}
@@ -21,5 +19,3 @@ services:
     command: node dist/apps/guideline/src/main
     restart: on-failure
     env_file: './apps/guideline/.env.production'
-    mem_limit: 2g
-    cpu_shares: 1024

@@ -1,5 +1,5 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
-import { DataSource, EntityManager, In, Repository } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import { RpcException } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { sortObject } from './utils';
@@ -408,20 +408,24 @@ export class PaymentService {
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
-      const discount = await this.discountRepository.findOne({
-        where: { code },
-      });
-      if (!discount) {
-        throw new RpcException({
-          message: 'Discount not found',
-          statusCode: HttpStatus.NOT_FOUND,
+      let discount_rate = 0;
+      if (code) {
+        const discount = await this.discountRepository.findOne({
+          where: { code: code },
         });
-      }
-      if (discount.expired_at < new Date()) {
-        throw new RpcException({
-          message: 'Discount code expired',
-          statusCode: HttpStatus.BAD_REQUEST,
-        });
+        if (!discount) {
+          throw new RpcException({
+            message: 'Discount code not found',
+            statusCode: HttpStatus.NOT_FOUND,
+          });
+        }
+        if (discount.expired_at < new Date()) {
+          throw new RpcException({
+            message: 'Discount code expired',
+            statusCode: HttpStatus.BAD_REQUEST,
+          });
+        }
+        discount_rate = discount.percentage;
       }
       const order_id = crypto.randomUUID();
       let price = null;
@@ -473,7 +477,7 @@ export class PaymentService {
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
-      const discountPrice = price - price * (discount.percentage / 100);
+      const discountPrice = price - price * (discount_rate / 100);
       return this.generateOrderLink(
         id_package,
         packageType,

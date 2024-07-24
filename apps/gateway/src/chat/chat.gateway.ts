@@ -68,28 +68,22 @@ export class ChatGateway implements OnModuleInit {
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
     try {
-      let userId: string | null = null;
       const keys = await this.cacheManager.store.keys();
       for (const key of keys) {
         const socketIds: string[] = await this.cacheManager.get(key);
         if (socketIds.includes(client.id)) {
-          userId = key;
+          const filteredSocketIds = socketIds.filter((id) => id !== client.id);
+          if (filteredSocketIds.length > 0) {
+            await this.cacheManager.set(key, filteredSocketIds);
+          } else {
+            await this.cacheManager.del(key);
+          }
+          console.log(`User ${key} disconnected from socket ${client.id}`);
           break;
         }
       }
-      if (userId) {
-        let socketIds: string[] = await this.cacheManager.get(userId);
-        socketIds = socketIds.filter((socketId) => socketId !== client.id);
-        if (socketIds.length > 0) {
-          await this.cacheManager.set(userId, socketIds);
-        } else {
-          await this.cacheManager.del(userId);
-        }
-        console.log(`User ${userId} disconnected from socket ${client.id}`);
-      }
     } catch (error) {
       console.error('Error handling disconnection:', error.message);
-      client.disconnect(true);
     }
   }
 
@@ -166,7 +160,6 @@ export class ChatGateway implements OnModuleInit {
     @MessageBody() roomId: string,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(currentUser);
     client.join(roomId);
     this.server
       .to(roomId)
