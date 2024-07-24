@@ -7,7 +7,7 @@ import { Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TokenPayload } from './interface/tokenPayload.interface';
 import { UserService } from './user/user.service';
-import * as bcrypt from 'bcrypt';
+import { comparePassword } from './utils';
 
 @Injectable()
 export class AuthService {
@@ -283,6 +283,7 @@ export class AuthService {
       user = await this.userRepository
         .createQueryBuilder('user')
         .addSelect('user.password')
+        .addSelect('user.salt')
         .where('user.email = :email', { email })
         .andWhere('user.login_type = :login_type', {
           login_type: LoginType.LOCAL,
@@ -309,7 +310,7 @@ export class AuthService {
       });
     }
 
-    const isMatch = await bcrypt.compare(inputPassword, user.password);
+    const isMatch = comparePassword(inputPassword, user.password, user.salt);
 
     if (!isMatch) {
       throw new RpcException({

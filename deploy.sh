@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TAG=latest
+export TAG=latest
 
 docker-compose -f docker-compose.prod1.yml build
 docker-compose -f docker-compose.prod1.yml push

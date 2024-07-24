@@ -13,10 +13,10 @@ import { RpcException } from '@nestjs/microservices';
 import { MailerService } from '@nestjs-modules/mailer';
 import { StorageService } from '../storage/storage.service';
 import { FamilyInvitation } from '@app/common/database/entity/family_invitation.entity';
-import * as bcrypt from 'bcrypt';
 import { TwilioService } from 'nestjs-twilio';
 import { ConfigService } from '@nestjs/config';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
+import { comparePassword, generateSalt, hashPassword } from '../utils';
 
 @Injectable()
 export class UserService {
@@ -43,7 +43,8 @@ export class UserService {
     avatar?: string;
   }) {
     try {
-      const hashedPassword = await bcrypt.hash(createAccountDto.password, 10);
+      const salt = generateSalt();
+      const hashedPassword = hashPassword(createAccountDto.password, salt);
       const user = await this.userRepository.create({
         email: createAccountDto.email,
         phone: createAccountDto.phone,
@@ -54,6 +55,7 @@ export class UserService {
         birthdate: createAccountDto.birthdate,
         login_type: createAccountDto.login_type,
         avatar: createAccountDto.avatar,
+        salt: salt,
       });
       await this.userRepository.save(user);
       return {
@@ -118,14 +120,18 @@ export class UserService {
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
-      const isMatch = await bcrypt.compare(oldPassword, foundUser.password);
+      const isMatch = await comparePassword(
+        oldPassword,
+        foundUser.password,
+        foundUser.salt,
+      );
       if (!isMatch) {
         throw new RpcException({
           message: 'Old password is not correct',
           statusCode: HttpStatus.UNAUTHORIZED,
         });
       }
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      const hashedPassword = await hashPassword(newPassword, foundUser.salt);
       foundUser.password = hashedPassword;
       await this.userRepository.save(foundUser);
 
@@ -462,7 +468,7 @@ export class UserService {
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await hashPassword(password, user.salt);
       user.password = hashedPassword;
       await Promise.all([
         this.userRepository.save(user),

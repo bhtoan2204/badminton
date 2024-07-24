@@ -76,6 +76,12 @@ export class Users {
   @Column('boolean', { nullable: false, default: false })
   is_banned: boolean;
 
+  @Column('varchar', {
+    nullable: false,
+    select: false,
+  })
+  salt: string;
+
   @OneToMany(() => Family, (family) => family.owner_id)
   families: Family[];
 
