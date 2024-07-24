@@ -2,19 +2,29 @@ import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from './user.service';
-import { DatabaseModule, RmqModule, Users } from '@app/common';
-import { ConfigService } from '@nestjs/config';
+import { DatabaseModule, OTP, RmqModule, Users } from '@app/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { StorageModule } from '../storage/storage.module';
+import { FamilyInvitation } from '@app/common/database/entity/family_invitation.entity';
+import { TwilioModule } from 'nestjs-twilio';
 
 @Module({
   imports: [
     DatabaseModule,
-    TypeOrmModule.forFeature([Users]),
+    TypeOrmModule.forFeature([Users, OTP, FamilyInvitation]),
     RmqModule,
     StorageModule,
+    TwilioModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (cfg: ConfigService) => ({
+        accountSid: cfg.get('TWILIO_ACCOUNT_SID'),
+        authToken: cfg.get('TWILIO_AUTH_TOKEN'),
+      }),
+      inject: [ConfigService],
+    }),
     MailerModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
         transport: {

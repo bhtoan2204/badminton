@@ -42,12 +42,12 @@ export class AuthApiService {
     }
   }
 
-  async logout(refreshToken) {
+  async logout(id_user: string) {
     try {
       return await this.rmqService.send(
         this.authClient,
         'authClient/logout',
-        refreshToken,
+        id_user,
       );
     } catch (error) {
       throw new HttpException(

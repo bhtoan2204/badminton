@@ -1,39 +1,65 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, EntityManager } from 'typeorm';
-import { DeleteFileRequest, UploadFileRequest, Users } from '@app/common';
+import { Repository } from 'typeorm';
+import {
+  DeleteFileRequest,
+  LoginType,
+  OTP,
+  OTPType,
+  UploadFileRequest,
+  Users,
+} from '@app/common';
 import { RpcException } from '@nestjs/microservices';
 import { MailerService } from '@nestjs-modules/mailer';
 import { StorageService } from '../storage/storage.service';
+import { FamilyInvitation } from '@app/common/database/entity/family_invitation.entity';
+import * as bcrypt from 'bcrypt';
+import { TwilioService } from 'nestjs-twilio';
+import { ConfigService } from '@nestjs/config';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(Users) private userRepository: Repository<Users>,
-    private readonly entityManager: EntityManager,
+    @InjectRepository(OTP) private otpRepository: Repository<OTP>,
+    @InjectRepository(FamilyInvitation)
+    private familyInvitationRepository: Repository<FamilyInvitation>,
     private readonly storageService: StorageService,
     private readonly mailerService: MailerService,
+    private readonly twilioService: TwilioService,
+    private readonly configService: ConfigService,
   ) {}
 
-  async createAccount(createAccountDto: any) {
+  async createAccount(createAccountDto: {
+    email: string;
+    phone: string;
+    password: string;
+    firstname: string;
+    lastname: string;
+    genre: string;
+    birthdate: string;
+    login_type: LoginType;
+    avatar?: string;
+  }) {
     try {
-      const { email, phone, password, firstname, lastname, genre, birthdate } =
-        createAccountDto;
-
-      const query = 'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7)';
-      const parameters = [
-        email,
-        phone,
-        password,
-        firstname,
-        lastname,
-        genre,
-        birthdate,
-      ];
-
-      const data = await this.entityManager.query(query, parameters);
-
-      return data;
+      const hashedPassword = await bcrypt.hash(createAccountDto.password, 10);
+      const user = await this.userRepository.create({
+        email: createAccountDto.email,
+        phone: createAccountDto.phone,
+        password: hashedPassword,
+        firstname: createAccountDto.firstname,
+        lastname: createAccountDto.lastname,
+        genre: createAccountDto.genre,
+        birthdate: createAccountDto.birthdate,
+        login_type: createAccountDto.login_type,
+        avatar: createAccountDto.avatar,
+      });
+      await this.userRepository.save(user);
+      return {
+        message: 'User has been created',
+        data: user.id_user,
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -56,12 +82,12 @@ export class UserService {
     }
   }
 
-  async check_phone(phone) {
+  async check_phone(phone: string) {
     try {
-      const query = 'SELECT * FROM check_phone_number_exists($1)';
-      const parameters = [phone];
-      const data = await this.entityManager.query(query, parameters);
-      return data;
+      const user = await this.userRepository.findOne({
+        where: { phone: phone },
+      });
+      return user ? true : false;
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -73,6 +99,7 @@ export class UserService {
   async changePassword(user: any, passwordDto: any) {
     try {
       const { oldPassword, newPassword } = passwordDto;
+
       if (oldPassword === newPassword) {
         throw new RpcException({
           message: 'New password must be different from old password',
@@ -80,38 +107,38 @@ export class UserService {
         });
       }
 
-      const { password } = await this.userRepository.findOne({
+      const foundUser = await this.userRepository.findOne({
         where: { id_user: user.id_user },
+        select: ['id_user', 'password'],
       });
-      const comparePasswordQuery = 'SELECT * FROM compare_passwords($1,$2)';
-      const comparePasswordParams = [oldPassword, password];
-      const isMatch = await this.entityManager.query(
-        comparePasswordQuery,
-        comparePasswordParams,
-      );
 
+      if (!foundUser) {
+        throw new RpcException({
+          message: 'User not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      const isMatch = await bcrypt.compare(oldPassword, foundUser.password);
       if (!isMatch) {
         throw new RpcException({
           message: 'Old password is not correct',
           statusCode: HttpStatus.UNAUTHORIZED,
         });
       }
-      const changePassQuery = 'SELECT * FROM f_change_password($1, $2)';
-      const changeParameters = [user.id_user, newPassword];
-      await this.entityManager.query(changePassQuery, changeParameters);
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      foundUser.password = hashedPassword;
+      await this.userRepository.save(foundUser);
+
       return {
         message: 'Password has been changed',
         data: true,
       };
     } catch (error) {
-      if (error instanceof RpcException) {
-        throw error;
-      } else {
-        throw new RpcException({
-          message: error.message,
-          statusCode: HttpStatus.UNAUTHORIZED,
-        });
-      }
+      console.log(error);
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
     }
   }
 
@@ -119,21 +146,58 @@ export class UserService {
     const { email, phone } = data;
     try {
       if (!email) {
-        const query = 'SELECT * FROM f_handle_forgot_password_by_phone($1)';
-        const parameters = [phone];
-        const result = await this.entityManager.query(query, parameters);
-        const code = result[0].f_handle_forgot_password_by_phone;
-        // TODO: send code to phone number
+        const user = await this.userRepository.findOne({
+          where: { phone },
+        });
+        if (!user) {
+          throw new RpcException({
+            message: 'User not found',
+            statusCode: HttpStatus.NOT_FOUND,
+          });
+        }
+        const phoneNumber = parsePhoneNumberFromString(phone);
+        const formattedNumber = phoneNumber.formatInternational();
+        if (!formattedNumber) {
+          throw new RpcException({
+            message: 'Invalid phone number',
+            statusCode: HttpStatus.BAD_REQUEST,
+          });
+        }
+        const otp = await this.otpRepository.create({
+          id_user: user.id_user,
+          code: Math.floor(100000 + Math.random() * 900000).toString(),
+          phone,
+        });
+        await this.otpRepository.save(otp);
+        this.twilioService.client.messages.create({
+          body: `Your OTP for Famfund Account Reset password is ${otp.code}`,
+          from: this.configService.get<string>('TWILIO_PHONE_NUMBER'),
+          to: formattedNumber,
+        });
         return {
           message: 'OTP has been sent to your phone',
-          data: code,
+          data: otp.code,
         };
       } else if (!phone) {
-        const query = 'SELECT * FROM f_handle_forgot_password_by_email($1)';
-        const parameters = [email];
-        const result = await this.entityManager.query(query, parameters);
-        const code = result[0].f_handle_forgot_password_by_email;
-        const sendEmail = await this.mailerService.sendMail({
+        const user = await this.userRepository.findOne({
+          where: { email },
+        });
+        if (!user) {
+          throw new RpcException({
+            message: 'User not found',
+            statusCode: HttpStatus.NOT_FOUND,
+          });
+        }
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        const newOtp = await this.otpRepository.create({
+          id_user: user.id_user,
+          code,
+          email,
+          phone: null,
+          type: OTPType.RESET_PASSWORD,
+        });
+        await this.otpRepository.save(newOtp);
+        this.mailerService.sendMail({
           to: email,
           from: '"Famfund" <famfund@famfund.com>',
           subject: `Your OTP for Famfund Account Reset password is ${code}`,
@@ -142,9 +206,9 @@ export class UserService {
             otp: code,
           },
         });
+
         return {
           message: 'OTP has been sent to your email',
-          data: sendEmail,
         };
       } else {
         throw new RpcException({
@@ -160,21 +224,23 @@ export class UserService {
     }
   }
 
-  async updateProfile(user: any, data: any) {
+  async updateProfile(inputUser: any, data: any) {
     try {
       const { firstname, lastname, genre, birthdate } = data;
-      if (user.firstname === firstname && user.lastname === lastname) {
+      const user = await this.userRepository.findOne({
+        where: { id_user: inputUser.id_user },
+      });
+      if (!user) {
         throw new RpcException({
-          message: 'No changes detected',
-          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'User not found',
+          statusCode: HttpStatus.NOT_FOUND,
         });
       }
-      const query = 'SELECT * FROM f_update_user_profile($1, $2, $3, $4, $5)';
-      const parameters = [user.id_user, firstname, lastname, genre, birthdate];
-      const result = await this.entityManager.query(query, parameters);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...userWithoutPassword } = result;
-      return userWithoutPassword;
+      user.firstname = firstname;
+      user.lastname = lastname;
+      user.genre = genre;
+      user.birthdate = birthdate;
+      return await this.userRepository.save(user);
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -231,18 +297,10 @@ export class UserService {
     try {
       const { currentUser, data } = dto;
       const { email, otp } = data;
-      const query = 'SELECT * FROM f_validate_otp($1, $2, $3)';
-      const parameters = [currentUser.id_user, otp, email];
-      const result = await this.entityManager.query(query, parameters);
-      if (!result[0].f_validate_otp) {
-        throw new RpcException({
-          message: 'OTP is not valid',
-          statusCode: HttpStatus.BAD_REQUEST,
-        });
-      }
+
       return {
         message: 'Email has been verified',
-        data: result,
+        // data: result,
       };
     } catch (error) {
       throw new RpcException({
@@ -303,27 +361,27 @@ export class UserService {
   async sendUserConfirmation(dto) {
     const { userInfo, email } = dto;
     try {
-      const generateOtpQuery = 'SELECT * FROM f_generate_otp($1, $2)';
-      const generateOtpParams = [userInfo.id_user, email];
-      const code = await this.entityManager.query(
-        generateOtpQuery,
-        generateOtpParams,
-      );
+      // const generateOtpQuery = 'SELECT * FROM f_generate_otp($1, $2)';
+      // const generateOtpParams = [userInfo.id_user, email];
+      // const code = await this.entityManager.query(
+      //   generateOtpQuery,
+      //   generateOtpParams,
+      // );
 
-      const sendConfirmation = await this.mailerService.sendMail({
-        to: email,
-        from: '"Famfund" <famfund@famfund.com>',
-        subject: `Your OTP for Famfund Account Verification is ${code[0].f_generate_otp}`,
-        template: 'verifyAccount',
-        context: {
-          name: userInfo.firstname + ' ' + userInfo.lastname,
-          otp: code[0].f_generate_otp,
-        },
-      });
+      // const sendConfirmation = await this.mailerService.sendMail({
+      //   to: email,
+      //   from: '"Famfund" <famfund@famfund.com>',
+      //   subject: `Your OTP for Famfund Account Verification is ${code[0].f_generate_otp}`,
+      //   template: 'verifyAccount',
+      //   context: {
+      //     name: userInfo.firstname + ' ' + userInfo.lastname,
+      //     otp: code[0].f_generate_otp,
+      //   },
+      // });
 
       return {
         message: 'OTP has been sent to your email',
-        data: sendConfirmation,
+        // data: sendConfirmation,
       };
     } catch (error) {
       throw new RpcException({
@@ -333,19 +391,14 @@ export class UserService {
     }
   }
 
-  async sendInvite(id_user, id_family) {
+  async sendInvite(id_user: string, id_family: number) {
     try {
-      const Query = 'select f_generate_link_invite($1)';
-      const params = [id_family];
-      const result = await this.entityManager.query(Query, params);
-      const inviteLink = result[0].f_generate_link_invite;
-
       const emailContent = `
             Join Famfund!
 
             We are a community of warmth, support, and love. We are thrilled to welcome you to join our family!
 
-            Please use the following link to join Famfund: ${inviteLink}
+            Please use the following link to join Famfund: ${'inviteLink'}
         `;
       return emailContent;
     } catch (error) {
@@ -356,31 +409,24 @@ export class UserService {
     }
   }
 
-  async checkOTP(data) {
-    const { email, phone, code } = data;
+  async checkOTP(data: { email: string; phone: string; code: string }) {
     try {
-      if (!email) {
-        const query = 'SELECT * FROM f_check_otp_by_phone($1, $2)';
-        const parameters = [phone, code];
-        const result = await this.entityManager.query(query, parameters);
-        const isValid = result[0].f_check_otp_by_phone;
-        return isValid
-          ? { message: 'OTP is valid', data: isValid }
-          : { message: 'OTP is not valid', data: isValid };
-      } else if (!phone) {
-        const query = 'SELECT * FROM f_check_otp_by_email($1, $2)';
-        const parameters = [email, code];
-        const result = await this.entityManager.query(query, parameters);
-        const isValid = result[0].f_check_otp_by_email;
-        return isValid
-          ? { message: 'OTP is valid', data: isValid }
-          : { message: 'OTP is not valid', data: isValid };
-      } else {
+      const otp = await this.otpRepository.findOne({
+        where: [
+          { email: data.email, code: data.code },
+          { phone: data.phone, code: data.code },
+        ],
+      });
+      if (!otp) {
         throw new RpcException({
-          message: 'Either email or phone must be provided, but not both.',
+          message: 'OTP is not valid',
           statusCode: HttpStatus.BAD_REQUEST,
         });
       }
+      return {
+        message: 'OTP is valid',
+        data: true,
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -389,58 +435,43 @@ export class UserService {
     }
   }
 
-  async resetPassword(data) {
+  async resetPassword(data: any) {
     const { email, phone, password, code } = data;
     try {
-      if (!email) {
-        const query = 'SELECT * FROM f_check_otp_by_phone($1, $2)';
-        const parameters = [phone, code];
-        const result = await this.entityManager.query(query, parameters);
-        const isReset = result[0].f_check_otp_by_phone;
-        if (isReset) {
-          const resetQuery = 'SELECT * FROM f_reset_password_by_phone($1, $2)';
-          const resetParams = [phone, password];
-          await this.entityManager.query(resetQuery, resetParams);
-          const deleteOtpQuery = 'SELECT * FROM f_delete_otp_by_phone($1)';
-          const deleteOtpParams = [phone];
-          await this.entityManager.query(deleteOtpQuery, deleteOtpParams);
-          return {
-            message: 'Password has been reset',
-            data: true,
-          };
-        } else {
-          throw new RpcException({
-            message: 'Password has not been reset',
-            statusCode: HttpStatus.BAD_REQUEST,
-          });
-        }
-      } else if (!phone) {
-        const query = 'SELECT * FROM f_check_otp_by_email($1, $2)';
-        const parameters = [email, code];
-        const result = await this.entityManager.query(query, parameters);
-        const isReset = result[0].f_check_otp_by_email;
-        if (isReset) {
-          const resetQuery = 'SELECT * FROM f_reset_password_by_email($1, $2)';
-          const resetParams = [email, password];
-          const deleteOtpQuery = 'SELECT * FROM f_delete_otp_by_email($1)';
-          const deleteOtpParams = [phone];
-          await this.entityManager.query(deleteOtpQuery, deleteOtpParams);
-          return {
-            message: 'Password has been reset',
-            data: true,
-          };
-        } else {
-          throw new RpcException({
-            message: 'Password has not been reset',
-            statusCode: HttpStatus.BAD_REQUEST,
-          });
-        }
-      } else {
+      const otp = await this.otpRepository.findOne({
+        where: [
+          { email, code },
+          { phone, code },
+        ],
+      });
+      if (!otp) {
         throw new RpcException({
-          message: 'Either email or phone must be provided, but not both.',
+          message: 'OTP is not valid',
           statusCode: HttpStatus.BAD_REQUEST,
         });
       }
+      const user = await this.userRepository.findOne({
+        where: [
+          { email, login_type: LoginType.LOCAL },
+          { phone, login_type: LoginType.LOCAL },
+        ],
+      });
+      if (!user) {
+        throw new RpcException({
+          message: 'User not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user.password = hashedPassword;
+      await Promise.all([
+        this.userRepository.save(user),
+        this.otpRepository.remove(otp),
+      ]);
+      return {
+        message: 'Password has been reset',
+        data: true,
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,

@@ -7,6 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { Users } from './users.entity';
 import { Checklist } from './checklist.entity';
@@ -25,6 +26,7 @@ import { FinanceExpenditure } from './finance_expenditure.entity';
 import { FinanceIncomeSource } from './finance_income_source.entity';
 import { FinanceIncome } from './finance_income.entity';
 import { FinanceAssets } from './finance_assets.entity';
+import { FamilyInvitation } from './family_invitation.entity';
 
 @Entity('family')
 export class Family {
@@ -61,6 +63,12 @@ export class Family {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @OneToOne(
+    () => FamilyInvitation,
+    (family_invitation) => family_invitation.family,
+  )
+  family_invitation: FamilyInvitation;
 
   @OneToMany(() => Checklist, (checklist) => checklist.family)
   checklists: Checklist[];

@@ -16,8 +16,10 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import {
   AdminAuthGuard,
+  CurrentUser,
   FacebookAuthGuard,
   GoogleAuthGuard,
+  JwtAuthGuard,
   JwtRefreshGuard,
   LocalAuthGuard,
 } from '../utils';
@@ -116,10 +118,9 @@ export class AuthApiController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout' })
-  @UseGuards(JwtRefreshGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('logout')
-  async logout(@Req() request: any) {
-    const refreshToken = request.headers['authorization'].split(' ')[1];
-    return this.authService.logout(refreshToken);
+  async logout(@CurrentUser() currentUser: any) {
+    return this.authService.logout(currentUser.id_user);
   }
 }

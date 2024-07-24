@@ -9,7 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async () => ({
-        throttlers: [{ limit: 1, ttl: seconds(60) }],
+        throttlers: [{ limit: 10, ttl: seconds(60) }],
       }),
       inject: [ConfigService],
     }),

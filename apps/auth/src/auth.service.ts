@@ -3,9 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { FirebaseService, LoginType, RefreshToken, Users } from '@app/common';
 import { RpcException } from '@nestjs/microservices';
-import { EntityManager, Like, Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TokenPayload } from './interface/tokenPayload.interface';
+import { UserService } from './user/user.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -15,42 +17,33 @@ export class AuthService {
     private refreshTokenRepository: Repository<RefreshToken>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
-    private readonly entityManager: EntityManager,
     private readonly firebaseService: FirebaseService,
+    private readonly userService: UserService,
   ) {}
 
   async validateGoogleUser(accessToken: string, profile: any) {
     try {
-      const getUserQuery =
-        'SELECT * FROM users where email = $1 and login_type = $2';
-      const getUserParams = [profile.emails[0].value, LoginType.GOOGLE];
-      const userResult = await this.entityManager.query(
-        getUserQuery,
-        getUserParams,
-      );
-      const user = userResult[0];
+      const user = await this.userRepository.findOne({
+        where: {
+          email: profile.emails[0].value,
+          login_type: LoginType.GOOGLE,
+        },
+      });
+      console.log(profile);
       if (!user) {
-        const query =
-          'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7, $8)';
-        const parameters = [
-          profile.emails[0].value,
-          null,
-          '',
-          profile.name.givenName,
-          profile.name.familyName,
-          null,
-          LoginType.GOOGLE,
-          profile.photos[0].value,
-        ];
-
-        const data = await this.entityManager.query(query, parameters);
-
-        return await this.userRepository.findOne({
-          where: {
-            id_user: data[0].id_user,
-            login_type: LoginType.GOOGLE,
-          },
+        const newUser = await this.userService.createAccount({
+          email: profile.emails[0].value,
+          phone: null,
+          password: '',
+          firstname: profile.name.givenName,
+          lastname: profile.name.familyName,
+          genre: null,
+          birthdate: null,
+          login_type: LoginType.GOOGLE,
+          avatar: profile.photos[0].value,
         });
+
+        return newUser;
       } else {
         if (user.is_banned === true) {
           throw new RpcException({
@@ -70,35 +63,26 @@ export class AuthService {
 
   async validateFacebookUser(accessToken: string, profile: any) {
     try {
-      const getUserQuery =
-        'SELECT * FROM users where email = $1 and login_type = $2';
-      const getUserParams = [profile.emails[0].value, LoginType.FACEBOOK];
-      const userResult = await this.entityManager.query(
-        getUserQuery,
-        getUserParams,
-      );
-      const user = userResult[0];
+      const user = await this.userRepository.findOne({
+        where: {
+          email: profile.emails[0].value,
+          login_type: LoginType.FACEBOOK,
+        },
+      });
       if (!user) {
-        const query =
-          'SELECT * FROM f_create_user($1, $2, $3, $4, $5, $6, $7, $8)';
-        const parameters = [
-          profile._json.email,
-          null,
-          '',
-          profile.name.givenName,
-          profile.name.familyName,
-          '',
-          LoginType.FACEBOOK,
-          profile.photos[0].value,
-        ];
-        const data = await this.entityManager.query(query, parameters);
-
-        return await this.userRepository.findOne({
-          where: {
-            id_user: data[0].id_user,
-            login_type: LoginType.FACEBOOK,
-          },
+        const newUser = await this.userService.createAccount({
+          email: profile.emails[0].value,
+          phone: null,
+          password: '',
+          firstname: profile.name.givenName,
+          lastname: profile.name.familyName,
+          genre: null,
+          birthdate: null,
+          login_type: LoginType.FACEBOOK,
+          avatar: profile.photos[0].value,
         });
+
+        return newUser;
       } else {
         if (user.is_banned === true) {
           throw new RpcException({
@@ -178,7 +162,10 @@ export class AuthService {
   }
 
   async googleValidate(google_accessToken: string, profile: any) {
-    const user = await this.validateGoogleUser(google_accessToken, profile);
+    const user = (await this.validateGoogleUser(
+      google_accessToken,
+      profile,
+    )) as Users;
     const {
       accessToken,
       refreshToken,
@@ -206,7 +193,10 @@ export class AuthService {
   }
 
   async facebookValidate(facebook_accessToken: string, profile: any) {
-    const user = await this.validateFacebookUser(facebook_accessToken, profile);
+    const user = (await this.validateFacebookUser(
+      facebook_accessToken,
+      profile,
+    )) as Users;
     const {
       accessToken,
       refreshToken,
@@ -262,11 +252,9 @@ export class AuthService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async logout(refreshToken: string) {
+  async logout(id_user: string) {
     try {
-      // const query = 'SELECT * FROM f_delete_refresh_token ($1)';
-      // const parameters = [refreshToken];
-      // await this.entityManager.query(query, parameters);
+      await this.refreshTokenRepository.delete({ id_user });
       return {
         message: 'Logout successfully',
       };
@@ -321,11 +309,7 @@ export class AuthService {
       });
     }
 
-    const Query = 'SELECT * FROM compare_passwords($1,$2)';
-    const param = [inputPassword, user.password];
-    const result = await this.entityManager.query(Query, param);
-
-    const isMatch = result[0]['compare_passwords'];
+    const isMatch = await bcrypt.compare(inputPassword, user.password);
 
     if (!isMatch) {
       throw new RpcException({

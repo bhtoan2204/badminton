@@ -48,6 +48,8 @@ import { ShoppingListSubscriber } from './subcriber/shoppingList.subcriber';
 import { ShoppingItemSubscriber } from './subcriber/shoppingItems.subcriber';
 import * as Joi from 'joi';
 import { Discount } from './entity/discount.entity';
+import { OTP } from './entity/otp.entity';
+import { FamilyInvitation } from './entity/family_invitation.entity';
 
 @Module({
   imports: [
@@ -83,8 +85,10 @@ import { Discount } from './entity/discount.entity';
             ChecklistType,
             PaymentHistory,
             Users,
+            OTP,
             Family,
             MemberFamily,
+            FamilyInvitation,
             FamilyExtraPackages,
             PackageCombo,
             PackageExtra,

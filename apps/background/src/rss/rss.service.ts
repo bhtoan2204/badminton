@@ -76,6 +76,7 @@ export class RssService implements OnModuleInit {
         take: itemsPerPages,
         skip: (page - 1) * itemsPerPages,
         relations: ['category', 'enclosure'],
+        order: { pubDate: 'DESC' },
       });
       return {
         data,
@@ -94,7 +95,7 @@ export class RssService implements OnModuleInit {
     await this.crawlerQueue.add(
       'crawl-articles',
       {},
-      { repeat: { cron: '0 0 */12 * *' } },
+      { repeat: { cron: '0 2 * * *' } },
     );
   }
 
@@ -154,7 +155,6 @@ export class RssService implements OnModuleInit {
     for (const type of category) {
       console.log(`Processing RSS for category ${type}`);
       const feed = await this.crawlRss(type);
-
       const itemsToProcess = feed.items.slice(0, 10);
 
       for (const item of itemsToProcess) {

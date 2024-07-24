@@ -44,9 +44,9 @@ export class AuthController {
   }
 
   @EventPattern('authClient/logout')
-  async handleLogout(@Payload() refreshToken, @Ctx() context: RmqContext) {
+  async handleLogout(@Payload() id_user, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.authService.logout(refreshToken);
+    return await this.authService.logout(id_user);
   }
 
   @EventPattern('authClient/validateUserId')

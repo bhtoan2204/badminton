@@ -202,7 +202,6 @@ export class BackgroundService implements OnModuleInit {
             interval = parseInt(part.split('=')[1], 10);
           }
         }
-        console.log('INTERVAL', interval);
         const jobName = `calendar_event_${event.id_calendar}_${frequency.toLowerCase()}_interval_${interval}`;
         let repeatEvery: number;
         switch (frequency) {

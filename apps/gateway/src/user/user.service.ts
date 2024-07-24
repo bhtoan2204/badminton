@@ -8,7 +8,7 @@ import { ChangePasswordDto } from './dto/changePassword.dto';
 import { CreateAccountDto } from './dto/createAccount.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { AUTH_SERVICE } from '../utils';
-import { RmqService } from '@app/common';
+import { LoginType, RmqService } from '@app/common';
 
 @Injectable()
 export class UserService {
@@ -17,8 +17,9 @@ export class UserService {
     private readonly rmqService: RmqService,
   ) {}
 
-  async createAccount(dto: CreateAccountDto) {
+  async createAccount(createUserDto: CreateAccountDto) {
     try {
+      const dto = { login_type: LoginType.LOCAL, ...createUserDto };
       return await this.rmqService.send(
         this.authClient,
         'authClient/create_account',
