@@ -31,7 +31,6 @@ export class WsJwtStrategy extends PassportStrategy(Strategy, 'ws-jwt') {
   }
 
   async validate(payload: any) {
-    console.log('goes here');
     const cacheKey = `user:${payload.id_user}`;
     try {
       const cachedUser = await this.redisService.get(cacheKey);

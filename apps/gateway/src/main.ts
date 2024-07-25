@@ -38,7 +38,8 @@ async function bootstrap() {
 
   app.useWebSocketAdapter(
     new WebsocketAdapter(app, {
-      origin: configService.get('FRONTEND_URL'),
+      // origin: configService.get('FRONTEND_URL'),
+      origin: '*',
     }),
   );
 

@@ -1,0 +1,143 @@
+version: '3.8'
+services:
+  gateway:
+    image: mjkundta/gateway:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/gateway/Dockerfile
+      target: production
+    command: node dist/apps/gateway/src/main
+    ports:
+      - '8080:8080'
+    restart: on-failure
+    env_file: './apps/gateway/.env.production'
+
+  auth:
+    image: mjkundta/auth:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: production
+    command: node dist/apps/auth/src/main
+    restart: on-failure
+    env_file: './apps/auth/.env.production'
+
+  calendar:
+    image: mjkundta/calendar:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/calendar/Dockerfile
+      target: production
+    command: node dist/apps/calendar/src/main
+    restart: on-failure
+    env_file: './apps/calendar/.env.production'
+
+  guideline:
+    image: mjkundta/guideline:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/guideline/Dockerfile
+      target: production
+    command: node dist/apps/guideline/src/main
+    restart: on-failure
+    env_file: './apps/guideline/.env.production'
+
+  storage:
+    image: mjkundta/storage:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/storage/Dockerfile
+      target: production
+    command: node dist/apps/storage/src/main
+    restart: on-failure
+    env_file: './apps/storage/.env.production'
+
+  chat:
+    image: mjkundta/chat:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/chat/Dockerfile
+      target: production
+    command: node dist/apps/chat/src/main
+    restart: on-failure
+    env_file: './apps/chat/.env.production'
+
+  finance:
+    image: mjkundta/finance:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/finance/Dockerfile
+      target: production
+    command: node dist/apps/finance/src/main
+    restart: on-failure
+    env_file: './apps/finance/.env.production'
+
+  shopping:
+    image: mjkundta/shopping:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/shopping/Dockerfile
+      target: production
+    command: node dist/apps/shopping/src/main
+    restart: on-failure
+    env_file: './apps/shopping/.env.production'
+
+  household:
+    image: mjkundta/household:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/household/Dockerfile
+      target: production
+    command: node dist/apps/household/src/main
+    restart: on-failure
+    env_file: './apps/household/.env.production'
+
+  search:
+    image: mjkundta/search:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/elasticsearch/Dockerfile
+      target: production
+    command: node dist/apps/elasticsearch/src/main
+    restart: on-failure
+    env_file: './apps/elasticsearch/.env.production'
+
+  education:
+    image: mjkundta/education:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/education/Dockerfile
+      target: production
+    command: node dist/apps/education/src/main
+    restart: on-failure
+    env_file: './apps/education/.env.production'
+
+  background:
+    image: mjkundta/background:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/background/Dockerfile
+      target: production
+    command: node dist/apps/background/src/main
+    restart: on-failure
+    env_file: './apps/background/.env.production'
+
+  payment:
+    image: mjkundta/payment:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/payment/Dockerfile
+      target: production
+    command: node dist/apps/payment/src/main
+    restart: on-failure
+    env_file: './apps/payment/.env.production'
+
+  family:
+    image: mjkundta/family:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/family/Dockerfile
+      target: production
+    command: node dist/apps/family/src/main
+    restart: on-failure
+    env_file: './apps/family/.env.production'

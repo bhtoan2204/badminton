@@ -155,7 +155,7 @@ export class ChatGateway implements OnModuleInit {
 
   @SubscribeMessage('joinRoom')
   @UseGuards(WsJwtAuthGuard)
-  handleJoinRoom(
+  async handleJoinRoom(
     @WsCurrentUser() currentUser,
     @MessageBody() roomId: string,
     @ConnectedSocket() client: Socket,
@@ -167,10 +167,17 @@ export class ChatGateway implements OnModuleInit {
     console.log(
       `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) joined room ${roomId}`,
     );
+    const room = this.server.in(roomId);
+    const roomSockets = await room.fetchSockets();
+    console.log(
+      'Join Room:',
+      roomSockets.map((socket: any) => socket.user.id_user),
+    );
   }
 
   @SubscribeMessage('leaveRoom')
-  handleLeaveRoom(
+  @UseGuards(WsJwtAuthGuard)
+  async handleLeaveRoom(
     @WsCurrentUser() currentUser,
     @MessageBody() roomId: string,
     @ConnectedSocket() client: Socket,
@@ -182,9 +189,16 @@ export class ChatGateway implements OnModuleInit {
     console.log(
       `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) left room ${roomId}`,
     );
+    const room = this.server.in(roomId);
+    const roomSockets = await room.fetchSockets();
+    console.log(
+      'Leave room',
+      roomSockets.map((socket: any) => socket.user.id_user),
+    );
   }
 
   @SubscribeMessage('offer')
+  @UseGuards(WsJwtAuthGuard)
   handleOffer(
     @WsCurrentUser() currentUser,
     @MessageBody() data: { roomId: string; offer: RTCSessionDescriptionInit },
@@ -201,6 +215,7 @@ export class ChatGateway implements OnModuleInit {
   }
 
   @SubscribeMessage('answer')
+  @UseGuards(WsJwtAuthGuard)
   handleAnswer(
     @WsCurrentUser() currentUser,
     @MessageBody() data: { roomId: string; answer: RTCSessionDescriptionInit },
@@ -216,19 +231,113 @@ export class ChatGateway implements OnModuleInit {
     );
   }
 
-  @SubscribeMessage('ice-candidate')
+  @SubscribeMessage('iceCandidate')
+  @UseGuards(WsJwtAuthGuard)
   handleIceCandidate(
     @WsCurrentUser() currentUser,
     @MessageBody() data: { roomId: string; candidate: RTCIceCandidateInit },
     @ConnectedSocket() client: Socket,
   ) {
-    this.server.to(data.roomId).emit('ice-candidate', {
+    this.server.to(data.roomId).emit('iceCandidate', {
       clientId: client.id,
       candidate: data.candidate,
       user: currentUser,
     });
     console.log(
       `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) sent ICE candidate to room ${data.roomId}`,
+    );
+  }
+
+  @SubscribeMessage('callUser')
+  @UseGuards(WsJwtAuthGuard)
+  async handleCallUser(
+    @WsCurrentUser() currentUser,
+    @MessageBody() data: { userId: string; roomId: string },
+  ) {
+    const { userId, roomId } = data;
+    const receiverSocketIds: string[] = await this.cacheManager.get(userId);
+    if (receiverSocketIds) {
+      const emitPromises = receiverSocketIds.map((socketId) =>
+        this.server.to(socketId).emit('incomingCall', {
+          data: 'incomingCall',
+          from: currentUser,
+          roomId,
+        }),
+      );
+      await Promise.all(emitPromises);
+    }
+    console.log(`User ${currentUser.id_user} is calling User ${userId}`);
+  }
+
+  @SubscribeMessage('callFamily')
+  @UseGuards(WsJwtAuthGuard)
+  async handleCallFamily(
+    @WsCurrentUser() currentUser,
+    @MessageBody() data: { familyId: number; roomId: string },
+  ) {
+    const { familyId, roomId } = data;
+    const listReceiverId = await this.chatService.getListReceiverId(
+      currentUser.id_user,
+      familyId,
+    );
+    await Promise.all(
+      listReceiverId.map(async (receiverId) => {
+        const receiverSocketIds: string[] =
+          (await this.cacheManager.get(receiverId)) || [];
+        receiverSocketIds.forEach((socketId) => {
+          this.server.to(socketId).emit('incomingFamilyCall', {
+            from: currentUser,
+            roomId,
+          });
+        });
+      }),
+    );
+    console.log(`User ${currentUser.id_user} is calling Family ${familyId}`);
+  }
+
+  @SubscribeMessage('acceptCall')
+  @UseGuards(WsJwtAuthGuard)
+  async handleAcceptCall(
+    @WsCurrentUser() currentUser,
+    @MessageBody() roomId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    client.join(roomId);
+    this.server
+      .to(roomId)
+      .emit('callAccepted', { clientId: client.id, user: currentUser });
+    console.log(
+      `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) accepted call and joined room ${roomId}`,
+    );
+    const room = this.server.in(roomId);
+    const roomSockets = await room.fetchSockets();
+    console.log(
+      'Accept and join room',
+      roomSockets.map((socket: any) => socket.user.id_user),
+    );
+  }
+
+  @SubscribeMessage('rejectCall')
+  @UseGuards(WsJwtAuthGuard)
+  async handleRejectCall(
+    @WsCurrentUser() currentUser,
+    @MessageBody() data: { callerId: string; roomId: string },
+    // @ConnectedSocket() client: Socket,
+  ) {
+    const { callerId, roomId } = data;
+    const callerSocketIds: string[] = await this.cacheManager.get(callerId);
+    if (callerSocketIds) {
+      const emitPromises = callerSocketIds.map((socketId) =>
+        this.server.to(socketId).emit('callRejected', {
+          data: 'callRejected',
+          from: currentUser,
+          roomId,
+        }),
+      );
+      await Promise.all(emitPromises);
+    }
+    console.log(
+      `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) rejected call from User ${callerId}`,
     );
   }
 }

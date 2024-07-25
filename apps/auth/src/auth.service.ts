@@ -14,7 +14,6 @@ export class AuthService {
   constructor(
     @InjectRepository(Users) private userRepository: Repository<Users>,
     @InjectRepository(RefreshToken)
-    private refreshTokenRepository: Repository<RefreshToken>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly firebaseService: FirebaseService,
@@ -29,7 +28,6 @@ export class AuthService {
           login_type: LoginType.GOOGLE,
         },
       });
-      console.log(profile);
       if (!user) {
         const newUser = await this.userService.createAccount({
           email: profile.emails[0].value,
@@ -110,27 +108,24 @@ export class AuthService {
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
-        secret: this.configService.get<string>('JWT_SECRET'),
+        secret: process.env.JWT_SECRET,
         expiresIn: '1d',
       }),
       this.jwtService.signAsync(jwtPayload, {
-        secret: this.configService.get<string>('JWT_SECRET_REFRESH'),
+        secret: process.env.JWT_SECRET_REFRESH,
         expiresIn: '3d',
       }),
     ]);
 
     const currentTime = Math.floor(Date.now() / 1000);
-    const accessTokenExpiresIn =
-      currentTime +
-      parseInt(this.configService.get<string>('JWT_EXPIRATION'), 10);
+    const accessTokenExpiresIn = currentTime + process.env.JWT_EXPIRATION;
     const refreshTokenExpiresIn =
-      currentTime +
-      parseInt(this.configService.get<string>('JWT_REFRESH_EXPIRATION'), 10);
+      currentTime + process.env.JWT_REFRESH_EXPIRATION;
     return {
       accessToken,
       refreshToken,
-      accessTokenExpiresIn,
-      refreshTokenExpiresIn,
+      accessTokenExpiresIn: parseInt(accessTokenExpiresIn),
+      refreshTokenExpiresIn: parseInt(refreshTokenExpiresIn),
     };
   }
 
@@ -141,18 +136,6 @@ export class AuthService {
       accessTokenExpiresIn,
       refreshTokenExpiresIn,
     } = await this.getTokens(payload);
-    try {
-      const newRefreshToken = new RefreshToken();
-      newRefreshToken.id_user = payload.id_user;
-      newRefreshToken.refresh_token = refreshToken;
-      newRefreshToken.expired_at = new Date(refreshTokenExpiresIn * 1000);
-      await this.refreshTokenRepository.save(newRefreshToken);
-    } catch (err) {
-      throw new RpcException({
-        message: err.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
     return {
       accessToken,
       refreshToken,
@@ -166,24 +149,19 @@ export class AuthService {
       google_accessToken,
       profile,
     )) as Users;
+    console.log(user);
     const {
       accessToken,
       refreshToken,
       accessTokenExpiresIn,
       refreshTokenExpiresIn,
     } = await this.getTokens(user);
-    try {
-      const newRefreshToken = new RefreshToken();
-      newRefreshToken.id_user = user.id_user;
-      newRefreshToken.refresh_token = refreshToken;
-      newRefreshToken.expired_at = new Date(refreshTokenExpiresIn * 1000);
-      await this.refreshTokenRepository.save(newRefreshToken);
-    } catch (err) {
-      throw new RpcException({
-        message: err.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
+    console.log({
+      accessToken,
+      refreshToken,
+      accessTokenExpiresIn,
+      refreshTokenExpiresIn,
+    });
     return {
       accessToken,
       refreshToken,
@@ -203,18 +181,7 @@ export class AuthService {
       accessTokenExpiresIn,
       refreshTokenExpiresIn,
     } = await this.getTokens(user);
-    try {
-      const newRefreshToken = new RefreshToken();
-      newRefreshToken.id_user = user.id_user;
-      newRefreshToken.refresh_token = refreshToken;
-      newRefreshToken.expired_at = new Date(refreshTokenExpiresIn * 1000);
-      await this.refreshTokenRepository.save(newRefreshToken);
-    } catch (err) {
-      throw new RpcException({
-        message: err.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
+
     return {
       accessToken,
       refreshToken,
@@ -231,18 +198,7 @@ export class AuthService {
       accessTokenExpiresIn,
       refreshTokenExpiresIn,
     } = await this.getTokens(payload);
-    try {
-      const newRefreshToken = new RefreshToken();
-      newRefreshToken.id_user = payload.id_user;
-      newRefreshToken.refresh_token = refreshToken;
-      newRefreshToken.expired_at = new Date(refreshTokenExpiresIn * 1000);
-      await this.refreshTokenRepository.save(newRefreshToken);
-    } catch (err) {
-      throw new RpcException({
-        message: err.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
+
     return {
       accessToken,
       refreshToken,
@@ -254,7 +210,6 @@ export class AuthService {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async logout(id_user: string) {
     try {
-      await this.refreshTokenRepository.delete({ id_user });
       return {
         message: 'Logout successfully',
       };

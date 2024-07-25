@@ -9,15 +9,3 @@ services:
     command: node dist/apps/family/src/main
     restart: on-failure
     env_file: './apps/family/.env.production'
-
-  # invoice:
-  #   image: mjkundta/invoice:${TAG}
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/invoice/Dockerfile
-  #     target: production
-  #   command: node dist/apps/invoice/src/main
-  #   restart: on-failure
-  #   env_file: './apps/invoice/.env.production'
-  #   mem_limit: 2g
-  #   cpu_shares: 1024

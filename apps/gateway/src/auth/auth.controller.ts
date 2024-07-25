@@ -71,8 +71,8 @@ export class AuthApiController {
       request.user,
     );
 
-    response.setHeader('accessToken', accessToken);
-    response.setHeader('refreshToken', refreshToken);
+    response.cookie('accessToken', accessToken, { httpOnly: true });
+    response.cookie('refreshToken', refreshToken, { httpOnly: true });
 
     return response.redirect(
       `${this.configService.get('FRONTEND_URL')}/setup&login=google`,

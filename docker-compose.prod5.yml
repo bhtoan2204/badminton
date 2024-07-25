@@ -1,14 +1,14 @@
 version: '3.8'
 services:
-  # household:
-  #   image: mjkundta/household:${TAG}
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/household/Dockerfile
-  #     target: production
-  #   command: node dist/apps/household/src/main
-  #   restart: on-failure
-  #   env_file: './apps/household/.env.production'
+  household:
+    image: mjkundta/household:${TAG}
+    build:
+      context: .
+      dockerfile: ./apps/household/Dockerfile
+      target: production
+    command: node dist/apps/household/src/main
+    restart: on-failure
+    env_file: './apps/household/.env.production'
 
   search:
     image: mjkundta/search:${TAG}
