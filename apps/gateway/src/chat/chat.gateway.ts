@@ -39,7 +39,8 @@ export class ChatGateway implements OnModuleInit {
   async onModuleInit() {
     this.server.on('connection', async (socket) => {
       try {
-        const token = socket.handshake.auth.authorization.split(' ')[1];
+        const token = socket.handshake.headers.authorization.split(' ')[1];
+        console.log(socket.handshake);
         if (!token) throw new UnauthorizedException('Token not found');
         const payload = (await this.jwtService.verify(token, {
           secret: this.configService.get<string>('JWT_SECRET'),
@@ -160,13 +161,15 @@ export class ChatGateway implements OnModuleInit {
     @MessageBody() roomId: string,
     @ConnectedSocket() client: Socket,
   ) {
-    client.join(roomId);
-    this.server
-      .to(roomId)
-      .emit('userJoined', { clientId: client.id, user: currentUser });
-    console.log(
-      `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) joined room ${roomId}`,
-    );
+    if (!client.rooms.has(roomId)) {
+      client.join(roomId);
+      this.server
+        .to(roomId)
+        .emit('userJoined', { clientId: client.id, user: currentUser });
+      console.log(
+        `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) joined room ${roomId}`,
+      );
+    }
     const room = this.server.in(roomId);
     const roomSockets = await room.fetchSockets();
     console.log(
@@ -231,22 +234,22 @@ export class ChatGateway implements OnModuleInit {
     );
   }
 
-  @SubscribeMessage('iceCandidate')
-  @UseGuards(WsJwtAuthGuard)
-  handleIceCandidate(
-    @WsCurrentUser() currentUser,
-    @MessageBody() data: { roomId: string; candidate: RTCIceCandidateInit },
-    @ConnectedSocket() client: Socket,
-  ) {
-    this.server.to(data.roomId).emit('iceCandidate', {
-      clientId: client.id,
-      candidate: data.candidate,
-      user: currentUser,
-    });
-    console.log(
-      `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) sent ICE candidate to room ${data.roomId}`,
-    );
-  }
+  // @SubscribeMessage('iceCandidate')
+  // @UseGuards(WsJwtAuthGuard)
+  // handleIceCandidate(
+  //   @WsCurrentUser() currentUser,
+  //   @MessageBody() data: { roomId: string; candidate: RTCIceCandidateInit },
+  //   @ConnectedSocket() client: Socket,
+  // ) {
+  //   this.server.to(data.roomId).emit('iceCandidate', {
+  //     clientId: client.id,
+  //     candidate: data.candidate,
+  //     user: currentUser,
+  //   });
+  //   console.log(
+  //     `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) sent ICE candidate to room ${data.roomId}`,
+  //   );
+  // }
 
   @SubscribeMessage('callUser')
   @UseGuards(WsJwtAuthGuard)
@@ -259,7 +262,6 @@ export class ChatGateway implements OnModuleInit {
     if (receiverSocketIds) {
       const emitPromises = receiverSocketIds.map((socketId) =>
         this.server.to(socketId).emit('incomingCall', {
-          data: 'incomingCall',
           from: currentUser,
           roomId,
         }),
@@ -302,19 +304,19 @@ export class ChatGateway implements OnModuleInit {
     @MessageBody() roomId: string,
     @ConnectedSocket() client: Socket,
   ) {
-    client.join(roomId);
+    // client.join(roomId);
     this.server
       .to(roomId)
       .emit('callAccepted', { clientId: client.id, user: currentUser });
-    console.log(
-      `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) accepted call and joined room ${roomId}`,
-    );
-    const room = this.server.in(roomId);
-    const roomSockets = await room.fetchSockets();
-    console.log(
-      'Accept and join room',
-      roomSockets.map((socket: any) => socket.user.id_user),
-    );
+    // console.log(
+    //   `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) accepted call and joined room ${roomId}`,
+    // );
+    // const room = this.server.in(roomId);
+    // const roomSockets = await room.fetchSockets();
+    // console.log(
+    //   'Accept and join room',
+    //   roomSockets.map((socket: any) => socket.user.id_user),
+    // );
   }
 
   @SubscribeMessage('rejectCall')
@@ -329,7 +331,6 @@ export class ChatGateway implements OnModuleInit {
     if (callerSocketIds) {
       const emitPromises = callerSocketIds.map((socketId) =>
         this.server.to(socketId).emit('callRejected', {
-          data: 'callRejected',
           from: currentUser,
           roomId,
         }),

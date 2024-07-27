@@ -149,19 +149,12 @@ export class AuthService {
       google_accessToken,
       profile,
     )) as Users;
-    console.log(user);
     const {
       accessToken,
       refreshToken,
       accessTokenExpiresIn,
       refreshTokenExpiresIn,
     } = await this.getTokens(user);
-    console.log({
-      accessToken,
-      refreshToken,
-      accessTokenExpiresIn,
-      refreshTokenExpiresIn,
-    });
     return {
       accessToken,
       refreshToken,

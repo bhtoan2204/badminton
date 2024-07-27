@@ -56,6 +56,11 @@ const globalModule = (module: DynamicModule) => {
         name: 'notifications',
       }),
     ),
+    globalModule(
+      BullModule.registerQueue({
+        name: 'crawler-queue',
+      }),
+    ),
     MgDatabaseModule,
     MongooseModule.forFeature([
       { name: NotificationData.name, schema: NotificationDataSchema },

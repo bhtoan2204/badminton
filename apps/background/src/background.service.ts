@@ -194,7 +194,6 @@ export class BackgroundService implements OnModuleInit {
       });
 
       for (const event of repeatlyEvents) {
-        console.log('ID CALENDAR', event.id_calendar);
         const ruleParts = event.recurrence_rule.split(';');
         let interval = 1; // Default interval
         for (const part of ruleParts) {

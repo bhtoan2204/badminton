@@ -439,7 +439,7 @@ export class ExpenseditureService {
     file: any,
   ) {
     try {
-      const dto: any = this.transformEmptyStringsToNull(Dto);
+      const dto: any = await this.transformEmptyStringsToNull(Dto);
 
       const {
         id_expenditure,

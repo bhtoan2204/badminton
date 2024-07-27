@@ -12,6 +12,7 @@ import {
   SentryService,
 } from '@app/common';
 import { WebsocketAdapter } from './utils/websocket/websocket-adapter';
+import { ExpressPeerServer } from 'peer';
 
 async function bootstrap() {
   await initTracing('gateway');
@@ -51,6 +52,12 @@ async function bootstrap() {
       cookie: { secure: true },
     }),
   );
+
+  const server = app.getHttpServer();
+  const peerServer = ExpressPeerServer(server, {
+    key: 'famfund',
+  });
+  app.use('/peerjs', peerServer);
 
   await app.listen(configService.get<number>('PORT'));
 }

@@ -19,7 +19,7 @@ export class WsJwtStrategy extends PassportStrategy(Strategy, 'ws-jwt') {
   ) {
     super({
       jwtFromRequest: (req) => {
-        const authHeader = req.handshake.auth.authorization;
+        const authHeader = req.handshake.headers.authorization;
         if (!authHeader) {
           throw new WsException('Missing Authorization header');
         }
