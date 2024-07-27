@@ -309,4 +309,19 @@ export class ChatService {
       );
     }
   }
+
+  async getJitsiToken(user: any) {
+    try {
+      return await this.rmqService.send(
+        this.chatClient,
+        'chatClient/getJitsiToken',
+        { user },
+      );
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
+    }
+  }
 }

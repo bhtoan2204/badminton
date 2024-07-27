@@ -142,4 +142,10 @@ export class ChatController {
     this.rmqService.ack(context);
     return this.chatService.getLinkedUser(data.id_user, data.search);
   }
+
+  @EventPattern('chatClient/getJitsiToken')
+  async getJitsiToken(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.chatService.getJitsiToken(data.user);
+  }
 }

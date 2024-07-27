@@ -13,6 +13,8 @@ import { StorageService } from './storage/storage.service';
 import { Brackets, EntityManager, In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Types } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
+import * as jsonwebtoken from 'jsonwebtoken';
 
 const limit = 30;
 
@@ -766,6 +768,63 @@ export class ChatService {
       const users = await query.getMany();
 
       return users;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  generate(privateKey, { id, name, email, avatar, appId, kid }, time = null) {
+    const jwt = jsonwebtoken.sign(
+      {
+        aud: 'jitsi',
+        iss: 'chat',
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000 + 1000 * 60 * time),
+        nbf: Math.floor(Date.now() / 1000 - 5),
+        sub: appId,
+        context: {
+          features: {
+            livestreaming: true,
+            'outbound-call': true,
+            'sip-outbound-call': true,
+            transcription: true,
+            recording: true,
+          },
+          user: {
+            id,
+            name,
+            avatar,
+            email: email,
+            moderator: false,
+            'hidden-from-recorder': false,
+          },
+        },
+        room: '*',
+      },
+      privateKey,
+      { algorithm: 'RS256', header: { kid } } as jsonwebtoken.SignOptions,
+    );
+    return jwt;
+  }
+
+  async getJitsiToken(user: any) {
+    try {
+      const room_id = uuidv4();
+      const data_jisti = {
+        id: room_id,
+        name: user.firstname + ' ' + user.lastname,
+        email: user.email,
+        avatar: user.avatar,
+        appId: 'vpaas-magic-cookie-1334387fd63341c78f731a149b004264',
+        kid: 'vpaas-magic-cookie-1334387fd63341c78f731a149b004264/510b0d-SAMPLE_APP',
+      };
+      return {
+        jwt: this.generate(process.env.PRIVATE_CONSULTATION, data_jisti),
+        room_id,
+      };
     } catch (error) {
       throw new RpcException({
         message: error.message,

@@ -37,3 +37,5 @@ lerna-debug.log*
 package-lock.json
 
 **/venv
+
+**/node_modules

@@ -141,11 +141,3 @@ services:
     command: node dist/apps/family/src/main
     restart: on-failure
     env_file: './apps/family/.env.production'
-
-  peerjs:
-    image: mjkundta/peerjs-server:${TAG}
-    build:
-      context: .
-      dockerfile: ./apps/peerjs/Dockerfile
-    ports:
-      - '9000:9000'
