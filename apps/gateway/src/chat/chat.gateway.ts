@@ -39,7 +39,7 @@ export class ChatGateway implements OnModuleInit {
   async onModuleInit() {
     this.server.on('connection', async (socket) => {
       try {
-        const token = socket.handshake.headers.authorization.split(' ')[1];
+        const token = socket.handshake.auth.authorization.split(' ')[1];
         console.log(socket.handshake);
         if (!token) throw new UnauthorizedException('Token not found');
         const payload = (await this.jwtService.verify(token, {
