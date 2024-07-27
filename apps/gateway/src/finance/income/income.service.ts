@@ -5,6 +5,7 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { NotificationType, RmqService } from '@app/common';
 import { UpdateIncomeDto } from './dto/updateIncome.dto';
+import { GetIncomeDto } from './dto/getIncome.dto';
 
 @Injectable()
 export class IncomeService {
@@ -79,19 +80,12 @@ export class IncomeService {
     }
   }
 
-  async getIncomeByDateRange(
-    id_user: string,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
-    fromDate: Date,
-    toDate: Date,
-  ) {
+  async getIncomeByDateRange(id_user: string, dto: GetIncomeDto) {
     try {
       return await this.rmqService.send(
         this.financeClient,
         'financeClient/getIncomeByDateRange',
-        { id_user, id_family, page, itemsPerPage, fromDate, toDate },
+        { id_user, dto },
       );
     } catch (error) {
       throw new HttpException(

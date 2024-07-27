@@ -19,7 +19,6 @@ import {
   ApiConsumes,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import {
@@ -33,6 +32,7 @@ import {
 import { UtilitiesService } from './utilities.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../../utils/interceptor/imageFile.interceptor';
+import { GetUtilitiesDto } from './dto/getUtilities.dto';
 
 @ApiTags('Utilities')
 @Controller('utilities')
@@ -51,22 +51,12 @@ export class UtilitiesController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get utilities' })
-  @ApiParam({ name: 'id_family', required: true, type: Number })
-  @ApiQuery({ name: 'page', required: true, type: Number })
-  @ApiQuery({ name: 'itemsPerPage', required: true, type: Number })
-  @Get('getUtilities/:id_family')
+  @Get('getUtilities')
   async getUtilities(
     @CurrentUser() currentUser,
-    @Param('id_family') id_family: number,
-    @Query('page') page: number,
-    @Query('itemsPerPage') itemsPerPage: number,
+    @Query() dto: GetUtilitiesDto,
   ) {
-    return this.utilitiesService.getUtilities(
-      currentUser.id_user,
-      id_family,
-      page,
-      itemsPerPage,
-    );
+    return this.utilitiesService.getUtilities(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)

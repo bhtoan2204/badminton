@@ -6,6 +6,7 @@ import { InputConsumableItemDto } from './dto/inputConsumableItem.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { NotificationType, RmqService } from '@app/common';
+import { GetHouseholdDto } from './dto/getHouseholdItem.dto';
 
 @Injectable()
 export class HouseholdService {
@@ -30,17 +31,12 @@ export class HouseholdService {
     }
   }
 
-  async getItem(
-    id_user: string,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
-  ) {
+  async getItem(id_user: string, dto: GetHouseholdDto) {
     try {
       return await this.rmqService.send(
         this.householdClient,
         'householdClient/getItem',
-        { id_user, id_family, page, itemsPerPage },
+        { id_user, dto },
       );
     } catch (error) {
       throw new HttpException(

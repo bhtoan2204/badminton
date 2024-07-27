@@ -19,24 +19,13 @@ export class ShoppingController {
   @EventPattern('shoppingClient/getShoppingList')
   async getShoppingList(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.shoppingService.getShoppingList(
-      data.id_user,
-      data.id_family,
-      data.page,
-      data.itemsPerPage,
-    );
+    return this.shoppingService.getShoppingList(data.id_user, data.dto);
   }
 
   @EventPattern('shoppingClient/getShoppingItem')
   async getShoppingItem(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.shoppingService.getShoppingItem(
-      data.id_user,
-      data.id_list,
-      data.id_family,
-      data.page,
-      data.itemsPerPage,
-    );
+    return this.shoppingService.getShoppingItem(data.id_user, data.dto);
   }
 
   @EventPattern('shoppingClient/createShoppingList')

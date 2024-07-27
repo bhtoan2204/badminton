@@ -2,6 +2,7 @@ import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { FINANCE_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { RmqService } from '@app/common';
+import { GetUtilitiesDto } from './dto/getUtilities.dto';
 
 @Injectable()
 export class UtilitiesService {
@@ -25,17 +26,12 @@ export class UtilitiesService {
     }
   }
 
-  async getUtilities(
-    id_user: string,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
-  ) {
+  async getUtilities(id_user: string, dto: GetUtilitiesDto) {
     try {
       return await this.rmqService.send(
         this.financeClient,
         'financeClient/getUtilities',
-        { id_user, id_family, page, itemsPerPage },
+        { id_user, dto },
       );
     } catch (error) {
       throw new HttpException(

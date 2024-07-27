@@ -117,23 +117,32 @@ export class IncomeService {
 
   async getIncomeByDateRange(
     id_user: string,
-    id_family: number,
-    pageNumber: number,
-    itemsPerPage: number,
-    fromDate: Date,
-    toDate: Date,
+    dto: {
+      id_family: number;
+      fromDate: string;
+      toDate: string;
+      page: number;
+      itemsPerPage: number;
+      sortBy: string;
+      sortDirection: 'ASC' | 'DESC';
+    },
   ) {
     try {
       const option = {
         where: {
-          id_family,
+          id_family: dto.id_family,
         },
-        skip: (pageNumber - 1) * itemsPerPage,
-        take: itemsPerPage,
+        skip: (dto.page - 1) * dto.itemsPerPage,
+        take: dto.itemsPerPage,
         relations: ['financeIncomeSource', 'users'],
       };
-      if (fromDate && toDate) {
-        option.where['income_date'] = Between(fromDate, toDate);
+      if (dto.sortBy && dto.sortDirection) {
+        option['order'] = {
+          [dto.sortBy]: dto.sortDirection,
+        };
+      }
+      if (dto.fromDate && dto.toDate) {
+        option.where['income_date'] = Between(dto.fromDate, dto.toDate);
       }
       const [data, total] =
         await this.financeIncomeRepository.findAndCount(option);

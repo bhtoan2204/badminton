@@ -15,7 +15,6 @@ import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import {
@@ -29,6 +28,7 @@ import {
 import { ChecklistService } from './checklist.service';
 import { CreateChecklistDto } from './dto/createChecklist.dto';
 import { UpdateChecklistDto } from './dto/updateChecklist.dto';
+import { GetCheckListDto } from './dto/getChecklist.dto';
 
 @ApiTags('Checklist')
 @Controller('checklist')
@@ -47,21 +47,12 @@ export class ChecklistController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all checklist of family' })
-  @ApiQuery({ name: 'page', required: true, type: Number })
-  @ApiQuery({ name: 'itemsPerPage', required: true, type: Number })
-  @Get('getAllChecklist/:id_family')
+  @Get('getAllChecklist')
   async getAllChecklist(
     @CurrentUser() currentUser,
-    @Param('id_family') id_family: number,
-    @Query('page') page: number,
-    @Query('itemsPerPage') itemsPerPage: number,
+    @Query() dto: GetCheckListDto,
   ) {
-    return this.checkListService.getAllChecklist(
-      currentUser.id_user,
-      id_family,
-      page,
-      itemsPerPage,
-    );
+    return this.checkListService.getAllChecklist(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)

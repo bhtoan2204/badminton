@@ -19,17 +19,25 @@ export class GuidelineService {
 
   async getAllGuideline(
     id_user: string,
-    id_family: number,
-    page: number = 1,
-    itemsPerPage: number = 10,
+    dto: {
+      id_family: number;
+      page: number;
+      itemsPerPage: number;
+      sortBy: string;
+      sortDirection: 'ASC' | 'DESC';
+    },
   ) {
     try {
-      const [data, total] = await this.guideItemsRepository.findAndCount({
-        where: { id_family },
-        take: itemsPerPage,
-        skip: (page - 1) * itemsPerPage,
-        order: { created_at: 'DESC' },
-      });
+      const option = {
+        where: { id_family: dto.id_family },
+        take: dto.itemsPerPage,
+        skip: (dto.page - 1) * dto.itemsPerPage,
+      };
+      if (dto.sortBy) {
+        option['order'] = { [dto.sortBy]: dto.sortDirection };
+      }
+      const [data, total] =
+        await this.guideItemsRepository.findAndCount(option);
       return {
         message: 'Success',
         data,

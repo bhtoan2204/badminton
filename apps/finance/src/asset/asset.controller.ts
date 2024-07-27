@@ -13,12 +13,7 @@ export class AssetController {
   @EventPattern('financeClient/getAsset')
   async getAsset(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.assetService.getAsset(
-      data.id_user,
-      data.id_family,
-      data.page,
-      data.itemsPerPage,
-    );
+    return await this.assetService.getAsset(data.id_user, data.dto);
   }
 
   @EventPattern('financeClient/createAsset')

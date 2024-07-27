@@ -29,6 +29,7 @@ import {
 } from '../../utils';
 import { CreateIncomeDto } from './dto/createIncome.dto';
 import { UpdateIncomeDto } from './dto/updateIncome.dto';
+import { GetIncomeDto } from './dto/getIncome.dto';
 
 @ApiTags('Income')
 @Controller('finance/income')
@@ -109,40 +110,12 @@ export class IncomeController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get statiscal income' })
-  @Get('getIncomeByDateRange/:id_family')
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'itemsPerPage', required: false, type: Number })
-  @ApiQuery({
-    name: 'fromDate',
-    required: false,
-    type: String,
-    description: 'Timestamp in milliseconds',
-  })
-  @ApiQuery({
-    name: 'toDate',
-    required: false,
-    type: String,
-    description: 'Timestamp in milliseconds',
-  })
-  @ApiParam({ name: 'id_family', required: true, type: Number })
+  @Get('getIncomeByDateRange')
   async getIncomeByDateRange(
     @CurrentUser() currentUser,
-    @Param('id_family') id_family: number,
-    @Query('page') page: number,
-    @Query('itemsPerPage') itemsPerPage: number,
-    @Query('fromDate') fromDate: string,
-    @Query('toDate') toDate: string,
+    @Query() dto: GetIncomeDto,
   ) {
-    const fromDateObj = fromDate ? new Date(fromDate) : null;
-    const toDateObj = toDate ? new Date(toDate) : null;
-    return this.incomeService.getIncomeByDateRange(
-      currentUser.id_user,
-      id_family,
-      page,
-      itemsPerPage,
-      fromDateObj,
-      toDateObj,
-    );
+    return this.incomeService.getIncomeByDateRange(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.CREATED)

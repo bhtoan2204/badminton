@@ -31,18 +31,29 @@ export class ChecklistService {
 
   async getChecklists(
     id_user: string,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
+    dto: {
+      id_family: number;
+      id_checklist_type: number;
+      page: number;
+      itemsPerPage: number;
+      sortBy: string;
+      sortDirection: 'ASC' | 'DESC';
+    },
   ) {
     try {
-      const [data, total] = await this.checklistRepository.findAndCount({
-        where: { id_family: id_family },
-        skip: (page - 1) * itemsPerPage,
-        take: itemsPerPage,
+      const option = {
+        where: { id_family: dto.id_family },
+        skip: (dto.page - 1) * dto.itemsPerPage,
+        take: dto.itemsPerPage,
         relations: ['checklistType'],
-        order: { created_at: 'DESC' },
-      });
+        order: {
+          [dto.sortBy]: dto.sortDirection,
+        },
+      };
+      if (dto.id_checklist_type) {
+        option.where['id_checklist_type'] = dto.id_checklist_type;
+      }
+      const [data, total] = await this.checklistRepository.findAndCount(option);
 
       return {
         data: data,

@@ -15,7 +15,6 @@ import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import {
@@ -29,6 +28,7 @@ import {
 import { EducationService } from './education.service';
 import { CreateEducationDto } from './dto/createEducation.dto';
 import { UpdateEducationDto } from './dto/updateEducation.dto';
+import { GetEducationDto } from './dto/getEducation.dto';
 
 @ApiTags('Education')
 @Controller('education')
@@ -53,29 +53,14 @@ export class EducationController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all education progress' })
-  @ApiQuery({ name: 'page', required: false, type: String })
-  @ApiQuery({ name: 'itemsPerPage', required: false, type: String })
-  @ApiQuery({ name: 'id_family', required: true, type: Number })
-  @ApiQuery({ name: 'search', required: false, type: String })
-  @ApiQuery({ name: 'id_user', required: false, type: String })
   @Get('getAll')
   async getAllEducationProgress(
     @CurrentUser() currentUser,
-    @Query('page') page,
-    @Query('itemsPerPage') itemsPerPage,
-    @Query('id_family') id_family,
-    @Query('search') search,
-    @Query('id_user') id_user,
+    @Query() dto: GetEducationDto,
   ) {
-    const pageNumber = parseInt(page, 10) || 1;
-    const itemsPerPageNumber = parseInt(itemsPerPage, 10) || 10;
     return this.educationService.getAllEducationProgress(
       currentUser.id_user,
-      pageNumber,
-      itemsPerPageNumber,
-      id_family,
-      search,
-      id_user,
+      dto,
     );
   }
 

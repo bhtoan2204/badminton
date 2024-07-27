@@ -15,21 +15,14 @@ export class AssetService {
     private readonly rmqService: RmqService,
   ) {}
 
-  async getAsset(
-    id_user: string,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
-  ) {
+  async getAsset(id_user: string, dto) {
     try {
       return await this.rmqService.send(
         this.financeClient,
         'financeClient/getAsset',
         {
           id_user,
-          id_family,
-          page,
-          itemsPerPage,
+          dto,
         },
       );
     } catch (error) {

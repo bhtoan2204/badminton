@@ -36,21 +36,23 @@ export class EducationService {
     }
   }
 
-  async getAllEducationProgress(
-    id_user: string,
-    pageNumber: number,
-    itemsPerPage: number,
-    id_family: number,
-    search: string,
-    member_id: string,
-  ) {
+  async getAllEducationProgress(none: string, dto: any) {
     try {
+      const {
+        page,
+        itemsPerPage,
+        search,
+        id_family,
+        id_user,
+        sortBy,
+        sortDirection,
+      } = dto;
       const queryBuilder = this.educationProgressRepository
         .createQueryBuilder('educationProgress')
         .leftJoinAndSelect('educationProgress.subjects', 'subjects')
         .leftJoinAndSelect('educationProgress.user', 'user')
         .where('educationProgress.id_family = :id_family', { id_family })
-        .skip((pageNumber - 1) * itemsPerPage)
+        .skip((page - 1) * itemsPerPage)
         .take(itemsPerPage);
       if (search) {
         queryBuilder.andWhere(
@@ -67,10 +69,17 @@ export class EducationService {
           }),
         );
       }
-      if (member_id) {
+      if (id_user) {
         queryBuilder.andWhere('educationProgress.id_user = :member_id', {
-          member_id,
+          id_user,
         });
+      }
+
+      if (sortBy && sortDirection) {
+        queryBuilder.orderBy(
+          `educationProgress.${sortBy}`,
+          sortDirection.toUpperCase() as 'ASC' | 'DESC',
+        );
       }
 
       const [data, total] = await queryBuilder.getManyAndCount();

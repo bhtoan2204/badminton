@@ -105,7 +105,6 @@ export class RssService implements OnModuleInit {
         where: { guid: articleData.guid },
       });
       if (existingArticle) {
-        console.log(`Article with guid ${articleData.guid} already exists.`);
         return;
       }
 
@@ -113,7 +112,6 @@ export class RssService implements OnModuleInit {
         where: { name: type },
       });
       if (!category) {
-        console.log(`Category ${type} not found.`);
         return;
       }
 
@@ -153,7 +151,6 @@ export class RssService implements OnModuleInit {
   @Process('crawl-articles')
   async getRssData() {
     for (const type of category) {
-      console.log(`Processing RSS for category ${type}`);
       const feed = await this.crawlRss(type);
       const itemsToProcess = feed.items.slice(0, 10);
 

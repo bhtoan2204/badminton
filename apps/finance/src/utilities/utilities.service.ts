@@ -32,15 +32,26 @@ export class UtilitiesService {
     }
   }
 
-  async getUtilities(id_family: number, page: number, itemsPerPage: number) {
+  async getUtilities(dto: {
+    id_family: number;
+    page: number;
+    itemsPerPage: number;
+    sortBy: string;
+    sortDirection: 'ASC' | 'DESC';
+  }) {
     try {
-      const [data, total] = await this.utilitiesRepository.findAndCount({
-        where: { id_family: id_family },
-        order: { created_at: 'DESC' },
-        skip: (page - 1) * itemsPerPage,
-        take: itemsPerPage,
+      const option = {
+        where: { id_family: dto.id_family },
+        skip: (dto.page - 1) * dto.itemsPerPage,
+        take: dto.itemsPerPage,
         relations: ['utilitiesType'],
-      });
+      };
+      if (dto.sortBy && dto.sortDirection) {
+        option['order'] = {
+          [dto.sortBy]: dto.sortDirection,
+        };
+      }
+      const [data, total] = await this.utilitiesRepository.findAndCount(option);
       return {
         data,
         total,

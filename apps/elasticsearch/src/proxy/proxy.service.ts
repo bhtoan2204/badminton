@@ -64,7 +64,7 @@ export class ProxyService {
       const data = await this.graphQLClient.request(query);
       return data;
     } catch (error) {
-      console.log('Error fetching data: ', error);
+      console.log(error);
       throw new RpcException({
         message: error.message || 'Internal server error',
         statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,

@@ -19,6 +19,9 @@ export class PackageCombo {
   @Column('varchar', { nullable: false })
   name: string;
 
+  @Column('varchar', { nullable: false, default: '' })
+  name_vn: string;
+
   @Column('varchar', { nullable: true })
   description: string;
 

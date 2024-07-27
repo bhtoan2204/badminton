@@ -19,11 +19,7 @@ export class UtilitiesController {
   @EventPattern('financeClient/getUtilities')
   async getUtilities(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.utilitiesService.getUtilities(
-      data.id_family,
-      data.page,
-      data.itemsPerPage,
-    );
+    return this.utilitiesService.getUtilities(data.dto);
   }
 
   @EventPattern('financeClient/getUtility')

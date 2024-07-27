@@ -36,6 +36,7 @@ import { CreateGuidelineDto } from './dto/createGuideline.dto';
 import { UpdateGuidelineDto } from './dto/updateGuideline.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
+import { GetGuidelineDto } from './dto/getGuideline.dto';
 
 @ApiTags('Guideline')
 @Controller('guideline')
@@ -47,26 +48,12 @@ export class GuidelineController {
   @Permission([PERMISSION_GUIDELINE])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all guideline' })
-  @Get('getAllGuideline/:id_family')
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'itemsPerPage', required: false, type: Number })
-  @ApiParam({
-    name: 'id_family',
-    required: true,
-    description: 'The ID of the family',
-  })
+  @Get('getAllGuideline')
   async getAllGuideline(
     @CurrentUser() currentUser,
-    @Param('id_family') id_family: number,
-    @Query('page') page: number,
-    @Query('itemsPerPage') itemsPerPage: number,
+    @Query() dto: GetGuidelineDto,
   ) {
-    return this.guidelineService.getAllGuideline(
-      currentUser.id_user,
-      id_family,
-      page,
-      itemsPerPage,
-    );
+    return this.guidelineService.getAllGuideline(currentUser.id_user, dto);
   }
 
   @UseGuards(JwtAuthGuard, FamilyTermCheckGuard, MemberFamilyGuard)

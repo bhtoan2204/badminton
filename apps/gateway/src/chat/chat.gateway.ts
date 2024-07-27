@@ -40,7 +40,6 @@ export class ChatGateway implements OnModuleInit {
     this.server.on('connection', async (socket) => {
       try {
         const token = socket.handshake.auth.authorization.split(' ')[1];
-        console.log(socket.handshake);
         if (!token) throw new UnauthorizedException('Token not found');
         const payload = (await this.jwtService.verify(token, {
           secret: this.configService.get<string>('JWT_SECRET'),
@@ -79,7 +78,6 @@ export class ChatGateway implements OnModuleInit {
           } else {
             await this.cacheManager.del(key);
           }
-          console.log(`User ${key} disconnected from socket ${client.id}`);
           break;
         }
       }
@@ -234,23 +232,6 @@ export class ChatGateway implements OnModuleInit {
     );
   }
 
-  // @SubscribeMessage('iceCandidate')
-  // @UseGuards(WsJwtAuthGuard)
-  // handleIceCandidate(
-  //   @WsCurrentUser() currentUser,
-  //   @MessageBody() data: { roomId: string; candidate: RTCIceCandidateInit },
-  //   @ConnectedSocket() client: Socket,
-  // ) {
-  //   this.server.to(data.roomId).emit('iceCandidate', {
-  //     clientId: client.id,
-  //     candidate: data.candidate,
-  //     user: currentUser,
-  //   });
-  //   console.log(
-  //     `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) sent ICE candidate to room ${data.roomId}`,
-  //   );
-  // }
-
   @SubscribeMessage('callUser')
   @UseGuards(WsJwtAuthGuard)
   async handleCallUser(
@@ -304,19 +285,9 @@ export class ChatGateway implements OnModuleInit {
     @MessageBody() roomId: string,
     @ConnectedSocket() client: Socket,
   ) {
-    // client.join(roomId);
     this.server
       .to(roomId)
       .emit('callAccepted', { clientId: client.id, user: currentUser });
-    // console.log(
-    //   `User ${currentUser.id_user} (${currentUser.firstname} ${currentUser.lastname}) accepted call and joined room ${roomId}`,
-    // );
-    // const room = this.server.in(roomId);
-    // const roomSockets = await room.fetchSockets();
-    // console.log(
-    //   'Accept and join room',
-    //   roomSockets.map((socket: any) => socket.user.id_user),
-    // );
   }
 
   @SubscribeMessage('rejectCall')

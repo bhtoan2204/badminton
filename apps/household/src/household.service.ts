@@ -45,18 +45,27 @@ export class HouseholdService {
 
   async getItem(
     id_user: string,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
+    dto: {
+      id_family: number;
+      page: number;
+      itemsPerPage: number;
+      sortBy: string;
+      sortDirection: 'ASC' | 'DESC';
+    },
   ) {
     try {
-      const [data, total] = await this.householdItemsRepository.findAndCount({
-        where: { id_family: id_family },
-        take: itemsPerPage,
-        skip: (page - 1) * itemsPerPage,
-        relations: ['category', 'room'],
-        order: { created_at: 'DESC' },
-      });
+      const option = {
+        where: { id_family: dto.id_family },
+        skip: (dto.page - 1) * dto.itemsPerPage,
+        take: dto.itemsPerPage,
+      };
+      if (dto.sortBy && dto.sortDirection) {
+        option['order'] = {
+          [dto.sortBy]: dto.sortDirection,
+        };
+      }
+      const [data, total] =
+        await this.householdItemsRepository.findAndCount(option);
       return {
         data,
         total,

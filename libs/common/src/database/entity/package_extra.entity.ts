@@ -19,6 +19,9 @@ export class PackageExtra {
   @Column('varchar')
   name: string;
 
+  @Column('varchar', { nullable: false, default: '' })
+  name_vn: string;
+
   @Column('int', { nullable: false, default: 500000 })
   price: number;
 

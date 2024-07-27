@@ -6,6 +6,7 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { NotificationType, RmqService } from '@app/common';
 import { CreateEducationDto } from './dto/createEducation.dto';
+import { GetEducationDto } from './dto/getEducation.dto';
 
 @Injectable()
 export class EducationService {
@@ -43,25 +44,14 @@ export class EducationService {
     }
   }
 
-  async getAllEducationProgress(
-    id_user: string,
-    pageNumber: number,
-    itemsPerPage: number,
-    id_family: number,
-    search: string,
-    member_id: string,
-  ) {
+  async getAllEducationProgress(id_user: string, dto: GetEducationDto) {
     try {
       return this.rmqService.send(
         this.educationClient,
         'educationClient/getAllEducationProgress',
         {
           id_user,
-          pageNumber,
-          itemsPerPage,
-          id_family,
-          search,
-          member_id,
+          dto,
         },
       );
     } catch (error) {

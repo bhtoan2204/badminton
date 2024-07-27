@@ -19,7 +19,6 @@ import {
   ApiConsumes,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { HouseholdService } from './household.service';
@@ -35,6 +34,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
 import { InputDurableItemDto } from './dto/inputDurableItem.dto';
 import { InputConsumableItemDto } from './dto/inputConsumableItem.dto';
+import { GetHouseholdDto } from './dto/getHouseholdItem.dto';
 
 @ApiTags('Household')
 @Controller('household')
@@ -53,26 +53,12 @@ export class HouseholdController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get household item' })
-  @Get('getHouseholdItem/:id_family')
-  @ApiQuery({ name: 'page', required: false, type: String })
-  @ApiQuery({ name: 'itemsPerPage', required: false, type: String })
-  @ApiParam({
-    name: 'id_family',
-    required: true,
-    description: 'The ID of the family',
-  })
+  @Get('getHouseholdItem')
   async getHouseholdItem(
     @CurrentUser() currentUser,
-    @Param('id_family') id_family: number,
-    @Query('page') page: number,
-    @Query('itemsPerPage') itemsPerPage: number,
+    @Query() dto: GetHouseholdDto,
   ) {
-    return this.householdService.getItem(
-      currentUser.id_user,
-      id_family,
-      page,
-      itemsPerPage,
-    );
+    return this.householdService.getItem(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)

@@ -30,11 +30,7 @@ export class EducationController {
     this.rmqService.ack(context);
     return this.educationService.getAllEducationProgress(
       data.id_user,
-      data.pageNumber,
-      data.itemsPerPage,
-      data.id_family,
-      data.search,
-      data.member_id,
+      data.dto,
     );
   }
 

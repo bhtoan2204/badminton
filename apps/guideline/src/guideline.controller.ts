@@ -10,15 +10,10 @@ export class GuidelineController {
     private readonly rmqService: RmqService,
   ) {}
 
-  @EventPattern('guidelineClient/get_all_guideline')
+  @EventPattern('guidelineClient/getAllGuideline')
   async getAllGuideline(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.guidelineService.getAllGuideline(
-      data.id_user,
-      data.id_family,
-      data.page,
-      data.itemsPerPage,
-    );
+    return await this.guidelineService.getAllGuideline(data.id_user, data.dto);
   }
 
   @EventPattern('guidelineClient/get_guideline')

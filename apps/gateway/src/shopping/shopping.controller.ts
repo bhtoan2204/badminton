@@ -30,6 +30,8 @@ import { CreateShoppingListDto } from './dto/createShoppingList.dto';
 import { CreateShoppingItemDto } from './dto/createShoppingItem.dto';
 import { UpdateShoppingListDto } from './dto/updateShoppingList.dto';
 import { UpdateShoppingItemDto } from './dto/updateShoppingItem.dto';
+import { GetShoppingListDto } from './dto/getShoppingList.dto';
+import { GetShoppingItemDto } from './dto/getShoppingItem.dto';
 
 @ApiTags('Shopping')
 @Controller('shopping')
@@ -49,46 +51,22 @@ export class ShoppingController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get shopping list' })
-  @ApiQuery({ name: 'page', required: false })
-  @ApiQuery({ name: 'itemsPerPage', required: false })
-  @Get('getShoppingList/:id_family')
+  @Get('getShoppingList')
   async getShoppingList(
     @CurrentUser() currentUser,
-    @Param('id_family') id_family: number,
-    @Query('page') page: number,
-    @Query('itemsPerPage') itemsPerPage: number,
+    @Query() dto: GetShoppingListDto,
   ) {
-    if (!page) page = 1;
-    if (!itemsPerPage) itemsPerPage = 10;
-    return this.shoppingService.getShoppingList(
-      currentUser.id_user,
-      id_family,
-      page,
-      itemsPerPage,
-    );
+    return this.shoppingService.getShoppingList(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get shopping item' })
-  @ApiQuery({ name: 'page', required: false })
-  @ApiQuery({ name: 'itemsPerPage', required: false })
-  @Get('getShoppingItem/:id_family/:id_list')
+  @Get('getShoppingIte')
   async getShoppingItem(
     @CurrentUser() currentUser,
-    @Param('id_list') id_list: number,
-    @Param('id_family') id_family: number,
-    @Query('page') page: number,
-    @Query('itemsPerPage') itemsPerPage: number,
+    @Query() dto: GetShoppingItemDto,
   ) {
-    if (!page) page = 1;
-    if (!itemsPerPage) itemsPerPage = 10;
-    return this.shoppingService.getShoppingItem(
-      currentUser.id_user,
-      id_list,
-      id_family,
-      page,
-      itemsPerPage,
-    );
+    return this.shoppingService.getShoppingItem(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.CREATED)

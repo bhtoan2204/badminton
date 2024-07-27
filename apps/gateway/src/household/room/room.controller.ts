@@ -18,7 +18,6 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { RoomService } from './room.service';
@@ -32,6 +31,7 @@ import {
 } from '../../utils';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../../utils/interceptor/imageFile.interceptor';
+import { GetRoomDto } from './dto/getRoom.dto';
 
 @ApiTags('Room')
 @Controller('room')
@@ -43,21 +43,9 @@ export class RoomController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all rooms' })
-  @ApiQuery({ name: 'page', type: Number, required: true })
-  @ApiQuery({ name: 'itemsPerPage', type: Number, required: true })
-  @Get('getRooms/:id_family')
-  async getRooms(
-    @CurrentUser() currentUser,
-    @Param('id_family') id_family: number,
-    @Query('page') page: number,
-    @Query('itemsPerPage') itemsPerPage: number,
-  ) {
-    return this.roomService.getRooms(
-      currentUser.id_user,
-      id_family,
-      page,
-      itemsPerPage,
-    );
+  @Get('getRooms')
+  async getRooms(@CurrentUser() currentUser, @Query() dto: GetRoomDto) {
+    return this.roomService.getRooms(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.CREATED)

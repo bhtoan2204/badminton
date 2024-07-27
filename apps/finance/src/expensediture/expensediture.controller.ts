@@ -98,14 +98,7 @@ export class ExpenseditureController {
     @Ctx() context: RmqContext,
   ) {
     this.rmqService.ack(context);
-    return this.expenseService.getExpenseByDateRange(
-      data.id_user,
-      data.id_family,
-      data.fromDate,
-      data.toDate,
-      data.page,
-      data.itemsPerPage,
-    );
+    return this.expenseService.getExpenseByDateRange(data.id_user, data.dto);
   }
 
   @EventPattern('financeClient/updateExpensediture')

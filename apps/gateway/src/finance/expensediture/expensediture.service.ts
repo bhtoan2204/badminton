@@ -78,19 +78,12 @@ export class ExpenseditureService {
     }
   }
 
-  async getExpenseByDateRange(
-    id_user: string,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
-    fromDate: Date | null,
-    toDate: Date | null,
-  ) {
+  async getExpenseByDateRange(id_user: string, dto) {
     try {
       return await this.rmqService.send(
         this.financeClient,
         'financeClient/getExpenseByDateRange',
-        { id_user, id_family, fromDate, toDate, page, itemsPerPage },
+        { id_user, dto },
       );
     } catch (error) {
       throw new HttpException(

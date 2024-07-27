@@ -34,3 +34,5 @@ export * from './strategies/oauth.strategy/google.strategy';
 export * from './strategies/admin.strategy';
 
 export * from './filter/http-exception.filter';
+
+export * from './dto/abstract.dto';

@@ -6,6 +6,7 @@ import { Queue } from 'bull';
 import { NotificationType, RmqService } from '@app/common';
 import { CreateChecklistDto } from './dto/createChecklist.dto';
 import { UpdateChecklistDto } from './dto/updateChecklist.dto';
+import { GetCheckListDto } from './dto/getChecklist.dto';
 
 @Injectable()
 export class ChecklistService {
@@ -30,17 +31,12 @@ export class ChecklistService {
     }
   }
 
-  async getAllChecklist(
-    id_user: string,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
-  ) {
+  async getAllChecklist(id_user: string, dto: GetCheckListDto) {
     try {
       return await this.rmqService.send(
         this.calendarClient,
         'calendarClient/getAllChecklist',
-        { id_user, id_family, page, itemsPerPage },
+        { id_user, dto },
       );
     } catch (error) {
       throw new HttpException(

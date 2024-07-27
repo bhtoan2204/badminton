@@ -6,6 +6,7 @@ import { Queue } from 'bull';
 import { NotificationType, RmqService } from '@app/common';
 import { CreateShoppingItemDto } from './dto/createShoppingItem.dto';
 import { UpdateShoppingItemDto } from './dto/updateShoppingItem.dto';
+import { GetShoppingListDto } from './dto/getShoppingList.dto';
 
 @Injectable()
 export class ShoppingService {
@@ -30,21 +31,14 @@ export class ShoppingService {
     }
   }
 
-  async getShoppingList(
-    id_user: string,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
-  ) {
+  async getShoppingList(id_user: string, dto: GetShoppingListDto) {
     try {
       return await this.rmqService.send(
         this.shoppingClient,
         'shoppingClient/getShoppingList',
         {
           id_user,
-          id_family,
-          page,
-          itemsPerPage,
+          dto,
         },
       );
     } catch (error) {
@@ -55,23 +49,14 @@ export class ShoppingService {
     }
   }
 
-  async getShoppingItem(
-    id_user: string,
-    id_list: number,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
-  ) {
+  async getShoppingItem(id_user: string, dto) {
     try {
       return await this.rmqService.send(
         this.shoppingClient,
         'shoppingClient/getShoppingItem',
         {
           id_user,
-          id_list,
-          id_family,
-          page,
-          itemsPerPage,
+          dto,
         },
       );
     } catch (error) {

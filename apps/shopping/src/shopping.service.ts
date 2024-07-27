@@ -47,18 +47,26 @@ export class ShoppingService {
 
   async getShoppingList(
     id_user: string,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
+    dto: {
+      id_family: number;
+      page: number;
+      itemsPerPage: number;
+      sortBy: string;
+      sortDirection: 'ASC' | 'DESC';
+    },
   ) {
     try {
-      const [data, total] = await this.shoppingListsRepository.findAndCount({
-        where: { id_family: id_family },
-        order: { created_at: 'DESC' },
-        skip: (page - 1) * itemsPerPage,
-        take: itemsPerPage,
+      const option = {
+        where: { id_family: dto.id_family },
+        skip: (dto.page - 1) * dto.itemsPerPage,
+        take: dto.itemsPerPage,
         relations: ['listType'],
-      });
+      };
+      if (dto.sortBy && dto.sortDirection)
+        option['order'] = { [dto.sortBy]: dto.sortDirection };
+
+      const [data, total] =
+        await this.shoppingListsRepository.findAndCount(option);
       return {
         data: data,
         total: total,
@@ -74,14 +82,18 @@ export class ShoppingService {
 
   async getShoppingItem(
     id_user: string,
-    id_list: number,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
+    dto: {
+      id_family: number;
+      id_list: number;
+      page: number;
+      itemsPerPage: number;
+      sortBy: string;
+      sortDirection: 'ASC' | 'DESC';
+    },
   ) {
     try {
       const shoppingList = await this.shoppingListsRepository.findOne({
-        where: { id_list: id_list, id_family: id_family },
+        where: { id_list: dto.id_list, id_family: dto.id_family },
       });
       if (!shoppingList) {
         throw new RpcException({
@@ -89,13 +101,18 @@ export class ShoppingService {
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
-      const [data, total] = await this.shoppingItemsRepository.findAndCount({
-        where: { id_list: id_list },
-        order: { created_at: 'DESC' },
-        skip: (page - 1) * itemsPerPage,
-        take: itemsPerPage,
+
+      const option = {
+        where: { id_list: dto.id_list },
+        skip: (dto.page - 1) * dto.itemsPerPage,
+        take: dto.itemsPerPage,
         relations: ['itemType'],
-      });
+      };
+      if (dto.sortBy && dto.sortDirection)
+        option['order'] = { [dto.sortBy]: dto.sortDirection };
+
+      const [data, total] =
+        await this.shoppingItemsRepository.findAndCount(option);
       return {
         data: data,
         total: total,

@@ -19,12 +19,7 @@ export class ChecklistController {
   @EventPattern('calendarClient/getAllChecklist')
   async getChecklists(@Ctx() context: RmqContext, @Payload() data: any) {
     this.rmqService.ack(context);
-    return this.checklistService.getChecklists(
-      data.id_user,
-      data.id_family,
-      data.page,
-      data.itemsPerPage,
-    );
+    return this.checklistService.getChecklists(data.id_user, data.dto);
   }
 
   @EventPattern('calendarClient/createChecklist')

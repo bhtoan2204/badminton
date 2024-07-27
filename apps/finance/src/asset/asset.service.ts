@@ -15,17 +15,26 @@ export class AssetService {
 
   async getAsset(
     id_user: string,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
+    dto: {
+      id_family: number;
+      page: number;
+      itemsPerPage: number;
+      sortBy: string;
+      sortDirection: 'ASC' | 'DESC';
+    },
   ) {
     try {
-      const [data, total] = await this.assetRepository.findAndCount({
-        where: { id_family: id_family },
-        skip: (page - 1) * itemsPerPage,
-        take: itemsPerPage,
-        order: { created_at: 'DESC' },
-      });
+      const option = {
+        where: { id_family: dto.id_family },
+        skip: (dto.page - 1) * dto.itemsPerPage,
+        take: dto.itemsPerPage,
+      };
+      if (dto.sortBy && dto.sortDirection) {
+        option['order'] = {
+          [dto.sortBy]: dto.sortDirection,
+        };
+      }
+      const [data, total] = await this.assetRepository.findAndCount(option);
       return {
         data: data,
         total: total,

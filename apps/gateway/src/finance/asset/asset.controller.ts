@@ -18,7 +18,6 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { AssetService } from './asset.service';
@@ -34,6 +33,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../../utils/interceptor/imageFile.interceptor';
 import { UpdateAssetSchema } from './schema/updateAsset.schema';
 import { CreateAssetSchema } from './schema/createAsset.schema';
+import { GetAssetDto } from './dto/getAsset.dto';
 
 @ApiTags('Asset')
 @Controller('finance/asset')
@@ -45,23 +45,9 @@ export class AssetController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get Assets' })
-  @Get('getAssets/:id_family')
-  @ApiQuery({ name: 'page', required: false, type: String })
-  @ApiQuery({ name: 'itemsPerPage', required: false, type: String })
-  async getExpense(
-    @CurrentUser() currentUser,
-    @Param('id_family') id_family: number,
-    @Query('page') page: number,
-    @Query('itemsPerPage') itemsPerPage: number,
-  ) {
-    const pageNumber = page || 1;
-    const itemsPerPageNumber = itemsPerPage || 10;
-    return this.expenseService.getAsset(
-      currentUser.id_user,
-      id_family,
-      pageNumber,
-      itemsPerPageNumber,
-    );
+  @Get('getAssets')
+  async getExpense(@CurrentUser() currentUser, @Query() dto: GetAssetDto) {
+    return this.expenseService.getAsset(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.CREATED)

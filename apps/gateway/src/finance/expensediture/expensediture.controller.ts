@@ -35,6 +35,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../../utils/interceptor/imageFile.interceptor';
 import { createExpenditureSchema } from './schema/createExpense.schema';
 import { updateExpenseSchema } from './schema/updateExpense.schema';
+import { GetExpenseDto } from './dto/getExpense.dto';
 
 @ApiTags('Expensediture')
 @Controller('finance/expensediture')
@@ -115,40 +116,12 @@ export class ExpenseditureController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get statiscal expenseditures' })
-  @Get('getExpenseByDateRange/:id_family')
-  @ApiQuery({ name: 'page', required: true, type: Number })
-  @ApiQuery({ name: 'itemsPerPage', required: true, type: Number })
-  @ApiQuery({
-    name: 'fromDate',
-    required: false,
-    type: String,
-    description: 'Timestamp in milliseconds',
-  })
-  @ApiQuery({
-    name: 'toDate',
-    required: false,
-    type: String,
-    description: 'Timestamp in milliseconds',
-  })
-  @ApiParam({ name: 'id_family', required: true, type: Number })
+  @Get('getExpenseByDateRange')
   async getExpenseByDateRange(
     @CurrentUser() currentUser,
-    @Param('id_family') id_family: number,
-    @Query('page') page: number,
-    @Query('itemsPerPage') itemsPerPage: number,
-    @Query('fromDate') fromDate: string,
-    @Query('toDate') toDate: string,
+    @Query() dto: GetExpenseDto,
   ) {
-    const fromDateObj = fromDate ? new Date(fromDate) : null;
-    const toDateObj = toDate ? new Date(toDate) : null;
-    return this.expenseService.getExpenseByDateRange(
-      currentUser.id_user,
-      id_family,
-      page,
-      itemsPerPage,
-      fromDateObj,
-      toDateObj,
-    );
+    return this.expenseService.getExpenseByDateRange(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.CREATED)

@@ -15,19 +15,18 @@ export class RoomController {
     @Payload()
     data: {
       id_user: string;
-      id_family: number;
-      page: number;
-      itemsPerPage: number;
+      dto: {
+        id_family: number;
+        page: number;
+        itemsPerPage: number;
+        sortBy: string;
+        sortDirection: 'ASC' | 'DESC';
+      };
     },
     @Ctx() context: RmqContext,
   ) {
     this.rmqService.ack(context);
-    return await this.roomService.getRooms(
-      data.id_user,
-      data.id_family,
-      data.page,
-      data.itemsPerPage,
-    );
+    return await this.roomService.getRooms(data.id_user, data.dto);
   }
 
   @EventPattern('householdClient/createRoom')

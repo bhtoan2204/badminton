@@ -371,7 +371,6 @@ export class FamilyService {
       }
       const currentDate = new Date();
       const expiredDate = family.expired_at;
-      console.log(currentDate, expiredDate);
       return currentDate < expiredDate;
     } catch (error) {
       throw new RpcException({

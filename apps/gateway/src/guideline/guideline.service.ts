@@ -7,6 +7,7 @@ import { AddStepGuidelineDto } from './dto/addStep.dto';
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
 import { NotificationType, RmqService } from '@app/common';
+import { GetGuidelineDto } from './dto/getGuideline.dto';
 
 @Injectable()
 export class GuidelineService {
@@ -17,17 +18,12 @@ export class GuidelineService {
     private readonly rmqService: RmqService,
   ) {}
 
-  async getAllGuideline(
-    id_user: string,
-    id_family: number,
-    page: number,
-    itemsPerPage: number,
-  ) {
+  async getAllGuideline(id_user: string, dto: GetGuidelineDto) {
     try {
       return await this.rmqService.send(
         this.guidelineClient,
-        'guidelineClient/get_all_guideline',
-        { id_user, id_family, page, itemsPerPage },
+        'guidelineClient/getAllGuideline',
+        { id_user, dto },
       );
     } catch (error) {
       throw new HttpException(

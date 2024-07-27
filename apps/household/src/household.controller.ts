@@ -17,14 +17,22 @@ export class HouseholdController {
   }
 
   @EventPattern('householdClient/getItem')
-  async getItem(@Payload() data: any, @Ctx() context: RmqContext) {
+  async getItem(
+    @Payload()
+    data: {
+      id_user: string;
+      dto: {
+        id_family: number;
+        page: number;
+        itemsPerPage: number;
+        sortBy: string;
+        sortDirection: 'ASC' | 'DESC';
+      };
+    },
+    @Ctx() context: RmqContext,
+  ) {
     this.rmqService.ack(context);
-    return await this.householdService.getItem(
-      data.id_user,
-      data.id_family,
-      data.page,
-      data.itemsPerPage,
-    );
+    return await this.householdService.getItem(data.id_user, data.dto);
   }
 
   @EventPattern('householdClient/getItemDetail')
