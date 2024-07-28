@@ -52,6 +52,6 @@ import { TwilioModule } from 'nestjs-twilio';
   ],
   controllers: [UserController],
   providers: [UserService],
-  exports: [UserService, RmqModule],
+  exports: [UserService],
 })
 export class UserModule {}

@@ -20,6 +20,7 @@ import { PaymentService } from './payment.service';
 import { CurrentUser, JwtAuthGuard } from '../utils';
 import { VerifyOrderDTO } from './dto/verifyOrder.dto';
 import { PlaceOrderDto } from './dto/placeOrder.dto';
+import { GetPaymentHistoryDto } from './dto/getPaymentHistory.dto';
 
 @ApiTags('Payment')
 @ApiBearerAuth()
@@ -101,10 +102,16 @@ export class PaymentController {
   @Get('paymentHistory')
   async paymentHistory(
     @CurrentUser() user,
-    @Query('page') page,
-    @Query('itemsPerPage') itemsPerPage,
+    @Query() dto: GetPaymentHistoryDto,
   ) {
     const id_user = user.id_user;
-    return this.paymentService.paymentHistory(id_user, page, itemsPerPage);
+    return this.paymentService.paymentHistory(id_user, dto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get frequency question' })
+  @Get('getFrequencyQuestion')
+  async getFrequencyQuestion() {
+    return this.paymentService.getFrequencyQuestion();
   }
 }

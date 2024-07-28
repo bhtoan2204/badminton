@@ -39,6 +39,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         'authClient/validateUserId',
         { id_user: payload.id_user },
       );
+      if (user.isemailverified === false) {
+        throw new UnauthorizedException('Email is not verified');
+      }
       await this.redisService.set(cacheKey, JSON.stringify(user), 'EX', 3600);
       return user;
     } catch (err) {

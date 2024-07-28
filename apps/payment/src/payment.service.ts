@@ -15,6 +15,7 @@ import {
   Feedback,
   FeedbackMetadata,
   FeedbackMetadataKey,
+  FrequentlyQuestionMetaData,
   MemberFamily,
   Order,
   OrderStatus,
@@ -57,6 +58,8 @@ export class PaymentService {
     private paymentHistoryRepository: Repository<PaymentHistory>,
     @InjectRepository(Discount)
     private discountRepository: Repository<Discount>,
+    @InjectRepository(FrequentlyQuestionMetaData)
+    private frequentlyQuestionMetaDataRepository: Repository<FrequentlyQuestionMetaData>,
   ) {
     this.vnpTmnCode = this.configService.get<string>('VNPAY_TMN_CODE');
     this.vnpHashSecret = this.configService.get<string>('VNPAY_HASH_SECRET');
@@ -712,15 +715,27 @@ export class PaymentService {
     }
   }
 
-  async paymentHistory(id_user: string, page: number, itemsPerPage: number) {
+  async paymentHistory(
+    id_user: string,
+    dto: {
+      page: number;
+      itemsPerPage: number;
+      sortBy: string;
+      sortDirection: 'ASC' | 'DESC';
+    },
+  ) {
     try {
-      const [data, total] = await this.paymentHistoryRepository.findAndCount({
+      const option = {
         where: { id_user: id_user },
-        order: { created_at: 'DESC' },
-        skip: (page - 1) * itemsPerPage,
-        take: itemsPerPage,
+        skip: (dto.page - 1) * dto.itemsPerPage,
+        take: dto.itemsPerPage,
         relations: ['orders'],
-      });
+      };
+      if (dto.sortBy && dto.sortDirection) {
+        option['order'] = { [dto.sortBy]: dto.sortDirection };
+      }
+      const [data, total] =
+        await this.paymentHistoryRepository.findAndCount(option);
       return {
         data: data,
         total: total,
@@ -775,6 +790,21 @@ export class PaymentService {
         data: data,
         total: total,
         message: 'Feedback fetched successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getFreqQuestion() {
+    try {
+      const data = await this.frequentlyQuestionMetaDataRepository.find();
+      return {
+        data: data,
+        message: 'Feedback metadata fetched successfully',
       };
     } catch (error) {
       throw new RpcException({

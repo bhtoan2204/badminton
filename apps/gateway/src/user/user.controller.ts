@@ -23,16 +23,17 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
 import { CurrentUser, JwtAuthGuard } from '../utils';
-import { ValidateEmailDto } from './dto/validateEmail.dto';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 import { CreateAccountDto } from './dto/createAccount.dto';
 import { UserService } from './user.service';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
-import { CheckOTPDto } from './dto/checkOtp.dto';
+import { CheckOTPDto } from './dto/checkOtpForgot.dto';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import * as validator from 'validator';
+import { VerifyAccountDto } from './dto/verifyAccount.dto';
+import { CreateAccountOTPDto } from './dto/createOTPAccount.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -43,16 +44,22 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Create account' })
   @Post('register/createAccount')
-  async createAccountForTest(@Body() createAccountDto: CreateAccountDto) {
-    return this.userService.createAccount(createAccountDto);
+  async createAccountForTest(@Body() dto: CreateAccountDto) {
+    return this.userService.createAccount(dto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send OTP verify account' })
+  @Post('register/sendOtpVerifyAccount')
+  async sendOtpVerifyAccount(@Body() dto: CreateAccountOTPDto) {
+    return this.userService.sendOtpVerifyAccount(dto);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verify account' })
   @Post('register/verifyAccount')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async verifyAccount(@Body() data: any) {
-    // return this.userService.verifyAccount(data);
+  async verifyAccount(@Body() dto: VerifyAccountDto) {
+    return this.userService.verifyAccount(dto);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -120,14 +127,6 @@ export class UserController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.userService.changeAvatar(user, file);
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Validate Email' })
-  @UseGuards(JwtAuthGuard)
-  @Post('validateEmail')
-  async validateEmail(@CurrentUser() user, @Body() data: ValidateEmailDto) {
-    return this.userService.validateEmail(user, data);
   }
 
   @HttpCode(HttpStatus.OK)

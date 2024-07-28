@@ -111,7 +111,7 @@ export class UserService {
 
       const foundUser = await this.userRepository.findOne({
         where: { id_user: user.id_user },
-        select: ['id_user', 'password'],
+        select: ['id_user', 'password', 'salt'],
       });
 
       if (!foundUser) {
@@ -120,6 +120,7 @@ export class UserService {
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
+
       const isMatch = await comparePassword(
         oldPassword,
         foundUser.password,
@@ -182,7 +183,6 @@ export class UserService {
         });
         return {
           message: 'OTP has been sent to your phone',
-          data: otp.code,
         };
       } else if (!phone) {
         const user = await this.userRepository.findOne({
@@ -299,15 +299,88 @@ export class UserService {
     }
   }
 
-  async validateEmail(dto: any) {
+  async sendOtpVerify(dto: any) {
     try {
-      const { currentUser, data } = dto;
-      const { email, otp } = data;
-
-      return {
-        message: 'Email has been verified',
-        // data: result,
-      };
+      const { email, phone } = dto;
+      if (email && phone) {
+        throw new RpcException({
+          message: 'Either email or phone must be provided, but not both.',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+      if (email) {
+        const user = await this.userRepository.findOne({
+          where: { email, login_type: LoginType.LOCAL, isemailverified: false },
+        });
+        if (!user) {
+          throw new RpcException({
+            message: 'User not found or already verified',
+            statusCode: HttpStatus.NOT_FOUND,
+          });
+        }
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        const newOtp = await this.otpRepository.create({
+          id_user: user.id_user,
+          code,
+          email,
+          phone: null,
+          type: OTPType.VALIDATE_ACCOUNT,
+        });
+        await this.otpRepository.save(newOtp);
+        this.mailerService.sendMail({
+          to: email,
+          from: '"Famfund" <famfund@famfund.com>',
+          subject: `Your OTP for Famfund Account Reset password is ${code}`,
+          template: 'verifyAccount',
+          context: {
+            otp: code,
+            name: user.firstname + ' ' + user.lastname,
+          },
+        });
+        return {
+          message: 'OTP has been sent to your email',
+        };
+      } else if (phone) {
+        const user = await this.userRepository.findOne({
+          where: { phone, login_type: LoginType.LOCAL, isphoneverified: false },
+        });
+        if (!user) {
+          throw new RpcException({
+            message: 'User not found or already verified',
+            statusCode: HttpStatus.NOT_FOUND,
+          });
+        }
+        const phoneNumber = parsePhoneNumberFromString(phone);
+        const formattedNumber = phoneNumber.formatInternational();
+        if (!formattedNumber) {
+          throw new RpcException({
+            message: 'Invalid phone number',
+            statusCode: HttpStatus.BAD_REQUEST,
+          });
+        }
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        const newOtp = await this.otpRepository.create({
+          id_user: user.id_user,
+          code,
+          email: null,
+          phone,
+          type: OTPType.VALIDATE_ACCOUNT,
+        });
+        await this.otpRepository.save(newOtp);
+        this.twilioService.client.messages.create({
+          body: `Your OTP for Famfund Account Verification password is ${code}`,
+          from: this.configService.get<string>('TWILIO_PHONE_NUMBER'),
+          to: formattedNumber,
+        });
+        return {
+          message: 'OTP has been sent to your phone',
+        };
+      } else {
+        throw new RpcException({
+          message: 'Either email or phone must be provided',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -364,49 +437,84 @@ export class UserService {
     }
   }
 
-  async sendUserConfirmation(dto) {
-    const { userInfo, email } = dto;
+  async verifyAccount(dto: { email: string; phone: string; code: string }) {
     try {
-      // const generateOtpQuery = 'SELECT * FROM f_generate_otp($1, $2)';
-      // const generateOtpParams = [userInfo.id_user, email];
-      // const code = await this.entityManager.query(
-      //   generateOtpQuery,
-      //   generateOtpParams,
-      // );
+      if (dto.email && dto.phone) {
+        throw new RpcException({
+          message: 'Both not must be provided',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      } else if (dto.email) {
+        const otp = await this.otpRepository.findOne({
+          where: {
+            email: dto.email,
+            code: dto.code,
+            type: OTPType.VALIDATE_ACCOUNT,
+          },
+        });
+        if (!otp) {
+          throw new RpcException({
+            message: 'OTP is not valid',
+            statusCode: HttpStatus.BAD_REQUEST,
+          });
+        }
+        const user = await this.userRepository.findOne({
+          where: { email: dto.email, login_type: LoginType.LOCAL },
+        });
+        if (!user) {
+          throw new RpcException({
+            message: 'User not found',
+            statusCode: HttpStatus.NOT_FOUND,
+          });
+        }
+        user.isemailverified = true;
+        await Promise.all([
+          this.userRepository.save(user),
+          this.otpRepository.remove(otp),
+        ]);
 
-      // const sendConfirmation = await this.mailerService.sendMail({
-      //   to: email,
-      //   from: '"Famfund" <famfund@famfund.com>',
-      //   subject: `Your OTP for Famfund Account Verification is ${code[0].f_generate_otp}`,
-      //   template: 'verifyAccount',
-      //   context: {
-      //     name: userInfo.firstname + ' ' + userInfo.lastname,
-      //     otp: code[0].f_generate_otp,
-      //   },
-      // });
-
-      return {
-        message: 'OTP has been sent to your email',
-        // data: sendConfirmation,
-      };
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  }
-
-  async sendInvite(id_user: string, id_family: number) {
-    try {
-      const emailContent = `
-            Join Famfund!
-
-            We are a community of warmth, support, and love. We are thrilled to welcome you to join our family!
-
-            Please use the following link to join Famfund: ${'inviteLink'}
-        `;
-      return emailContent;
+        return {
+          message: 'Email has been verified',
+          data: true,
+        };
+      } else if (dto.phone) {
+        const otp = await this.otpRepository.findOne({
+          where: {
+            phone: dto.phone,
+            code: dto.code,
+            type: OTPType.VALIDATE_ACCOUNT,
+          },
+        });
+        if (!otp) {
+          throw new RpcException({
+            message: 'OTP is not valid',
+            statusCode: HttpStatus.BAD_REQUEST,
+          });
+        }
+        const user = await this.userRepository.findOne({
+          where: { phone: dto.phone, login_type: LoginType.LOCAL },
+        });
+        if (!user) {
+          throw new RpcException({
+            message: 'User not found',
+            statusCode: HttpStatus.NOT_FOUND,
+          });
+        }
+        user.isphoneverified = true;
+        await Promise.all([
+          this.userRepository.save(user),
+          this.otpRepository.remove(otp),
+        ]);
+        return {
+          message: 'Phone has been verified',
+          data: true,
+        };
+      } else {
+        throw new RpcException({
+          message: 'Either email or phone must be provided',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
     } catch (error) {
       throw new RpcException({
         message: error.message,

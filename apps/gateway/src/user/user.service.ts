@@ -9,6 +9,8 @@ import { CreateAccountDto } from './dto/createAccount.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { AUTH_SERVICE } from '../utils';
 import { LoginType, RmqService } from '@app/common';
+import { CreateAccountOTPDto } from './dto/createOTPAccount.dto';
+import { VerifyAccountDto } from './dto/verifyAccount.dto';
 
 @Injectable()
 export class UserService {
@@ -23,6 +25,36 @@ export class UserService {
       return await this.rmqService.send(
         this.authClient,
         'authClient/create_account',
+        dto,
+      );
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
+    }
+  }
+
+  async sendOtpVerifyAccount(dto: CreateAccountOTPDto) {
+    try {
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/sendOtpVerifyAccount',
+        dto,
+      );
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
+    }
+  }
+
+  async verifyAccount(dto: VerifyAccountDto) {
+    try {
+      return await this.rmqService.send(
+        this.authClient,
+        'authClient/verifyAccount',
         dto,
       );
     } catch (error) {
@@ -66,12 +98,12 @@ export class UserService {
     }
   }
 
-  async changePassword(currentUser, data: ChangePasswordDto) {
+  async changePassword(currentUser, dto: ChangePasswordDto) {
     try {
       return await this.rmqService.send(
         this.authClient,
         'authClient/change_password',
-        { currentUser, data },
+        { currentUser, dto },
       );
     } catch (error) {
       throw new HttpException(

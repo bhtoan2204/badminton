@@ -24,11 +24,15 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
 
   private async validateUser(email: string, password: string) {
     try {
-      return await this.rmqService.send(
+      const user = await this.rmqService.send(
         this.authClient,
         'authClient/validateUser',
         { email, password },
       );
+      if (user.isemailverified === false) {
+        throw new UnauthorizedException('Email is not verified');
+      }
+      return user;
     } catch (err) {
       throw new UnauthorizedException(err.message);
     }

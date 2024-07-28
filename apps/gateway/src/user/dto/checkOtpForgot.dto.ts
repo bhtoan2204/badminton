@@ -11,7 +11,7 @@ import {
   ValidationOptions,
 } from 'class-validator';
 
-function IsEmailOrPhone(validationOptions?: ValidationOptions) {
+export function IsEmailOrPhone(validationOptions?: ValidationOptions) {
   return function (object: any, propertyName: string) {
     registerDecorator({
       name: 'isEmailOrPhone',

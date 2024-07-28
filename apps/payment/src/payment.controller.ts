@@ -125,10 +125,12 @@ export class PaymentController {
   @EventPattern('paymentClient/paymentHistory')
   async paymentHistory(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.paymentService.paymentHistory(
-      data.id_user,
-      data.page,
-      data.itemsPerPage,
-    );
+    return this.paymentService.paymentHistory(data.id_user, data.dto);
+  }
+
+  @EventPattern('paymentClient/getFreqQuestion')
+  async getFreqQuestion(@Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.paymentService.getFreqQuestion();
   }
 }

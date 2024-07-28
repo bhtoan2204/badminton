@@ -55,6 +55,7 @@ export * from './database/entity/finance_income_source.entity';
 export * from './database/entity/finance_assets.entity';
 export * from './database/entity/refresh_token.entity';
 export * from './database/entity/discount.entity';
+export * from './database/entity/freq_question.entity';
 
 export * from './database/enum/login_type.enum';
 

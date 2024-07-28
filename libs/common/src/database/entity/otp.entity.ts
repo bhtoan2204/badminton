@@ -8,7 +8,7 @@ import {
 
 export enum OTPType {
   RESET_PASSWORD = 'reset_password',
-  VALIDATE_EMAIL = 'validate_email',
+  VALIDATE_ACCOUNT = 'validate_account',
 }
 
 @Entity('otp')

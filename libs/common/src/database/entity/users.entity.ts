@@ -48,7 +48,7 @@ export class Users {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @Column('boolean', { default: false, select: false })
+  @Column('boolean', { default: false })
   isemailverified: boolean;
 
   @Column('boolean', { default: false })

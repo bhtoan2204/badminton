@@ -50,6 +50,7 @@ import * as Joi from 'joi';
 import { Discount } from './entity/discount.entity';
 import { OTP } from './entity/otp.entity';
 import { FamilyInvitation } from './entity/family_invitation.entity';
+import { FrequentlyQuestionMetaData } from './entity/freq_question.entity';
 
 @Module({
   imports: [
@@ -124,6 +125,7 @@ import { FamilyInvitation } from './entity/family_invitation.entity';
             FinanceAssets,
             RefreshToken,
             Discount,
+            FrequentlyQuestionMetaData,
           ],
           // subscribers: [OrderSubscriber],
         };

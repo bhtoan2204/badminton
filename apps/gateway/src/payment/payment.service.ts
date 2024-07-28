@@ -3,6 +3,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { PAYMENT_SERVICE } from '../utils';
 import { VerifyOrderDTO } from './dto/verifyOrder.dto';
 import { PackageType, RmqService } from '@app/common';
+import { GetPaymentHistoryDto } from './dto/getPaymentHistory.dto';
 
 @Injectable()
 export class PaymentService {
@@ -157,12 +158,27 @@ export class PaymentService {
     }
   }
 
-  async paymentHistory(id_user: string, page: number, itemsPerPage: number) {
+  async paymentHistory(id_user: string, dto: GetPaymentHistoryDto) {
     try {
       return await this.rmqService.send(
         this.paymentClient,
         'paymentClient/paymentHistory',
-        { id_user, page, itemsPerPage },
+        { id_user, dto },
+      );
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
+    }
+  }
+
+  async getFrequencyQuestion() {
+    try {
+      return await this.rmqService.send(
+        this.paymentClient,
+        'paymentClient/getFreqQuestion',
+        {},
       );
     } catch (error) {
       throw new HttpException(

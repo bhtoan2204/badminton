@@ -25,7 +25,7 @@ export class UserController {
   @EventPattern('authClient/change_password')
   async handleChangePassword(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.userService.changePassword(data.currentUser, data.data);
+    return await this.userService.changePassword(data.currentUser, data.dto);
   }
 
   @EventPattern('authClient/forgot_password')
@@ -46,10 +46,10 @@ export class UserController {
     return await this.userService.changeAvatar(data);
   }
 
-  @EventPattern('authClient/validate_email')
-  async handleValidateEmail(@Payload() data: any, @Ctx() context: RmqContext) {
+  @EventPattern('authClient/sendOtpVerifyAccount')
+  async handleSendOtpVerify(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.userService.validateEmail(data);
+    return await this.userService.sendOtpVerify(data);
   }
 
   @EventPattern('authClient/getUserInfoByEmail')
@@ -70,16 +70,10 @@ export class UserController {
     return await this.userService.getUserInfoByPhone(data.phone);
   }
 
-  @EventPattern('mailClient/sendUserConfirmation')
+  @EventPattern('authClient/verifyAccount')
   async sendUserConfirmation(@Payload() dto: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return await this.userService.sendUserConfirmation(dto);
-  }
-
-  @EventPattern('mailClient/sendInvitation')
-  async sendInvite(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return await this.userService.sendInvite(data.id_user, data.id_family);
+    return await this.userService.verifyAccount(dto);
   }
 
   @EventPattern('authClient/check_otp')
