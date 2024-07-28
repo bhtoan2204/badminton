@@ -70,6 +70,7 @@ import { FrequentlyQuestionMetaData } from './entity/freq_question.entity';
         const dbUrl = configService.get('DATABASE_URL');
         const connectionOptions = parse(dbUrl);
         return {
+          name: 'main',
           type: 'postgres',
           host: connectionOptions.host,
           port: parseInt(connectionOptions.port),

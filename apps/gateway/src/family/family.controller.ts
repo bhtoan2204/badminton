@@ -27,7 +27,6 @@ import {
   JwtAuthGuard,
   MemberFamilyGuard,
 } from '../utils';
-import { CreateFamilyDto } from './dto/createFamily.dto';
 import { MemberFamilyDto } from './dto/memberFamily.dto';
 import { DeleteMemberDTO } from './dto/deleteFamily.dto';
 import { UpdateFamilyDTO } from './dto/updateFamily.dto';

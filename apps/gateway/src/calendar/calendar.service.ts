@@ -116,7 +116,7 @@ export class CalendarService {
     try {
       return await this.rmqService.send(
         this.calendarClient,
-        'calendarClient/getCategoryEventByCalendar',
+        'calendarClient/getCalendarDetail',
         { id_user, id_calendar, id_family },
       );
     } catch (error) {
@@ -159,8 +159,8 @@ export class CalendarService {
     try {
       return await this.rmqService.send(
         this.calendarClient,
-        'calendarClient/getCategoryEventByCalendar',
-        { id_user, id_calendar: dto.id_calendar, id_family: dto.id_family },
+        'calendarClient/updateCalendar',
+        { id_user, dto },
       );
     } catch (error) {
       throw new HttpException(

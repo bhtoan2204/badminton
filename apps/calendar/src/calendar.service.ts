@@ -21,6 +21,7 @@ export class CalendarService {
     @InjectRepository(CategoryEvent)
     private readonly categoryEventRepository: Repository<CategoryEvent>,
   ) {}
+
   async getAllCategoryEvent(id_user: string, id_family: number) {
     try {
       const [data, total] = await this.categoryEventRepository.findAndCount({
