@@ -1,13 +1,11 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
-import { RpcException } from "@nestjs/microservices";
-import { EntityManager } from "typeorm";
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
+import { EntityManager } from 'typeorm';
 import * as uuid from 'uuid';
 
 @Injectable()
 export class InvitationService {
-  constructor(
-    private readonly entityManager: EntityManager,
-  ) { }
+  constructor(private readonly entityManager: EntityManager) {}
 
   async getInvitationCode(id_user: string, id_family: number) {
     try {
@@ -16,10 +14,9 @@ export class InvitationService {
       const data = await this.entityManager.query(query, params);
       return {
         message: 'Success',
-        data: data[0]
-      }
-    }
-    catch (error) {
+        data: data[0],
+      };
+    } catch (error) {
       throw new RpcException({
         message: error.message || 'Internal server error',
         statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
@@ -37,11 +34,10 @@ export class InvitationService {
         message: 'Success',
         data: {
           id_family: id_family,
-          code: code
-        }
-      }
-    }
-    catch (error) {
+          code: code,
+        },
+      };
+    } catch (error) {
       throw new RpcException({
         message: error.message || 'Internal server error',
         statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
@@ -58,11 +54,10 @@ export class InvitationService {
         message: data[0].f_handle_invitation || 'Error',
         data: {
           id_family: id_family,
-          code: code
-        }
-      }
-    }
-    catch (error) {
+          code: code,
+        },
+      };
+    } catch (error) {
       throw new RpcException({
         message: error.message || 'Internal server error',
         statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,

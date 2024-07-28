@@ -8,6 +8,7 @@ import {
   MemberFamily,
   PackageExtra,
   RmqModule,
+  Users,
 } from '@app/common';
 import { FamilyService } from './family.service';
 import { ConfigModule } from '@nestjs/config';
@@ -39,6 +40,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       FamilyExtraPackages,
       MemberFamily,
       FamilyRoles,
+      Users,
     ]),
   ],
   controllers: [FamilyController],

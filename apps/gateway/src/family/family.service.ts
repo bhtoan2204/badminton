@@ -113,42 +113,12 @@ export class FamilyService {
     }
   }
 
-  async createFamily(id_user, createFamilyDto: CreateFamilyDto) {
-    try {
-      return await this.rmqService.send(
-        this.familyClient,
-        'familyClient/createFamily',
-        { id_user, createFamilyDto },
-      );
-    } catch (error) {
-      throw new HttpException(
-        error.message,
-        error.statusCode || error.status || 500,
-      );
-    }
-  }
-
   async updateFamily(id_user: string, updateFamilyDTO: UpdateFamilyDTO) {
     try {
       return await this.rmqService.send(
         this.familyClient,
         'familyClient/updateFamily',
         { id_user, updateFamilyDTO },
-      );
-    } catch (error) {
-      throw new HttpException(
-        error.message,
-        error.statusCode || error.status || 500,
-      );
-    }
-  }
-
-  async deleteFamily(id_user: string, id_family) {
-    try {
-      return await this.rmqService.send(
-        this.familyClient,
-        'familyClient/deleteFamily',
-        { id_user, id_family },
       );
     } catch (error) {
       throw new HttpException(

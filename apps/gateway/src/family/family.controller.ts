@@ -59,19 +59,6 @@ export class FamilyController {
     return this.familyService.getFamily(currentUser.id_user, id_family);
   }
 
-  @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a family' })
-  @Post('createFamily')
-  async createFamily(
-    @CurrentUser() currentUser,
-    @Body() createFamilyDto: CreateFamilyDto,
-  ) {
-    return this.familyService.createFamily(
-      currentUser.id_user,
-      createFamilyDto,
-    );
-  }
-
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update a family' })
   @Put('updateFamily')
@@ -83,16 +70,6 @@ export class FamilyController {
       currentUser.id_user,
       updateFamilyDTO,
     );
-  }
-
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete a family' })
-  @Delete('deleteFamily')
-  async deleteFamily(
-    @Query('id_family') id_family: number,
-    @CurrentUser() currentUser,
-  ) {
-    return this.familyService.deleteFamily(currentUser.id_user, id_family);
   }
 
   @HttpCode(HttpStatus.OK)

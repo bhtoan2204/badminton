@@ -10,6 +10,7 @@ import {
   MemberFamily,
   PackageExtra,
   UploadFileRequest,
+  Users,
 } from '@app/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -27,6 +28,8 @@ export class FamilyService {
     private memberFamilyRepository: Repository<MemberFamily>,
     @InjectRepository(FamilyRoles)
     private familyRolesRepository: Repository<FamilyRoles>,
+    @InjectRepository(Users)
+    private usersRepository: Repository<Users>,
   ) {}
 
   async checkExtraPackage(
@@ -69,10 +72,10 @@ export class FamilyService {
 
   async checkIsMember(id_user: string, id_family: number): Promise<boolean> {
     try {
-      const q2 = 'select * from f_is_user_member_of_family($1, $2)';
-      const param = [id_user, id_family];
-      const data = await this.entityManager.query(q2, param);
-      return data[0].f_is_user_member_of_family;
+      const memberFamily = await this.memberFamilyRepository.findOne({
+        where: { id_user, id_family },
+      });
+      return !!memberFamily;
     } catch (error) {
       throw new RpcException({
         message: error.message || 'Internal server error',
@@ -83,10 +86,11 @@ export class FamilyService {
 
   async getFamily(id_user: string, id_family: any) {
     try {
-      const q2 = 'select * from f_getfamily($1, $2)';
-      const param = [id_user, id_family];
-      const data = await this.entityManager.query(q2, param);
-      return data;
+      const family = await this.familyRepository.findOne({
+        where: { id_family },
+        relations: ['users'],
+      });
+      return family;
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -163,14 +167,38 @@ export class FamilyService {
     }
   }
 
-  async addMember(id_user: string, memberFamilyDto: any) {
+  async addMember(
+    id_user: string,
+    dto: { id_family: number; phone: string; gmail: string; role: number },
+  ) {
     try {
-      const { id_family, phone, gmail, role } = memberFamilyDto;
-      const q2 = 'select * from f_add_member($1,$2,$3,$4,$5)';
-      const param = [id_user, id_family, phone, gmail, role];
-      const data = await this.entityManager.query(q2, param);
+      const { id_family, phone, gmail, role } = dto;
+      const user = await this.usersRepository.findOne({
+        where: { phone, email: gmail },
+      });
+      if (!user) {
+        throw new RpcException({
+          message: 'User not found or they are not verified phone and email',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      const memberFamily = await this.memberFamilyRepository.findOne({
+        where: { id_user: user.id_user, id_family },
+      });
+      if (memberFamily) {
+        throw new RpcException({
+          message: 'Member already in family',
+          statusCode: HttpStatus.CONFLICT,
+        });
+      }
+      const newMember = this.memberFamilyRepository.create({
+        id_user: user.id_user,
+        id_family,
+        id_family_role: role,
+      });
+      await this.memberFamilyRepository.save(newMember);
       return {
-        data: data[0]['f_add_member'],
+        data: newMember,
         message: 'Member added',
       };
     } catch (error) {
@@ -181,15 +209,27 @@ export class FamilyService {
     }
   }
 
-  async createFamily(id_user: string, createFamilyDto) {
+  async updateFamily(
+    id_user: string,
+    dto: { id_family: number; name: string; description: string },
+  ) {
     try {
-      const { description, name, id_order } = createFamilyDto;
-      const Query = 'SELECT * FROM f_create_family($1, $2, $3, $4)';
-      const params = [id_user, description, name, id_order];
-      const data = await this.entityManager.query(Query, params);
+      const { id_family, name, description } = dto;
+      const family = await this.familyRepository.findOne({
+        where: { id_family },
+      });
+      if (!family) {
+        throw new RpcException({
+          message: 'Family not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      if (name) family.name = name;
+      if (description) family.description = description;
+      await this.familyRepository.save(family);
       return {
-        data: data[0]['f_create_family'],
-        message: 'Family created',
+        message: 'Family updated',
+        data: family,
       };
     } catch (error) {
       throw new RpcException({
@@ -199,48 +239,22 @@ export class FamilyService {
     }
   }
 
-  async updateFamily(id_user: string, UpdateFamilyDTO) {
-    try {
-      const { id_family, description, name } = UpdateFamilyDTO;
-      const Query = 'select * from f_update_family($1,$2,$3,$4)';
-      const param = [id_user, id_family, name, description];
-      const data = await this.entityManager.query(Query, param);
-      return data;
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  }
-
-  async deleteFamily(id_user: string, id_family: any) {
-    try {
-      const Query = 'select * from f_delete_family($1, $2)';
-      const param = [id_user, id_family];
-      const data = await this.entityManager.query(Query, param);
-      return {
-        data: data[0]['f_delete_family'],
-        message: 'Family deleted',
-      };
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  }
-
-  async deleteMember(id_user: string, member: any) {
+  async deleteMember(none: string, member: any) {
     try {
       const { id_family, id_user } = member;
-
-      const Query = 'select * from f_delete_member($1, $2, $3)';
-      const param = [id_user, id_user, id_family];
-      const data = await this.entityManager.query(Query, param);
+      const memberFamily = await this.memberFamilyRepository.findOne({
+        where: { id_family, id_user },
+      });
+      if (!memberFamily) {
+        throw new RpcException({
+          message: 'Member not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      await this.memberFamilyRepository.remove(memberFamily);
       return {
-        data: data[0]['f_delete_member'],
         message: 'Member deleted',
+        data: true,
       };
     } catch (error) {
       throw new RpcException({
@@ -252,10 +266,11 @@ export class FamilyService {
 
   async getIdsMember(id_user: string, id_family: number) {
     try {
-      const Query = 'select * from f_get_ids_member($1, $2)';
-      const param = [id_user, id_family];
-      const data = await this.entityManager.query(Query, param);
-      const ids = data.map((row) => row.f_get_ids_member);
+      const data = await this.memberFamilyRepository.find({
+        where: { id_family },
+        select: ['id_user'],
+      });
+      const ids = data.map((row) => row.id_user);
       return ids;
     } catch (error) {
       throw new RpcException({
