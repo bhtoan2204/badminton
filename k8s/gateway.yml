@@ -110,7 +110,7 @@ data:
         overwrite_keys: true
 
     output.elasticsearch:
-      hosts: ["https://elasticsearch.rancher.io.vn:443"]
+      hosts: ["10.0.0.5:9200"]
       index: "famfund-app-production"
       username: "elastic"
       password: "Toan123456789"
