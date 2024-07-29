@@ -28,7 +28,6 @@ import {
   MemberFamilyGuard,
 } from '../utils';
 import { MemberFamilyDto } from './dto/memberFamily.dto';
-import { DeleteMemberDTO } from './dto/deleteFamily.dto';
 import { UpdateFamilyDTO } from './dto/updateFamily.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFileInterceptor } from '../utils/interceptor/imageFile.interceptor';
@@ -99,16 +98,6 @@ export class FamilyController {
   @Post('addMember')
   async addMember(@CurrentUser() currentUser, @Body() data: MemberFamilyDto) {
     return this.familyService.addMember(currentUser.id_user, data);
-  }
-
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete member' })
-  @Delete('deleteMember')
-  async deleteMember(
-    @CurrentUser() currentUser,
-    @Body() member: DeleteMemberDTO,
-  ) {
-    return this.familyService.deleteMember(currentUser.id_user, member);
   }
 
   @HttpCode(HttpStatus.OK)

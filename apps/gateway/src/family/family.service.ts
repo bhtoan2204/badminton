@@ -2,7 +2,6 @@ import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { FAMILY_SERVICE } from '../utils';
 import { MemberFamilyDto } from './dto/memberFamily.dto';
-import { DeleteMemberDTO } from './dto/deleteFamily.dto';
 import { UpdateFamilyDTO } from './dto/updateFamily.dto';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
@@ -84,24 +83,6 @@ export class FamilyService {
         { id_user, memberFamilyDto },
       );
       const cacheKey = `familyCheck:${memberFamilyDto.id_family}:${id_user}`;
-      await this.redisService.del(cacheKey);
-      return data;
-    } catch (error) {
-      throw new HttpException(
-        error.message,
-        error.statusCode || error.status || 500,
-      );
-    }
-  }
-
-  async deleteMember(id_user: string, deleteMemberDTO: DeleteMemberDTO) {
-    try {
-      const data = await this.rmqService.send(
-        this.familyClient,
-        'familyClient/deleteMember',
-        { id_user, deleteMemberDTO },
-      );
-      const cacheKey = `familyCheck:${deleteMemberDTO.id_family}:${id_user}`;
       await this.redisService.del(cacheKey);
       return data;
     } catch (error) {

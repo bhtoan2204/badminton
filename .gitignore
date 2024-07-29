@@ -39,3 +39,5 @@ package-lock.json
 **/venv
 
 **/node_modules
+
+deploy.sh

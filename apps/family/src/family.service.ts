@@ -5,7 +5,6 @@ import { StorageService } from './storage/storage.service';
 import {
   Family,
   FamilyExtraPackages,
-  FamilyRole,
   FamilyRoles,
   MemberFamily,
   PackageExtra,
@@ -340,15 +339,15 @@ export class FamilyService {
 
   async kickMember(id_user: string, id_user_kick: string, id_family: number) {
     try {
-      const [roleOfKicker, memberFamily] = await Promise.all([
-        this.memberFamilyRepository.findOne({
-          where: { id_user, id_family },
+      const [family, memberFamily] = await Promise.all([
+        this.familyRepository.findOne({
+          where: { id_family },
         }),
         this.memberFamilyRepository.findOne({
           where: { id_user: id_user_kick, id_family },
         }),
       ]);
-      if (!roleOfKicker || roleOfKicker.role !== FamilyRole.OWNER) {
+      if (family.owner_id !== id_user) {
         throw new RpcException({
           message: 'Only owner can kick member',
           statusCode: HttpStatus.FORBIDDEN,
