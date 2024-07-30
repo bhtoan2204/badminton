@@ -72,7 +72,7 @@ export class CalendarController {
     return this.calendarService.updateCategoryEvent(currentUser.id_user, dto);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(204)
   @ApiOperation({ summary: 'Delete category event of family' })
   @ApiParam({ name: 'id_family', required: true })
   @Delete('deleteCategoryEvent/:id_family')

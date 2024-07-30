@@ -44,23 +44,28 @@ export class CalendarService {
   async createCategoryEvent(id_user: string, dto: any) {
     try {
       const { title, color, id_family } = dto;
-      const newCategoryEvent = this.categoryEventRepository.create({
-        title,
-        color,
-        id_family,
-      });
-      const data = await this.categoryEventRepository.save(newCategoryEvent);
+
+      const newCategoryEvent = new CategoryEvent();
+      newCategoryEvent.title = title;
+      newCategoryEvent.color = color;
+      newCategoryEvent.id_family = id_family;
+
+      const savedCategoryEvent =
+        await this.categoryEventRepository.save(newCategoryEvent);
+
       return {
         message: 'Success',
-        data: data,
+        data: savedCategoryEvent,
       };
     } catch (error) {
+      console.error('Error:', error);
       throw new RpcException({
         message: error.message,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
+
   async updateCategoryEvent(id_user: string, dto: any) {
     try {
       const { id_category_event, title, color, id_family } = dto;

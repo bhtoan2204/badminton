@@ -120,4 +120,13 @@ export class ExpenseditureController {
       data.id_expenditure,
     );
   }
+
+  @EventPattern('financeClient/addDefaultExpenseType')
+  async addDefaultExpenseType(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    return this.expenseService.addDefaultExpenseType(data.id_family);
+  }
 }

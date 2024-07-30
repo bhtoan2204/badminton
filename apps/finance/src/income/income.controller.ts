@@ -103,4 +103,13 @@ export class IncomeController {
       data.id_income,
     );
   }
+
+  @EventPattern('financeClient/addDefaultIncomeSource')
+  async addDefaultIncomeSource(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    return this.incomeService.addDefaultIncomeSource(data.id_family);
+  }
 }

@@ -21,6 +21,7 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DiscountModule } from './discount/discount.module';
+import { FinanceModule } from './finance/finance.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { DiscountModule } from './discount/discount.module';
       Discount,
       FrequentlyQuestionMetaData,
     ]),
+    FinanceModule,
   ],
   controllers: [PaymentController],
   providers: [PaymentService],

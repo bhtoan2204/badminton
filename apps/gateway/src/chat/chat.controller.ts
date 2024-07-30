@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -270,7 +271,7 @@ export class ChatController {
   @ApiOperation({ summary: 'Get Linked User' })
   @ApiQuery({ name: 'search', required: false, description: 'Search string' })
   @Get('getLinkedUser')
-  async getLinkedUser(@CurrentUser() user, @Param('search') search: string) {
+  async getLinkedUser(@CurrentUser() user, @Query('search') search: string) {
     return this.chatService.getLinkedUser(user.id_user, search);
   }
 

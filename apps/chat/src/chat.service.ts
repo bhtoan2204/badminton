@@ -761,7 +761,8 @@ export class ChatService {
           new Brackets((qb) => {
             qb.where('user.firstname LIKE :search', { search: `%${search}%` })
               .orWhere('user.lastname LIKE :search', { search: `%${search}%` })
-              .orWhere('user.avatar LIKE :search', { search: `%${search}%` });
+              .orWhere('user.email LIKE :search', { search: `%${search}%` })
+              .orWhere('user.phone LIKE :search', { search: `%${search}%` });
           }),
         );
       }

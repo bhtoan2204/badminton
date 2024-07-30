@@ -553,4 +553,52 @@ export class ExpenseditureService {
       });
     }
   }
+
+  async addDefaultExpenseType(id_family: number) {
+    try {
+      const defaultExpenseTypes = [
+        {
+          expense_type_name: 'Food & Groceries',
+          expense_type_name_vn: 'Thực phẩm và mặt hàng phẩm',
+        },
+        { expense_type_name: 'Rent', expense_type_name_vn: 'Tiền thuê' },
+        {
+          expense_type_name: 'Utilities',
+          expense_type_name_vn: 'Chi phí tiện ích',
+        },
+        {
+          expense_type_name: 'Transportation',
+          expense_type_name_vn: 'Chi phí đi lại',
+        },
+        { expense_type_name: 'Healthcare', expense_type_name_vn: 'Y tế' },
+        { expense_type_name: 'Education', expense_type_name_vn: 'Giáo dục' },
+        {
+          expense_type_name: 'Entertainment',
+          expense_type_name_vn: 'Giải trí',
+        },
+        { expense_type_name: 'Insurance', expense_type_name_vn: 'Bảo hiểm' },
+        { expense_type_name: 'Debt Payments', expense_type_name_vn: 'Nợ' },
+        { expense_type_name: 'Savings', expense_type_name_vn: 'Tiết kiệm' },
+      ];
+      const expenseTypesToInsert = defaultExpenseTypes.map((expenseType) => ({
+        id_family,
+        ...expenseType,
+      }));
+      await this.financeExpenditureTypeRepository
+        .createQueryBuilder()
+        .insert()
+        .into(FinanceExpenditureType)
+        .values(expenseTypesToInsert)
+        .execute();
+
+      return {
+        message: 'Default expense types added successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
 }

@@ -1,5 +1,5 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
-import { EntityManager, In, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { RpcException } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { sortObject } from './utils';
@@ -25,6 +25,7 @@ import {
   PackageType,
   PaymentHistory,
 } from '@app/common';
+import { FinanceService } from './finance/finance.service';
 
 @Injectable()
 export class PaymentService {
@@ -34,7 +35,7 @@ export class PaymentService {
   private readonly vnpReturnUrl: string;
 
   constructor(
-    private readonly entityManager: EntityManager,
+    private readonly financeService: FinanceService,
     private readonly configService: ConfigService,
     @InjectRepository(PackageMain)
     private packageMainRepository: Repository<PackageMain>,
@@ -124,6 +125,21 @@ export class PaymentService {
     }
   }
 
+  async addDefaultExpenseIncomeType(id_family: number) {
+    try {
+      const [expenseType, incomeType] = await Promise.all([
+        this.financeService.addDefaultExpenseType(id_family),
+        this.financeService.addDefaultIncomeSource(id_family),
+      ]);
+      return { expenseType, incomeType };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
   async checkOrder(id_user: string, dto: any) {
     const { id_order, bankCode, id_family } = dto;
 
@@ -152,6 +168,8 @@ export class PaymentService {
         message: 'Check order success',
       };
     } catch (error) {
+      console.error('Error details:', error);
+      console.error('Error stack:', error.stack);
       throw new RpcException({
         message: error.message,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -216,6 +234,7 @@ export class PaymentService {
       memberFamily.id_family = newFamily.id_family;
       await this.memberFamilyRepository.save(memberFamily);
       order.id_family = family.id_family;
+      await this.addDefaultExpenseIncomeType(family.id_family);
     }
   }
 
@@ -457,17 +476,40 @@ export class PaymentService {
               statusCode: HttpStatus.NOT_FOUND,
             });
           }
+          const familyExtra = await this.familyExtraRepository.findOne({
+            where: { id_family, id_extra_package },
+          });
+          if (familyExtra) {
+            throw new RpcException({
+              message: 'Family already bought this extra package',
+              statusCode: HttpStatus.BAD_REQUEST,
+            });
+          }
           id_package = extraPackage.id_extra_package;
           price = extraPackage.price;
           break;
         case PackageType.COMBO:
           const comboPackage = await this.packageComboRepository.findOne({
             where: { id_combo_package },
+            relations: ['packageExtras'],
           });
           if (!comboPackage) {
             throw new RpcException({
               message: 'Combo package not found',
               statusCode: HttpStatus.NOT_FOUND,
+            });
+          }
+          const familyExtras = comboPackage.packageExtras.map(
+            (item) => item.id_extra_package,
+          );
+          const existingFamilyExtras = await this.familyExtraRepository.find({
+            where: { id_family, id_extra_package: In(familyExtras) },
+          });
+          if (existingFamilyExtras.length > 0) {
+            throw new RpcException({
+              message:
+                'Family already bought one or more of these extra packages',
+              statusCode: HttpStatus.BAD_REQUEST,
             });
           }
           id_package = comboPackage.id_combo_package;

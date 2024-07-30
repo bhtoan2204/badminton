@@ -47,7 +47,7 @@ export class CalendarService {
           content_vn: 'Loại sự kiện mới đã được tạo',
           type: NotificationType.CALENDAR,
           id_family: dto.id_family,
-          id_target: data[0].id_category_event,
+          id_target: data.id_category_event,
         },
       });
       return data;
@@ -80,7 +80,7 @@ export class CalendarService {
     id_category_event: number,
   ) {
     try {
-      return await this.rmqService.send(
+      await this.rmqService.send(
         this.calendarClient,
         'calendarClient/deleteCategoryEvent',
         { id_user, id_family, id_category_event },

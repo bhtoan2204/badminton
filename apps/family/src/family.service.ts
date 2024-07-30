@@ -315,15 +315,18 @@ export class FamilyService {
 
   async leaveFamily(id_user: string, id_family: number) {
     try {
+      const family = await this.familyRepository.findOne({
+        where: { id_family },
+      });
+      if (family.owner_id === id_user) {
+        throw new RpcException({
+          message: 'Owner cannot leave family',
+          statusCode: HttpStatus.FORBIDDEN,
+        });
+      }
       const memberFamily = await this.memberFamilyRepository.findOne({
         where: { id_user, id_family },
       });
-      if (!memberFamily) {
-        throw new RpcException({
-          message: 'Member not found',
-          statusCode: HttpStatus.NOT_FOUND,
-        });
-      }
       await this.memberFamilyRepository.remove(memberFamily);
       return {
         message: 'Member left family',

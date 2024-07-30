@@ -490,4 +490,49 @@ export class IncomeService {
       });
     }
   }
+
+  async addDefaultIncomeSource(id_family: number) {
+    try {
+      const defaultIncomeSources = [
+        { income_source_name: 'Salary', income_source_name_vn: 'Lương' },
+        { income_source_name: 'Services', income_source_name_vn: 'Dịch vụ' },
+        { income_source_name: 'Investments', income_source_name_vn: 'Đầu tư' },
+        { income_source_name: 'Rent', income_source_name_vn: 'Thuê' },
+        { income_source_name: 'Dividends', income_source_name_vn: 'Cổ tức' },
+        {
+          income_source_name: 'Consulting fees',
+          income_source_name_vn: 'Phí tư vấn',
+        },
+        {
+          income_source_name: 'Royalties',
+          income_source_name_vn: 'Tiền bản quyền',
+        },
+        { income_source_name: 'Grants', income_source_name_vn: 'Tài trợ' },
+        { income_source_name: 'Bonuses', income_source_name_vn: 'Thưởng' },
+        { income_source_name: 'Interest', income_source_name_vn: 'Lãi suất' },
+      ];
+      const incomeSourcesToInsert = defaultIncomeSources.map(
+        (incomeSource) => ({
+          id_family,
+          ...incomeSource,
+        }),
+      );
+
+      await this.financeIncomeSourceRepository
+        .createQueryBuilder()
+        .insert()
+        .into(FinanceIncomeSource)
+        .values(incomeSourcesToInsert)
+        .execute();
+
+      return {
+        message: 'Default income sources added successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
 }
