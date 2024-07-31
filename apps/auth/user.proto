@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package user;
+
+service UserService {
+  rpc findById (GetUserRequest) returns (GetUserResponse);
+  rpc findByIds(GetUsersRequest) returns (GetUsersResponse);
+}
+
+message GetUserRequest {
+  string id_user = 1;
+}
+
+message GetUserResponse {
+  string id_user = 1;
+  string email = 2;
+  string phone = 3;
+  string firstname = 4;
+  string lastname = 5;
+  string genre = 6;
+  string birthdate = 7;
+  string avatar = 8;
+  string created_at = 9;
+  string updated_at = 10;
+}
+
+message GetUsersRequest {
+  repeated string id_users = 1;
+}
+
+message GetUsersResponse {
+  repeated GetUserResponse users = 1;
+}

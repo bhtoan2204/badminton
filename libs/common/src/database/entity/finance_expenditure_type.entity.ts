@@ -1,12 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Family } from './family.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { FinanceExpenditure } from './finance_expenditure.entity';
 
 @Entity('finance_expenditure_type')
@@ -22,10 +14,6 @@ export class FinanceExpenditureType {
 
   @Column({ type: 'int' })
   id_family: number;
-
-  @ManyToOne(() => Family, (family) => family.financeExpenditureTypes)
-  @JoinColumn({ name: 'id_family' })
-  family: Family;
 
   @OneToMany(
     () => FinanceExpenditure,

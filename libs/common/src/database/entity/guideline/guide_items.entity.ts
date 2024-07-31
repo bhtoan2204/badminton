@@ -2,12 +2,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Family } from './family.entity';
 
 @Entity('guide_items')
 export class GuideItems {
@@ -34,8 +31,4 @@ export class GuideItems {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @ManyToOne(() => Family, (family) => family.guideItems)
-  @JoinColumn({ name: 'id_family' })
-  family: Family;
 }

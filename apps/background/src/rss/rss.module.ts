@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   Article,
   ArticleCategory,
-  DatabaseModule,
+  ArticleDatabaseModule,
   Enclosure,
 } from '@app/common';
 import { BackgroundModule } from '../background.module';
@@ -13,7 +13,7 @@ import { BackgroundModule } from '../background.module';
 @Module({
   imports: [
     forwardRef(() => BackgroundModule),
-    DatabaseModule,
+    ArticleDatabaseModule,
     TypeOrmModule.forFeature([Article, ArticleCategory, Enclosure]),
   ],
   controllers: [RssController],

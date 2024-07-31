@@ -39,6 +39,6 @@ spec:
     app: family
   ports:
     - protocol: TCP
-      port: 8085
-      targetPort: 8085
+      port: 50001
+      targetPort: 50001
   type: ClusterIP

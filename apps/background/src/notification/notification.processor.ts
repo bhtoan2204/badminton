@@ -2,9 +2,13 @@ import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { NotificationService } from './notification.service';
 import { Job, Queue } from 'bull';
 import { InjectModel } from '@nestjs/mongoose';
-import { NotificationData, NotificationType, Users } from '@app/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {
+  GetUserRequest,
+  GetUserResponse,
+  NotificationData,
+  NotificationType,
+} from '@app/common';
+import { UserService } from '../user/user.service';
 
 export interface NotificationDataInterface {
   title: string;
@@ -21,8 +25,8 @@ export class NotificationProcessor {
   constructor(
     private readonly notificationService: NotificationService,
     @InjectModel(NotificationData.name) private readonly notificationRepository,
-    @InjectRepository(Users) private userRepository: Repository<Users>,
     @InjectQueue('chats') private readonly chatsQueue: Queue,
+    private readonly userService: UserService,
   ) {}
 
   @Process('createNotificationFamily')
@@ -49,7 +53,10 @@ export class NotificationProcessor {
           id_user,
           content,
         );
-      const user = await this.userRepository.findOne({ where: { id_user } });
+      const requestUser: GetUserRequest = {
+        idUser: id_user,
+      };
+      const user: GetUserResponse = await this.userService.findOne(requestUser);
       const userInfo = user
         ? {
             name: `${user.firstname} ${user.lastname}`,

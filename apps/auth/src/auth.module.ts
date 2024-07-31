@@ -14,6 +14,7 @@ import { AuthService } from './auth.service';
 import * as Joi from 'joi';
 import { UserModule } from './user/user.module';
 import { RefreshTokenModule } from './refreshToken/refreshToken.module';
+import { UserGrpcModule } from './grpc/user-grpc.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { RefreshTokenModule } from './refreshToken/refreshToken.module';
     TypeOrmModule.forFeature([Users, RefreshToken]),
     GlobalJwtModule,
     UserModule,
+    UserGrpcModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, FirebaseService],

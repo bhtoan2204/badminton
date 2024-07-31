@@ -14,17 +14,12 @@ import { Checklist } from './checklist.entity';
 import { FamilyExtraPackages } from './family_package_extra.entity';
 import { Room } from './room.entity';
 import { HouseholdItems } from './household_items.entity';
-import { GuideItems } from './guide_items.entity';
 import { EducationProgress } from './education_progress.entity';
 import { ShoppingLists } from './shopping_lists.entity';
 import { MemberFamily } from './member_family.entity';
 import { Order } from './order.entity';
 import { Calendar } from './calendar.entity';
 import { Utilities } from './utilities.entity';
-import { FinanceExpenditureType } from './finance_expenditure_type.entity';
-import { FinanceExpenditure } from './finance_expenditure.entity';
-import { FinanceIncomeSource } from './finance_income_source.entity';
-import { FinanceIncome } from './finance_income.entity';
 import { FinanceAssets } from './finance_assets.entity';
 import { FamilyInvitation } from './family_invitation.entity';
 
@@ -85,9 +80,6 @@ export class Family {
   @OneToMany(() => HouseholdItems, (household_item) => household_item.family)
   householdItems: HouseholdItems[];
 
-  @OneToMany(() => GuideItems, (guide_item) => guide_item.family)
-  guideItems: GuideItems[];
-
   @OneToMany(
     () => EducationProgress,
     (education_progress) => education_progress.family,
@@ -108,27 +100,6 @@ export class Family {
 
   @OneToMany(() => Utilities, (utilities) => utilities.family)
   utilities: Utilities[];
-
-  @OneToMany(
-    () => FinanceExpenditureType,
-    (financeExpenditureType) => financeExpenditureType.family,
-  )
-  financeExpenditureTypes: FinanceExpenditureType[];
-
-  @OneToMany(
-    () => FinanceExpenditure,
-    (financeExpenditure) => financeExpenditure.family,
-  )
-  financeExpenditures: FinanceExpenditure[];
-
-  @OneToMany(
-    () => FinanceIncomeSource,
-    (financeIncomeSource) => financeIncomeSource.family,
-  )
-  financeIncomeSources: FinanceIncomeSource[];
-
-  @OneToMany(() => FinanceIncome, (financeIncome) => financeIncome.family)
-  financeIncomes: FinanceIncome[];
 
   @OneToMany(() => FinanceAssets, (financeAssets) => financeAssets.family)
   financeAssets: FinanceAssets[];

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { GuidelineController } from './guideline.controller';
 import { GuidelineService } from './guideline.service';
-import { DatabaseModule, GuideItems, RmqModule } from '@app/common';
+import { GuideItems, GuidelineDatabaseModule, RmqModule } from '@app/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { StorageModule } from './storage/storage.module';
@@ -26,7 +26,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     }),
     RmqModule,
     RmqModule.register({ name: 'ELASTICSEARCH' }),
-    DatabaseModule,
+    GuidelineDatabaseModule,
     StorageModule,
     TypeOrmModule.forFeature([GuideItems]),
     ElasticsearchModule.registerAsync({

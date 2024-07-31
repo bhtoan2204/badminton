@@ -5,6 +5,8 @@ export * from './grpc/grpc.module';
 export * from './grpc/grpc.service';
 
 export * from './database/database.module';
+export * from './database/guideline_database.module';
+export * from './database/article_database.module';
 
 export * from './sentry/sentry.module';
 export * from './sentry/sentry-exception.filter';
@@ -28,7 +30,7 @@ export * from './database/entity/room.entity';
 export * from './database/entity/household_item_categories.entity';
 export * from './database/entity/household_durable_items.entity';
 export * from './database/entity/household_consumable_items.entity';
-export * from './database/entity/guide_items.entity';
+export * from './database/entity/guideline/guide_items.entity';
 export * from './database/entity/education_progress.entity';
 export * from './database/entity/subject.entity';
 export * from './database/entity/shopping_item_types.entity';
@@ -39,9 +41,9 @@ export * from './database/entity/member_family.entity';
 export * from './database/entity/feedback.entity';
 export * from './database/entity/feedbackMetadata.entity';
 export * from './database/entity/order.entity';
-export * from './database/entity/article_category.entity';
-export * from './database/entity/article.entity';
-export * from './database/entity/enclosure.entity';
+export * from './database/entity/article/article_category.entity';
+export * from './database/entity/article/article.entity';
+export * from './database/entity/article/enclosure.entity';
 export * from './database/entity/payment_history.entity';
 export * from './database/entity/family_roles.entity';
 export * from './database/entity/calendar.entity';
@@ -60,6 +62,8 @@ export * from './database/entity/freq_question.entity';
 export * from './database/enum/login_type.enum';
 
 export * from './types/storage';
+export * from './types/family';
+export * from './types/user';
 
 export * from './jwt/jwt.module';
 

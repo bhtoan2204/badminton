@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package family;
+
+service FamilyService {
+  rpc findById (GetFamilyRequest) returns (GetFamilyResponse);
+  rpc findByIds(GetFamiliesRequest) returns (GetFamiliesResponse);
+  rpc findIdsUserInFamily(GerUserIdsRequest) returns (GerUserIdsResponse);
+}
+
+message GerUserIdsRequest {
+  int32 id_family = 1;
+}
+
+message GerUserIdsResponse {
+  repeated string id_user = 1;
+}
+
+message GetFamilyRequest {
+  int32 id_family = 1;
+}
+
+message GetFamilyResponse {
+  int32 id_family = 1;
+  int32 quantity = 2;
+  string name = 3;
+  string description = 4;
+  string owner_id = 5;
+  string created_at = 6;
+  string updated_at = 7;
+  string expired_at = 8;
+  string avatar = 9;
+}
+
+message GetFamiliesRequest {
+  repeated int32 id_families = 1;
+}
+
+message GetFamiliesResponse {
+  repeated GetFamilyResponse families = 1;
+}

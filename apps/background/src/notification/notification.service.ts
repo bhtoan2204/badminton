@@ -1,13 +1,22 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Family, MemberFamily, NotificationData, Users } from '@app/common';
+import {
+  GerUserIdsRequest,
+  GetFamiliesRequest,
+  GetFamilyRequest,
+  GetFamilyResponse,
+  GetUserResponse,
+  GetUsersRequest,
+  NotificationData,
+  NotificationDetail,
+} from '@app/common';
 import { Types } from 'mongoose';
 import { RpcException } from '@nestjs/microservices';
 import { NotificationDataInterface } from './notification.processor';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { FamilyService } from '../family/family.service';
+import { UserService } from '../user/user.service';
 
 const limit = 20;
 
@@ -15,11 +24,9 @@ const limit = 20;
 export class NotificationService {
   constructor(
     @InjectModel(NotificationData.name) private readonly notificationRepository,
-    @InjectRepository(MemberFamily)
-    private memberFamilyRepository: Repository<MemberFamily>,
-    @InjectRepository(Family) private familyRepository: Repository<Family>,
-    @InjectRepository(Users) private userRepository: Repository<Users>,
     @InjectQueue('chats') private readonly chatsQueue: Queue,
+    private readonly familyService: FamilyService,
+    private readonly userService: UserService,
   ) {}
 
   async getNotification(id_user: string, index: number) {
@@ -37,34 +44,42 @@ export class NotificationService {
           },
         },
       ];
-
       const notification = await this.notificationRepository
         .aggregate(notificationPipeline)
         .exec();
+      const notificationArr: (NotificationDetail & {
+        familyInfo?: { name: string; avatar: string };
+        userInfo?: { name: string; avatar: string };
+      })[] = notification[0]?.notificationArr || [];
 
-      const notificationArr = notification[0]?.notificationArr || [];
-
+      console.log(notificationArr);
       const familyIds = new Set<number>();
       const userIds = new Set<string>();
-
       notificationArr.forEach((notification) => {
         if (notification.id_family) {
-          familyIds.add(parseInt(notification.id_family));
+          familyIds.add(notification.id_family);
         } else {
           userIds.add(notification.id_target.toString());
         }
       });
 
-      const families = await this.familyRepository.findByIds(
-        Array.from(familyIds),
+      const getFamiliesRequest: GetFamiliesRequest = {
+        idFamilies: Array.from(familyIds),
+      };
+      const families = await this.familyService.findByIds(getFamiliesRequest);
+
+      const userRequest: GetUsersRequest = { idUsers: Array.from(userIds) };
+      const users = await this.userService.findByIds(userRequest);
+
+      const familyMap = new Map<number, GetFamilyResponse>();
+      families.families.forEach((family) =>
+        familyMap.set(family.idFamily, family),
       );
-      const users = await this.userRepository.findByIds(Array.from(userIds));
-
-      const familyMap = new Map<number, Family>();
-      families.forEach((family) => familyMap.set(family.id_family, family));
-
-      const userMap = new Map<string, Users>();
-      users.forEach((user) => userMap.set(user.id_user, user));
+      console.log(familyMap);
+      const userMap = new Map<string, GetUserResponse>();
+      if (users.users !== undefined) {
+        users.users.forEach((user) => userMap.set(user.idUser, user));
+      }
 
       notificationArr.forEach((notification) => {
         if (notification.id_family) {
@@ -73,7 +88,7 @@ export class NotificationService {
             ? { name: family.name, avatar: family.avatar }
             : null;
         } else {
-          const user = userMap.get(notification.id_target);
+          const user = userMap.get(notification.id_target as any);
           notification.userInfo = user
             ? {
                 name: `${user.firstname} ${user.lastname}`,
@@ -82,20 +97,16 @@ export class NotificationService {
             : null;
         }
       });
-
       const unreadCountPipeline = [
         { $match: { id_user: id_user } },
         { $unwind: '$notificationArr' },
         { $match: { 'notificationArr.isRead': false } },
         { $count: 'unreadCount' },
       ];
-
       const unreadCountResult = await this.notificationRepository
         .aggregate(unreadCountPipeline)
         .exec();
-
       const unreadCount = unreadCountResult[0]?.unreadCount || 0;
-
       return {
         data: notificationArr,
         unreadCount: unreadCount,
@@ -141,17 +152,13 @@ export class NotificationService {
     notificationData: NotificationDataInterface,
   ) {
     try {
-      const memberFamilies = await this.memberFamilyRepository.find({
-        where: {
-          id_family,
-        },
-      });
-      const userIds = memberFamilies.map(
-        (memberFamily) => memberFamily.id_user,
+      const idsUserInFamilyRequest: GerUserIdsRequest = { idFamily: id_family };
+      const idsUserInFamily = await this.familyService.getIdsUserInFamily(
+        idsUserInFamilyRequest,
       );
-      const family = await this.familyRepository.findOne({
-        where: { id_family },
-      });
+      const userIds = idsUserInFamily.idUser;
+      const getFamilyReq: GetFamilyRequest = { idFamily: id_family };
+      const family = await this.familyService.findById(getFamilyReq);
       const familyInfo = family
         ? { name: family.name, avatar: family.avatar }
         : null;

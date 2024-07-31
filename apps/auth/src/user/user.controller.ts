@@ -70,6 +70,24 @@ export class UserController {
     return await this.userService.getUserInfoByPhone(data.phone);
   }
 
+  @EventPattern('authClient/getUserById')
+  async handleGetUserById(
+    @Payload() id_user: string,
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    return await this.userService.getUserById(id_user);
+  }
+
+  @EventPattern('authClient/getUsersByIds')
+  async handleGetUsersByIds(
+    @Payload() data: { ids: string[] },
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    return await this.userService.getUsersByIds(data.ids);
+  }
+
   @EventPattern('authClient/verifyAccount')
   async sendUserConfirmation(@Payload() dto: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);

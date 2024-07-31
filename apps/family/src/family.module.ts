@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { FamilyController } from './family.controller';
 import {
   DatabaseModule,
@@ -16,6 +16,7 @@ import { StorageModule } from './storage/storage.module';
 import * as Joi from 'joi';
 import { InvitationModule } from './invitation/invitation.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { FamilyGrpcModule } from './grpc/family-grpc.module';
 
 @Module({
   imports: [
@@ -24,6 +25,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       validationSchema: Joi.object({
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_FAMILY_QUEUE: Joi.string().required(),
+
+        GRPC_FAMILY_PACKAGE: Joi.string().required(),
+        GRPC_FAMILY_PROTO_PATH: Joi.string().required(),
+        GRPC_FAMILY_URL: Joi.string().required(),
       }),
       envFilePath:
         process.env.NODE_ENV === 'production'
@@ -33,7 +38,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     DatabaseModule,
     RmqModule,
     StorageModule,
-    forwardRef(() => InvitationModule),
+    InvitationModule,
     TypeOrmModule.forFeature([
       Family,
       PackageExtra,
@@ -42,9 +47,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       FamilyRoles,
       Users,
     ]),
+    FamilyGrpcModule,
   ],
   controllers: [FamilyController],
   providers: [FamilyService],
-  exports: [RmqModule, DatabaseModule],
 })
 export class FamilyModule {}

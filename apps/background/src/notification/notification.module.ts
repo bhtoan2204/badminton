@@ -5,15 +5,12 @@ import {
   MgDatabaseModule,
   NotificationData,
   NotificationDataSchema,
-  MemberFamily,
-  DatabaseModule,
-  Users,
-  Family,
 } from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { NotificationProcessor } from './notification.processor';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { BackgroundModule } from '../background.module';
+import { FamilyModule } from '../family/family.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -21,8 +18,8 @@ import { BackgroundModule } from '../background.module';
     MongooseModule.forFeature([
       { name: NotificationData.name, schema: NotificationDataSchema },
     ]),
-    TypeOrmModule.forFeature([MemberFamily, Users, Family]),
-    DatabaseModule,
+    FamilyModule,
+    UserModule,
     forwardRef(() => BackgroundModule),
   ],
   controllers: [NotificationController],

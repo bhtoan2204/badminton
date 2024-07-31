@@ -2,7 +2,7 @@
 import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 
-export const protobufPackage = 'storage';
+export const storageProtobufPackage = 'storage';
 
 export interface UploadFileRequest {
   fileName: string;

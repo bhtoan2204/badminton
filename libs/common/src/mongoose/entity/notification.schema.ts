@@ -27,7 +27,7 @@ export enum NotificationType {
   },
   timestamps: true,
 })
-class NotificationDetail {
+export class NotificationDetail {
   @Prop({ required: true })
   _id: Types.ObjectId;
 

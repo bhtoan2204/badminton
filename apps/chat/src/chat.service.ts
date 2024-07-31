@@ -63,6 +63,9 @@ export class ChatService {
         },
       });
       const users = await usersPromise;
+      if (!users || users.length === 0) {
+        return [];
+      }
       const userMap = users.reduce((map, user) => {
         map[user.id_user] = user;
         return map;
@@ -177,7 +180,11 @@ export class ChatService {
           },
         ]),
       ]);
+      if (!conversations || conversations.length === 0) {
+        return [];
+      }
       const messages = conversations[0].messages;
+
       const results = messages.map((message) => {
         if (message.senderId !== senderId) {
           return {

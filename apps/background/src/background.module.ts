@@ -3,11 +3,10 @@ import { BackgroundService } from './background.service';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
-  Calendar,
-  Checklist,
-  DatabaseModule,
-  Family,
-  MemberFamily,
+  Article,
+  ArticleCategory,
+  ArticleDatabaseModule,
+  Enclosure,
   MgDatabaseModule,
   NotificationData,
   NotificationDataSchema,
@@ -29,7 +28,19 @@ const globalModule = (module: DynamicModule) => {
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      validationSchema: Joi.object({}),
+      validationSchema: Joi.object({
+        GRPC_FAMILY_PACKAGE: Joi.string().required(),
+        GRPC_FAMILY_PROTO_PATH: Joi.string().required(),
+        GRPC_FAMILY_URL: Joi.string().required(),
+
+        GRPC_USER_PACKAGE: Joi.string().required(),
+        GRPC_USER_PROTO_PATH: Joi.string().required(),
+        GRPC_USER_URL: Joi.string().required(),
+      }),
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? './apps/background/.env.production'
+          : './apps/background/.env',
     }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
@@ -66,8 +77,8 @@ const globalModule = (module: DynamicModule) => {
       { name: NotificationData.name, schema: NotificationDataSchema },
     ]),
     RmqModule,
-    DatabaseModule,
-    TypeOrmModule.forFeature([Family, MemberFamily, Checklist, Calendar]),
+    ArticleDatabaseModule,
+    TypeOrmModule.forFeature([Article, ArticleCategory, Enclosure]),
     forwardRef(() => NotificationModule),
     forwardRef(() => RssModule),
     forwardRef(() => BankModule),

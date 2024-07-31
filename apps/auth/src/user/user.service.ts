@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import {
   DeleteFileRequest,
   LoginType,
@@ -429,6 +429,40 @@ export class UserService {
         total: total,
         message: 'Get user info by phone successfully',
       };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getUserById(id_user: string) {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id_user },
+      });
+      if (!user) {
+        throw new RpcException({
+          message: 'User not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      return user;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getUsersByIds(ids: string[]) {
+    try {
+      const users = await this.userRepository.find({
+        where: { id_user: In(ids) },
+      });
+      return users;
     } catch (error) {
       throw new RpcException({
         message: error.message,

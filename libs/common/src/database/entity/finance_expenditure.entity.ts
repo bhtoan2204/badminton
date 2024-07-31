@@ -7,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Family } from './family.entity';
 import { FinanceExpenditureType } from './finance_expenditure_type.entity';
 import { Users } from './users.entity';
 
@@ -42,10 +41,6 @@ export class FinanceExpenditure {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @ManyToOne(() => Family, (family) => family.financeExpenditures)
-  @JoinColumn({ name: 'id_family' })
-  family: Family;
 
   @ManyToOne(
     () => FinanceExpenditureType,

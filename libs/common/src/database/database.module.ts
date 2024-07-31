@@ -15,7 +15,6 @@ import { HouseholdItemCategories } from './entity/household_item_categories.enti
 import { HouseholdDurableItems } from './entity/household_durable_items.entity';
 import { HouseholdConsumableItems } from './entity/household_consumable_items.entity';
 import { parse } from 'pg-connection-string';
-import { GuideItems } from './entity/guide_items.entity';
 import { EducationProgress } from './entity/education_progress.entity';
 import { Subjects } from './entity/subject.entity';
 import { ShoppingItemTypes } from './entity/shopping_item_types.entity';
@@ -25,9 +24,6 @@ import { MemberFamily } from './entity/member_family.entity';
 import { Feedback } from './entity/feedback.entity';
 import { FeedbackMetadata } from './entity/feedbackMetadata.entity';
 import { Order } from './entity/order.entity';
-import { ArticleCategory } from './entity/article_category.entity';
-import { Article } from './entity/article.entity';
-import { Enclosure } from './entity/enclosure.entity';
 import { OrderSubscriber } from './subcriber/order.subcriber';
 import { FamilyRoles } from './entity/family_roles.entity';
 import { Calendar } from './entity/calendar.entity';
@@ -100,7 +96,6 @@ import { FrequentlyQuestionMetaData } from './entity/freq_question.entity';
             HouseholdItemCategories,
             HouseholdDurableItems,
             HouseholdConsumableItems,
-            GuideItems,
             EducationProgress,
             Subjects,
             ShoppingItemTypes,
@@ -109,9 +104,6 @@ import { FrequentlyQuestionMetaData } from './entity/freq_question.entity';
             ShoppingListTypes,
             Feedback,
             FeedbackMetadata,
-            ArticleCategory,
-            Article,
-            Enclosure,
             PaymentHistory,
             Order,
             FamilyRoles,

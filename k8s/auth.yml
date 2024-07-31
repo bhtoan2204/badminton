@@ -39,6 +39,6 @@ spec:
     app: auth
   ports:
     - protocol: TCP
-      port: 8081
-      targetPort: 8081
+      port: 50002
+      targetPort: 50002
   type: ClusterIP

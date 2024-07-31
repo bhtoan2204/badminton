@@ -104,6 +104,7 @@ export class RssService implements OnModuleInit {
       const existingArticle = await this.articleRepository.findOne({
         where: { guid: articleData.guid },
       });
+
       if (existingArticle) {
         return;
       }
@@ -137,7 +138,7 @@ export class RssService implements OnModuleInit {
 
       await this.articleRepository.save(article);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   }
 
@@ -152,6 +153,7 @@ export class RssService implements OnModuleInit {
   async getRssData() {
     for (const type of category) {
       const feed = await this.crawlRss(type);
+
       const itemsToProcess = feed.items.slice(0, 10);
 
       for (const item of itemsToProcess) {
