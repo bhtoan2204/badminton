@@ -287,7 +287,6 @@ export class ChatService {
         'SELECT * FROM f_get_users_infos($1)',
         [userIds],
       );
-      console.log(userInfos);
       const userInfoMap = new Map(
         userInfos.map((user) => [user.id_user, user]),
       );

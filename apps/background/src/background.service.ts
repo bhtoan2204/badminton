@@ -2,10 +2,10 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
 import {
-  Calendar,
-  Checklist,
-  Family,
-  MemberFamily,
+  CalendarResponse,
+  FindCalendarByFrequencyRequest,
+  FindOneByIdRequest,
+  GerUserIdsRequest,
   NotificationData,
   NotificationType,
 } from '@app/common';
@@ -21,9 +21,10 @@ import {
   FAMILY_PACKAGE_EXPIRED,
   INCOME_REPORT,
 } from './constant';
-import { InjectRepository } from '@nestjs/typeorm';
-import { LessThan, Like, Repository } from 'typeorm';
 import * as moment from 'moment';
+import { FamilyService } from './family/family.service';
+import { UserService } from './user/user.service';
+import { CalendarService } from './calendar/calendar.service';
 
 @Injectable()
 @Processor('cron-queue')
@@ -33,6 +34,9 @@ export class BackgroundService implements OnModuleInit {
     @InjectQueue('chats') private readonly chatsQueue: Queue,
     @InjectModel(NotificationData.name)
     private notificationDataRepository: Model<NotificationData>,
+    private readonly familyService: FamilyService,
+    private readonly userService: UserService,
+    private readonly calendarService: CalendarService,
     // @InjectRepository(Family) private familyRepository: Repository<Family>,
     // @InjectRepository(MemberFamily)
     // private memberFamilyRepository: Repository<MemberFamily>,
@@ -42,50 +46,51 @@ export class BackgroundService implements OnModuleInit {
     // private calendarRepository: Repository<Calendar>,
   ) {}
 
-  // async createNotificationFamily(
-  //   id_family: number,
-  //   data: {
-  //     type: NotificationType;
-  //     title: string;
-  //     content: string;
-  //     id_target: string | number;
-  //   },
-  // ) {
-  //   try {
-  //     const memberFamilies = await this.memberFamilyRepository.find({
-  //       where: {
-  //         id_family,
-  //       },
-  //     });
-  //     const userIds = memberFamilies.map(
-  //       (memberFamily) => memberFamily.id_user,
-  //     );
+  async createNotificationFamily(
+    id_family: number,
+    data: {
+      type: NotificationType;
+      title: string;
+      title_vn: string;
+      content: string;
+      content_vn: string;
+      id_target: string | number;
+    },
+  ) {
+    try {
+      const idsUserInFamilyRequest: GerUserIdsRequest = { idFamily: id_family };
+      const idsUserInFamily = await this.familyService.getIdsUserInFamily(
+        idsUserInFamilyRequest,
+      );
+      const userIds = idsUserInFamily.idUser;
 
-  //     await Promise.all(
-  //       userIds.map(async (userId) => {
-  //         const notificationDetail = {
-  //           _id: new Types.ObjectId(),
-  //           title: data.title,
-  //           content: data.content,
-  //           type: data.type,
-  //           id_family,
-  //           id_target: data.id_target,
-  //         };
-  //         await this.notificationDataRepository.updateOne(
-  //           { id_user: userId },
-  //           { $push: { notificationArr: notificationDetail } },
-  //           { upsert: true },
-  //         );
-  //         await this.chatsQueue.add('sendNotification', {
-  //           id_user: userId,
-  //           notification: notificationDetail,
-  //         });
-  //       }),
-  //     );
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
+      await Promise.all(
+        userIds.map(async (userId) => {
+          const notificationDetail = {
+            _id: new Types.ObjectId(),
+            title: data.title,
+            title_vn: data.title_vn,
+            content: data.content,
+            content_vn: data.content_vn,
+            type: data.type,
+            id_family,
+            id_target: data.id_target,
+          };
+          await this.notificationDataRepository.updateOne(
+            { id_user: userId },
+            { $push: { notificationArr: notificationDetail } },
+            { upsert: true },
+          );
+          await this.chatsQueue.add('sendNotification', {
+            id_user: userId,
+            notification: notificationDetail,
+          });
+        }),
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   async createNotificationUser(
     id_user: string,
@@ -187,124 +192,132 @@ export class BackgroundService implements OnModuleInit {
     await this.cronQueue.add(CALENDAR_EVENT_OCCURED_REPEATLY_DAILY, {});
   }
 
-  // async processCalendarEvents(frequency: string) {
-  //   try {
-  //     const repeatlyEvents = await this.calendarRepository.find({
-  //       where: { recurrence_rule: Like(`%FREQ=${frequency}%`) },
-  //     });
+  async processCalendarEvents(frequency: string) {
+    try {
+      const request: FindCalendarByFrequencyRequest = { frequency };
+      const calendarRpc =
+        await this.calendarService.findCalendarByFrequency(request);
+      const repeatlyEvents = calendarRpc.calendar;
+      if (!repeatlyEvents || repeatlyEvents.length === 0) {
+        return;
+      }
+      for (const event of repeatlyEvents) {
+        const ruleParts = event.recurrenceRule.split(';');
+        let interval = 1; // Default interval
+        for (const part of ruleParts) {
+          if (part.startsWith('INTERVAL=')) {
+            interval = parseInt(part.split('=')[1], 10);
+          }
+        }
+        const jobName = `calendar_event_${event.idCalendar}_${frequency.toLowerCase()}_interval_${interval}`;
+        let repeatEvery: number;
+        switch (frequency) {
+          case 'DAILY':
+            repeatEvery = interval * 24 * 60 * 60 * 1000;
+            break;
+          case 'WEEKLY':
+            repeatEvery = interval * 7 * 24 * 60 * 60 * 1000;
+            break;
+          case 'MONTHLY':
+            repeatEvery = interval * 30 * 24 * 60 * 60 * 1000;
+            break;
+          case 'YEARLY':
+            repeatEvery = interval * 365 * 24 * 60 * 60 * 1000;
+            break;
+        }
 
-  //     for (const event of repeatlyEvents) {
-  //       const ruleParts = event.recurrence_rule.split(';');
-  //       let interval = 1; // Default interval
-  //       for (const part of ruleParts) {
-  //         if (part.startsWith('INTERVAL=')) {
-  //           interval = parseInt(part.split('=')[1], 10);
-  //         }
-  //       }
-  //       const jobName = `calendar_event_${event.id_calendar}_${frequency.toLowerCase()}_interval_${interval}`;
-  //       let repeatEvery: number;
-  //       switch (frequency) {
-  //         case 'DAILY':
-  //           repeatEvery = interval * 24 * 60 * 60 * 1000;
-  //           break;
-  //         case 'WEEKLY':
-  //           repeatEvery = interval * 7 * 24 * 60 * 60 * 1000;
-  //           break;
-  //         case 'MONTHLY':
-  //           repeatEvery = interval * 30 * 24 * 60 * 60 * 1000;
-  //           break;
-  //         case 'YEARLY':
-  //           repeatEvery = interval * 365 * 24 * 60 * 60 * 1000;
-  //           break;
-  //       }
+        await this.cronQueue.add(
+          jobName,
+          { eventId: event.idCalendar },
+          {
+            repeat: {
+              every: repeatEvery,
+            },
+          },
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
-  //       await this.cronQueue.add(
-  //         jobName,
-  //         { eventId: event.id_calendar },
-  //         {
-  //           repeat: {
-  //             every: repeatEvery,
-  //           },
-  //         },
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
+  @Process(CALENDAR_EVENT_OCCURED_REPEATLY_DAILY)
+  async handleCalendarEventOccured() {
+    await this.processCalendarEvents('DAILY');
+  }
 
-  // @Process(CALENDAR_EVENT_OCCURED_REPEATLY_DAILY)
-  // async handleCalendarEventOccured() {
-  //   await this.processCalendarEvents('DAILY');
-  // }
+  @Process(CALENDAR_EVENT_OCCURED_REPEATLY_WEEKLY)
+  async handleCalendarEventOccuredWeekly() {
+    await this.processCalendarEvents('WEEKLY');
+  }
 
-  // @Process(CALENDAR_EVENT_OCCURED_REPEATLY_WEEKLY)
-  // async handleCalendarEventOccuredWeekly() {
-  //   await this.processCalendarEvents('WEEKLY');
-  // }
+  @Process(CALENDAR_EVENT_OCCURED_REPEATLY_MONTHLY)
+  async handleCalendarEventOccuredMonthly() {
+    await this.processCalendarEvents('MONTHLY');
+  }
 
-  // @Process(CALENDAR_EVENT_OCCURED_REPEATLY_MONTHLY)
-  // async handleCalendarEventOccuredMonthly() {
-  //   await this.processCalendarEvents('MONTHLY');
-  // }
+  @Process(CALENDAR_EVENT_OCCURED_REPEATLY_YEARLY)
+  async handleCalendarEventOccuredYearly() {
+    await this.processCalendarEvents('YEARLY');
+  }
 
-  // @Process(CALENDAR_EVENT_OCCURED_REPEATLY_YEARLY)
-  // async handleCalendarEventOccuredYearly() {
-  //   await this.processCalendarEvents('YEARLY');
-  // }
+  @Process('calendar_event_*_interval_*')
+  async handleCalendarEventNotification(job: Job<{ eventId: number }>) {
+    try {
+      const id_calendar = job.data.eventId;
+      const findOneRequest: FindOneByIdRequest = { idCalendar: id_calendar };
+      const eventRpc: CalendarResponse =
+        await this.calendarService.findCalendarById(findOneRequest);
+      const event = eventRpc;
+      if (event) {
+        await this.createNotificationFamily(event.idCalendar, {
+          type: NotificationType.CALENDAR,
+          title: `Reminder for event: ${event.title}`,
+          title_vn: `Nhắc nhở cho sự kiện: ${event.title}`,
+          content: `The event "${event.title}" is scheduled for ${moment(
+            event.timeStart,
+          ).format('MMMM Do YYYY, h:mm:ss a')}`,
+          content_vn: `Sự kiện "${event.title}" được lên lịch vào lúc ${moment(
+            event.timeEnd,
+          ).format('MMMM Do YYYY, h:mm:ss a')}`,
+          id_target: event.idCalendar,
+        });
+        this.createNotificationFamily(event.idFamily, {
+          type: NotificationType.CALENDAR,
+          title: 'Reminder for event',
+          title_vn: 'Nhắc nhở cho sự kiện',
+          content: `The event "${event.title}" is scheduled for ${moment(event.timeStart).format('MMMM Do YYYY, h:mm:ss a')}`,
+          content_vn: `Sự kiện "${event.title}" được lên lịch vào lúc ${moment(event.timeStart).format('MMMM Do YYYY, h:mm:ss a')}`,
+          id_target: event.idCalendar,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
-  // @Process('calendar_event_*_interval_*')
-  // async handleCalendarEventNotification(job: Job<{ eventId: number }>) {
-  //   try {
-  //     const event = await this.calendarRepository.findOne({
-  //       where: { id_calendar: job.data.eventId },
-  //     });
-  //     if (event) {
-  //       await this.createNotificationFamily(event.id_family, {
-  //         type: NotificationType.CALENDAR,
-  //         title: `Reminder for event: ${event.title}`,
-  //         content: `The event "${event.title}" is scheduled for ${moment(
-  //           event.time_start,
-  //         ).format('MMMM Do YYYY, h:mm:ss a')}`,
-  //         id_target: event.id_calendar,
-  //       });
-  //       this.createNotificationFamily(event.id_family, {
-  //         type: NotificationType.CALENDAR,
-  //         title: 'Reminder for event',
-  //         content: `The event "${event.title}" is scheduled for ${moment(event.time_start).format('MMMM Do YYYY, h:mm:ss a')}`,
-  //         id_target: event.id_family,
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
+  @Process(FAMILY_PACKAGE_EXPIRED)
+  async handleFamilyPackageExpired() {
+    try {
+      const familiesRpc = await this.familyService.getExpiredFamilies({});
+      const families = familiesRpc.families;
 
-  // @Process(FAMILY_PACKAGE_EXPIRED)
-  // async handleFamilyPackageExpired() {
-  //   try {
-  //     const oneDayLater = moment().add(3, 'days').toDate();
-
-  //     const families = await this.familyRepository.find({
-  //       where: {
-  //         expired_at: LessThan(oneDayLater),
-  //       },
-  //     });
-
-  //     await Promise.all(
-  //       families.map((family) =>
-  //         this.createNotificationFamily(family.id_family, {
-  //           type: NotificationType.FAMILY,
-  //           title: 'Family package expired',
-  //           content: `Family package of family ${family.name} is going to expire in 3 days`,
-  //           id_target: family.id_family,
-  //         }),
-  //       ),
-  //     );
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
+      await Promise.all(
+        families.map((family) =>
+          this.createNotificationFamily(family.id_family, {
+            type: NotificationType.FAMILY,
+            title: 'Family package expired',
+            title_vn: 'Gói gia đình hết hạn',
+            content: `Family package of family ${family.name} is going to expire in 3 days`,
+            content_vn: `Gói gia đình của gia đình ${family.name} sắp hết hạn trong 3 ngày`,
+            id_target: family.id_family,
+          }),
+        ),
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   // @Process(CHECKLIST_OCCURED)
   // async handleChecklistOccured() {

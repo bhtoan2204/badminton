@@ -22,7 +22,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: storage
-          image: mjkundta/storage:<TAG>
+          image: mjkundta/storage:latest
+          imagePullPolicy: Always
           command: ['node', 'dist/apps/storage/src/main.js']
           ports:
             - containerPort: 50000

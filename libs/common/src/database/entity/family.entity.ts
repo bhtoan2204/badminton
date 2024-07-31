@@ -10,7 +10,6 @@ import {
   OneToOne,
 } from 'typeorm';
 import { Users } from './users.entity';
-import { Checklist } from './checklist.entity';
 import { FamilyExtraPackages } from './family_package_extra.entity';
 import { Room } from './room.entity';
 import { HouseholdItems } from './household_items.entity';
@@ -18,7 +17,6 @@ import { EducationProgress } from './education_progress.entity';
 import { ShoppingLists } from './shopping_lists.entity';
 import { MemberFamily } from './member_family.entity';
 import { Order } from './order.entity';
-import { Calendar } from './calendar.entity';
 import { Utilities } from './utilities.entity';
 import { FinanceAssets } from './finance_assets.entity';
 import { FamilyInvitation } from './family_invitation.entity';
@@ -65,9 +63,6 @@ export class Family {
   )
   family_invitation: FamilyInvitation;
 
-  @OneToMany(() => Checklist, (checklist) => checklist.family)
-  checklists: Checklist[];
-
   @OneToMany(
     () => FamilyExtraPackages,
     (familyExtraPackage) => familyExtraPackage.family,
@@ -94,9 +89,6 @@ export class Family {
 
   @OneToMany(() => Order, (order) => order.family)
   orders: Order[];
-
-  @OneToMany(() => Calendar, (calendar) => calendar.family)
-  calendars: Calendar[];
 
   @OneToMany(() => Utilities, (utilities) => utilities.family)
   utilities: Utilities[];

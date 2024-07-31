@@ -22,7 +22,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: background
-          image: mjkundta/background:<TAG>
+          image: mjkundta/background:latest
+          imagePullPolicy: Always
           command: ['node', 'dist/apps/background/src/main.js']
           env:
             - name: NODE_ENV

@@ -22,7 +22,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: guideline
-          image: mjkundta/guideline:<TAG>
+          image: mjkundta/guideline:latest
+          imagePullPolicy: Always
           command: ['node', 'dist/apps/guideline/src/main.js']
           env:
             - name: NODE_ENV

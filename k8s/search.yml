@@ -22,7 +22,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: search
-          image: mjkundta/search:<TAG>
+          image: mjkundta/search:latest
+          imagePullPolicy: Always
           command: ['node', 'dist/apps/elasticsearch/src/main.js']
           env:
             - name: NODE_ENV

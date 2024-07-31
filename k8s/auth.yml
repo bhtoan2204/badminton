@@ -22,7 +22,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: auth
-          image: mjkundta/auth:<TAG>
+          image: mjkundta/auth:latest
+          imagePullPolicy: Always
           command: ['node', 'dist/apps/auth/src/main.js']
           env:
             - name: NODE_ENV

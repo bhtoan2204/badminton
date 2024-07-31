@@ -42,6 +42,8 @@ export interface GetFamiliesResponse {
   families: any[];
 }
 
+export interface Empty {}
+
 export const FAMILY_PACKAGE_NAME = 'family';
 
 export interface FamilyServiceClient {
@@ -52,6 +54,8 @@ export interface FamilyServiceClient {
   findIdsUserInFamily(
     request: GerUserIdsRequest,
   ): Observable<GerUserIdsResponse>;
+
+  findExpiredFamilies(request: Empty): Observable<GetFamiliesResponse>;
 }
 
 export interface FamilyServiceController {
@@ -70,6 +74,13 @@ export interface FamilyServiceController {
     | Promise<GerUserIdsResponse>
     | Observable<GerUserIdsResponse>
     | GerUserIdsResponse;
+
+  findExpiredFamilies(
+    request: Empty,
+  ):
+    | Promise<GetFamiliesResponse>
+    | Observable<GetFamiliesResponse>
+    | GetFamiliesResponse;
 }
 
 export function FamilyServiceControllerMethods() {
@@ -78,6 +89,7 @@ export function FamilyServiceControllerMethods() {
       'findById',
       'findByIds',
       'findIdsUserInFamily',
+      'findExpiredFamilies',
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(

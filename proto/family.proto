@@ -6,6 +6,7 @@ service FamilyService {
   rpc findById (GetFamilyRequest) returns (GetFamilyResponse);
   rpc findByIds(GetFamiliesRequest) returns (GetFamiliesResponse);
   rpc findIdsUserInFamily(GerUserIdsRequest) returns (GerUserIdsResponse);
+  rpc findExpiredFamilies(Empty) returns (GetFamiliesResponse);
 }
 
 message GerUserIdsRequest {
@@ -39,3 +40,5 @@ message GetFamiliesRequest {
 message GetFamiliesResponse {
   repeated GetFamilyResponse families = 1;
 }
+
+message Empty {}

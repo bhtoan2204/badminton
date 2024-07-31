@@ -7,7 +7,6 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Family } from './family.entity';
 import { ChecklistType } from './checklist_type.entity';
 
 @Entity('checklist')
@@ -47,10 +46,6 @@ export class Checklist {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @ManyToOne(() => Family, (family) => family.checklists)
-  @JoinColumn({ name: 'id_family' })
-  family: Family;
 
   @ManyToOne(() => ChecklistType, (checklistType) => checklistType.checklists)
   @JoinColumn({ name: 'id_checklist_type' })

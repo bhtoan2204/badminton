@@ -22,7 +22,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: family
-          image: mjkundta/family:<TAG>
+          image: mjkundta/family:latest
+          imagePullPolicy: Always
           command: ['node', 'dist/apps/family/src/main.js']
           env:
             - name: NODE_ENV

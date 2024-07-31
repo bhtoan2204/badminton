@@ -22,7 +22,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: education
-          image: mjkundta/education:<TAG>
+          image: mjkundta/education:latest
+          imagePullPolicy: Always
           command: ['node', 'dist/apps/education/src/main.js']
           env:
             - name: NODE_ENV

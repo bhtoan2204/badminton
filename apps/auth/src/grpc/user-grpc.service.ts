@@ -42,7 +42,6 @@ export class UserGrpcService {
       const users = await this.userRepository.find({
         where: { id_user: In(ids) },
       });
-      console.log(users);
       if (!users) {
         throw new RpcException({
           message: 'Users not found',

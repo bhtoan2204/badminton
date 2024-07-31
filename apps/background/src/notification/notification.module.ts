@@ -1,14 +1,14 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { NotificationController } from './notification.controller';
 import { NotificationService } from './notification.service';
 import {
   MgDatabaseModule,
   NotificationData,
   NotificationDataSchema,
+  RmqModule,
 } from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { NotificationProcessor } from './notification.processor';
-import { BackgroundModule } from '../background.module';
 import { FamilyModule } from '../family/family.module';
 import { UserModule } from '../user/user.module';
 
@@ -20,7 +20,7 @@ import { UserModule } from '../user/user.module';
     ]),
     FamilyModule,
     UserModule,
-    forwardRef(() => BackgroundModule),
+    RmqModule,
   ],
   controllers: [NotificationController],
   providers: [NotificationService, NotificationProcessor],

@@ -22,7 +22,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: shopping
-          image: mjkundta/shopping:<TAG>
+          image: mjkundta/shopping:latest
+          imagePullPolicy: Always
           command: ['node', 'dist/apps/shopping/src/main.js']
           env:
             - name: NODE_ENV

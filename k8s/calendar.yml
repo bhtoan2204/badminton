@@ -22,7 +22,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: calendar
-          image: mjkundta/calendar:<TAG>
+          image: mjkundta/calendar:latest
+          imagePullPolicy: Always
           command: ['node', 'dist/apps/calendar/src/main.js']
           env:
             - name: NODE_ENV
@@ -40,6 +41,6 @@ spec:
     app: calendar
   ports:
     - protocol: TCP
-      port: 8089
-      targetPort: 8089
+      port: 50003
+      targetPort: 50003
   type: ClusterIP

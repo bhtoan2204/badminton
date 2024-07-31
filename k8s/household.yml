@@ -22,7 +22,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: household
-          image: mjkundta/household:<TAG>
+          image: mjkundta/household:latest
+          imagePullPolicy: Always
           command: ['node', 'dist/apps/household/src/main.js']
           env:
             - name: NODE_ENV

@@ -1,16 +1,17 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { CalendarController } from './calendar.controller';
 import { CalendarService } from './calendar.service';
 import {
   Calendar,
+  CalendarDatabaseModule,
   CategoryEvent,
-  DatabaseModule,
   RmqModule,
 } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ChecklistModule } from './checklist/checklist.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GrpcCalendarModule } from './grpc/grpc-calendar.module';
 
 @Module({
   imports: [
@@ -26,12 +27,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           : './apps/calendar/.env',
     }),
     RmqModule,
-    DatabaseModule,
+    CalendarDatabaseModule,
     TypeOrmModule.forFeature([Calendar, CategoryEvent]),
-    forwardRef(() => ChecklistModule),
+    GrpcCalendarModule,
+    ChecklistModule,
   ],
   controllers: [CalendarController],
   providers: [CalendarService],
-  exports: [RmqModule, DatabaseModule],
 })
 export class CalendarModule {}

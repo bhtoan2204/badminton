@@ -1,4 +1,5 @@
 import {
+  Empty,
   Family,
   GerUserIdsRequest,
   GerUserIdsResponse,
@@ -11,7 +12,8 @@ import {
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import moment from 'moment';
+import { In, LessThan, Repository } from 'typeorm';
 
 @Injectable()
 export class FamilyGrpcService {
@@ -95,6 +97,40 @@ export class FamilyGrpcService {
       }
       return {
         idUser: userIds.map((memberFamily) => memberFamily.id_user),
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getExpiredFamilies(request: Empty): Promise<GetFamiliesResponse> {
+    try {
+      const oneDayLater = moment().add(3, 'days').toDate();
+
+      const expiredFamilies = await this.familyRepository.find({
+        where: {
+          expired_at: LessThan(oneDayLater),
+        },
+      });
+      const getFamilyResponses: GetFamilyResponse[] = expiredFamilies.map(
+        (family) => ({
+          idFamily: family.id_family,
+          quantity: family.quantity,
+          name: family.name,
+          description: family.description,
+          ownerId: family.owner_id,
+          createdAt: family.created_at.toISOString(),
+          updatedAt: family.updated_at.toISOString(),
+          expiredAt: family.expired_at.toISOString(),
+          avatar: family.avatar,
+        }),
+      );
+      return {
+        families: getFamilyResponses,
       };
     } catch (error) {
       throw new RpcException({

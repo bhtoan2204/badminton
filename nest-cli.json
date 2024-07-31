@@ -102,7 +102,9 @@
       "entryFile": "src/main",
       "sourceRoot": "./",
       "compilerOptions": {
-        "tsConfigPath": "apps/calendar/tsconfig.app.json"
+        "tsConfigPath": "apps/calendar/tsconfig.app.json",
+        "assets": ["proto/*.proto"],
+        "watchAssets": true
       }
     },
     "guideline": {

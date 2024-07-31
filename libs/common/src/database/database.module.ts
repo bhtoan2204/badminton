@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Checklist } from './entity/checklist.entity';
 import { Family } from './entity/family.entity';
 import { PaymentHistory } from './entity/payment_history.entity';
 import { Users } from './entity/users.entity';
@@ -26,12 +25,9 @@ import { FeedbackMetadata } from './entity/feedbackMetadata.entity';
 import { Order } from './entity/order.entity';
 import { OrderSubscriber } from './subcriber/order.subcriber';
 import { FamilyRoles } from './entity/family_roles.entity';
-import { Calendar } from './entity/calendar.entity';
-import { CategoryEvent } from './entity/category_event.entity';
 import { ShoppingListTypes } from './entity/shopping_list_type.entity';
 import { Utilities } from './entity/utilities.entity';
 import { UtilitiesType } from './entity/utilities_type.entity';
-import { ChecklistType } from './entity/checklist_type.entity';
 import { FinanceExpenditure } from './entity/finance_expenditure.entity';
 import { FinanceExpenditureType } from './entity/finance_expenditure_type.entity';
 import { FinanceIncome } from './entity/finance_income.entity';
@@ -42,12 +38,11 @@ import { FamilySubscriber } from './subcriber/family.subcriber';
 import { UtilitiesSubcriber } from './subcriber/utilities.subcriber';
 import { ShoppingListSubscriber } from './subcriber/shoppingList.subcriber';
 import { ShoppingItemSubscriber } from './subcriber/shoppingItems.subcriber';
-import * as Joi from 'joi';
 import { Discount } from './entity/discount.entity';
 import { OTP } from './entity/otp.entity';
 import { FamilyInvitation } from './entity/family_invitation.entity';
 import { FrequentlyQuestionMetaData } from './entity/freq_question.entity';
-
+import * as Joi from 'joi';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -79,8 +74,6 @@ import { FrequentlyQuestionMetaData } from './entity/freq_question.entity';
             rejectUnauthorized: false,
           },
           entities: [
-            Checklist,
-            ChecklistType,
             PaymentHistory,
             Users,
             OTP,
@@ -107,8 +100,6 @@ import { FrequentlyQuestionMetaData } from './entity/freq_question.entity';
             PaymentHistory,
             Order,
             FamilyRoles,
-            Calendar,
-            CategoryEvent,
             Utilities,
             UtilitiesType,
             FinanceExpenditure,

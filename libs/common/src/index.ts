@@ -7,13 +7,14 @@ export * from './grpc/grpc.service';
 export * from './database/database.module';
 export * from './database/guideline_database.module';
 export * from './database/article_database.module';
+export * from './database/calendar_database.module';
 
 export * from './sentry/sentry.module';
 export * from './sentry/sentry-exception.filter';
 export * from './sentry/sentry.service';
 
-export * from './database/entity/checklist.entity';
-export * from './database/entity/checklist_type.entity';
+export * from './database/entity/calendar/checklist.entity';
+export * from './database/entity/calendar/checklist_type.entity';
 export * from './database/entity/family.entity';
 export * from './database/entity/member_family.entity';
 export * from './database/entity/otp.entity';
@@ -46,8 +47,8 @@ export * from './database/entity/article/article.entity';
 export * from './database/entity/article/enclosure.entity';
 export * from './database/entity/payment_history.entity';
 export * from './database/entity/family_roles.entity';
-export * from './database/entity/calendar.entity';
-export * from './database/entity/category_event.entity';
+export * from './database/entity/calendar/calendar.entity';
+export * from './database/entity/calendar/category_event.entity';
 export * from './database/entity/utilities.entity';
 export * from './database/entity/utilities_type.entity';
 export * from './database/entity/finance_expenditure.entity';
@@ -64,6 +65,7 @@ export * from './database/enum/login_type.enum';
 export * from './types/storage';
 export * from './types/family';
 export * from './types/user';
+export * from './types/calendar';
 
 export * from './jwt/jwt.module';
 

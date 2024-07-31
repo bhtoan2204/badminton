@@ -1,14 +1,18 @@
-import { forwardRef, Module } from '@nestjs/common';
-import { CalendarModule } from '../calendar.module';
+import { Module } from '@nestjs/common';
 import { ChecklistController } from './checklist.controller';
 import { ChecklistService } from './checklist.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Checklist, ChecklistType, DatabaseModule } from '@app/common';
+import {
+  CalendarDatabaseModule,
+  Checklist,
+  ChecklistType,
+  RmqModule,
+} from '@app/common';
 
 @Module({
   imports: [
-    forwardRef(() => CalendarModule),
-    DatabaseModule,
+    CalendarDatabaseModule,
+    RmqModule,
     TypeOrmModule.forFeature([Checklist, ChecklistType]),
   ],
   controllers: [ChecklistController],

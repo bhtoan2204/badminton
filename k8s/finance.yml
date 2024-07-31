@@ -22,7 +22,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: finance
-          image: mjkundta/finance:<TAG>
+          image: mjkundta/finance:latest
+          imagePullPolicy: Always
           command: ['node', 'dist/apps/finance/src/main.js']
           env:
             - name: NODE_ENV

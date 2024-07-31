@@ -1,21 +1,12 @@
 import { Calendar, CategoryEvent } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  And,
-  EntityManager,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-  Repository,
-} from 'typeorm';
+import { And, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 
 @Injectable()
 export class CalendarService {
   constructor(
-    private readonly configService: ConfigService,
-    private readonly entityManager: EntityManager,
     @InjectRepository(Calendar)
     private readonly calendarRepository: Repository<Calendar>,
     @InjectRepository(CategoryEvent)

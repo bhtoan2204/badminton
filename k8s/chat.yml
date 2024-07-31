@@ -22,7 +22,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: chat
-          image: mjkundta/chat:<TAG>
+          image: mjkundta/chat:latest
+          imagePullPolicy: Always
           command: ['node', 'dist/apps/chat/src/main.js']
           env:
             - name: NODE_ENV

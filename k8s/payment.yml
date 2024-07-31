@@ -22,7 +22,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: payment
-          image: mjkundta/payment:<TAG>
+          image: mjkundta/payment:latest
+          imagePullPolicy: Always
           command: ['node', 'dist/apps/payment/src/main.js']
           env:
             - name: NODE_ENV

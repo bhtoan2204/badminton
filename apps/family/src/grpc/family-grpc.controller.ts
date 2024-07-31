@@ -1,4 +1,5 @@
 import {
+  Empty,
   FamilyServiceController,
   FamilyServiceControllerMethods,
   GerUserIdsRequest,
@@ -41,5 +42,14 @@ export class FamilyGrpcController implements FamilyServiceController {
     | Observable<GetFamiliesResponse>
     | GetFamiliesResponse {
     return this.familyGrpcService.getFamilyByIds(request);
+  }
+
+  findExpiredFamilies(
+    request: Empty,
+  ):
+    | Promise<GetFamiliesResponse>
+    | Observable<GetFamiliesResponse>
+    | GetFamiliesResponse {
+    return this.familyGrpcService.getExpiredFamilies(request);
   }
 }

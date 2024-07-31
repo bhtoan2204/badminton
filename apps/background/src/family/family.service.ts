@@ -1,4 +1,5 @@
 import {
+  Empty,
   FAMILY_SERVICE_NAME,
   FamilyServiceClient,
   GerUserIdsRequest,
@@ -44,6 +45,14 @@ export class FamilyService implements OnModuleInit {
   ): Promise<GerUserIdsResponse> {
     try {
       return await lastValueFrom(this.familyService.findIdsUserInFamily(req));
+    } catch (error) {
+      throw new RpcException(error);
+    }
+  }
+
+  async getExpiredFamilies(req: Empty): Promise<GetFamiliesResponse> {
+    try {
+      return await lastValueFrom(this.familyService.findExpiredFamilies(req));
     } catch (error) {
       throw new RpcException(error);
     }

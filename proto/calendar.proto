@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package calendar;
+
+service CalendarService {
+  rpc findCalendarByFrequency(FindCalendarByFrequencyRequest) returns (FindCalendarByFrequencyResponse);
+  rpc findOneById(FindOneByIdRequest) returns (CalendarResponse);
+}
+
+message FindOneByIdRequest {
+  int32 id_calendar = 1;
+}
+
+message FindCalendarByFrequencyRequest {
+  string frequency = 1;
+}
+
+message CalendarResponse {
+  int32 id_calendar = 1;
+  int32 id_family = 2;
+  int32 category = 3;
+  string title = 4;
+  string description = 5;
+  string time_start = 6;
+  string time_end = 7;
+  bool all_day = 8;
+  string location = 9;
+  string color = 10;
+  string start_timezone = 11;
+  string end_timezone = 12;
+  int32 recurrence_id = 13;
+  string recurrence_exception = 14;
+  string recurrence_rule = 15;
+  string created_at = 16;
+  string updated_at = 17;
+}
+
+message FindCalendarByFrequencyResponse {
+  repeated CalendarResponse calendar = 1;
+}
+

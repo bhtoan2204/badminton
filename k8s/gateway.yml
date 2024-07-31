@@ -46,19 +46,14 @@ spec:
               mountPath: /usr/src/app/logs
       containers:
         - name: gateway
-          image: mjkundta/gateway:<TAG>
+          image: mjkundta/gateway:latest
+          imagePullPolicy: Always
           command: ['node', 'dist/apps/gateway/src/main.js']
           ports:
             - containerPort: 8080
           env:
             - name: NODE_ENV
               value: 'production'
-            - name: REDIS_HOST
-              value: 'redis'
-            - name: REDIS_PORT
-              value: '6379'
-            - name: RABBIT_MQ_BACKGROUND_QUEUE
-              value: 'BACKGROUND'
           volumeMounts:
             - name: log-volume
               mountPath: /usr/src/app/logs
@@ -129,4 +124,4 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 8080
-  type: LoadBalancer
+  type: ClusterIP

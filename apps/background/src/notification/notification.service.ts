@@ -52,7 +52,6 @@ export class NotificationService {
         userInfo?: { name: string; avatar: string };
       })[] = notification[0]?.notificationArr || [];
 
-      console.log(notificationArr);
       const familyIds = new Set<number>();
       const userIds = new Set<string>();
       notificationArr.forEach((notification) => {
@@ -75,7 +74,6 @@ export class NotificationService {
       families.families.forEach((family) =>
         familyMap.set(family.idFamily, family),
       );
-      console.log(familyMap);
       const userMap = new Map<string, GetUserResponse>();
       if (users.users !== undefined) {
         users.users.forEach((user) => userMap.set(user.idUser, user));

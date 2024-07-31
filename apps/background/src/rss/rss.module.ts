@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { RssController } from './rss.controller';
 import { RssService } from './rss.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,12 +7,12 @@ import {
   ArticleCategory,
   ArticleDatabaseModule,
   Enclosure,
+  RmqModule,
 } from '@app/common';
-import { BackgroundModule } from '../background.module';
 
 @Module({
   imports: [
-    forwardRef(() => BackgroundModule),
+    RmqModule,
     ArticleDatabaseModule,
     TypeOrmModule.forFeature([Article, ArticleCategory, Enclosure]),
   ],
