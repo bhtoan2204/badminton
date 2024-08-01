@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { FamilyController } from './family.controller';
 import {
-  DatabaseModule,
+  MainDatabaseModule,
   Family,
   FamilyExtraPackages,
   FamilyRoles,
@@ -35,7 +35,7 @@ import { FamilyGrpcModule } from './grpc/family-grpc.module';
           ? './apps/family/.env.production'
           : './apps/family/.env',
     }),
-    DatabaseModule,
+    MainDatabaseModule,
     RmqModule,
     StorageModule,
     InvitationModule,

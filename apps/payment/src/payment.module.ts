@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 import {
-  DatabaseModule,
+  MainDatabaseModule,
   Discount,
   Family,
   FamilyExtraPackages,
@@ -37,7 +37,7 @@ import { FinanceModule } from './finance/finance.module';
           : './apps/payment/.env',
     }),
     RmqModule,
-    DatabaseModule,
+    MainDatabaseModule,
     DiscountModule,
     TypeOrmModule.forFeature([
       PackageMain,
@@ -57,6 +57,6 @@ import { FinanceModule } from './finance/finance.module';
   ],
   controllers: [PaymentController],
   providers: [PaymentService],
-  exports: [RmqModule, DatabaseModule],
+  exports: [RmqModule, MainDatabaseModule],
 })
 export class PaymentModule {}

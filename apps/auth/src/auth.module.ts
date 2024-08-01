@@ -7,7 +7,7 @@ import {
   Users,
 } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
-import { DatabaseModule } from '@app/common/database/database.module';
+import { MainDatabaseModule } from '@app/common/database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -39,7 +39,7 @@ import { UserGrpcModule } from './grpc/user-grpc.module';
           ? './apps/auth/.env.production'
           : './apps/auth/.env',
     }),
-    DatabaseModule,
+    MainDatabaseModule,
     AuthModule,
     RefreshTokenModule,
     RmqModule,

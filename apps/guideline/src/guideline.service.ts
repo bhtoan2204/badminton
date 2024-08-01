@@ -475,7 +475,6 @@ export class GuidelineService {
     try {
       const guideline = await this.guideItemsRepository.findOne({
         where: { id_guide_item: id_guideline, is_shared: true },
-        relations: ['family'],
       });
       if (!guideline) {
         throw new RpcException({

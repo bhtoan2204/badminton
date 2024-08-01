@@ -66,7 +66,11 @@ export class ShoppingLists {
   @OneToMany(() => ShoppingItems, (shoppingItem) => shoppingItem.shoppingList)
   shoppingItems: ShoppingItems[];
 
-  @OneToOne(() => FinanceExpenditure)
+  @OneToOne(
+    () => FinanceExpenditure,
+    (financeExpenditure) => financeExpenditure.shoppingLists,
+    { onDelete: 'SET NULL' },
+  )
   @JoinColumn({ name: 'id_expenditure' })
   expenditure: FinanceExpenditure;
 }

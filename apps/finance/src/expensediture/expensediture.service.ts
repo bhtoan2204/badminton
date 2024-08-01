@@ -145,7 +145,12 @@ export class ExpenseditureService {
             id_family,
             expenditure_date: Between(startDate, endDate),
           },
-          relations: ['financeExpenditureType', 'users'],
+          relations: [
+            'financeExpenditureType',
+            'users',
+            'shoppingLists',
+            'utilities',
+          ],
           order: { created_at: 'DESC' },
         });
       const sum =
@@ -296,24 +301,57 @@ export class ExpenseditureService {
         },
         skip: (dto.page - 1) * dto.itemsPerPage,
         take: dto.itemsPerPage,
-        relations: ['financeExpenditureType', 'users'],
+        relations: [
+          'financeExpenditureType',
+          'users',
+          'shoppingLists',
+          'utilities',
+        ],
       };
+
       if (dto.sortBy && dto.sortDirection) {
         option['order'] = {
           [dto.sortBy]: dto.sortDirection,
         };
       }
+
+      let fromDate: Date | null = null;
+      let toDate: Date | null = null;
       if (dto.fromDate && dto.toDate) {
-        option.where['expenditure_date'] = Between(dto.fromDate, dto.toDate);
+        fromDate = new Date(dto.fromDate);
+        toDate = new Date(dto.toDate);
+        toDate.setDate(toDate.getDate() + 1);
+        option.where['expenditure_date'] = Between(fromDate, toDate);
       }
-      const [data, total] =
-        await this.financeExpenditureRepository.findAndCount(option);
-      const sum =
-        data.map((expense) => expense.amount).reduce((a, b) => a + b, 0) || 0;
+
+      const totalSumQuery = this.financeExpenditureRepository
+        .createQueryBuilder('expenditure')
+        .select('SUM(expenditure.amount)', 'sum')
+        .where('expenditure.id_family = :id_family', {
+          id_family: dto.id_family,
+        });
+
+      if (fromDate && toDate) {
+        totalSumQuery.andWhere(
+          'expenditure.expenditure_date BETWEEN :fromDate AND :toDate',
+          {
+            fromDate: fromDate.toISOString(),
+            toDate: toDate.toISOString(),
+          },
+        );
+      }
+
+      const [totalSumResult, [data, total]] = await Promise.all([
+        totalSumQuery.getRawOne(),
+        this.financeExpenditureRepository.findAndCount(option),
+      ]);
+
+      const totalSum = totalSumResult.sum || 0;
+
       return {
         data: data,
         total: total,
-        sum: sum,
+        sum: parseInt(totalSum),
         message: 'Get expenditure by date range',
       };
     } catch (error) {
@@ -332,7 +370,12 @@ export class ExpenseditureService {
     try {
       const expenditure = await this.financeExpenditureRepository.findOne({
         where: { id_expenditure, id_family },
-        relations: ['financeExpenditureType', 'users'],
+        relations: [
+          'financeExpenditureType',
+          'users',
+          'shoppingLists',
+          'utilities',
+        ],
       });
       if (!expenditure) {
         throw new RpcException({
@@ -453,7 +496,7 @@ export class ExpenseditureService {
       const {
         id_expenditure,
         id_family,
-        id_expenditure_type,
+        id_expense_type,
         amount,
         description,
         expenditure_date,
@@ -482,11 +525,10 @@ export class ExpenseditureService {
           await this.storageService.uploadImageExpense(params);
         expenditure.image_url = uploadImageData.fileUrl;
       }
-
-      if (id_expenditure_type !== undefined) {
+      if (id_expense_type !== undefined && id_expense_type !== null) {
         const expenseType = await this.financeExpenditureTypeRepository.findOne(
           {
-            where: { id_expenditure_type, id_family },
+            where: { id_expenditure_type: id_expense_type, id_family },
           },
         );
         if (!expenseType) {
@@ -495,7 +537,7 @@ export class ExpenseditureService {
             statusCode: HttpStatus.NOT_FOUND,
           });
         }
-        expenditure.id_expenditure_type = id_expenditure_type;
+        expenditure.id_expenditure_type = id_expense_type;
       }
 
       if (amount !== undefined && amount !== null) {
@@ -511,9 +553,17 @@ export class ExpenseditureService {
         expenditure.id_created_by = id_created_by;
       }
 
+      await this.financeExpenditureRepository.save(expenditure);
       const updatedExpenditure =
-        await this.financeExpenditureRepository.save(expenditure);
-
+        await this.financeExpenditureRepository.findOne({
+          where: { id_expenditure, id_family },
+          relations: [
+            'financeExpenditureType',
+            'users',
+            'shoppingLists',
+            'utilities',
+          ],
+        });
       return {
         data: updatedExpenditure,
         message: 'Update expenditure',

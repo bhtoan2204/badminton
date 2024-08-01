@@ -8,7 +8,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Family } from './family.entity';
 import { HouseholdItemCategories } from './household_item_categories.entity';
 import { Room } from './room.entity';
 import { HouseholdDurableItems } from './household_durable_items.entity';
@@ -42,10 +41,6 @@ export class HouseholdItems {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @ManyToOne(() => Family, (family) => family.householdItems)
-  @JoinColumn({ name: 'id_family' })
-  family: Family;
 
   @ManyToOne(
     () => HouseholdItemCategories,

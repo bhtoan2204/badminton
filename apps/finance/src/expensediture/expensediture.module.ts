@@ -4,7 +4,7 @@ import { ExpenseditureService } from './expensediture.service';
 import { FinanceModule } from '../finance.module';
 import { StorageModule } from '../storage/storage.module';
 import {
-  DatabaseModule,
+  MainDatabaseModule,
   FinanceExpenditure,
   FinanceExpenditureType,
   MemberFamily,
@@ -15,7 +15,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [
     forwardRef(() => FinanceModule),
     StorageModule,
-    DatabaseModule,
+    MainDatabaseModule,
     TypeOrmModule.forFeature([
       FinanceExpenditure,
       FinanceExpenditureType,

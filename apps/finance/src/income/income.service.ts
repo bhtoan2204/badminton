@@ -136,20 +136,49 @@ export class IncomeService {
         take: dto.itemsPerPage,
         relations: ['financeIncomeSource', 'users'],
       };
+
       if (dto.sortBy && dto.sortDirection) {
         option['order'] = {
           [dto.sortBy]: dto.sortDirection,
         };
       }
+
+      let fromDate: Date | null = null;
+      let toDate: Date | null = null;
       if (dto.fromDate && dto.toDate) {
-        option.where['income_date'] = Between(dto.fromDate, dto.toDate);
+        fromDate = new Date(dto.fromDate);
+        toDate = new Date(dto.toDate);
+        toDate.setDate(toDate.getDate() + 1);
+        option.where['expenditure_date'] = Between(fromDate, toDate);
       }
-      const [data, total] =
-        await this.financeIncomeRepository.findAndCount(option);
-      const sum = data.reduce((acc, cur) => acc + cur.amount, 0) || 0;
+
+      // Query to get the total sum
+      const totalSumQuery = this.financeIncomeRepository
+        .createQueryBuilder('income')
+        .select('SUM(income.amount)', 'sum')
+        .where('income.id_family = :id_family', { id_family: dto.id_family });
+
+      if (fromDate && toDate) {
+        totalSumQuery.andWhere(
+          'income.expenditure_date BETWEEN :fromDate AND :toDate',
+          {
+            fromDate: fromDate.toISOString(),
+            toDate: toDate.toISOString(),
+          },
+        );
+      }
+
+      // Run both queries in parallel
+      const [totalSumResult, [data, total]] = await Promise.all([
+        totalSumQuery.getRawOne(),
+        this.financeIncomeRepository.findAndCount(option),
+      ]);
+
+      const totalSum = totalSumResult.sum || 0;
+
       return {
         data: data,
-        sum: sum,
+        sum: parseInt(totalSum),
         total: total,
         message: 'Get income by date range',
       };
@@ -451,7 +480,14 @@ export class IncomeService {
       if (description !== undefined) {
         income.description = description;
       }
-      const updatedIncome = await this.financeIncomeRepository.save(income);
+      await this.financeIncomeRepository.save(income);
+      const updatedIncome = await this.financeIncomeRepository.findOne({
+        where: {
+          id_income: id_income,
+          id_family: id_family,
+        },
+        relations: ['financeIncomeSource', 'users'],
+      });
       return {
         data: updatedIncome,
         message: 'Update income successfully',

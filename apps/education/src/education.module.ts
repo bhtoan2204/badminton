@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { EducationController } from './education.controller';
 import { EducationService } from './education.service';
 import {
-  DatabaseModule,
+  MainDatabaseModule,
   EducationProgress,
   RmqModule,
   Subjects,
@@ -25,7 +25,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           : './apps/education/.env',
     }),
     RmqModule,
-    DatabaseModule,
+    MainDatabaseModule,
     TypeOrmModule.forFeature([EducationProgress, Subjects]),
   ],
   controllers: [EducationController],

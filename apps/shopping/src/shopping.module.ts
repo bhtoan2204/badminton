@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ShoppingController } from './shopping.controller';
 import { ShoppingService } from './shopping.service';
 import {
-  DatabaseModule,
+  MainDatabaseModule,
   RmqModule,
   ShoppingItems,
   ShoppingItemTypes,
@@ -28,7 +28,7 @@ import { SerperModule } from './serper/serper.module';
           : './apps/shopping/.env',
     }),
     RmqModule,
-    DatabaseModule,
+    MainDatabaseModule,
     TypeOrmModule.forFeature([
       ShoppingItemTypes,
       ShoppingLists,

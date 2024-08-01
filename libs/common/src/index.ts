@@ -26,12 +26,15 @@ export * from './database/entity/refresh_token.entity';
 export * from './database/entity/role.entity';
 export * from './database/entity/users.entity';
 export * from './database/entity/payment_history.entity';
-export * from './database/entity/household_items.entity';
-export * from './database/entity/room.entity';
-export * from './database/entity/household_item_categories.entity';
-export * from './database/entity/household_durable_items.entity';
-export * from './database/entity/household_consumable_items.entity';
+
+export * from './database/entity/household/household_items.entity';
+export * from './database/entity/household/room.entity';
+export * from './database/entity/household/household_item_categories.entity';
+export * from './database/entity/household/household_durable_items.entity';
+export * from './database/entity/household/household_consumable_items.entity';
+
 export * from './database/entity/guideline/guide_items.entity';
+
 export * from './database/entity/education_progress.entity';
 export * from './database/entity/subject.entity';
 export * from './database/entity/shopping_item_types.entity';

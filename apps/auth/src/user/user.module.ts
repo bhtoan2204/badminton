@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from './user.service';
-import { DatabaseModule, OTP, RmqModule, Users } from '@app/common';
+import { MainDatabaseModule, OTP, RmqModule, Users } from '@app/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
@@ -13,7 +13,7 @@ import { TwilioModule } from 'nestjs-twilio';
 
 @Module({
   imports: [
-    DatabaseModule,
+    MainDatabaseModule,
     TypeOrmModule.forFeature([Users, OTP, FamilyInvitation]),
     RmqModule,
     StorageModule,

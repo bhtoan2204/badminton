@@ -3,7 +3,7 @@ import { IncomeController } from './income.controller';
 import { IncomeService } from './income.service';
 import { FinanceModule } from '../finance.module';
 import {
-  DatabaseModule,
+  MainDatabaseModule,
   FinanceIncome,
   FinanceIncomeSource,
   MemberFamily,
@@ -13,7 +13,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 @Module({
   imports: [
     forwardRef(() => FinanceModule),
-    DatabaseModule,
+    MainDatabaseModule,
     TypeOrmModule.forFeature([
       FinanceIncome,
       FinanceIncomeSource,

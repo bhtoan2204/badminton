@@ -1,7 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { FinanceController } from './finance.controller';
 import { FinanceService } from './finance.service';
-import { DatabaseModule, RmqModule } from '@app/common';
+import { MainDatabaseModule, RmqModule } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import { AssetModule } from './asset/asset.module';
 import { ExpenseditureModule } from './expensediture/expensediture.module';
@@ -22,7 +22,7 @@ import * as Joi from 'joi';
           : './apps/finance/.env',
     }),
     RmqModule,
-    DatabaseModule,
+    MainDatabaseModule,
     forwardRef(() => AssetModule),
     forwardRef(() => ExpenseditureModule),
     forwardRef(() => IncomeModule),
@@ -30,6 +30,6 @@ import * as Joi from 'joi';
   ],
   controllers: [FinanceController],
   providers: [FinanceService],
-  exports: [RmqModule, DatabaseModule],
+  exports: [RmqModule, MainDatabaseModule],
 })
 export class FinanceModule {}

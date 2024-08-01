@@ -2,14 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
-import { Family } from './family.entity';
 import { HouseholdItems } from './household_items.entity';
 
 @Entity('room')
@@ -32,10 +29,6 @@ export class Room {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @ManyToOne(() => Family, (family) => family.rooms)
-  @JoinColumn({ name: 'id_family' })
-  family: Family;
 
   @OneToMany(() => HouseholdItems, (householdItems) => householdItems.room)
   householdItems: HouseholdItems[];

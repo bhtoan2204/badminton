@@ -8,11 +8,6 @@ import { FamilyExtraPackages } from './entity/family_package_extra.entity';
 import { PackageCombo } from './entity/package_combo.entity';
 import { PackageExtra } from './entity/package_extra.entity';
 import { PackageMain } from './entity/package_main.entity';
-import { HouseholdItems } from './entity/household_items.entity';
-import { Room } from './entity/room.entity';
-import { HouseholdItemCategories } from './entity/household_item_categories.entity';
-import { HouseholdDurableItems } from './entity/household_durable_items.entity';
-import { HouseholdConsumableItems } from './entity/household_consumable_items.entity';
 import { parse } from 'pg-connection-string';
 import { EducationProgress } from './entity/education_progress.entity';
 import { Subjects } from './entity/subject.entity';
@@ -84,11 +79,6 @@ import * as Joi from 'joi';
             PackageCombo,
             PackageExtra,
             PackageMain,
-            HouseholdItems,
-            Room,
-            HouseholdItemCategories,
-            HouseholdDurableItems,
-            HouseholdConsumableItems,
             EducationProgress,
             Subjects,
             ShoppingItemTypes,
@@ -125,4 +115,4 @@ import * as Joi from 'joi';
     ShoppingItemSubscriber,
   ],
 })
-export class DatabaseModule {}
+export class MainDatabaseModule {}

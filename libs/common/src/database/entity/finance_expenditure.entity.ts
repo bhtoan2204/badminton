@@ -4,11 +4,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { FinanceExpenditureType } from './finance_expenditure_type.entity';
 import { Users } from './users.entity';
+import { Utilities } from './utilities.entity';
+import { ShoppingLists } from './shopping_lists.entity';
 
 @Entity('finance_expenditure')
 export class FinanceExpenditure {
@@ -36,6 +39,12 @@ export class FinanceExpenditure {
   @Column('text', { nullable: true })
   image_url: string;
 
+  @Column('int', { nullable: true })
+  id_utility: number;
+
+  @Column('int', { nullable: true })
+  id_shopping_list: number;
+
   @CreateDateColumn()
   created_at: Date;
 
@@ -45,6 +54,7 @@ export class FinanceExpenditure {
   @ManyToOne(
     () => FinanceExpenditureType,
     (financeExpenditureType) => financeExpenditureType.financeExpenditures,
+    { onDelete: 'CASCADE' },
   )
   @JoinColumn({ name: 'id_expenditure_type' })
   financeExpenditureType: FinanceExpenditureType;
@@ -52,4 +62,17 @@ export class FinanceExpenditure {
   @ManyToOne(() => Users, (user) => user.financeExpenditures)
   @JoinColumn({ name: 'id_created_by' })
   users: Users;
+
+  @OneToOne(() => Utilities, (utilities) => utilities.expenditure, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'id_utility' })
+  utilities: Utilities;
+
+  @OneToOne(() => ShoppingLists, (shoppingLists) => shoppingLists.expenditure, {
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'id_shopping_list' })
+  shoppingLists: ShoppingLists;
 }

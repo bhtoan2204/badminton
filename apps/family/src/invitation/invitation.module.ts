@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { InvitationController } from './invitation.controller';
 import { InvitationService } from './invitation.service';
 import {
-  DatabaseModule,
+  MainDatabaseModule,
   Family,
   FamilyExtraPackages,
   FamilyRoles,
@@ -15,7 +15,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
-    DatabaseModule,
+    MainDatabaseModule,
     RmqModule,
     TypeOrmModule.forFeature([
       Family,

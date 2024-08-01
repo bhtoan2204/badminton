@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { RefreshTokenController } from './refreshToken.controller';
 import { RefreshTokenService } from './refreshToken.service';
-import { DatabaseModule, RefreshToken, RmqModule } from '@app/common';
+import { MainDatabaseModule, RefreshToken, RmqModule } from '@app/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
     RmqModule,
-    DatabaseModule,
+    MainDatabaseModule,
     TypeOrmModule.forFeature([RefreshToken]),
   ],
   controllers: [RefreshTokenController],

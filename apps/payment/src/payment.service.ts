@@ -168,8 +168,6 @@ export class PaymentService {
         message: 'Check order success',
       };
     } catch (error) {
-      console.error('Error details:', error);
-      console.error('Error stack:', error.stack);
       throw new RpcException({
         message: error.message,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

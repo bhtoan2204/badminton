@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString, Max } from 'class-validator';
 
 export class AbstractDto {
   @ApiProperty({ type: Number, default: 1 })
@@ -10,6 +10,7 @@ export class AbstractDto {
 
   @ApiProperty({ type: Number, default: 10 })
   @IsNumber()
+  @Max(100)
   @Transform(({ value }) => parseInt(value, 10))
   itemsPerPage: number;
 

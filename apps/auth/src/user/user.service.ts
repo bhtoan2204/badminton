@@ -603,6 +603,7 @@ export class UserService {
           { email, login_type: LoginType.LOCAL },
           { phone, login_type: LoginType.LOCAL },
         ],
+        select: ['id_user', 'password', 'salt'],
       });
       if (!user) {
         throw new RpcException({

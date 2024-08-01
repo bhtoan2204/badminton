@@ -49,7 +49,11 @@ export class Utilities {
   @JoinColumn({ name: 'id_family' })
   family: Family;
 
-  @OneToOne(() => FinanceExpenditure)
+  @OneToOne(
+    () => FinanceExpenditure,
+    (financeExpenditure) => financeExpenditure.utilities,
+    { onDelete: 'SET NULL' },
+  )
   @JoinColumn({ name: 'id_expenditure' })
   expenditure: FinanceExpenditure;
 }

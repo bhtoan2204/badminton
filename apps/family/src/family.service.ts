@@ -127,9 +127,15 @@ export class FamilyService {
       if (search) {
         query.andWhere(
           new Brackets((qb) => {
-            qb.where('user.firstname LIKE :search', {
+            qb.where('LOWER(user.firstname) ILIKE LOWER(:search)', {
               search: `%${search}%`,
-            }).orWhere('user.lastname LIKE :search', { search: `%${search}%` });
+            })
+              .orWhere('LOWER(user.lastname) ILIKE LOWER(:search)', {
+                search: `%${search}%`,
+              })
+              .orWhere('LOWER(user.email) ILIKE LOWER(:search)', {
+                search: `%${search}%`,
+              });
           }),
         );
       }

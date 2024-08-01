@@ -2,7 +2,7 @@ import { Module, forwardRef } from '@nestjs/common';
 import { HouseholdController } from './household.controller';
 import { HouseholdService } from './household.service';
 import {
-  DatabaseModule,
+  MainDatabaseModule,
   HouseholdConsumableItems,
   HouseholdDurableItems,
   HouseholdItemCategories,
@@ -29,7 +29,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           : './apps/household/.env',
     }),
     RmqModule,
-    DatabaseModule,
+    MainDatabaseModule,
     StorageModule,
     TypeOrmModule.forFeature([
       HouseholdItems,
