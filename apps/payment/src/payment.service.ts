@@ -168,6 +168,7 @@ export class PaymentService {
         message: 'Check order success',
       };
     } catch (error) {
+      console.log(error);
       throw new RpcException({
         message: error.message,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -209,7 +210,6 @@ export class PaymentService {
     const mainPackage = await this.packageMainRepository.findOne({
       where: { id_main_package: order.id_package_main },
     });
-
     if (order.id_family) {
       const family = await this.familyRepository.findOne({
         where: { id_family: order.id_family },
@@ -219,20 +219,25 @@ export class PaymentService {
         .toDate();
       await this.familyRepository.save(family);
     } else {
-      const family = new Family();
-      family.quantity = 1;
-      family.owner_id = order.id_user;
-      family.expired_at = moment()
-        .add(mainPackage.duration_months, 'months')
-        .toDate();
-      const newFamily = await this.familyRepository.save(family);
-      const memberFamily = new MemberFamily();
-      memberFamily.id_user = order.id_user;
-      memberFamily.role = FamilyRole.OWNER;
-      memberFamily.id_family = newFamily.id_family;
-      await this.memberFamilyRepository.save(memberFamily);
-      order.id_family = family.id_family;
-      await this.addDefaultExpenseIncomeType(family.id_family);
+      const newFamily = await this.familyRepository.save({
+        quantity: 1,
+        owner_id: order.id_user,
+        expired_at: moment()
+          .add(mainPackage.duration_months, 'months')
+          .toDate(),
+      });
+      console.log(newFamily);
+
+      await this.memberFamilyRepository.save({
+        id_user: order.id_user,
+        role: FamilyRole.OWNER,
+        id_family: newFamily.id_family,
+      });
+
+      order.id_family = newFamily.id_family;
+      await this.orderRepository.save(order);
+
+      await this.addDefaultExpenseIncomeType(newFamily.id_family);
     }
   }
 
