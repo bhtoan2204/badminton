@@ -8,6 +8,7 @@ export * from './database/database.module';
 export * from './database/guideline_database.module';
 export * from './database/article_database.module';
 export * from './database/calendar_database.module';
+export * from './database/household_database.module';
 
 export * from './sentry/sentry.module';
 export * from './sentry/sentry-exception.filter';

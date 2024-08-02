@@ -145,6 +145,7 @@ export class HouseholdService {
         data: data,
       };
     } catch (error) {
+      console.log(error);
       throw new RpcException({
         message: error.message,
         statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
