@@ -2,12 +2,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { CategoryEvent } from './category_event.entity';
 
 @Entity('calendar')
 export class Calendar {
@@ -61,8 +58,4 @@ export class Calendar {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @ManyToOne(() => CategoryEvent, (categoryEvent) => categoryEvent.calendars)
-  @JoinColumn({ name: 'category' })
-  categoryEvent: CategoryEvent;
 }

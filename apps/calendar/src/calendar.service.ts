@@ -219,7 +219,11 @@ export class CalendarService {
         start_timezone,
         end_timezone,
       });
-      const data = await this.calendarRepository.save(newCalendar);
+      await this.calendarRepository.save(newCalendar);
+      const data = await this.calendarRepository.findOne({
+        where: { id_calendar: newCalendar.id_calendar },
+        relations: ['categoryEvent'],
+      });
       return {
         message: 'Success',
         data: data,
@@ -274,7 +278,11 @@ export class CalendarService {
       if (recurrence_rule) calendar.recurrence_rule = recurrence_rule;
       if (start_timezone) calendar.start_timezone = start_timezone;
       if (end_timezone) calendar.end_timezone = end_timezone;
-      const data = await this.calendarRepository.save(calendar);
+      await this.calendarRepository.save(calendar);
+      const data = await this.calendarRepository.findOne({
+        where: { id_calendar, id_family },
+        relations: ['categoryEvent'],
+      });
       return {
         message: 'Success',
         data: data,

@@ -2,11 +2,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Calendar } from './calendar.entity';
 
 @Entity('category_event')
 export class CategoryEvent {
@@ -31,7 +29,4 @@ export class CategoryEvent {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @OneToMany(() => Calendar, (calendar) => calendar.categoryEvent)
-  calendars: Calendar[];
 }

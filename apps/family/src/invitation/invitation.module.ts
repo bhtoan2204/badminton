@@ -3,13 +3,9 @@ import { InvitationController } from './invitation.controller';
 import { InvitationService } from './invitation.service';
 import {
   MainDatabaseModule,
-  Family,
-  FamilyExtraPackages,
-  FamilyRoles,
   MemberFamily,
-  PackageExtra,
   RmqModule,
-  Users,
+  FamilyInvitation,
 } from '@app/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -17,14 +13,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [
     MainDatabaseModule,
     RmqModule,
-    TypeOrmModule.forFeature([
-      Family,
-      PackageExtra,
-      FamilyExtraPackages,
-      MemberFamily,
-      FamilyRoles,
-      Users,
-    ]),
+    TypeOrmModule.forFeature([MemberFamily, FamilyInvitation]),
   ],
   controllers: [InvitationController],
   providers: [InvitationService],

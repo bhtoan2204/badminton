@@ -32,7 +32,7 @@ export class InvitationService {
     try {
       return await this.rmqService.send(
         this.familyClient,
-        'familyClient/getInvitationCode',
+        'familyClient/generateInvitation',
         { id_user, id_family },
       );
     } catch (error) {

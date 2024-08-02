@@ -149,7 +149,7 @@ export class IncomeService {
         fromDate = new Date(dto.fromDate);
         toDate = new Date(dto.toDate);
         toDate.setDate(toDate.getDate() + 1);
-        option.where['expenditure_date'] = Between(fromDate, toDate);
+        option.where['income_date'] = Between(fromDate, toDate);
       }
 
       // Query to get the total sum
@@ -160,7 +160,7 @@ export class IncomeService {
 
       if (fromDate && toDate) {
         totalSumQuery.andWhere(
-          'income.expenditure_date BETWEEN :fromDate AND :toDate',
+          'income.income_date BETWEEN :fromDate AND :toDate',
           {
             fromDate: fromDate.toISOString(),
             toDate: toDate.toISOString(),

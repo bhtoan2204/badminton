@@ -1,20 +1,34 @@
+import { FamilyInvitation, MemberFamily } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { EntityManager } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import * as uuid from 'uuid';
 
 @Injectable()
 export class InvitationService {
-  constructor(private readonly entityManager: EntityManager) {}
+  constructor(
+    private readonly entityManager: EntityManager,
+    @InjectRepository(FamilyInvitation)
+    private readonly familyInvitationRepository: Repository<FamilyInvitation>,
+    @InjectRepository(MemberFamily)
+    private readonly memberFamilyRepository: Repository<MemberFamily>,
+  ) {}
 
   async getInvitationCode(id_user: string, id_family: number) {
     try {
-      const query = 'SELECT * FROM f_get_invitation_code($1, $2)';
-      const params = [id_user, id_family];
-      const data = await this.entityManager.query(query, params);
+      const data = await this.familyInvitationRepository.findOne({
+        where: { id_family },
+      });
+      if (!data) {
+        throw new RpcException({
+          message: 'No invitation code found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
       return {
         message: 'Success',
-        data: data[0],
+        data: data,
       };
     } catch (error) {
       throw new RpcException({
@@ -27,15 +41,21 @@ export class InvitationService {
   async generateInvitation(id_user: string, id_family: number) {
     try {
       const code = uuid.v4();
-      const query = 'SELECT * FROM f_generate_invitation($1, $2, $3)';
-      const params = [id_user, id_family, code];
-      await this.entityManager.query(query, params);
+      const oldData = await this.familyInvitationRepository.findOne({
+        where: { id_family },
+      });
+      if (oldData) {
+        await this.familyInvitationRepository.delete({
+          id_family: id_family,
+        });
+      }
+      const data = await this.familyInvitationRepository.save({
+        id_family: id_family,
+        code: code,
+      });
       return {
         message: 'Success',
-        data: {
-          id_family: id_family,
-          code: code,
-        },
+        data: data,
       };
     } catch (error) {
       throw new RpcException({
@@ -47,15 +67,31 @@ export class InvitationService {
 
   async handleInvitation(id_user: string, id_family: number, code: string) {
     try {
-      const query = 'SELECT * FROM f_handle_invitation($1, $2, $3)';
-      const params = [id_user, id_family, code];
-      const data = await this.entityManager.query(query, params);
+      const memberFamily = await this.memberFamilyRepository.findOne({
+        where: { id_user, id_family },
+      });
+      if (memberFamily) {
+        throw new RpcException({
+          message: 'You are already a member of this family',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+      const invitation = await this.familyInvitationRepository.find({
+        where: { id_family, code },
+      });
+      if (!invitation.length) {
+        throw new RpcException({
+          message: 'Invalid code',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+      const data = await this.memberFamilyRepository.save({
+        id_user: id_user,
+        id_family: id_family,
+      });
       return {
-        message: data[0].f_handle_invitation || 'Error',
-        data: {
-          id_family: id_family,
-          code: code,
-        },
+        message: 'Success',
+        data: data,
       };
     } catch (error) {
       throw new RpcException({
