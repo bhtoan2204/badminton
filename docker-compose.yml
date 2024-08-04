@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   gateway:
-    image: mjkundta/gateway:latest
+    image: mjkundta/gateway:local
     build:
       context: .
       dockerfile: ./apps/gateway/Dockerfile
@@ -16,7 +16,7 @@ services:
       - .:/usr/src/app
 
   auth:
-    image: mjkundta/auth:latest
+    image: mjkundta/auth:local
     build:
       context: .
       dockerfile: ./apps/auth/Dockerfile
@@ -27,7 +27,7 @@ services:
       - .:/usr/src/app
 
   # user:
-  #   image: mjkundta/user:latest
+  #   image: mjkundta/user:local
   #   build:
   #     context: .
   #     dockerfile: ./apps/user/Dockerfile
@@ -40,7 +40,7 @@ services:
   #     - .:/usr/src/app
 
   payment:
-    image: mjkundta/payment:latest
+    image: mjkundta/payment:local
     build:
       context: .
       dockerfile: ./apps/payment/Dockerfile
@@ -53,7 +53,7 @@ services:
       - .:/usr/src/app
 
   family:
-    image: mjkundta/family:latest
+    image: mjkundta/family:local
     build:
       context: .
       dockerfile: ./apps/family/Dockerfile
@@ -66,7 +66,7 @@ services:
       - .:/usr/src/app
 
   storage:
-    image: mjkundta/storage:latest
+    image: mjkundta/storage:local
     build:
       context: .
       dockerfile: ./apps/storage/Dockerfile
@@ -79,7 +79,7 @@ services:
       - .:/usr/src/app
 
   # mailer:
-  #   image: mjkundta/mailer:latest
+  #   image: mjkundta/mailer:local
   #   build:
   #     context: .
   #     dockerfile: ./apps/mailer/Dockerfile
@@ -92,7 +92,7 @@ services:
   #     - .:/usr/src/app
 
   chat:
-    image: mjkundta/chat:latest
+    image: mjkundta/chat:local
     build:
       context: .
       dockerfile: ./apps/chat/Dockerfile
@@ -105,7 +105,7 @@ services:
       - .:/usr/src/app
 
   calendar:
-    image: mjkundta/calendar:latest
+    image: mjkundta/calendar:local
     build:
       context: .
       dockerfile: ./apps/calendar/Dockerfile
@@ -116,7 +116,7 @@ services:
       - .:/usr/src/app
 
   guideline:
-    image: mjkundta/guideline:latest
+    image: mjkundta/guideline:local
     build:
       context: .
       dockerfile: ./apps/guideline/Dockerfile
@@ -127,7 +127,7 @@ services:
       - .:/usr/src/app
 
   education:
-    image: mjkundta/education:latest
+    image: mjkundta/education:local
     build:
       context: .
       dockerfile: ./apps/education/Dockerfile
@@ -138,7 +138,7 @@ services:
       - .:/usr/src/app
 
   search:
-    image: mjkundta/search:latest
+    image: mjkundta/search:local
     build:
       context: .
       dockerfile: ./apps/elasticsearch/Dockerfile
@@ -151,7 +151,7 @@ services:
       - '8081:8081'
 
   household:
-    image: mjkundta/household:latest
+    image: mjkundta/household:local
     build:
       context: .
       dockerfile: ./apps/household/Dockerfile
@@ -162,7 +162,7 @@ services:
       - .:/usr/src/app
 
   finance:
-    image: mjkundta/finance:latest
+    image: mjkundta/finance:local
     build:
       context: .
       dockerfile: ./apps/finance/Dockerfile
@@ -173,7 +173,7 @@ services:
       - .:/usr/src/app
 
   shopping:
-    image: mjkundta/shopping:latest
+    image: mjkundta/shopping:local
     build:
       context: .
       dockerfile: ./apps/shopping/Dockerfile
@@ -184,7 +184,7 @@ services:
       - .:/usr/src/app
 
   # invoice:
-  #   image: mjkundta/invoice:latest
+  #   image: mjkundta/invoice:local
   #   build:
   #     context: .
   #     dockerfile: ./apps/invoice/Dockerfile
@@ -197,7 +197,7 @@ services:
   #     - .:/usr/src/app
 
   background:
-    image: mjkundta/background:latest
+    image: mjkundta/background:local
     build:
       context: .
       dockerfile: ./apps/background/Dockerfile
@@ -210,7 +210,7 @@ services:
       - .:/usr/src/app
 
   # filebeat:
-  #   image: mjkundta/filebeat:latest
+  #   image: mjkundta/filebeat:local
   #   build:
   #     context: .
   #     dockerfile: ./apps/filebeat/Dockerfile
