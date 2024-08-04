@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { EntityManager, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 import {
   FinanceExpenditure,
@@ -9,12 +9,11 @@ import {
   UtilitiesType,
 } from '@app/common';
 import { RpcException } from '@nestjs/microservices';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UtilitiesService {
   constructor(
-    private readonly entityManager: EntityManager,
     private readonly storageService: StorageService,
     @InjectRepository(UtilitiesType)
     private utilitiesTypeRepository: Repository<UtilitiesType>,
@@ -24,6 +23,7 @@ export class UtilitiesService {
     private financeExpenditureTypeRepository: Repository<FinanceExpenditureType>,
     @InjectRepository(FinanceExpenditure)
     private financeExpenditureRepository: Repository<FinanceExpenditure>,
+    @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
 
   async getUtilityTypes() {
@@ -100,8 +100,7 @@ export class UtilitiesService {
   }
 
   async createUtility(id_user: string, dto: any, file: any) {
-    const queryRunner =
-      this.utilitiesRepository.manager.connection.createQueryRunner();
+    const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
@@ -127,9 +126,10 @@ export class UtilitiesService {
       newUtility.description = description;
       newUtility.image_url = fileUrl;
 
-      const utility = await queryRunner.manager.save(Utilities, newUtility);
+      const utility = await queryRunner.manager.save(newUtility);
 
-      let expenditureType = await this.financeExpenditureTypeRepository.findOne(
+      let expenditureType = await queryRunner.manager.findOne(
+        FinanceExpenditureType,
         {
           where: {
             expense_type_name: 'Utilities',
@@ -139,16 +139,14 @@ export class UtilitiesService {
       );
 
       if (!expenditureType) {
-        expenditureType = await queryRunner.manager.save(
-          FinanceExpenditureType,
-          {
-            id_family: newUtility.id_family,
-            expense_type_name: 'Utilities',
-          },
-        );
+        expenditureType = queryRunner.manager.create(FinanceExpenditureType, {
+          id_family: newUtility.id_family,
+          expense_type_name: 'Utilities',
+        });
+        expenditureType = await queryRunner.manager.save(expenditureType);
       }
 
-      const expenditure = this.financeExpenditureRepository.create({
+      const expenditure = queryRunner.manager.create(FinanceExpenditure, {
         id_family: newUtility.id_family,
         id_expenditure_type: expenditureType.id_expenditure_type,
         amount: newUtility.value,
@@ -159,15 +157,13 @@ export class UtilitiesService {
         id_user: id_user,
       });
 
-      const savedExpenditure = await queryRunner.manager.save(
-        FinanceExpenditure,
-        expenditure,
-      );
+      const savedExpenditure = await queryRunner.manager.save(expenditure);
 
       utility.id_expenditure = savedExpenditure.id_expenditure;
-      const savedUtility = await queryRunner.manager.save(Utilities, utility);
+      const savedUtility = await queryRunner.manager.save(utility);
 
       await queryRunner.commitTransaction();
+
       return {
         data: savedUtility,
         message: 'Utility created successfully',
