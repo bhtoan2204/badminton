@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  Unique,
 } from 'typeorm';
 import { LoginType } from '../enum/login_type.enum';
 import { Family } from './family.entity';
@@ -16,6 +17,8 @@ import { FinanceIncome } from './finance_income.entity';
 import { RefreshToken } from './refresh_token.entity';
 
 @Entity('users')
+@Unique(['email', 'login_type'])
+@Unique(['phone'])
 export class Users {
   @PrimaryGeneratedColumn('uuid')
   id_user: string;

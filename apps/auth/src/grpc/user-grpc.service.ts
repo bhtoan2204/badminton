@@ -23,7 +23,7 @@ export class UserGrpcService {
         lastname: user.lastname,
         genre: user.genre,
         avatar: user.avatar,
-        birthdate: user.birthdate.toISOString(),
+        birthdate: user.birthdate.toString(),
         createdAt: user.created_at.toISOString(),
         updatedAt: user.updated_at.toISOString(),
       };
@@ -57,7 +57,7 @@ export class UserGrpcService {
           lastname: user.lastname,
           genre: user.genre,
           avatar: user.avatar,
-          birthdate: user.birthdate.toISOString(),
+          birthdate: user.birthdate.toString(),
           createdAt: user.created_at.toISOString(),
           updatedAt: user.updated_at.toISOString(),
         })),

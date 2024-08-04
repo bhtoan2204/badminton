@@ -71,9 +71,11 @@ export class FamilyService {
 
   async checkIsMember(id_user: string, id_family: number): Promise<boolean> {
     try {
+      console.log(id_user, id_family);
       const memberFamily = await this.memberFamilyRepository.findOne({
         where: { id_user, id_family },
       });
+      console.log(memberFamily);
       return !!memberFamily;
     } catch (error) {
       throw new RpcException({

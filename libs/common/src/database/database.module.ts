@@ -16,7 +16,6 @@ import { MemberFamily } from './entity/member_family.entity';
 import { Feedback } from './entity/feedback.entity';
 import { FeedbackMetadata } from './entity/feedbackMetadata.entity';
 import { Order } from './entity/order.entity';
-import { OrderSubscriber } from './subcriber/order.subcriber';
 import { FamilyRoles } from './entity/family_roles.entity';
 import { ShoppingListTypes } from './entity/shopping_list_type.entity';
 import { Utilities } from './entity/utilities.entity';
@@ -27,10 +26,11 @@ import { FinanceIncome } from './entity/finance_income.entity';
 import { FinanceIncomeSource } from './entity/finance_income_source.entity';
 import { FinanceAssets } from './entity/finance_assets.entity';
 import { RefreshToken } from './entity/refresh_token.entity';
-import { FamilySubscriber } from './subcriber/family.subcriber';
-import { UtilitiesSubcriber } from './subcriber/utilities.subcriber';
-import { ShoppingListSubscriber } from './subcriber/shoppingList.subcriber';
-import { ShoppingItemSubscriber } from './subcriber/shoppingItems.subcriber';
+import { FamilySubscriber } from './subscriber/family.subscriber';
+import { UtilitiesSubscriber } from './subscriber/utilities.subscriber';
+import { ShoppingListSubscriber } from './subscriber/shoppingList.subscriber';
+import { ShoppingItemSubscriber } from './subscriber/shoppingItems.subscriber';
+import { OrderSubscriber } from './subscriber/order.subscriber';
 import { Discount } from './entity/discount.entity';
 import { OTP } from './entity/otp.entity';
 import { FamilyInvitation } from './entity/family_invitation.entity';
@@ -106,7 +106,7 @@ import * as Joi from 'joi';
   providers: [
     OrderSubscriber,
     FamilySubscriber,
-    UtilitiesSubcriber,
+    UtilitiesSubscriber,
     ShoppingListSubscriber,
     ShoppingItemSubscriber,
   ],

@@ -65,7 +65,7 @@ export class FinanceExpenditure {
 
   @OneToOne(() => Utilities, (utilities) => utilities.expenditure, {
     cascade: true,
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'id_utility' })
   utilities: Utilities;
