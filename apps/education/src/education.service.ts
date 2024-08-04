@@ -1,8 +1,14 @@
-import { EducationProgress, Subjects } from '@app/common';
+import {
+  EducationProgress,
+  GetUserRequest,
+  GetUserResponse,
+  Subjects,
+} from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, EntityManager, Repository } from 'typeorm';
+import { UserService } from './user/user.service';
 
 @Injectable()
 export class EducationService {
@@ -12,11 +18,21 @@ export class EducationService {
     private educationProgressRepository: Repository<EducationProgress>,
     @InjectRepository(Subjects)
     private subjectsRepository: Repository<Subjects>,
+    private readonly userService: UserService,
   ) {}
 
   async createEducationProgress(owner_id_user: string, dto: any) {
     try {
       const { id_family, id_user, title, progress_notes, school_info } = dto;
+      const userReq: GetUserRequest = { idUser: id_user };
+      const user: GetUserResponse = await this.userService.findOne(userReq);
+      if (!user) {
+        throw new RpcException({
+          message: 'User not found',
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        });
+      }
+
       const newEducationProgress = new EducationProgress();
       newEducationProgress.id_family = id_family;
       newEducationProgress.id_user = id_user;
@@ -50,7 +66,6 @@ export class EducationService {
       const queryBuilder = this.educationProgressRepository
         .createQueryBuilder('educationProgress')
         .leftJoinAndSelect('educationProgress.subjects', 'subjects')
-        .leftJoinAndSelect('educationProgress.user', 'user')
         .where('educationProgress.id_family = :id_family', { id_family })
         .skip((page - 1) * itemsPerPage)
         .take(itemsPerPage);
@@ -83,10 +98,21 @@ export class EducationService {
       }
 
       const [data, total] = await queryBuilder.getManyAndCount();
-
+      const userIds = data.map((item) => item.id_user);
+      const users = await this.userService.findByIds({ idUsers: userIds });
+      const userEducationMap = {};
+      users.users.forEach((user) => {
+        userEducationMap[user.idUser] = user;
+      });
       return {
         message: 'Success',
-        data: data,
+        data: data.map((item) => {
+          const user = userEducationMap[item.id_user];
+          return {
+            ...item,
+            users: user,
+          };
+        }),
         total: total,
       };
     } catch (error) {
@@ -108,7 +134,7 @@ export class EducationService {
           id_family: id_family,
           id_education_progress: id_education_progress,
         },
-        relations: ['subjects', 'user'],
+        relations: ['subjects'],
       });
 
       if (!data) {
@@ -117,6 +143,16 @@ export class EducationService {
           statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         });
       }
+      const userReq: GetUserRequest = { idUser: data.id_user };
+      const user: GetUserResponse = await this.userService.findOne(userReq);
+      data['users'] = {
+        id_user: user.idUser,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        phone: user.phone,
+        avatar: user.avatar,
+      };
       data.subjects.sort((a, b) => a.id_subject - b.id_subject);
       const [successfulSubjects, totalSubject] = data.subjects.reduce(
         (acc, curr) => {

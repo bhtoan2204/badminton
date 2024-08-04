@@ -2,14 +2,15 @@ import { Module } from '@nestjs/common';
 import { EducationController } from './education.controller';
 import { EducationService } from './education.service';
 import {
-  MainDatabaseModule,
   EducationProgress,
   RmqModule,
   Subjects,
+  EducationDatabaseModule,
 } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
-import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModule } from './user/user.module';
+import * as Joi from 'joi';
 
 @Module({
   imports: [
@@ -25,8 +26,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           : './apps/education/.env',
     }),
     RmqModule,
-    MainDatabaseModule,
+    EducationDatabaseModule,
     TypeOrmModule.forFeature([EducationProgress, Subjects]),
+    UserModule,
   ],
   controllers: [EducationController],
   providers: [EducationService],

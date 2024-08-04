@@ -9,8 +9,6 @@ import { PackageCombo } from './entity/package_combo.entity';
 import { PackageExtra } from './entity/package_extra.entity';
 import { PackageMain } from './entity/package_main.entity';
 import { parse } from 'pg-connection-string';
-import { EducationProgress } from './entity/education_progress.entity';
-import { Subjects } from './entity/subject.entity';
 import { ShoppingItemTypes } from './entity/shopping_item_types.entity';
 import { ShoppingItems } from './entity/shopping_items.entity';
 import { ShoppingLists } from './entity/shopping_lists.entity';
@@ -79,8 +77,6 @@ import * as Joi from 'joi';
             PackageCombo,
             PackageExtra,
             PackageMain,
-            EducationProgress,
-            Subjects,
             ShoppingItemTypes,
             ShoppingItems,
             ShoppingLists,

@@ -124,7 +124,9 @@
       "entryFile": "src/main",
       "sourceRoot": "./",
       "compilerOptions": {
-        "tsConfigPath": "apps/education/tsconfig.app.json"
+        "tsConfigPath": "apps/education/tsconfig.app.json",
+        "assets": ["proto/*.proto"],
+        "watchAssets": true
       }
     },
     "elasticsearch": {

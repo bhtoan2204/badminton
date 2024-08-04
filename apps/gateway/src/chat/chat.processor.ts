@@ -8,8 +8,13 @@ export class ChatProcessor {
 
   @Process('sendNotification')
   async handleNotification(job: Job) {
-    const { id_user, notification } = job.data;
-    this.chatGateway.emitNotificationToUser(id_user, notification);
+    try {
+      const { id_user, notification } = job.data;
+      this.chatGateway.emitNotificationToUser(id_user, notification);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 }
 
@@ -19,7 +24,12 @@ export class AuthProcessor {
 
   @Process('logoutUser')
   async handleNotification(job: Job) {
-    const { id_user } = job.data;
-    this.chatGateway.emitLogoutToUser(id_user);
+    try {
+      const { id_user } = job.data;
+      this.chatGateway.emitLogoutToUser(id_user);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 }

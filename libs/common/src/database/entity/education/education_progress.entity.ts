@@ -2,14 +2,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Family } from './family.entity';
-import { Users } from './users.entity';
 import { Subjects } from './subject.entity';
 
 @Entity('education_progress')
@@ -37,14 +33,6 @@ export class EducationProgress {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @ManyToOne(() => Family, (family) => family.educationProgresses)
-  @JoinColumn({ name: 'id_family' })
-  family: Family;
-
-  @ManyToOne(() => Users, (user) => user.educationProgresses)
-  @JoinColumn({ name: 'id_user' })
-  user: Users;
 
   @OneToMany(() => Subjects, (subject) => subject.educationProgress, {
     cascade: ['remove'],

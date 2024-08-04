@@ -209,35 +209,35 @@ services:
     volumes:
       - .:/usr/src/app
 
-  filebeat:
-    image: mjkundta/filebeat:latest
-    build:
-      context: .
-      dockerfile: ./apps/filebeat/Dockerfile
-    container_name: filebeat
-    command: filebeat -e -strict.perms=false
-    volumes:
-      - ./logs:/src/logs
-    labels:
-      co.elastic.logs/json.overwrite_keys: true
-      co.elastic.logs/json.add_error_key: true
-      co.elastic.logs/json.expand_keys: true
+  # filebeat:
+  #   image: mjkundta/filebeat:latest
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/filebeat/Dockerfile
+  #   container_name: filebeat
+  #   command: filebeat -e -strict.perms=false
+  #   volumes:
+  #     - ./logs:/src/logs
+  #   labels:
+  #     co.elastic.logs/json.overwrite_keys: true
+  #     co.elastic.logs/json.add_error_key: true
+  #     co.elastic.logs/json.expand_keys: true
 
-  # jaeger:
-  #   image: jaegertracing/all-in-one:1.30
-  #   container_name: jaeger
-  #   ports:
-  #     - '5775:5775/udp'
-  #     - '6831:6831/udp'
-  #     - '6832:6832/udp'
-  #     - '5778:5778'
-  #     - '16686:16686'
-  #     - '14250:14250'
-  #     - '14268:14268'
-  #     - '14269:14269'
-  #     - '9411:9411'
-  #   environment:
-  #     COLLECTOR_ZIPKIN_HTTP_PORT: 9411
+  jaeger:
+    image: jaegertracing/all-in-one:1.30
+    container_name: jaeger
+    ports:
+      - '5775:5775/udp'
+      - '6831:6831/udp'
+      - '6832:6832/udp'
+      - '5778:5778'
+      - '16686:16686'
+      - '14250:14250'
+      - '14268:14268'
+      - '14269:14269'
+      - '9411:9411'
+    environment:
+      COLLECTOR_ZIPKIN_HTTP_PORT: 9411
 
   rabbitmq:
     image: rabbitmq:management
@@ -260,24 +260,24 @@ services:
     ports:
       - '6379:6379'
 
-  redis-insight:
-    image: redis/redisinsight:latest
-    restart: always
-    ports:
-      - '5540:5540'
+  # redis-insight:
+  #   image: redis/redisinsight:latest
+  #   restart: always
+  #   ports:
+  #     - '5540:5540'
 
-  jaeger:
-    image: jaegertracing/all-in-one:1.22
-    container_name: jaeger
-    ports:
-      - '5775:5775/udp'
-      - '6831:6831/udp'
-      - '6832:6832/udp'
-      - '5778:5778'
-      - '16686:16686'
-      - '14268:14268'
-      - '14250:14250'
-      - '4317:4317'
-      - '9411:9411'
-    environment:
-      COLLECTOR_ZIPKIN_HTTP_PORT: 9411
+  # jaeger:
+  #   image: jaegertracing/all-in-one:1.22
+  #   container_name: jaeger
+  #   ports:
+  #     - '5775:5775/udp'
+  #     - '6831:6831/udp'
+  #     - '6832:6832/udp'
+  #     - '5778:5778'
+  #     - '16686:16686'
+  #     - '14268:14268'
+  #     - '14250:14250'
+  #     - '4317:4317'
+  #     - '9411:9411'
+  #   environment:
+  #     COLLECTOR_ZIPKIN_HTTP_PORT: 9411

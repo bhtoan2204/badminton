@@ -89,6 +89,7 @@ export class BackgroundService implements OnModuleInit {
       );
     } catch (error) {
       console.error(error);
+      throw error;
     }
   }
 
@@ -117,6 +118,7 @@ export class BackgroundService implements OnModuleInit {
       );
     } catch (error) {
       console.error(error);
+      throw error;
     }
   }
 
@@ -238,6 +240,7 @@ export class BackgroundService implements OnModuleInit {
       }
     } catch (error) {
       console.error(error);
+      throw error;
     }
   }
 
@@ -293,6 +296,7 @@ export class BackgroundService implements OnModuleInit {
       }
     } catch (error) {
       console.error(error);
+      throw error;
     }
   }
 
@@ -316,6 +320,7 @@ export class BackgroundService implements OnModuleInit {
       );
     } catch (error) {
       console.error(error);
+      throw error;
     }
   }
 
@@ -401,6 +406,7 @@ export class BackgroundService implements OnModuleInit {
     try {
     } catch (error) {
       console.error(error);
+      throw error;
     }
   }
 
@@ -409,6 +415,7 @@ export class BackgroundService implements OnModuleInit {
     try {
     } catch (error) {
       console.error(error);
+      throw error;
     }
   }
 }

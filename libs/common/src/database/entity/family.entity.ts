@@ -11,7 +11,6 @@ import {
 } from 'typeorm';
 import { Users } from './users.entity';
 import { FamilyExtraPackages } from './family_package_extra.entity';
-import { EducationProgress } from './education_progress.entity';
 import { ShoppingLists } from './shopping_lists.entity';
 import { MemberFamily } from './member_family.entity';
 import { Order } from './order.entity';
@@ -66,12 +65,6 @@ export class Family {
     (familyExtraPackage) => familyExtraPackage.family,
   )
   familyExtraPackages: FamilyExtraPackages[];
-
-  @OneToMany(
-    () => EducationProgress,
-    (education_progress) => education_progress.family,
-  )
-  educationProgresses: EducationProgress[];
 
   @OneToMany(() => ShoppingLists, (shoppingList) => shoppingList.family)
   shoppingLists: ShoppingLists[];

@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 import { LoginType } from '../enum/login_type.enum';
 import { Family } from './family.entity';
-import { EducationProgress } from './education_progress.entity';
 import { MemberFamily } from './member_family.entity';
 import { Feedback } from './feedback.entity';
 import { Order } from './order.entity';
@@ -84,12 +83,6 @@ export class Users {
 
   @OneToMany(() => Family, (family) => family.owner_id)
   families: Family[];
-
-  @OneToMany(
-    () => EducationProgress,
-    (educationProgress) => educationProgress.user,
-  )
-  educationProgresses: EducationProgress[];
 
   @OneToMany(() => MemberFamily, (memberFamily) => memberFamily.user)
   memberFamilies: MemberFamily[];
