@@ -7,6 +7,11 @@ import {
 } from 'typeorm';
 import { EducationProgress } from './education_progress.entity';
 
+export enum EducationStatus {
+  in_progress = 'in_progress',
+  completed = 'completed',
+}
+
 @Entity('subject')
 export class Subjects {
   @PrimaryGeneratedColumn()
@@ -22,19 +27,21 @@ export class Subjects {
   description: string;
 
   @Column('json', { nullable: true })
-  component_scores: { component_name: string; score: number }[];
+  component_scores: {
+    component_name: string;
+    score: number;
+    target_score: number;
+    maximum_score: number;
+    created_at: Date;
+    updated_at: Date;
+  }[];
 
-  @Column('float', { nullable: true, default: null })
-  midterm_score: number;
-
-  @Column('float', { nullable: true, default: null })
-  final_score: number;
-
-  @Column('float', { nullable: true, default: null })
-  bonus_score: number;
-
-  @Column('varchar', { nullable: true, default: 'in_progress' })
-  status: string;
+  @Column('enum', {
+    nullable: true,
+    default: EducationStatus.in_progress,
+    enum: EducationStatus,
+  })
+  status: EducationStatus;
 
   @ManyToOne(
     () => EducationProgress,

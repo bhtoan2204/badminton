@@ -1,5 +1,6 @@
 import {
   EducationProgress,
+  EducationStatus,
   GetUserRequest,
   GetUserResponse,
   Subjects,
@@ -108,9 +109,33 @@ export class EducationService {
         message: 'Success',
         data: data.map((item) => {
           const user = userEducationMap[item.id_user];
+          let totalTargetScore = 0;
+          let totalScore = 0;
+          let totalMaximumScore = 0;
+          let successfulSubjects = 0;
+          const totalSubject = item.subjects.length;
+          item.subjects.reduce((acc, curr) => {
+            if (curr.component_scores) {
+              curr.component_scores.forEach((component) => {
+                totalTargetScore = acc + component.target_score;
+                totalScore = acc + component.score;
+                totalMaximumScore = acc + (component.maximum_score || 0);
+                if (curr.status === EducationStatus.completed) {
+                  successfulSubjects++;
+                }
+              });
+            }
+            return acc;
+          }, 0);
+
           return {
             ...item,
             users: user,
+            total_successful_subject: successfulSubjects,
+            total_subjects: totalSubject,
+            total_score: totalScore,
+            total_target_score: totalTargetScore,
+            total_maximum_score: totalMaximumScore,
           };
         }),
         total: total,
@@ -153,23 +178,33 @@ export class EducationService {
         phone: user.phone,
         avatar: user.avatar,
       };
-      data.subjects.sort((a, b) => a.id_subject - b.id_subject);
-      const [successfulSubjects, totalSubject] = data.subjects.reduce(
-        (acc, curr) => {
-          if (curr.status === 'successful') {
-            acc[0]++;
-          }
-          acc[1]++;
-          return acc;
-        },
-        [0, 0],
-      );
+      let totalTargetScore = 0;
+      let totalScore = 0;
+      let totalMaximumScore = 0;
+      let successfulSubjects = 0;
+      const totalSubject = data.subjects.length;
+      data.subjects.reduce((acc, curr) => {
+        if (curr.component_scores) {
+          curr.component_scores.forEach((component) => {
+            totalTargetScore = acc + component.target_score;
+            totalScore = acc + component.score;
+            totalMaximumScore = acc + (component.maximum_score || 0);
+            if (curr.status === EducationStatus.completed) {
+              successfulSubjects++;
+            }
+          });
+        }
+        return acc;
+      }, 0);
 
       return {
         message: 'Success',
         data: data,
         total_subject: totalSubject,
-        successful_subject: successfulSubjects,
+        total_successful_subject: successfulSubjects,
+        total_score: totalScore,
+        total_target_score: totalTargetScore,
+        total_maximum_score: totalMaximumScore,
       };
     } catch (error) {
       throw new RpcException({
@@ -421,14 +456,25 @@ export class EducationService {
     }
   }
 
-  async addComponentScore(id_user: string, dto: any) {
-    const {
-      id_subject,
-      id_education_progress,
-      id_family,
-      component_name,
-      score,
-    } = dto;
+  async addComponentScore(
+    id_user: string,
+    dto: {
+      id_subject: number;
+      id_education_progress: number;
+      id_family: number;
+      component_scores: {
+        id_subject: number;
+        id_education_progress: number;
+        id_family: number;
+        component_name: string;
+        score: number;
+        target_score: number;
+        maximum_score: number;
+      }[];
+    },
+  ) {
+    const { id_subject, id_education_progress, id_family, component_scores } =
+      dto;
     try {
       const education_progress = await this.educationProgressRepository.findOne(
         {
@@ -456,14 +502,23 @@ export class EducationService {
           statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         });
       }
-      const component_scores = {
-        component_name: component_name,
-        score: score,
-      };
-      if (subject.component_scores === null) {
-        subject.component_scores = [component_scores];
-      } else {
-        subject.component_scores.push(component_scores);
+      const component_scores_arr = component_scores.map((item) => {
+        return {
+          component_name: item.component_name,
+          score: item.score | 0,
+          target_score: item.target_score,
+          maximum_score: item.maximum_score,
+          created_at: new Date(),
+          updated_at: new Date(),
+        };
+      });
+      if (component_scores_arr.length > 0) {
+        if (subject.component_scores === null) {
+          subject.component_scores = component_scores_arr;
+        } else {
+          subject.component_scores =
+            subject.component_scores.concat(component_scores_arr);
+        }
       }
       const data = await this.entityManager.save(subject);
       return {
@@ -485,6 +540,8 @@ export class EducationService {
       id_family,
       component_name,
       score,
+      target_score,
+      maximum_score,
       index,
     } = dto;
     try {
@@ -516,7 +573,11 @@ export class EducationService {
       }
       const component_scores = {
         component_name: component_name,
-        score: score,
+        score: score | 0,
+        target_score: target_score,
+        maximum_score: maximum_score,
+        created_at: new Date(),
+        updated_at: new Date(),
       };
 
       if (index < 0 || index > subject.component_scores.length) {
@@ -551,6 +612,8 @@ export class EducationService {
       id_family,
       component_name,
       score,
+      target_score,
+      maximum_score,
     } = dto;
     try {
       const education_progress = await this.educationProgressRepository.findOne(
@@ -592,8 +655,14 @@ export class EducationService {
         });
       }
       subject.component_scores[index] = {
-        component_name: component_name,
-        score: score,
+        component_name:
+          component_name || subject.component_scores[index].component_name,
+        score: score || subject.component_scores[index].score,
+        target_score: target_score,
+        maximum_score:
+          maximum_score || subject.component_scores[index].maximum_score,
+        created_at: subject.component_scores[index].created_at,
+        updated_at: new Date(),
       };
       const data = await this.entityManager.save(subject);
       return {
@@ -650,120 +719,6 @@ export class EducationService {
         });
       }
       subject.component_scores.splice(index, 1);
-      const data = await this.entityManager.save(subject);
-      return {
-        message: 'Success',
-        data: data,
-      };
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  }
-
-  async modifyScore(id_user: string, dto: any) {
-    const {
-      id_subject,
-      id_education_progress,
-      id_family,
-      midterm_score,
-      final_score,
-      bonus_score,
-    } = dto;
-    try {
-      const education_progress = await this.educationProgressRepository.findOne(
-        {
-          where: {
-            id_family: id_family,
-            id_education_progress: id_education_progress,
-          },
-        },
-      );
-      if (!education_progress) {
-        throw new RpcException({
-          message: 'Education progress not found',
-          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        });
-      }
-      const subject = await this.subjectsRepository.findOne({
-        where: {
-          id_subject: id_subject,
-          id_education_progress: id_education_progress,
-        },
-      });
-      if (!subject) {
-        throw new RpcException({
-          message: 'Subject not found',
-          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        });
-      }
-
-      if (midterm_score) {
-        subject.midterm_score = midterm_score;
-      }
-      if (final_score) {
-        subject.final_score = final_score;
-      }
-      if (bonus_score) {
-        subject.bonus_score = bonus_score;
-      }
-      const data = await this.entityManager.save(subject);
-      return {
-        message: 'Success',
-        data: data,
-      };
-    } catch (error) {
-      console.log(error);
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  }
-
-  async removeScore(id_user: string, dto: any) {
-    const { id_subject, id_family, id_education_progress, score_name } = dto;
-    try {
-      const education_progress = await this.educationProgressRepository.findOne(
-        {
-          where: {
-            id_family: id_family,
-            id_education_progress: id_education_progress,
-          },
-        },
-      );
-      if (!education_progress) {
-        throw new RpcException({
-          message: 'Education progress not found',
-          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        });
-      }
-      const subject = await this.subjectsRepository.findOne({
-        where: {
-          id_subject: id_subject,
-          id_education_progress: id_education_progress,
-        },
-      });
-      if (!subject) {
-        throw new RpcException({
-          message: 'Subject not found',
-          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        });
-      }
-      if (score_name === 'midterm_score') {
-        subject.midterm_score = null;
-      } else if (score_name === 'final_score') {
-        subject.final_score = null;
-      } else if (score_name === 'bonus_score') {
-        subject.bonus_score = null;
-      } else {
-        throw new RpcException({
-          message: 'Score name not found',
-          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        });
-      }
       const data = await this.entityManager.save(subject);
       return {
         message: 'Success',

@@ -22,11 +22,12 @@ import { CurrentUser, JwtAuthGuard } from '../../utils';
 import { CreateSubjectDto } from './dto/createSubject.dto';
 import { SubjectService } from './subject.service';
 import { UpdateSubjectDto } from './dto/updateSubject.dto';
-import { AddComponentScoreDto } from './dto/addComponentScore.dto';
+import {
+  AddComponentScoreArrayDto,
+  AddComponentScoreDto,
+} from './dto/addComponentScore.dto';
 import { UpdateComponentScoreDto } from './dto/updateComponentScore.dto';
 import { DeleteComponentScoreDto } from './dto/deleteComponentScore.dto';
-import { ModifyScoreDto } from './dto/modifyScore.dto';
-import { RemoveScoreDto } from './dto/removeScore.dto';
 import { ChangeStatusSubjectDto } from './dto/changeStatusSubject.dto';
 
 @ApiTags('Subject')
@@ -101,7 +102,7 @@ export class SubjectController {
   @Post('addComponentScore')
   async addComponentScore(
     @CurrentUser() currentUser,
-    @Body() dto: AddComponentScoreDto,
+    @Body() dto: AddComponentScoreArrayDto,
   ) {
     return this.subjectService.addComponentScore(currentUser.id_user, dto);
   }
@@ -137,20 +138,6 @@ export class SubjectController {
     @Body() dto: DeleteComponentScoreDto,
   ) {
     return this.subjectService.deleteComponentScore(currentUser.id_user, dto);
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Modify midterm, final, bonus score' })
-  @Put('modifyScore')
-  async modifyScore(@CurrentUser() currentUser, @Body() dto: ModifyScoreDto) {
-    return this.subjectService.modifyScore(currentUser.id_user, dto);
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Modify midterm, final, bonus score' })
-  @Delete('removeScore')
-  async removeScore(@CurrentUser() currentUser, @Body() dto: RemoveScoreDto) {
-    return this.subjectService.removeScore(currentUser.id_user, dto);
   }
 
   @HttpCode(HttpStatus.OK)

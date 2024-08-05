@@ -3,10 +3,9 @@ import { EDUCATION_SERVICE } from '../../utils';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateSubjectDto } from './dto/createSubject.dto';
 import { UpdateSubjectDto } from './dto/updateSubject.dto';
-import { AddComponentScoreDto } from './dto/addComponentScore.dto';
+import { AddComponentScoreArrayDto } from './dto/addComponentScore.dto';
 import { UpdateComponentScoreDto } from './dto/updateComponentScore.dto';
 import { DeleteComponentScoreDto } from './dto/deleteComponentScore.dto';
-import { ModifyScoreDto } from './dto/modifyScore.dto';
 import { RmqService } from '@app/common';
 
 @Injectable()
@@ -96,7 +95,7 @@ export class SubjectService {
     }
   }
 
-  async addComponentScore(id_user: string, dto: AddComponentScoreDto) {
+  async addComponentScore(id_user: string, dto: AddComponentScoreArrayDto) {
     try {
       return await this.rmqService.send(
         this.educationClient,
@@ -146,21 +145,6 @@ export class SubjectService {
       return await this.rmqService.send(
         this.educationClient,
         'educationClient/deleteComponentScore',
-        { id_user, dto },
-      );
-    } catch (error) {
-      throw new HttpException(
-        error.message,
-        error.statusCode || error.status || 500,
-      );
-    }
-  }
-
-  async modifyScore(id_user: string, dto: ModifyScoreDto) {
-    try {
-      return await this.rmqService.send(
-        this.educationClient,
-        'educationClient/modifyScore',
         { id_user, dto },
       );
     } catch (error) {

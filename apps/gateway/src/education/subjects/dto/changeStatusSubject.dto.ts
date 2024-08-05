@@ -1,10 +1,6 @@
+import { EducationStatus } from '@app/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
-
-enum Status {
-  IN_PROGRESS = 'in_progress',
-  DONE = 'done',
-}
 
 export class ChangeStatusSubjectDto {
   @ApiProperty({ description: 'Subject id' })
@@ -23,8 +19,8 @@ export class ChangeStatusSubjectDto {
   id_family: number;
 
   @ApiProperty({ description: 'Status' })
-  @IsEnum(Status, {
-    message: `Status must be either ${Status.IN_PROGRESS} or ${Status.DONE}`,
+  @IsEnum(EducationStatus, {
+    message: `Status must be either ${EducationStatus.in_progress} or ${EducationStatus.completed}`,
   })
   @IsNotEmpty()
   status: string;

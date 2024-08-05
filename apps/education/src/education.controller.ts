@@ -130,18 +130,6 @@ export class EducationController {
     return this.educationService.deleteComponentScore(data.id_user, data.dto);
   }
 
-  @EventPattern('educationClient/modifyScore')
-  async modifyScore(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return this.educationService.modifyScore(data.id_user, data.dto);
-  }
-
-  @EventPattern('educationClient/removeScore')
-  async removeScore(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
-    return this.educationService.removeScore(data.id_user, data.dto);
-  }
-
   @EventPattern('educationClient/changeStatus')
   async changeStatus(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);

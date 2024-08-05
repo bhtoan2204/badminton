@@ -41,6 +41,20 @@ export class UpdateComponentScoreDto {
   @IsNumber()
   @IsOptional()
   @Min(0.0, { message: 'Score must be at least 0.0' })
-  @Max(10.0, { message: 'Score must not be greater than 10.0' })
+  @Max(1000, { message: 'Score must not be greater than 1000' })
   score: number;
+
+  @ApiProperty({ description: 'Score of component', example: 9.5 })
+  @IsNumber()
+  @IsOptional()
+  @Min(0.0, { message: 'Score must be at least 0.0' })
+  @Max(1000, { message: 'Score must not be greater than 1000' })
+  target_score: number;
+
+  @ApiProperty({ description: 'Score of component', example: 10 })
+  @IsNumber()
+  @IsOptional()
+  @Min(0.0, { message: 'Score must be at least 0.0' })
+  @Max(1000, { message: 'Score must not be greater than 1000' })
+  maximum_score: number;
 }
