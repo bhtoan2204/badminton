@@ -28,6 +28,6 @@ export class GrpcHouseholdController implements HouseholdServiceController {
     | Promise<HouseholdResponse>
     | Observable<HouseholdResponse>
     | HouseholdResponse {
-    throw new Error('Method not implemented.');
+    return this.grpcHouseholdService.updateOneById(request);
   }
 }

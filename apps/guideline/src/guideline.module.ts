@@ -7,6 +7,7 @@ import * as Joi from 'joi';
 import { StorageModule } from './storage/storage.module';
 import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { HouseholdModule } from './household/household.module';
 
 @Module({
   imports: [
@@ -15,9 +16,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       validationSchema: Joi.object({
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_GUIDELINE_QUEUE: Joi.string().required(),
+
         GRPC_STORAGE_PACKAGE: Joi.string().required(),
         GRPC_STORAGE_PROTO_PATH: Joi.string().required(),
         GRPC_STORAGE_URL: Joi.string().required(),
+
+        GRPC_HOUSEHOLD_PACKAGE: Joi.string().required(),
+        GRPC_HOUSEHOLD_PROTO_PATH: Joi.string().required(),
+        GRPC_HOUSEHOLD_URL: Joi.string().required(),
       }),
       envFilePath:
         process.env.NODE_ENV === 'production'
@@ -28,6 +34,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     RmqModule.register({ name: 'ELASTICSEARCH' }),
     GuidelineDatabaseModule,
     StorageModule,
+    HouseholdModule,
     TypeOrmModule.forFeature([GuideItems]),
     ElasticsearchModule.registerAsync({
       imports: [ConfigModule],

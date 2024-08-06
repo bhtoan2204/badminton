@@ -1,11 +1,18 @@
-import { GuideItems, UploadFileRequest } from '@app/common';
+import {
+  FindOneHouseholdByIdRequest,
+  GuideItems,
+  UpdateOneByIdRequest,
+  UploadFileRequest,
+} from '@app/common';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { StorageService } from './storage/storage.service';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { InjectRepository } from '@nestjs/typeorm';
 import { lastValueFrom, timeout } from 'rxjs';
+import { HouseholdService } from './household/household.service';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class GuidelineService {
@@ -15,6 +22,8 @@ export class GuidelineService {
     @InjectRepository(GuideItems)
     private readonly guideItemsRepository: Repository<GuideItems>,
     @Inject('ELASTICSEARCH') private readonly elasticsearchClient: ClientProxy,
+    private readonly householdService: HouseholdService,
+    private dataSource: DataSource,
   ) {}
 
   async getAllGuideline(
@@ -56,6 +65,21 @@ export class GuidelineService {
       const data = await this.guideItemsRepository.findOne({
         where: { id_family, id_guide_item: id_guideline },
       });
+      if (!data) {
+        throw new RpcException({
+          message: 'Guide item not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      if (data.id_household_item) {
+        const householdReq: FindOneHouseholdByIdRequest = {
+          idHousehold: data.id_household_item,
+          idFamily: id_family,
+        };
+        const householdData =
+          await this.householdService.findOneById(householdReq);
+        data['householdData'] = householdData;
+      }
       return {
         message: 'Success',
         data: data,
@@ -72,29 +96,66 @@ export class GuidelineService {
     id_user: string,
     { id_family, name, description, id_household_item },
   ) {
-    try {
-      const newGuideItem = await this.guideItemsRepository.create({
-        id_family,
-        name,
-        description,
-        is_shared: false,
-        steps: null,
-      });
+    return await this.dataSource.transaction(
+      async (entityManager: EntityManager) => {
+        try {
+          let householdData = null;
+          if (id_household_item) {
+            const householdReq: FindOneHouseholdByIdRequest = {
+              idHousehold: id_household_item,
+              idFamily: id_family,
+            };
+            householdData =
+              await this.householdService.findOneById(householdReq);
 
-      const data = await this.guideItemsRepository.save(newGuideItem);
-      await this.elasticsearchClient.emit('guidelineIndexer/indexGuideline', {
-        data,
-      });
-      return {
-        message: 'Success',
-        data: newGuideItem,
-      };
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
+            if (!householdData) {
+              throw new RpcException({
+                message: 'Household item not found',
+                statusCode: HttpStatus.NOT_FOUND,
+              });
+            }
+          }
+
+          const savedGuideItem: GuideItems = await entityManager.save(
+            GuideItems,
+            {
+              id_family,
+              name,
+              id_household_item,
+              description,
+              is_shared: false,
+              steps: null,
+            },
+          );
+          console.log('savedGuideItem', savedGuideItem);
+          if (householdData !== null) {
+            const updateHouseholdReq: UpdateOneByIdRequest = {
+              idGuideItem: savedGuideItem.id_guide_item,
+              idFamily: id_family,
+              idHouseholdItem: id_household_item,
+            };
+            await this.householdService.updateOneById(updateHouseholdReq);
+          }
+
+          await this.elasticsearchClient.emit(
+            'guidelineIndexer/indexGuideline',
+            {
+              savedGuideItem,
+            },
+          );
+
+          return {
+            message: 'Success',
+            data: { newGuideItem: savedGuideItem, householdData },
+          };
+        } catch (error) {
+          throw new RpcException({
+            message: error.message,
+            statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          });
+        }
+      },
+    );
   }
 
   async updateGuideline(id_user: any, dto: any) {

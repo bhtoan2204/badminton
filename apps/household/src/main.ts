@@ -5,14 +5,14 @@ import { GrpcService, initTracing, RmqService } from '@app/common';
 async function bootstrap() {
   await initTracing('household');
   const app = await NestFactory.create(HouseholdModule);
-  const rmqService = app.get<RmqService>(RmqService);
 
+  const rmqService = app.get<RmqService>(RmqService);
   app.connectMicroservice(rmqService.getOptions('HOUSEHOLD'));
-  app.startAllMicroservices();
 
   const grpcService = app.get(GrpcService);
   app.connectMicroservice(grpcService.getOptions('HOUSEHOLD'));
 
+  app.startAllMicroservices();
   await app.init();
 }
 bootstrap();

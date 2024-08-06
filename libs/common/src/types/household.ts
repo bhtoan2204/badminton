@@ -50,6 +50,8 @@ export interface HouseholdItemCategoryRpc {
 
 export interface UpdateOneByIdRequest {
   idGuideItem: number;
+  idFamily: number;
+  idHouseholdItem: number;
 }
 
 export const HOUSEHOLD_PACKAGE_NAME = 'household';

@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { HouseholdItemCategories } from './household_item_categories.entity';
@@ -14,6 +15,7 @@ import { HouseholdDurableItems } from './household_durable_items.entity';
 import { HouseholdConsumableItems } from './household_consumable_items.entity';
 
 @Entity('household_items')
+@Unique(['id_guide_item'])
 export class HouseholdItems {
   @PrimaryGeneratedColumn()
   id_household_item: number;

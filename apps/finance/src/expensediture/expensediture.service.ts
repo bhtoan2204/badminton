@@ -150,6 +150,7 @@ export class ExpenseditureService {
             'users',
             'shoppingLists',
             'utilities',
+            'utilities.utilitiesType',
           ],
           order: { created_at: 'DESC' },
         });
@@ -306,6 +307,7 @@ export class ExpenseditureService {
           'users',
           'shoppingLists',
           'utilities',
+          'utilities.utilitiesType',
         ],
       };
 
@@ -375,6 +377,7 @@ export class ExpenseditureService {
           'users',
           'shoppingLists',
           'utilities',
+          'utilities.utilitiesType',
         ],
       });
       if (!expenditure) {
@@ -562,6 +565,7 @@ export class ExpenseditureService {
             'users',
             'shoppingLists',
             'utilities',
+            'utilities.utilitiesType',
           ],
         });
       return {

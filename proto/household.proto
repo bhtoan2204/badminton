@@ -47,4 +47,6 @@ message HouseholdItemCategoryRpc {
 
 message UpdateOneByIdRequest {
   int32 id_guide_item = 1;
+  int32 id_family = 2;
+  int32 id_household_item = 3;
 }

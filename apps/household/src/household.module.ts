@@ -14,6 +14,7 @@ import { StorageModule } from './storage/storage.module';
 import * as Joi from 'joi';
 import { RoomModule } from './room/room.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GrpcHouseholdModule } from './grpc/grpc-household.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       HouseholdConsumableItems,
       HouseholdItemCategories,
     ]),
+    forwardRef(() => GrpcHouseholdModule),
     forwardRef(() => RoomModule),
   ],
   controllers: [HouseholdController],
