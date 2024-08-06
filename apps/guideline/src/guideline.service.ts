@@ -68,7 +68,10 @@ export class GuidelineService {
     }
   }
 
-  async createGuideline(id_user: string, { id_family, name, description }) {
+  async createGuideline(
+    id_user: string,
+    { id_family, name, description, id_household_item },
+  ) {
     try {
       const newGuideItem = await this.guideItemsRepository.create({
         id_family,

@@ -3,6 +3,7 @@ import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
 import {
   CalendarResponse,
+  Empty,
   FindCalendarByFrequencyRequest,
   FindOneByIdRequest,
   GerUserIdsRequest,
@@ -12,14 +13,10 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import {
-  CALENDAR_EVENT_OCCURED_REPEATLY_DAILY,
-  CALENDAR_EVENT_OCCURED_REPEATLY_MONTHLY,
-  CALENDAR_EVENT_OCCURED_REPEATLY_WEEKLY,
-  CALENDAR_EVENT_OCCURED_REPEATLY_YEARLY,
+  CALENDAR_EVENT_OCCURED_NON_REPEATLY,
+  CALENDAR_EVENT_OCCURED_REPEATLY,
   CHECKLIST_OCCURED,
-  EXPENSE_REPORT,
   FAMILY_PACKAGE_EXPIRED,
-  INCOME_REPORT,
 } from './constant';
 import * as moment from 'moment';
 import { FamilyService } from './family/family.service';
@@ -37,13 +34,6 @@ export class BackgroundService implements OnModuleInit {
     private readonly familyService: FamilyService,
     private readonly userService: UserService,
     private readonly calendarService: CalendarService,
-    // @InjectRepository(Family) private familyRepository: Repository<Family>,
-    // @InjectRepository(MemberFamily)
-    // private memberFamilyRepository: Repository<MemberFamily>,
-    // @InjectRepository(Checklist)
-    // private checklistRepository: Repository<Checklist>,
-    // @InjectRepository(Calendar)
-    // private calendarRepository: Repository<Calendar>,
   ) {}
 
   async createNotificationFamily(
@@ -126,9 +116,7 @@ export class BackgroundService implements OnModuleInit {
     await this.addCalendarEventOccuredNonRepeatlyJob();
     await this.addFamilyPackageExpiredJob();
     await this.addChecklistNotificationJobs();
-    await this.addIncomeReportJob();
-    await this.addExpenseReportJob();
-    await this.addCalendarEventOccuredJob();
+    await this.addCalendarEventOccuredRepeatlyJob();
   }
 
   async addFamilyPackageExpiredJob() {
@@ -149,119 +137,88 @@ export class BackgroundService implements OnModuleInit {
     );
   }
 
-  async addIncomeReportJob() {
-    // Cron expression for the last day of each month at 12:00 AM
+  async addCalendarEventOccuredRepeatlyJob() {
     await this.cronQueue.add(
-      INCOME_REPORT,
-      {},
-      { repeat: { cron: '0 0 L * *' } },
-    );
-  }
-
-  async addExpenseReportJob() {
-    // Cron expression for the last day of each month at 12:00 AM
-    await this.cronQueue.add(
-      EXPENSE_REPORT,
-      {},
-      { repeat: { cron: '0 0 L * *' } },
-    );
-  }
-
-  async addCalendarEventOccuredJob() {
-    await this.cronQueue.add(
-      CALENDAR_EVENT_OCCURED_REPEATLY_DAILY,
+      CALENDAR_EVENT_OCCURED_REPEATLY,
       {},
       { repeat: { cron: '0 0 * * *' } },
-    );
-    await this.cronQueue.add(
-      CALENDAR_EVENT_OCCURED_REPEATLY_WEEKLY,
-      {},
-      { repeat: { cron: '0 0 * * 0' } },
-    );
-    await this.cronQueue.add(
-      CALENDAR_EVENT_OCCURED_REPEATLY_MONTHLY,
-      {},
-      { repeat: { cron: '0 0 1 * *' } },
-    );
-    await this.cronQueue.add(
-      CALENDAR_EVENT_OCCURED_REPEATLY_YEARLY,
-      {},
-      { repeat: { cron: '0 0 1 1 *' } },
     );
   }
 
   async addCalendarEventOccuredNonRepeatlyJob() {
-    await this.cronQueue.add(CALENDAR_EVENT_OCCURED_REPEATLY_DAILY, {});
+    await this.cronQueue.add(
+      CALENDAR_EVENT_OCCURED_NON_REPEATLY,
+      {},
+      { repeat: { cron: '0 0 * * *' } },
+    );
   }
 
-  async processCalendarEvents(frequency: string) {
+  @Process(CALENDAR_EVENT_OCCURED_NON_REPEATLY)
+  async handleCalendarEventOccuredNonRepeatly() {
     try {
-      const request: FindCalendarByFrequencyRequest = { frequency };
+      const request: Empty = {};
       const calendarRpc =
-        await this.calendarService.findCalendarByFrequency(request);
-      const repeatlyEvents = calendarRpc.calendar;
-      if (!repeatlyEvents || repeatlyEvents.length === 0) {
+        await this.calendarService.findNonRepeatCalendar(request);
+      const nonRepeatEvents = calendarRpc;
+      if (!nonRepeatEvents || nonRepeatEvents.length === 0) {
         return;
       }
-      for (const event of repeatlyEvents) {
-        const ruleParts = event.recurrenceRule.split(';');
-        let interval = 1; // Default interval
-        for (const part of ruleParts) {
-          if (part.startsWith('INTERVAL=')) {
-            interval = parseInt(part.split('=')[1], 10);
-          }
-        }
-        const jobName = `calendar_event_${event.idCalendar}_${frequency.toLowerCase()}_interval_${interval}`;
-        let repeatEvery: number;
-        switch (frequency) {
-          case 'DAILY':
-            repeatEvery = interval * 24 * 60 * 60 * 1000;
-            break;
-          case 'WEEKLY':
-            repeatEvery = interval * 7 * 24 * 60 * 60 * 1000;
-            break;
-          case 'MONTHLY':
-            repeatEvery = interval * 30 * 24 * 60 * 60 * 1000;
-            break;
-          case 'YEARLY':
-            repeatEvery = interval * 365 * 24 * 60 * 60 * 1000;
-            break;
-        }
-
-        await this.cronQueue.add(
-          jobName,
-          { eventId: event.idCalendar },
-          {
-            repeat: {
-              every: repeatEvery,
-            },
-          },
-        );
-      }
+      const nonRepeatEventsPromises = [];
+      nonRepeatEvents.forEach(async (event) =>
+        nonRepeatEventsPromises.push(
+          this.createNotificationFamily(event.idFamily, {
+            type: NotificationType.CALENDAR,
+            title: `Reminder for event: ${event.title}`,
+            title_vn: `Nhắc nhở cho sự kiện: ${event.title}`,
+            content: `The event "${event.title}" is scheduled for ${moment(
+              event.timeStart,
+            ).format('MMMM Do YYYY, h:mm:ss a')}`,
+            content_vn: `Sự kiện "${event.title}" được lên lịch vào lúc ${moment(
+              event.timeEnd,
+            ).format('MMMM Do YYYY, h:mm:ss a')}`,
+            id_target: event.idCalendar,
+          }),
+        ),
+      );
+      await Promise.all(nonRepeatEventsPromises);
     } catch (error) {
       console.error(error);
       throw error;
     }
   }
 
-  @Process(CALENDAR_EVENT_OCCURED_REPEATLY_DAILY)
+  @Process(CALENDAR_EVENT_OCCURED_REPEATLY)
   async handleCalendarEventOccured() {
-    await this.processCalendarEvents('DAILY');
-  }
-
-  @Process(CALENDAR_EVENT_OCCURED_REPEATLY_WEEKLY)
-  async handleCalendarEventOccuredWeekly() {
-    await this.processCalendarEvents('WEEKLY');
-  }
-
-  @Process(CALENDAR_EVENT_OCCURED_REPEATLY_MONTHLY)
-  async handleCalendarEventOccuredMonthly() {
-    await this.processCalendarEvents('MONTHLY');
-  }
-
-  @Process(CALENDAR_EVENT_OCCURED_REPEATLY_YEARLY)
-  async handleCalendarEventOccuredYearly() {
-    await this.processCalendarEvents('YEARLY');
+    try {
+      const request: FindCalendarByFrequencyRequest = { frequency: '' };
+      const calendarRpc =
+        await this.calendarService.findCalendarByFrequency(request);
+      const repeatEvents = calendarRpc.calendar;
+      if (!repeatEvents || repeatEvents.length === 0) {
+        return;
+      }
+      const repeatEventsPromises = [];
+      repeatEvents.forEach(async (event) =>
+        repeatEventsPromises.push(
+          this.createNotificationFamily(event.idFamily, {
+            type: NotificationType.CALENDAR,
+            title: `Reminder for event: ${event.title}`,
+            title_vn: `Nhắc nhở cho sự kiện: ${event.title}`,
+            content: `The event "${event.title}" is scheduled for ${moment(
+              event.timeStart,
+            ).format('MMMM Do YYYY, h:mm:ss a')}`,
+            content_vn: `Sự kiện "${event.title}" được lên lịch vào lúc ${moment(
+              event.timeEnd,
+            ).format('MMMM Do YYYY, h:mm:ss a')}`,
+            id_target: event.idCalendar,
+          }),
+        ),
+      );
+      await Promise.all(repeatEventsPromises);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   @Process('calendar_event_*_interval_*')
@@ -318,101 +275,6 @@ export class BackgroundService implements OnModuleInit {
           }),
         ),
       );
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
-
-  // @Process(CHECKLIST_OCCURED)
-  // async handleChecklistOccured() {
-  //   try {
-  //     const now = moment();
-  //     const threeDaysBefore = now.clone().add(3, 'days').toDate();
-  //     const oneDayBefore = now.clone().add(1, 'days').toDate();
-
-  //     const checklists = await this.checklistRepository.find({
-  //       where: [
-  //         {
-  //           due_date: LessThan(threeDaysBefore),
-  //           is_notified_3_days_before: false,
-  //         },
-  //         { due_date: LessThan(oneDayBefore), is_notified_1_day_before: false },
-  //         { due_date: LessThan(now.toDate()), is_notified_on_due_date: false },
-  //       ],
-  //     });
-
-  //     await Promise.all(
-  //       checklists.map(async (checklist) => {
-  //         const notifications = [];
-  //         const now = moment();
-  //         const dueDate = moment(checklist.due_date);
-
-  //         if (
-  //           dueDate.isSame(now.clone().add(3, 'days'), 'day') &&
-  //           !checklist.is_notified_3_days_before
-  //         ) {
-  //           notifications.push(
-  //             this.createNotificationFamily(checklist.id_family, {
-  //               type: NotificationType.CHECKLIST,
-  //               title: 'Checklist due in 3 days',
-  //               content: `Checklist "${checklist.task_name}" is due in 3 days`,
-  //               id_target: checklist.id_checklist,
-  //             }),
-  //           );
-  //           checklist.is_notified_3_days_before = true;
-  //         }
-  //         if (
-  //           dueDate.isSame(now.clone().add(1, 'days'), 'day') &&
-  //           !checklist.is_notified_1_day_before
-  //         ) {
-  //           notifications.push(
-  //             this.createNotificationFamily(checklist.id_family, {
-  //               type: NotificationType.CHECKLIST,
-  //               title: 'Checklist due tomorrow',
-  //               content: `Task "${checklist.task_name}" is due tomorrow`,
-  //               id_target: checklist.id_checklist,
-  //             }),
-  //           );
-  //           checklist.is_notified_1_day_before = true;
-  //         }
-
-  //         if (
-  //           dueDate.isSame(now, 'day') &&
-  //           !checklist.is_notified_on_due_date
-  //         ) {
-  //           notifications.push(
-  //             this.createNotificationFamily(checklist.id_family, {
-  //               type: NotificationType.CHECKLIST,
-  //               title: 'Checklist due today',
-  //               content: `Task "${checklist.task_name}" is due today`,
-  //               id_target: checklist.id_checklist,
-  //             }),
-  //           );
-  //           checklist.is_notified_on_due_date = true;
-  //         }
-
-  //         await Promise.all(notifications);
-  //         await this.checklistRepository.save(checklist);
-  //       }),
-  //     );
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-
-  @Process(EXPENSE_REPORT)
-  async handleExpenseReport() {
-    try {
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
-
-  @Process(INCOME_REPORT)
-  async handleIncomeReport() {
-    try {
     } catch (error) {
       console.error(error);
       throw error;

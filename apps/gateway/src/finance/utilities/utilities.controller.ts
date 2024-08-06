@@ -95,12 +95,17 @@ export class UtilitiesController {
           type: 'number',
           description: 'The value of the utility',
         },
+        name: {
+          type: 'string',
+          description: 'Name of the utility',
+        },
         description: {
           type: 'string',
           description: 'Description of the utility',
         },
         utilityImg: { type: 'string', format: 'binary' },
       },
+      required: ['id_family', 'id_utilities_type', 'value', 'name'],
     },
   })
   @UseInterceptors(
@@ -140,6 +145,10 @@ export class UtilitiesController {
         value: {
           type: 'number',
           description: 'The value of the utility',
+        },
+        name: {
+          type: 'string',
+          description: 'Name of the utility',
         },
         description: {
           type: 'string',

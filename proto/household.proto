@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package household;
+
+service HouseholdService {
+  rpc findOneById(FindOneHouseholdByIdRequest) returns (HouseholdResponse);
+  rpc updateOneById(UpdateOneByIdRequest) returns (HouseholdResponse);
+}
+
+message FindOneHouseholdByIdRequest {
+  int32 id_household = 1;
+  int32 id_family = 2;
+}
+
+message HouseholdResponse {
+  HouseholdItemRpc household_item = 1;
+  RoomRpc room = 2;
+  HouseholdItemCategoryRpc category = 3;
+}
+
+message HouseholdItemRpc {
+  int32 id_household_item = 1;
+  int32 id_guide_item = 2;
+  int32 id_family = 3;
+  string item_name = 4;
+  string description = 5;
+  string item_imageurl = 6;
+  int32 id_category = 7;
+  int32 id_room = 8;
+  string created_at = 9;
+  string updated_at = 10;
+}
+
+message RoomRpc {
+  int32 id_room = 1;
+  int32 id_family = 2;
+  string room_name = 3;
+  string room_image = 4;
+  string created_at = 5;
+  string updated_at = 6;
+}
+
+message HouseholdItemCategoryRpc {
+  int32 id_household_item_category = 1;
+  string category_name = 2;
+}
+
+message UpdateOneByIdRequest {
+  int32 id_guide_item = 1;
+}

@@ -16,4 +16,9 @@ export class CreateGuidelineDto {
   @IsOptional()
   @IsString()
   description: string;
+
+  @ApiProperty({ example: 'Id Household' })
+  @IsOptional()
+  @IsNumber()
+  id_household_item: number;
 }

@@ -11,6 +11,9 @@ export class GuideItems {
   @PrimaryGeneratedColumn()
   id_guide_item: number;
 
+  @Column('int', { nullable: true, default: null })
+  id_household_item: number;
+
   @Column()
   id_family: number;
 

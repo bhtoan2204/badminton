@@ -7,6 +7,7 @@
 /* eslint-disable */
 import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
+import { Empty } from './family';
 
 export const calendarProtobufPackage = 'calendar';
 
@@ -42,6 +43,10 @@ export interface FindOneByIdRequest {
   idCalendar: number;
 }
 
+export interface FindNonRepeatCalendarResponse {
+  calendar: CalendarResponse[];
+}
+
 export const CALENDAR_PACKAGE_NAME = 'calendar';
 
 export interface CalendarServiceClient {
@@ -50,6 +55,10 @@ export interface CalendarServiceClient {
   ): Observable<FindCalendarByFrequencyResponse>;
 
   findOneById(request: FindOneByIdRequest): Observable<CalendarResponse>;
+
+  findNonRepeatCalendar(
+    request: Empty,
+  ): Observable<FindNonRepeatCalendarResponse>;
 }
 
 export interface CalendarServiceController {
@@ -66,11 +75,22 @@ export interface CalendarServiceController {
     | Promise<CalendarResponse>
     | Observable<CalendarResponse>
     | CalendarResponse;
+
+  findNonRepeatCalendar(
+    request: Empty,
+  ):
+    | Promise<FindNonRepeatCalendarResponse>
+    | Observable<FindNonRepeatCalendarResponse>
+    | FindNonRepeatCalendarResponse;
 }
 
 export function CalendarServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['findCalendarByFrequency', 'findOneById'];
+    const grpcMethods: string[] = [
+      'findCalendarByFrequency',
+      'findOneById',
+      'findNonRepeatCalendar',
+    ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
         constructor.prototype,

@@ -73,6 +73,7 @@ export * from './types/storage';
 export * from './types/family';
 export * from './types/user';
 export * from './types/calendar';
+export * from './types/household';
 
 export * from './jwt/jwt.module';
 

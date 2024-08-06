@@ -5,7 +5,10 @@ package calendar;
 service CalendarService {
   rpc findCalendarByFrequency(FindCalendarByFrequencyRequest) returns (FindCalendarByFrequencyResponse);
   rpc findOneById(FindOneByIdRequest) returns (CalendarResponse);
+  rpc findNonRepeatCalendar(Empty) returns (FindNonRepeatCalendarResponse);
 }
+
+message Empty {}
 
 message FindOneByIdRequest {
   int32 id_calendar = 1;
@@ -39,3 +42,6 @@ message FindCalendarByFrequencyResponse {
   repeated CalendarResponse calendar = 1;
 }
 
+message FindNonRepeatCalendarResponse {
+  repeated CalendarResponse calendar = 1;
+}

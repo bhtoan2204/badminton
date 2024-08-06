@@ -22,9 +22,9 @@ export class EducationService {
     private readonly userService: UserService,
   ) {}
 
-  async createEducationProgress(owner_id_user: string, dto: any) {
+  async createEducationProgress(id_user: string, dto: any) {
     try {
-      const { id_family, id_user, title, progress_notes, school_info } = dto;
+      const { id_family, title, progress_notes, school_info } = dto;
       const userReq: GetUserRequest = { idUser: id_user };
       const user: GetUserResponse = await this.userService.findOne(userReq);
       if (!user) {
@@ -53,21 +53,23 @@ export class EducationService {
     }
   }
 
-  async getAllEducationProgress(none: string, dto: any) {
+  async getAllEducationProgress(id_user: string, dto: any) {
     try {
-      const {
-        page,
-        itemsPerPage,
-        search,
-        id_family,
-        id_user,
-        sortBy,
-        sortDirection,
-      } = dto;
+      const { page, itemsPerPage, search, id_family, sortBy, sortDirection } =
+        dto;
+
       const queryBuilder = this.educationProgressRepository
         .createQueryBuilder('educationProgress')
         .leftJoinAndSelect('educationProgress.subjects', 'subjects')
         .where('educationProgress.id_family = :id_family', { id_family })
+        .andWhere(
+          new Brackets((qb) => {
+            qb.where('educationProgress.is_shared = true').orWhere(
+              'educationProgress.id_user = :id_user',
+              { id_user },
+            );
+          }),
+        )
         .skip((page - 1) * itemsPerPage)
         .take(itemsPerPage);
       if (search) {
@@ -85,11 +87,6 @@ export class EducationService {
           }),
         );
       }
-      if (id_user) {
-        queryBuilder.andWhere('educationProgress.id_user = :member_id', {
-          id_user,
-        });
-      }
 
       if (sortBy && sortDirection) {
         queryBuilder.orderBy(
@@ -97,10 +94,16 @@ export class EducationService {
           sortDirection.toUpperCase() as 'ASC' | 'DESC',
         );
       }
-
       const [data, total] = await queryBuilder.getManyAndCount();
       const userIds = data.map((item) => item.id_user);
       const users = await this.userService.findByIds({ idUsers: userIds });
+      if (users.users.length === 0 || users.users === null) {
+        return {
+          message: 'Success',
+          data: data,
+          total: total,
+        };
+      }
       const userEducationMap = {};
       users.users.forEach((user) => {
         userEducationMap[user.idUser] = user;
@@ -168,6 +171,12 @@ export class EducationService {
           statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         });
       }
+      if (data.is_shared === false && data.id_user !== id_user) {
+        throw new RpcException({
+          message: 'Permission denied',
+          statusCode: HttpStatus.FORBIDDEN,
+        });
+      }
       const userReq: GetUserRequest = { idUser: data.id_user };
       const user: GetUserResponse = await this.userService.findOne(userReq);
       data['users'] = {
@@ -222,6 +231,7 @@ export class EducationService {
         title,
         progress_notes,
         school_info,
+        is_shared,
       } = dto;
       const educationProgress = await this.educationProgressRepository.findOne({
         where: {
@@ -243,6 +253,9 @@ export class EducationService {
       }
       if (school_info) {
         educationProgress.school_info = school_info;
+      }
+      if (is_shared !== undefined) {
+        educationProgress.is_shared = is_shared;
       }
       const updatedData = await this.entityManager.save(educationProgress);
       return {

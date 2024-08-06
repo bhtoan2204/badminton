@@ -39,7 +39,7 @@ export class EducationController {
   constructor(private readonly educationService: EducationService) {}
 
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Get all education progress' })
+  @ApiOperation({ summary: 'Create education progress' })
   @Post('create')
   async createEducationProgress(
     @CurrentUser() currentUser,
@@ -65,7 +65,7 @@ export class EducationController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get all education progress' })
+  @ApiOperation({ summary: 'Get education progress detail' })
   @ApiParam({ name: 'id_family', required: true, type: Number })
   @ApiParam({ name: 'id_education_progress', required: true, type: Number })
   @Get('getDetail/:id_family/:id_education_progress')

@@ -18,6 +18,9 @@ export class HouseholdItems {
   @PrimaryGeneratedColumn()
   id_household_item: number;
 
+  @Column('int', { nullable: true, default: null })
+  id_guide_item: number;
+
   @Column()
   id_family: number;
 

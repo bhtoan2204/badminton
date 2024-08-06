@@ -23,6 +23,9 @@ export class Utilities {
   @Column()
   id_utilities_type: number;
 
+  @Column({ nullable: false, default: 'Default name' })
+  name: string;
+
   @Column({ nullable: true, default: '' })
   description: string;
 

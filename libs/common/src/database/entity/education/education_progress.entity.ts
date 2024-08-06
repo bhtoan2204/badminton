@@ -28,6 +28,9 @@ export class EducationProgress {
   @Column('varchar', { nullable: false })
   school_info: string;
 
+  @Column('boolean', { nullable: false, default: false })
+  is_shared: boolean;
+
   @CreateDateColumn()
   created_at: Date;
 

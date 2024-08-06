@@ -6,6 +6,7 @@ import {
   FindCalendarByFrequencyResponse,
   FindOneByIdRequest,
 } from '@app/common';
+import { Empty } from '@app/common';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
@@ -37,6 +38,17 @@ export class CalendarService implements OnModuleInit {
   async findCalendarById(req: FindOneByIdRequest): Promise<CalendarResponse> {
     try {
       return await lastValueFrom(this.calendarService.findOneById(req));
+    } catch (error) {
+      throw new RpcException(error);
+    }
+  }
+
+  async findNonRepeatCalendar(req: Empty): Promise<CalendarResponse[]> {
+    try {
+      const response = await lastValueFrom(
+        this.calendarService.findNonRepeatCalendar(req),
+      );
+      return response.calendar;
     } catch (error) {
       throw new RpcException(error);
     }

@@ -118,10 +118,11 @@ export class UtilitiesService {
         fileUrl = uploadImageData.fileUrl;
       }
 
-      const { id_family, id_utilities_type, value, description } = dto;
+      const { id_family, id_utilities_type, value, description, name } = dto;
       const newUtility = new Utilities();
       newUtility.id_family = id_family;
       newUtility.id_utilities_type = id_utilities_type;
+      newUtility.name = name;
       newUtility.value = value;
       newUtility.description = description;
       newUtility.image_url = fileUrl;
@@ -199,8 +200,14 @@ export class UtilitiesService {
         fileUrl = uploadImageData.fileUrl;
       }
 
-      const { id_utilities_type, value, description, id_family, id_utility } =
-        dto;
+      const {
+        id_utilities_type,
+        value,
+        description,
+        id_family,
+        id_utility,
+        name,
+      } = dto;
       const updatedUtility = await this.utilitiesRepository.findOne({
         where: { id_family, id_utility },
       });
@@ -215,6 +222,7 @@ export class UtilitiesService {
       if (id_utilities_type)
         updatedUtility.id_utilities_type = id_utilities_type;
       if (value) updatedUtility.value = value;
+      if (name) updatedUtility.name = name;
       if (description) updatedUtility.description = description;
       if (fileUrl) updatedUtility.image_url = fileUrl;
 

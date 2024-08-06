@@ -40,6 +40,6 @@ spec:
     app: household
   ports:
     - protocol: TCP
-      port: 8099
-      targetPort: 8099
+      port: 50004
+      targetPort: 50004
   type: ClusterIP

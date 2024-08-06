@@ -4,11 +4,13 @@ import {
   CalendarServiceControllerMethods,
   FindCalendarByFrequencyRequest,
   FindCalendarByFrequencyResponse,
+  FindNonRepeatCalendarResponse,
   FindOneByIdRequest,
 } from '@app/common';
 import { Controller } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { GrpcCalendarService } from './grpc-calendar.service';
+import { Empty } from '@app/common';
 
 @Controller()
 @CalendarServiceControllerMethods()
@@ -31,5 +33,15 @@ export class GrpcCalendarController implements CalendarServiceController {
     | Observable<CalendarResponse>
     | CalendarResponse {
     return this.grpcCalendarService.findCalendarById(request);
+  }
+
+  findNonRepeatCalendar(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    request: Empty,
+  ):
+    | Promise<FindNonRepeatCalendarResponse>
+    | Observable<FindNonRepeatCalendarResponse>
+    | FindNonRepeatCalendarResponse {
+    return this.grpcCalendarService.findNonRepeatCalendar();
   }
 }
