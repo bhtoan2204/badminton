@@ -15,22 +15,6 @@ export class ChecklistService {
     private readonly calendarService: CalendarService,
   ) {}
 
-  async getChecklistTypes() {
-    try {
-      const [data, total] = await this.checklistTypeRepository.findAndCount();
-      return {
-        data: data,
-        total: total,
-        message: 'Get checklist types successfully',
-      };
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
-    }
-  }
-
   async getChecklists(
     id_user: string,
     dto: {
@@ -81,7 +65,7 @@ export class ChecklistService {
         id_calendar,
       } = dto;
       const checklistType = await this.checklistTypeRepository.findOne({
-        where: { id_checklist_type },
+        where: { id_checklist_type, id_family },
       });
       if (id_calendar) {
         const calendar =
@@ -102,13 +86,14 @@ export class ChecklistService {
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
-      const checklist = new Checklist();
-      checklist.id_family = id_family;
-      checklist.id_checklist_type = id_checklist_type;
-      checklist.task_name = task_name;
-      checklist.description = description;
-      checklist.due_date = due_date;
-      checklist.id_calendar = id_calendar;
+      const checklist = await this.checklistRepository.save({
+        id_family,
+        id_checklist_type,
+        task_name,
+        description,
+        due_date,
+        id_calendar,
+      });
 
       if (id_calendar) {
         await this.calendarService.findOneAndUpdateCalendarByCustomQuery(
@@ -119,9 +104,8 @@ export class ChecklistService {
         );
       }
 
-      const savedChecklist = await this.checklistRepository.save(checklist);
       return {
-        data: savedChecklist,
+        data: checklist,
         message: 'Checklist created successfully',
       };
     } catch (error) {

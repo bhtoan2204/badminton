@@ -98,14 +98,13 @@ export class AuthService {
     }
   }
 
-  async getTokens(payload) {
+  async getTokens(user: Users) {
     const jwtPayload: TokenPayload = {
-      email: payload.email,
-      id_user: payload.id_user,
-      phone: payload.phone,
-      isadmin: payload.isadmin,
+      email: user.email,
+      id_user: user.id_user,
+      phone: user.phone,
+      isadmin: user.isadmin,
     };
-
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
         secret: process.env.JWT_SECRET,
@@ -145,22 +144,18 @@ export class AuthService {
   }
 
   async googleValidate(google_accessToken: string, profile: any) {
-    const user = (await this.validateGoogleUser(
-      google_accessToken,
-      profile,
-    )) as Users;
-    const {
-      accessToken,
-      refreshToken,
-      accessTokenExpiresIn,
-      refreshTokenExpiresIn,
-    } = await this.getTokens(user);
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiresIn,
-      refreshTokenExpiresIn,
-    };
+    try {
+      const user = (await this.validateGoogleUser(
+        google_accessToken,
+        profile,
+      )) as Users;
+      return user;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: 404,
+      });
+    }
   }
 
   async facebookValidate(facebook_accessToken: string, profile: any) {
@@ -168,19 +163,7 @@ export class AuthService {
       facebook_accessToken,
       profile,
     )) as Users;
-    const {
-      accessToken,
-      refreshToken,
-      accessTokenExpiresIn,
-      refreshTokenExpiresIn,
-    } = await this.getTokens(user);
-
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiresIn,
-      refreshTokenExpiresIn,
-    };
+    return user;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

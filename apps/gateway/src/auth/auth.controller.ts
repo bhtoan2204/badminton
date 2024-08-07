@@ -72,7 +72,7 @@ export class AuthApiController {
     );
 
     return response.redirect(
-      `${this.configService.get('FRONTEND_URL')}/setup&login=google&accessToken=${accessToken}&refreshToken=${refreshToken}`,
+      `${this.configService.get('FRONTEND_URL')}/setup?login=google&accessToken=${accessToken}&refreshToken=${refreshToken}`,
     );
   }
 

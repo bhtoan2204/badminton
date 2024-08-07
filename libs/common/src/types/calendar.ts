@@ -15,6 +15,10 @@ export interface FindCalendarByFrequencyRequest {
   frequency: string;
 }
 
+export interface CreateDefaultChecklistTypeRequest {
+  idFamily: number;
+}
+
 export interface CalendarResponse {
   idCalendar: number;
   idFamily: number;
@@ -59,6 +63,10 @@ export interface CalendarServiceClient {
   findNonRepeatCalendar(
     request: Empty,
   ): Observable<FindNonRepeatCalendarResponse>;
+
+  createDefaultChecklistType(
+    request: CreateDefaultChecklistTypeRequest,
+  ): Observable<Empty>;
 }
 
 export interface CalendarServiceController {
@@ -82,6 +90,10 @@ export interface CalendarServiceController {
     | Promise<FindNonRepeatCalendarResponse>
     | Observable<FindNonRepeatCalendarResponse>
     | FindNonRepeatCalendarResponse;
+
+  createDefaultChecklistType(
+    request: CreateDefaultChecklistTypeRequest,
+  ): Promise<Empty> | Observable<Empty> | Empty;
 }
 
 export function CalendarServiceControllerMethods() {
@@ -90,6 +102,7 @@ export function CalendarServiceControllerMethods() {
       'findCalendarByFrequency',
       'findOneById',
       'findNonRepeatCalendar',
+      'createDefaultChecklistType',
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(

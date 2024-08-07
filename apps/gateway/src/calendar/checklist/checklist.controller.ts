@@ -15,6 +15,7 @@ import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import {
@@ -29,6 +30,8 @@ import { ChecklistService } from './checklist.service';
 import { CreateChecklistDto } from './dto/createChecklist.dto';
 import { UpdateChecklistDto } from './dto/updateChecklist.dto';
 import { GetCheckListDto } from './dto/getChecklist.dto';
+import { CreateChecklistTypeDto } from './dto/createChecklistType.dto';
+import { UpdateChecklistTypeDto } from './dto/updateChecklistType.dto';
 
 @ApiTags('Checklist')
 @Controller('checklist')
@@ -40,13 +43,29 @@ export class ChecklistController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get checklist type' })
+  @ApiQuery({ name: 'id_family', required: true, type: Number })
   @Get('getChecklistTypes')
-  async getChecklistTypes() {
-    return this.checkListService.getChecklistTypes();
+  async getChecklistTypes(@Query('id_family') id_family: number) {
+    return this.checkListService.getChecklistTypes(id_family);
+  }
+
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create checklist type' })
+  @Post('createChecklistType')
+  async createChecklistType(@Body() dto: CreateChecklistTypeDto) {
+    return this.checkListService.createChecklistType(dto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update checklist type' })
+  @Put('updateChecklistType')
+  async updateChecklistType(@Body() dto: UpdateChecklistTypeDto) {
+    return this.checkListService.updateChecklistType(dto);
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all checklist of family' })
+  @ApiQuery({ name: 'id_checklist_type', required: true, type: Number })
   @Get('getAllChecklist')
   async getAllChecklist(
     @CurrentUser() currentUser,

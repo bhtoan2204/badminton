@@ -12,6 +12,7 @@ import * as Joi from 'joi';
 import { ChecklistModule } from './checklist/checklist.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GrpcCalendarModule } from './grpc/grpc-calendar.module';
+import { ChecklistTypeModule } from './checklistType/checklistType.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { GrpcCalendarModule } from './grpc/grpc-calendar.module';
     TypeOrmModule.forFeature([Calendar, CategoryEvent]),
     GrpcCalendarModule,
     ChecklistModule,
+    ChecklistTypeModule,
   ],
   controllers: [CalendarController],
   providers: [CalendarService],

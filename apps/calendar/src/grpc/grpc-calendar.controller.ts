@@ -2,6 +2,7 @@ import {
   CalendarResponse,
   CalendarServiceController,
   CalendarServiceControllerMethods,
+  CreateDefaultChecklistTypeRequest,
   FindCalendarByFrequencyRequest,
   FindCalendarByFrequencyResponse,
   FindNonRepeatCalendarResponse,
@@ -16,6 +17,12 @@ import { Empty } from '@app/common';
 @CalendarServiceControllerMethods()
 export class GrpcCalendarController implements CalendarServiceController {
   constructor(private readonly grpcCalendarService: GrpcCalendarService) {}
+
+  createDefaultChecklistType(
+    request: CreateDefaultChecklistTypeRequest,
+  ): Promise<Empty> | Observable<Empty> | Empty {
+    return this.createDefaultChecklistType(request);
+  }
 
   findCalendarByFrequency(
     request: FindCalendarByFrequencyRequest,

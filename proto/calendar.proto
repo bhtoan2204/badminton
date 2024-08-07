@@ -6,6 +6,11 @@ service CalendarService {
   rpc findCalendarByFrequency(FindCalendarByFrequencyRequest) returns (FindCalendarByFrequencyResponse);
   rpc findOneById(FindOneByIdRequest) returns (CalendarResponse);
   rpc findNonRepeatCalendar(Empty) returns (FindNonRepeatCalendarResponse);
+  rpc createDefaultChecklistType(CreateDefaultChecklistTypeRequest) returns(Empty);
+}
+
+message CreateDefaultChecklistTypeRequest{
+  int32 id_family = 1;
 }
 
 message Empty {}

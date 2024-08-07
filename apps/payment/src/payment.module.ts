@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 import {
@@ -17,11 +17,17 @@ import {
   PaymentHistory,
   RmqModule,
 } from '@app/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DiscountModule } from './discount/discount.module';
 import { FinanceModule } from './finance/finance.module';
+import { BullModule } from '@nestjs/bull';
+
+const globalModule = (module: DynamicModule) => {
+  module.global = true;
+  return module;
+};
 
 @Module({
   imports: [
@@ -54,6 +60,21 @@ import { FinanceModule } from './finance/finance.module';
       FrequentlyQuestionMetaData,
     ]),
     FinanceModule,
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get<string>('REDIS_HOST'),
+          port: configService.get<number>('REDIS_PORT'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
+    globalModule(
+      BullModule.registerQueue({
+        name: 'default-checklist-queue',
+      }),
+    ),
   ],
   controllers: [PaymentController],
   providers: [PaymentService],

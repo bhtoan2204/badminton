@@ -326,6 +326,12 @@ export class CalendarService {
   async findOneCalendarByCustomQuery(query: any) {
     try {
       const data = await this.calendarRepository.findOne(query);
+      if (!data) {
+        throw new RpcException({
+          message: 'Calendar event not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
       if (data.id_checklist) {
         throw new RpcException({
           message: 'Calendar event already has checklist',
@@ -359,10 +365,9 @@ export class CalendarService {
           statusCode: HttpStatus.BAD_REQUEST,
         });
       }
-      const updatedCalendar = await this.calendarRepository.save({
-        ...calendar,
-        ...data,
-      });
+      calendar.id_checklist = data.id_checklist;
+      const updatedCalendar = await this.calendarRepository.save(calendar);
+      console.log(data);
       return {
         message: 'Success',
         data: updatedCalendar,

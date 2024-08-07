@@ -7,6 +7,8 @@ import { NotificationType, RmqService } from '@app/common';
 import { CreateChecklistDto } from './dto/createChecklist.dto';
 import { UpdateChecklistDto } from './dto/updateChecklist.dto';
 import { GetCheckListDto } from './dto/getChecklist.dto';
+import { CreateChecklistTypeDto } from './dto/createChecklistType.dto';
+import { UpdateChecklistTypeDto } from './dto/updateChecklistType.dto';
 
 @Injectable()
 export class ChecklistService {
@@ -16,12 +18,42 @@ export class ChecklistService {
     private readonly rmqService: RmqService,
   ) {}
 
-  async getChecklistTypes() {
+  async getChecklistTypes(id_family: number) {
     try {
       return await this.rmqService.send(
         this.calendarClient,
         'calendarClient/getChecklistTypes',
-        {},
+        { id_family },
+      );
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
+    }
+  }
+
+  async createChecklistType(dto: CreateChecklistTypeDto) {
+    try {
+      return await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/createChecklistType',
+        { dto },
+      );
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
+    }
+  }
+
+  async updateChecklistType(dto: UpdateChecklistTypeDto) {
+    try {
+      return await this.rmqService.send(
+        this.calendarClient,
+        'calendarClient/updateChecklistType',
+        { dto },
       );
     } catch (error) {
       throw new HttpException(

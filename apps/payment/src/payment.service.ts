@@ -26,6 +26,8 @@ import {
   PaymentHistory,
 } from '@app/common';
 import { FinanceService } from './finance/finance.service';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class PaymentService {
@@ -37,6 +39,8 @@ export class PaymentService {
   constructor(
     private readonly financeService: FinanceService,
     private readonly configService: ConfigService,
+    @InjectQueue('default-checklist-queue')
+    private readonly checlistQueue: Queue,
     @InjectRepository(PackageMain)
     private packageMainRepository: Repository<PackageMain>,
     @InjectRepository(PackageExtra)
@@ -226,14 +230,15 @@ export class PaymentService {
           .add(mainPackage.duration_months, 'months')
           .toDate(),
       });
-      console.log(newFamily);
 
       await this.memberFamilyRepository.save({
         id_user: order.id_user,
         role: FamilyRole.OWNER,
         id_family: newFamily.id_family,
       });
-
+      this.checlistQueue.add('createChecklist', {
+        id_family: newFamily.id_family,
+      });
       order.id_family = newFamily.id_family;
       await this.orderRepository.save(order);
 
