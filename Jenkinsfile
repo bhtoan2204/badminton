@@ -29,6 +29,17 @@ pipeline {
             }
         }
 
+        stage("SonarQube Analysis") {
+            steps {
+                script {
+                  def scannerHome = tool 'SonarQube-Scanner';
+                  withSonarQubeEnv('SonarQube-Server') {
+                    sh "${tool("SonarQube-Scanner")}/bin/sonar-scanner -Dsonar.projectKey=Family-Backend"
+                  }
+                }
+            }
+        }
+
         stage("Build Docker Images") {
             steps {
                 script {
