@@ -2,21 +2,23 @@ pipeline {
     agent any
 
     tools {
-      nodejs 'NodeJs Environment'
+        nodejs 'NodeJs Environment'
     }
 
     options {
-      skipDefaultCheckout(true)
-      disableConcurrentBuilds()
+        skipDefaultCheckout(true)
+        disableConcurrentBuilds()
     }
 
     environment {
         SSH_password = credentials('SSH_password')
         SSH_user = credentials('SSH_user')
         SSH_ip = credentials('SSH_ip')
+        K8S_API_URL = credentials('K8S_API_URL')
+        K8S_TOKEN = credentials('K8S_TOKEN')
     }
 
-    stages{
+    stages {
         stage("Checkout") {
             steps {
                 script {
@@ -30,14 +32,14 @@ pipeline {
         stage("Build Docker Images") {
             steps {
                 script {
-                  sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod1.yml build"
-                  sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod2.yml build"
-                  sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod3.yml build"
-                  sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod4.yml build"
-                  sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod5.yml build"
-                  sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod6.yml build"
-                  sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod7.yml build"
-                  sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod8.yml build"
+                    sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod1.yml build"
+                    sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod2.yml build"
+                    sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod3.yml build"
+                    sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod4.yml build"
+                    sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod5.yml build"
+                    sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod6.yml build"
+                    sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod7.yml build"
+                    sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod8.yml build"
                 }
             }
         }
@@ -55,9 +57,9 @@ pipeline {
                         sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod6.yml push"
                         sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod7.yml push"
                         sh "TAG=${COMMIT_ID} docker compose -f docker-compose.prod8.yml push"
-                        sh "tar -czvf k8s.tar.gz k8s/"
-                        sh "sshpass -p ${SSH_password} scp -o StrictHostKeyChecking=no -r k8s.tar.gz ${SSH_user}@${SSH_ip}:~/"
-                        sh "rm -rf k8s.tar.gz"
+                        // sh "tar -czvf k8s.tar.gz k8s/"
+                        // sh "scp -o StrictHostKeyChecking=no -r k8s.tar.gz ${SSH_user}@${SSH_ip}:~/"
+                        // sh "rm -rf k8s.tar.gz"
                     }
                 }
             }
@@ -65,38 +67,21 @@ pipeline {
 
         stage("Deploy to Kubernetes") {
             steps {
-                withCredentials([
-                    string(credentialsId: 'SSH_password', variable: 'SSH_PASS'),
-                    string(credentialsId: 'SSH_user', variable: 'SSH_USER'),
-                    string(credentialsId: 'SSH_ip', variable: 'SSH_IP')
-                ]) {
-                    script {
-                        // Use double quotes around the shell script block
+                script {
+                    sh """
+                        curl -X POST -H "Authorization: Bearer ${K8S_TOKEN}" \
+                        -H "Content-Type: application/tar" \
+                        --data-binary @k8s.tar.gz \
+                        ${K8S_API_URL}/api/v1/namespaces/default/deployments
+                    """
+                    def response = sh(script: "curl -s -X GET -H 'Authorization: Bearer ${K8S_TOKEN}' ${K8S_API_URL}/apis/apps/v1/namespaces/default/deployments", returnStdout: true).trim()
+                    def deployments = readJSON(text: response).items.collect { it.metadata.name }
+                    deployments.each { deployment ->
                         sh """
-                            sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
-                            'TAG=${COMMIT_ID} tar -xzvf k8s.tar.gz'
+                            curl -X POST -H 'Authorization: Bearer ${K8S_TOKEN}' \
+                            -H 'Content-Type: application/json' \
+                            ${K8S_API_URL}/apis/apps/v1/namespaces/default/deployments/${deployment}/restart
                         """
-                        sh """
-                            sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
-                            'find ./k8s -type f -name "*.yml" -print0 | xargs -0 sed -i "s/<TAG>/${COMMIT_ID}/g"'
-                        """
-                        sh """
-                            sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
-                            'kubectl apply -f ./k8s'
-                        """
-                        // sh """
-                        //     sshpass -p $SSH_PASS ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP \
-                        //     'DEPLOYMENTS=\$(kubectl get deployments --no-headers -o custom-columns=\":metadata.name\") && \
-                        //     if [ -z "\$DEPLOYMENTS" ]; then \
-                        //         echo "First deployment, skipping rollout restart"; \
-                        //     else \
-                        //         for deployment in \$DEPLOYMENTS; do \
-                        //             if [[ "\$deployment" != "rabbitmq-deployment" && "\$deployment" != "redis-deployment" && "\$deployment" != "jaeger-deployment" ]]; then \
-                        //                 kubectl rollout restart deployment/\$deployment; \
-                        //             fi; \
-                        //         done \
-                        //     fi'
-                        // """
                     }
                 }
             }

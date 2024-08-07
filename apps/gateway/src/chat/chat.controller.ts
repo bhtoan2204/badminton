@@ -268,6 +268,31 @@ export class ChatController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Remove Family Message' })
+  @Get('removeFamilyMessage/:id_family/:id_message')
+  @ApiParam({
+    name: 'id_family',
+    required: true,
+    description: 'The ID of the family',
+  })
+  @ApiParam({
+    name: 'id_message',
+    required: true,
+    description: 'The ID of the message',
+  })
+  async removeFamilyMessage(
+    @CurrentUser() user,
+    @Param('id_family') id_family: number,
+    @Param('id_message') id_message: string,
+  ) {
+    return this.chatService.removeFamilyMessage(
+      user.id_user,
+      id_family,
+      id_message,
+    );
+  }
+
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get Linked User' })
   @ApiQuery({ name: 'search', required: false, description: 'Search string' })
   @Get('getLinkedUser')

@@ -116,7 +116,7 @@ export class CalendarService {
     try {
       const [data, total] = await this.calendarRepository.findAndCount({
         where: { id_family },
-        relations: ['categoryEvent'],
+        relations: ['categoryEvent', 'checklist'],
         order: { created_at: 'DESC' },
       });
       return {
@@ -143,7 +143,7 @@ export class CalendarService {
           id_family,
           time_start: And(MoreThanOrEqual(dateStart), LessThanOrEqual(dateEnd)),
         },
-        relations: ['categoryEvent'],
+        relations: ['categoryEvent', 'checklist'],
       });
       return {
         message: 'Success',
@@ -165,7 +165,7 @@ export class CalendarService {
     try {
       const data = await this.calendarRepository.findOne({
         where: { id_calendar, id_family },
-        relations: ['categoryEvent'],
+        relations: ['categoryEvent', 'checklist'],
       });
       if (!data) {
         throw new RpcException({
@@ -222,7 +222,7 @@ export class CalendarService {
       await this.calendarRepository.save(newCalendar);
       const data = await this.calendarRepository.findOne({
         where: { id_calendar: newCalendar.id_calendar },
-        relations: ['categoryEvent'],
+        relations: ['categoryEvent', 'checklist'],
       });
       return {
         message: 'Success',
@@ -281,7 +281,7 @@ export class CalendarService {
       await this.calendarRepository.save(calendar);
       const data = await this.calendarRepository.findOne({
         where: { id_calendar, id_family },
-        relations: ['categoryEvent'],
+        relations: ['categoryEvent', 'checklist'],
       });
       return {
         message: 'Success',
@@ -314,6 +314,58 @@ export class CalendarService {
       return {
         message: 'Success',
         data: calendar,
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async findOneCalendarByCustomQuery(query: any) {
+    try {
+      const data = await this.calendarRepository.findOne(query);
+      if (data.id_checklist) {
+        throw new RpcException({
+          message: 'Calendar event already has checklist',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+      return {
+        message: 'Success',
+        data: data,
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async findOneAndUpdateCalendarByCustomQuery(query: any, data: any) {
+    try {
+      const calendar = await this.calendarRepository.findOne(query);
+      if (!calendar) {
+        throw new RpcException({
+          message: 'Calendar event not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      if (calendar.id_checklist) {
+        throw new RpcException({
+          message: 'Calendar event already has checklist',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+      const updatedCalendar = await this.calendarRepository.save({
+        ...calendar,
+        ...data,
+      });
+      return {
+        message: 'Success',
+        data: updatedCalendar,
       };
     } catch (error) {
       throw new RpcException({

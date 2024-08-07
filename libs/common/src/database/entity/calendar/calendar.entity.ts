@@ -4,10 +4,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { CategoryEvent } from './category_event.entity';
+import { Checklist } from './checklist.entity';
 
 @Entity('calendar')
 export class Calendar {
@@ -16,6 +18,9 @@ export class Calendar {
 
   @Column('int', { nullable: false })
   id_family: number;
+
+  @Column('int', { nullable: true, default: null })
+  id_checklist: number;
 
   @Column('int', { nullable: false })
   category: number;
@@ -68,4 +73,10 @@ export class Calendar {
   )
   @JoinColumn({ name: 'category' })
   categoryEvent: CategoryEvent;
+
+  @OneToOne(() => Checklist, (checklist) => checklist.calendar, {
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'id_checklist' })
+  checklist: Checklist;
 }

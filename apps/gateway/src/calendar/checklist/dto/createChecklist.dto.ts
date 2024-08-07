@@ -48,6 +48,11 @@ export class CreateChecklistDto {
   @IsString()
   description: string;
 
+  @ApiProperty()
+  @IsOptional()
+  @IsNumber()
+  id_calendar: number;
+
   @ApiProperty({
     description: 'Due date of checklist',
     required: true,

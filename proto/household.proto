@@ -5,6 +5,16 @@ package household;
 service HouseholdService {
   rpc findOneById(FindOneHouseholdByIdRequest) returns (HouseholdResponse);
   rpc updateOneById(UpdateOneByIdRequest) returns (HouseholdResponse);
+  rpc findByIds(FindHouseholdByIdsRequest) returns (HouseholdsResponse);
+}
+
+message FindHouseholdByIdsRequest {
+  int32 id_family = 1;
+  repeated int32 id_household = 2;
+}
+
+message HouseholdsResponse {
+  repeated HouseholdResponse households = 1;
 }
 
 message FindOneHouseholdByIdRequest {

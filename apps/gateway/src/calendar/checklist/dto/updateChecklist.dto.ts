@@ -72,4 +72,9 @@ export class UpdateChecklistDto {
   @IsOptional()
   @IsBoolean()
   is_completed: boolean;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsNumber()
+  id_calendar: number;
 }

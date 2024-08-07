@@ -1,10 +1,12 @@
 import {
+  FindHouseholdByIdsRequest,
   FindOneHouseholdByIdRequest,
   HouseholdItemCategories,
   HouseholdItemCategoryRpc,
   HouseholdItemRpc,
   HouseholdItems,
   HouseholdResponse,
+  HouseholdsResponse,
   Room,
   RoomRpc,
   UpdateOneByIdRequest,
@@ -12,7 +14,7 @@ import {
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class GrpcHouseholdService {
@@ -82,7 +84,7 @@ export class GrpcHouseholdService {
   async updateOneById(req: UpdateOneByIdRequest): Promise<HouseholdResponse> {
     try {
       const { idGuideItem, idFamily, idHouseholdItem } = req;
-      console.log(req);
+
       const householdItems = await this.householdItemsRepository.findOne({
         where: { id_household_item: idHouseholdItem, id_family: idFamily },
         relations: ['room', 'category'],
@@ -101,7 +103,7 @@ export class GrpcHouseholdService {
       }
 
       householdItems.id_guide_item = idGuideItem;
-      console.log(householdItems);
+
       const savedHouseholdItems =
         await this.householdItemsRepository.save(householdItems);
 
@@ -136,6 +138,57 @@ export class GrpcHouseholdService {
         room: roomResult,
         category: categoryResult,
       };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message || 'Internal server error',
+        statusCode: error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async findByIds(req: FindHouseholdByIdsRequest): Promise<HouseholdsResponse> {
+    try {
+      const { idFamily, idHousehold } = req;
+      const householdItems = await this.householdItemsRepository.find({
+        where: { id_family: idFamily, id_household_item: In(idHousehold) },
+        relations: ['room', 'category'],
+      });
+      const householdItemsResult: HouseholdResponse[] = householdItems.map(
+        (householdItem) => {
+          const room: Room = householdItem.room;
+          const category: HouseholdItemCategories = householdItem.category;
+          const householdResult: HouseholdItemRpc = {
+            idHouseholdItem: householdItem.id_household_item,
+            idGuideItem: householdItem.id_guide_item,
+            idFamily: householdItem.id_family,
+            itemName: householdItem.item_name,
+            description: householdItem.description,
+            itemImageurl: householdItem.item_imageurl,
+            idCategory: householdItem.id_category,
+            idRoom: householdItem.id_room,
+            createdAt: householdItem.created_at.toISOString(),
+            updatedAt: householdItem.updated_at.toISOString(),
+          };
+          const roomResult: RoomRpc = {
+            idRoom: room.id_room,
+            idFamily: room.id_family,
+            roomName: room.room_name,
+            roomImage: room.room_image,
+            createdAt: room.created_at.toISOString(),
+            updatedAt: room.updated_at.toISOString(),
+          };
+          const categoryResult: HouseholdItemCategoryRpc = {
+            idHouseholdItemCategory: category.id_household_item_category,
+            categoryName: category.category_name,
+          };
+          return {
+            householdItem: householdResult,
+            room: roomResult,
+            category: categoryResult,
+          };
+        },
+      );
+      return { households: householdItemsResult };
     } catch (error) {
       throw new RpcException({
         message: error.message || 'Internal server error',

@@ -1,8 +1,10 @@
 import {
+  FindHouseholdByIdsRequest,
   FindOneHouseholdByIdRequest,
   HOUSEHOLD_SERVICE_NAME,
   HouseholdResponse,
   HouseholdServiceClient,
+  HouseholdsResponse,
   UpdateOneByIdRequest,
 } from '@app/common';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
@@ -32,5 +34,11 @@ export class HouseholdService implements OnModuleInit {
     request: UpdateOneByIdRequest,
   ): Promise<HouseholdResponse> {
     return await lastValueFrom(this.householdService.updateOneById(request));
+  }
+
+  async findByIds(
+    request: FindHouseholdByIdsRequest,
+  ): Promise<HouseholdsResponse> {
+    return await lastValueFrom(this.householdService.findByIds(request));
   }
 }

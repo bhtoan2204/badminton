@@ -54,6 +54,15 @@ export interface UpdateOneByIdRequest {
   idHouseholdItem: number;
 }
 
+export interface FindHouseholdByIdsRequest {
+  idFamily: number;
+  idHousehold: number[];
+}
+
+export interface HouseholdsResponse {
+  households: HouseholdResponse[];
+}
+
 export const HOUSEHOLD_PACKAGE_NAME = 'household';
 
 export interface HouseholdServiceClient {
@@ -62,6 +71,8 @@ export interface HouseholdServiceClient {
   ): Observable<HouseholdResponse>;
 
   updateOneById(request: UpdateOneByIdRequest): Observable<HouseholdResponse>;
+
+  findByIds(request: FindHouseholdByIdsRequest): Observable<HouseholdsResponse>;
 }
 
 export interface HouseholdServiceController {
@@ -78,11 +89,18 @@ export interface HouseholdServiceController {
     | Promise<HouseholdResponse>
     | Observable<HouseholdResponse>
     | HouseholdResponse;
+
+  findByIds(
+    request: FindHouseholdByIdsRequest,
+  ):
+    | Promise<HouseholdsResponse>
+    | Observable<HouseholdsResponse>
+    | HouseholdsResponse;
 }
 
 export function HouseholdServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['findOneById', 'updateOneById'];
+    const grpcMethods: string[] = ['findOneById', 'updateOneById', 'findByIds'];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
         constructor.prototype,

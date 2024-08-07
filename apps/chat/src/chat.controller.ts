@@ -137,6 +137,16 @@ export class ChatController {
     );
   }
 
+  @EventPattern('chatClient/removeFamilyMessage')
+  async removeFamilyMessage(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.chatService.removeFamilyMessage(
+      data.id_user,
+      data.id_family,
+      data.id_message,
+    );
+  }
+
   @EventPattern('chatClient/getLinkedUser')
   async getLinkedUser(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);

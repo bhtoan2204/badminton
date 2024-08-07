@@ -1,8 +1,10 @@
 import {
+  FindHouseholdByIdsRequest,
   FindOneHouseholdByIdRequest,
   HouseholdResponse,
   HouseholdServiceController,
   HouseholdServiceControllerMethods,
+  HouseholdsResponse,
   UpdateOneByIdRequest,
 } from '@app/common';
 import { Controller } from '@nestjs/common';
@@ -29,5 +31,14 @@ export class GrpcHouseholdController implements HouseholdServiceController {
     | Observable<HouseholdResponse>
     | HouseholdResponse {
     return this.grpcHouseholdService.updateOneById(request);
+  }
+
+  findByIds(
+    request: FindHouseholdByIdsRequest,
+  ):
+    | Promise<HouseholdsResponse>
+    | Observable<HouseholdsResponse>
+    | HouseholdsResponse {
+    return this.grpcHouseholdService.findByIds(request);
   }
 }

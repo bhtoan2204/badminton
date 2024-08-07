@@ -315,6 +315,12 @@ export class ChatService {
           statusCode: HttpStatus.BAD_REQUEST,
         });
       }
+      if (id_user === messageData.receiverId) {
+        throw new RpcException({
+          message: 'Cannot send message to yourself',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
       const receiver = await this.usersRepository.findOne({
         where: { id_user: messageData.receiverId },
       });
@@ -683,21 +689,78 @@ export class ChatService {
     id_message: string,
   ): Promise<any> {
     try {
-      const updatedConversation =
-        await this.userConversationsRepository.findOneAndUpdate(
-          { userId: id_user, 'conversations.receiverId': receiver_id },
-          {
-            $pull: { 'conversations.$.messages': { _id: id_message } },
-          },
-          { new: true },
-        );
-
-      if (!updatedConversation) {
+      const [userConversation, receiverConversation] = await Promise.all([
+        this.userConversationsRepository.findOne({
+          userId: id_user,
+          'conversations.receiverId': receiver_id,
+          'conversations.messages._id': id_message,
+          'conversations.messages.senderId': id_user,
+        }),
+        this.userConversationsRepository.findOne({
+          userId: receiver_id,
+          'conversations.receiverId': id_user,
+          'conversations.messages._id': id_message,
+          'conversations.messages.senderId': id_user,
+        }),
+      ]);
+      if (!userConversation || !receiverConversation) {
         throw new RpcException({
           message: 'Conversation not found',
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
+      await Promise.all([
+        this.userConversationsRepository.findOneAndUpdate(
+          { userId: id_user, 'conversations.receiverId': receiver_id },
+          {
+            $pull: { 'conversations.$.messages': { _id: id_message } },
+          },
+          { new: true },
+        ),
+        this.userConversationsRepository.findOneAndUpdate(
+          { userId: receiver_id, 'conversations.receiverId': id_user },
+          {
+            $pull: { 'conversations.$.messages': { _id: id_message } },
+          },
+          { new: true },
+        ),
+      ]);
+
+      return { message: 'Remove message successfully' };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async removeFamilyMessage(
+    id_user: string,
+    id_family: number,
+    id_message: string,
+  ): Promise<any> {
+    try {
+      const conversation = await this.familyConversationsRepository.findOne({
+        familyId: id_family,
+        'conversations._id': id_message,
+        'conversations.senderId': id_user,
+      });
+
+      if (!conversation) {
+        throw new RpcException({
+          message: 'Message not found',
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+
+      await this.familyConversationsRepository.findOneAndUpdate(
+        { familyId: id_family },
+        {
+          $pull: { conversations: { _id: id_message, senderId: id_user } },
+        },
+        { new: true },
+      );
 
       return { message: 'Remove message successfully' };
     } catch (error) {

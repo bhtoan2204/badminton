@@ -295,6 +295,25 @@ export class ChatService {
     }
   }
 
+  async removeFamilyMessage(
+    id_user: string,
+    id_family: number,
+    id_message: string,
+  ) {
+    try {
+      return await this.rmqService.send(
+        this.chatClient,
+        'chatClient/removeFamilyMessage',
+        { id_user, id_family, id_message },
+      );
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
+    }
+  }
+
   async getLinkedUser(id_user: string, search: string) {
     try {
       return await this.rmqService.send(

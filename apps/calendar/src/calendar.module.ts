@@ -34,5 +34,6 @@ import { GrpcCalendarModule } from './grpc/grpc-calendar.module';
   ],
   controllers: [CalendarController],
   providers: [CalendarService],
+  exports: [CalendarService],
 })
 export class CalendarModule {}

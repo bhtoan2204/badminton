@@ -1,18 +1,19 @@
 import {
+  FindHouseholdByIdsRequest,
   FindOneHouseholdByIdRequest,
   GuideItems,
+  HouseholdsResponse,
   UpdateOneByIdRequest,
   UploadFileRequest,
 } from '@app/common';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { EntityManager, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { StorageService } from './storage/storage.service';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { InjectRepository } from '@nestjs/typeorm';
 import { lastValueFrom, timeout } from 'rxjs';
 import { HouseholdService } from './household/household.service';
-import { DataSource } from 'typeorm';
 
 @Injectable()
 export class GuidelineService {
@@ -23,7 +24,6 @@ export class GuidelineService {
     private readonly guideItemsRepository: Repository<GuideItems>,
     @Inject('ELASTICSEARCH') private readonly elasticsearchClient: ClientProxy,
     private readonly householdService: HouseholdService,
-    private dataSource: DataSource,
   ) {}
 
   async getAllGuideline(
@@ -47,9 +47,32 @@ export class GuidelineService {
       }
       const [data, total] =
         await this.guideItemsRepository.findAndCount(option);
+      const setHouseholdIds = new Set<number>();
+      data.map((item) => {
+        if (item.id_household_item) {
+          setHouseholdIds.add(item.id_household_item);
+        }
+      });
+      const householdReq: FindHouseholdByIdsRequest = {
+        idFamily: dto.id_family,
+        idHousehold: Array.from(setHouseholdIds),
+      };
+      const householdData: HouseholdsResponse =
+        await this.householdService.findByIds(householdReq);
+      const mapHouseholdData = {};
+      householdData.households.map((household) => {
+        mapHouseholdData[household.householdItem.idHouseholdItem] = household;
+      });
       return {
         message: 'Success',
-        data,
+        data: data.map((item) => {
+          if (item.id_household_item) {
+            item['householdData'] = mapHouseholdData[item.id_household_item];
+          } else {
+            item['householdData'] = null;
+          }
+          return item;
+        }),
         total,
       };
     } catch (error) {
@@ -96,95 +119,158 @@ export class GuidelineService {
     id_user: string,
     { id_family, name, description, id_household_item },
   ) {
-    return await this.dataSource.transaction(
-      async (entityManager: EntityManager) => {
-        try {
-          let householdData = null;
-          if (id_household_item) {
-            const householdReq: FindOneHouseholdByIdRequest = {
-              idHousehold: id_household_item,
-              idFamily: id_family,
-            };
-            householdData =
-              await this.householdService.findOneById(householdReq);
+    let newGuideItem = null;
+    let householdData = null;
+    try {
+      if (id_household_item) {
+        const householdReq: FindOneHouseholdByIdRequest = {
+          idHousehold: id_household_item,
+          idFamily: id_family,
+        };
+        householdData = await this.householdService.findOneById(householdReq);
 
-            if (!householdData) {
-              throw new RpcException({
-                message: 'Household item not found',
-                statusCode: HttpStatus.NOT_FOUND,
-              });
-            }
-          }
-
-          const savedGuideItem: GuideItems = await entityManager.save(
-            GuideItems,
-            {
-              id_family,
-              name,
-              id_household_item,
-              description,
-              is_shared: false,
-              steps: null,
-            },
-          );
-          console.log('savedGuideItem', savedGuideItem);
-          if (householdData !== null) {
-            const updateHouseholdReq: UpdateOneByIdRequest = {
-              idGuideItem: savedGuideItem.id_guide_item,
-              idFamily: id_family,
-              idHouseholdItem: id_household_item,
-            };
-            await this.householdService.updateOneById(updateHouseholdReq);
-          }
-
-          await this.elasticsearchClient.emit(
-            'guidelineIndexer/indexGuideline',
-            {
-              savedGuideItem,
-            },
-          );
-
-          return {
-            message: 'Success',
-            data: { newGuideItem: savedGuideItem, householdData },
-          };
-        } catch (error) {
+        if (!householdData) {
           throw new RpcException({
-            message: error.message,
-            statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: 'Household item not found',
+            statusCode: HttpStatus.NOT_FOUND,
           });
         }
-      },
-    );
+      }
+
+      newGuideItem = await this.guideItemsRepository.save({
+        id_family,
+        name,
+        id_household_item,
+        description,
+        is_shared: false,
+        steps: null,
+      });
+
+      if (householdData) {
+        const updateHouseholdReq: UpdateOneByIdRequest = {
+          idGuideItem: newGuideItem.id_guide_item,
+          idFamily: id_family,
+          idHouseholdItem: id_household_item,
+        };
+        await this.householdService.updateOneById(updateHouseholdReq);
+      }
+
+      const data = await this.guideItemsRepository.save(newGuideItem);
+      await this.elasticsearchClient.emit('guidelineIndexer/indexGuideline', {
+        data,
+      });
+
+      return {
+        message: 'Success',
+        data: { newGuideItem, householdData },
+      };
+    } catch (error) {
+      if (newGuideItem && householdData) {
+        try {
+          const updateHouseholdReq: UpdateOneByIdRequest = {
+            idGuideItem: null,
+            idFamily: id_family,
+            idHouseholdItem: id_household_item,
+          };
+          await this.householdService.updateOneById(updateHouseholdReq);
+        } catch (updateError) {
+          console.error(
+            'Failed to rollback household item:',
+            updateError.message,
+          );
+        }
+      }
+
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
   }
 
-  async updateGuideline(id_user: any, dto: any) {
+  async updateGuideline(id_user: string, dto: any) {
+    const { id_family, id_guideline, name, description, id_household_item } =
+      dto;
+    let guideItem = null;
+    let previousHouseholdItem = null;
+
     try {
-      const { id_family, id_guideline, name, description } = dto;
-      const guideItem = await this.guideItemsRepository.findOne({
+      guideItem = await this.guideItemsRepository.findOne({
         where: { id_family, id_guide_item: id_guideline },
       });
+
       if (!guideItem) {
         throw new RpcException({
           message: 'Guide item not found',
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
+
+      previousHouseholdItem = guideItem.id_household_item;
+
       if (name !== undefined) {
         guideItem.name = name;
       }
+
       if (description !== undefined) {
         guideItem.description = description;
       }
-      const data = await this.guideItemsRepository.save(guideItem);
+
+      if (
+        id_household_item !== undefined &&
+        id_household_item !== guideItem.id_household_item
+      ) {
+        guideItem.id_household_item = id_household_item;
+
+        if (previousHouseholdItem) {
+          const resetHouseholdReq: UpdateOneByIdRequest = {
+            idGuideItem: id_guideline,
+            idFamily: id_family,
+            idHouseholdItem: previousHouseholdItem,
+          };
+          await this.householdService.updateOneById(resetHouseholdReq);
+        }
+
+        if (id_household_item) {
+          const updateHouseholdReq: UpdateOneByIdRequest = {
+            idGuideItem: guideItem.id_guide_item,
+            idFamily: id_family,
+            idHouseholdItem: id_household_item,
+          };
+          await this.householdService.updateOneById(updateHouseholdReq);
+        }
+      }
+
+      const updatedGuideItem = await this.guideItemsRepository.save(guideItem);
       await this.elasticsearchClient.emit('guidelineIndexer/indexGuideline', {
-        data,
+        data: updatedGuideItem,
       });
+
       return {
         message: 'Success',
-        guideItem,
+        guideItem: updatedGuideItem,
       };
     } catch (error) {
+      if (
+        guideItem &&
+        previousHouseholdItem &&
+        id_household_item !== previousHouseholdItem
+      ) {
+        try {
+          const resetHouseholdReq: UpdateOneByIdRequest = {
+            idGuideItem: guideItem.id_guide_item,
+            idFamily: id_family,
+            idHouseholdItem: previousHouseholdItem,
+          };
+          await this.householdService.updateOneById(resetHouseholdReq);
+        } catch (updateError) {
+          console.error(
+            'Failed to rollback household item:',
+            updateError.message,
+          );
+        }
+      }
+
       throw new RpcException({
         message: error.message,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -206,6 +292,14 @@ export class GuidelineService {
           message: 'Guide item not found',
           statusCode: HttpStatus.NOT_FOUND,
         });
+      }
+      if (guideItem.id_household_item) {
+        const updateHouseholdReq: UpdateOneByIdRequest = {
+          idGuideItem: null,
+          idFamily: id_family,
+          idHouseholdItem: guideItem.id_household_item,
+        };
+        await this.householdService.updateOneById(updateHouseholdReq);
       }
       await this.guideItemsRepository.remove(guideItem);
       await this.elasticsearchClient.emit('guidelineIndexer/deleteGuideline', {
