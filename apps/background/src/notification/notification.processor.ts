@@ -34,6 +34,7 @@ export class NotificationProcessor {
     try {
       const id_family: number = job.data.id_family;
       const content: NotificationDataInterface = job.data.notificationData;
+      console.log(content);
       await this.notificationService.createNotificationProcessorFamily(
         id_family,
         content,

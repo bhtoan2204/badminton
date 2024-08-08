@@ -30,9 +30,6 @@ export class ShoppingLists {
   @Column()
   id_shopping_list_type: number;
 
-  @Column({ nullable: true, default: null })
-  id_expenditure: number;
-
   @Column('varchar', { length: 255, nullable: false })
   title: string;
 
@@ -69,8 +66,6 @@ export class ShoppingLists {
   @OneToOne(
     () => FinanceExpenditure,
     (financeExpenditure) => financeExpenditure.shoppingLists,
-    { onDelete: 'SET NULL' },
   )
-  @JoinColumn({ name: 'id_expenditure' })
   expenditure: FinanceExpenditure;
 }

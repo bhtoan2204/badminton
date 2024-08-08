@@ -36,13 +36,13 @@ export class FinanceExpenditure {
   @Column('text', { nullable: true, default: '' })
   description: string;
 
-  @Column('text', { nullable: true })
+  @Column('text', { nullable: true, default: null })
   image_url: string;
 
-  @Column('int', { nullable: true })
+  @Column('int', { nullable: true, default: null })
   id_utility: number;
 
-  @Column('int', { nullable: true })
+  @Column('int', { nullable: true, default: null })
   id_shopping_list: number;
 
   @CreateDateColumn()

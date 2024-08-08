@@ -13,6 +13,7 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SerperModule } from './serper/serper.module';
+import { FinanceExpenditureModule } from './expenditure/expenditure.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { SerperModule } from './serper/serper.module';
       ShoppingListTypes,
     ]),
     SerperModule,
+    FinanceExpenditureModule,
   ],
   controllers: [ShoppingController],
   providers: [ShoppingService],

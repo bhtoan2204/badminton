@@ -61,7 +61,7 @@ export class ShoppingController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get shopping item' })
-  @Get('getShoppingIte')
+  @Get('getShoppingItem')
   async getShoppingItem(
     @CurrentUser() currentUser,
     @Query() dto: GetShoppingItemDto,

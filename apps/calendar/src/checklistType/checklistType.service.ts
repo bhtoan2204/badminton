@@ -39,18 +39,21 @@ export class ChecklistTypeService {
     id_calendar: number;
   }) {
     try {
-      const calendar = await this.calendarService.findOneCalendarByCustomQuery({
-        where: {
-          id_calendar: dto.id_calendar,
-          id_checklist_type: null,
-          id_family: dto.id_family,
-        },
-      });
-      if (!calendar) {
-        throw new RpcException({
-          message: 'Calendar not found or already has checklist type',
-          statusCode: HttpStatus.NOT_FOUND,
-        });
+      if (dto.id_calendar) {
+        const calendar =
+          await this.calendarService.findOneCalendarByCustomQuery({
+            where: {
+              id_calendar: dto.id_calendar,
+              id_checklist_type: null,
+              id_family: dto.id_family,
+            },
+          });
+        if (!calendar) {
+          throw new RpcException({
+            message: 'Calendar not found or already has checklist type',
+            statusCode: HttpStatus.NOT_FOUND,
+          });
+        }
       }
       const checklistType = await this.checklistTypeRepository.save({
         name_en: dto.name,
@@ -59,12 +62,14 @@ export class ChecklistTypeService {
         id_family: dto.id_family,
         icon_url: dto.icon_url,
       });
-      await this.calendarService.findOneAndUpdateCalendarByCustomQuery(
-        {
-          where: { id_calendar: dto.id_calendar, id_family: dto.id_family },
-        },
-        { id_checklist_type: checklistType.id_checklist_type },
-      );
+      if (dto.id_calendar) {
+        await this.calendarService.findOneAndUpdateCalendarByCustomQuery(
+          {
+            where: { id_calendar: dto.id_calendar, id_family: dto.id_family },
+          },
+          { id_checklist_type: checklistType.id_checklist_type },
+        );
+      }
       return {
         data: checklistType,
         message: 'Create checklist type successfully',

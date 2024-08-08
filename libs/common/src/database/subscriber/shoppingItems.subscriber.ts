@@ -41,17 +41,26 @@ export class ShoppingItemSubscriber
 
     const shoppingList = await shoppingListRepository.findOne({
       where: { id_list },
+      relations: ['shoppingItems'],
     });
 
-    if (shoppingList && shoppingList.status === ShoppingListsStatus.COMPLETED) {
+    if (shoppingList) {
       const expenditure = await expenditureRepository.findOne({
-        where: { id_expenditure: shoppingList.id_expenditure },
+        where: { id_shopping_list: id_list },
       });
-
-      if (expenditure) {
-        expenditure.amount = await this.calculateTotalAmount(id_list);
-        expenditure.expenditure_date = new Date();
-        await expenditureRepository.save(expenditure);
+      console.log('expenditure', expenditure);
+      if (shoppingList.status === ShoppingListsStatus.COMPLETED) {
+        if (expenditure) {
+          expenditure.amount = await this.calculateTotalAmount(id_list);
+          expenditure.expenditure_date = new Date();
+          await expenditureRepository.save(expenditure);
+        }
+      } else if (shoppingList.status === ShoppingListsStatus.IN_PROGRESS) {
+        if (expenditure) {
+          expenditure.amount = 0;
+          expenditure.expenditure_date = new Date();
+          await expenditureRepository.save(expenditure);
+        }
       }
     }
   }

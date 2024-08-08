@@ -9,6 +9,7 @@ import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { SerperService } from './serper/serper.service';
+import { FinanceExpenditureService } from './expenditure/expenditure.service';
 
 @Injectable()
 export class ShoppingService {
@@ -22,6 +23,7 @@ export class ShoppingService {
     @InjectRepository(ShoppingListTypes)
     private shoppingListTypesRepository: Repository<ShoppingListTypes>,
     private serperService: SerperService,
+    private financeExpenditureService: FinanceExpenditureService,
   ) {}
 
   async getShoppingItemType(search: string) {
@@ -129,14 +131,32 @@ export class ShoppingService {
   async createShoppingList(id_user: string, dto: any) {
     try {
       const { id_family, id_shopping_list_type, title, description } = dto;
-      const newShoppingList = new ShoppingLists();
-      newShoppingList.id_family = id_family;
-      newShoppingList.title = title;
-      newShoppingList.description = description;
-      newShoppingList.id_shopping_list_type = id_shopping_list_type;
-      const data = await this.shoppingListsRepository.save(newShoppingList);
+
+      const newShoppingList = this.shoppingListsRepository.create({
+        id_family,
+        id_shopping_list_type,
+        title,
+        description,
+      });
+      const savedShoppingList =
+        await this.shoppingListsRepository.save(newShoppingList);
+
+      const expenditure =
+        await this.financeExpenditureService.createExpenditure({
+          id_family,
+          description,
+          id_shopping_list: savedShoppingList.id_list,
+        });
+
+      if (!expenditure) {
+        throw new RpcException({
+          message: 'Create expenditure failed',
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        });
+      }
+
       return {
-        data: data,
+        data: savedShoppingList,
         message: 'Create shopping list',
       };
     } catch (error) {
