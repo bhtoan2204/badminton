@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { CategoryEvent } from './category_event.entity';
 import { Checklist } from './checklist.entity';
+import { ChecklistType } from './checklist_type.entity';
 
 @Entity('calendar')
 export class Calendar {
@@ -20,7 +21,7 @@ export class Calendar {
   id_family: number;
 
   @Column('int', { nullable: true, default: null })
-  id_checklist: number;
+  id_checklist_type: number;
 
   @Column('int', { nullable: false })
   category: number;
@@ -74,9 +75,9 @@ export class Calendar {
   @JoinColumn({ name: 'category' })
   categoryEvent: CategoryEvent;
 
-  @OneToOne(() => Checklist, (checklist) => checklist.calendar, {
+  @OneToOne(() => ChecklistType, (checklistType) => checklistType.calendar, {
     onDelete: 'SET NULL',
   })
-  @JoinColumn({ name: 'id_checklist' })
-  checklist: Checklist;
+  @JoinColumn({ name: 'id_checklist_type' })
+  checklistType: ChecklistType;
 }

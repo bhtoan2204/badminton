@@ -116,7 +116,7 @@ export class CalendarService {
     try {
       const [data, total] = await this.calendarRepository.findAndCount({
         where: { id_family },
-        relations: ['categoryEvent', 'checklist'],
+        relations: ['categoryEvent', 'checklistType'],
         order: { created_at: 'DESC' },
       });
       return {
@@ -143,7 +143,7 @@ export class CalendarService {
           id_family,
           time_start: And(MoreThanOrEqual(dateStart), LessThanOrEqual(dateEnd)),
         },
-        relations: ['categoryEvent', 'checklist'],
+        relations: ['categoryEvent', 'checklistType'],
       });
       return {
         message: 'Success',
@@ -165,7 +165,7 @@ export class CalendarService {
     try {
       const data = await this.calendarRepository.findOne({
         where: { id_calendar, id_family },
-        relations: ['categoryEvent', 'checklist'],
+        relations: ['categoryEvent', 'checklistType'],
       });
       if (!data) {
         throw new RpcException({
@@ -222,7 +222,7 @@ export class CalendarService {
       await this.calendarRepository.save(newCalendar);
       const data = await this.calendarRepository.findOne({
         where: { id_calendar: newCalendar.id_calendar },
-        relations: ['categoryEvent', 'checklist'],
+        relations: ['categoryEvent', 'checklistType'],
       });
       return {
         message: 'Success',
@@ -281,7 +281,7 @@ export class CalendarService {
       await this.calendarRepository.save(calendar);
       const data = await this.calendarRepository.findOne({
         where: { id_calendar, id_family },
-        relations: ['categoryEvent', 'checklist'],
+        relations: ['categoryEvent', 'checklistType'],
       });
       return {
         message: 'Success',
@@ -332,9 +332,9 @@ export class CalendarService {
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
-      if (data.id_checklist) {
+      if (data.id_checklist_type) {
         throw new RpcException({
-          message: 'Calendar event already has checklist',
+          message: 'Calendar event already has checklist type',
           statusCode: HttpStatus.BAD_REQUEST,
         });
       }
@@ -359,15 +359,15 @@ export class CalendarService {
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
-      if (calendar.id_checklist) {
+      if (calendar.id_checklist_type) {
         throw new RpcException({
-          message: 'Calendar event already has checklist',
+          message: 'Calendar event already has checklist type',
           statusCode: HttpStatus.BAD_REQUEST,
         });
       }
-      calendar.id_checklist = data.id_checklist;
+      calendar.id_checklist_type = data.id_checklist_type;
       const updatedCalendar = await this.calendarRepository.save(calendar);
-      console.log(data);
+
       return {
         message: 'Success',
         data: updatedCalendar,

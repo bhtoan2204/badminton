@@ -3,7 +3,6 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CalendarService } from '../calendar.service';
 
 @Injectable()
 export class ChecklistService {
@@ -12,7 +11,6 @@ export class ChecklistService {
     private checklistRepository: Repository<Checklist>,
     @InjectRepository(ChecklistType)
     private checklistTypeRepository: Repository<ChecklistType>,
-    private readonly calendarService: CalendarService,
   ) {}
 
   async getChecklists(
@@ -31,7 +29,7 @@ export class ChecklistService {
         where: { id_family: dto.id_family },
         skip: (dto.page - 1) * dto.itemsPerPage,
         take: dto.itemsPerPage,
-        relations: ['checklistType', 'calendar'],
+        relations: ['checklistType'],
         order: {
           [dto.sortBy]: dto.sortDirection,
         },
@@ -56,30 +54,12 @@ export class ChecklistService {
 
   async createChecklist(id_user: string, dto: any) {
     try {
-      const {
-        id_family,
-        id_checklist_type,
-        task_name,
-        description,
-        due_date,
-        id_calendar,
-      } = dto;
+      const { id_family, id_checklist_type, task_name, description, due_date } =
+        dto;
       const checklistType = await this.checklistTypeRepository.findOne({
         where: { id_checklist_type, id_family },
       });
-      if (id_calendar) {
-        const calendar =
-          await this.calendarService.findOneCalendarByCustomQuery({
-            where: { id_calendar, id_family },
-          });
 
-        if (!calendar.data) {
-          throw new RpcException({
-            message: 'Calendar not found',
-            statusCode: HttpStatus.NOT_FOUND,
-          });
-        }
-      }
       if (!checklistType) {
         throw new RpcException({
           message: 'Checklist type not found',
@@ -92,17 +72,7 @@ export class ChecklistService {
         task_name,
         description,
         due_date,
-        id_calendar,
       });
-
-      if (id_calendar) {
-        await this.calendarService.findOneAndUpdateCalendarByCustomQuery(
-          {
-            where: { id_calendar, id_family },
-          },
-          { id_checklist: checklist.id_checklist },
-        );
-      }
 
       return {
         data: checklist,
@@ -125,7 +95,6 @@ export class ChecklistService {
       description,
       due_date,
       is_completed,
-      id_calendar,
     } = dto;
     try {
       const checklist = await this.checklistRepository.findOne({
@@ -161,9 +130,7 @@ export class ChecklistService {
       if (is_completed !== undefined) {
         checklist.is_completed = is_completed;
       }
-      if (id_calendar !== undefined) {
-        checklist.id_calendar = id_calendar;
-      }
+
       const updatedChecklist = await this.checklistRepository.save(checklist);
       return {
         data: updatedChecklist,

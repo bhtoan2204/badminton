@@ -1,11 +1,14 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
 import { Checklist } from './checklist.entity';
+import { Calendar } from './calendar.entity';
 
 @Entity('checklist_type')
 @Unique(['name_en', 'id_family'])
@@ -23,9 +26,16 @@ export class ChecklistType {
   @Column('int', { nullable: false })
   id_family: number;
 
+  @Column('int', { nullable: true, default: null })
+  id_calendar: number;
+
   @Column('text', { nullable: true })
   icon_url: string;
 
   @OneToMany(() => Checklist, (checklist) => checklist.checklistType)
   checklists: Checklist[];
+
+  @OneToOne(() => Calendar, (calendar) => calendar.checklistType)
+  @JoinColumn({ name: 'id_calendar' })
+  calendar: Calendar;
 }

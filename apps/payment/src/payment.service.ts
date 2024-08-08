@@ -779,7 +779,13 @@ export class PaymentService {
         where: { id_user: id_user },
         skip: (dto.page - 1) * dto.itemsPerPage,
         take: dto.itemsPerPage,
-        relations: ['orders'],
+        relations: [
+          'orders',
+          'orders.packageMain',
+          'orders.packageExtra',
+          'orders.packageCombo',
+          'orders.family',
+        ],
       };
       if (dto.sortBy && dto.sortDirection) {
         option['order'] = { [dto.sortBy]: dto.sortDirection };

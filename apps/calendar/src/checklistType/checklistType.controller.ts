@@ -20,7 +20,14 @@ export class ChecklistTypeController {
   async createChecklistType(
     @Ctx() context: RmqContext,
     @Payload()
-    data: { dto: { name: string; id_family: number; icon_url: string } },
+    data: {
+      dto: {
+        name: string;
+        id_family: number;
+        icon_url: string;
+        id_calendar: number;
+      };
+    },
   ) {
     this.rmqService.ack(context);
     return this.checklistTypeService.createChecklistType(data.dto);

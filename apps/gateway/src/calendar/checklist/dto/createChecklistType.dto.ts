@@ -14,6 +14,11 @@ export class CreateChecklistTypeDto {
 
   @ApiProperty()
   @IsNotEmpty()
+  @IsNumber()
+  id_calendar: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
   @IsString()
   icon_url: string;
 }

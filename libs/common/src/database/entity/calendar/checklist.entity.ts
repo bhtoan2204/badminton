@@ -6,10 +6,8 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
-  OneToOne,
 } from 'typeorm';
 import { ChecklistType } from './checklist_type.entity';
-import { Calendar } from './calendar.entity';
 
 @Entity('checklist')
 export class Checklist {
@@ -18,9 +16,6 @@ export class Checklist {
 
   @Column({ nullable: false, default: 1 })
   id_checklist_type: number;
-
-  @Column({ nullable: true, default: null })
-  id_calendar: number;
 
   @Column()
   id_family: number;
@@ -55,11 +50,4 @@ export class Checklist {
   @ManyToOne(() => ChecklistType, (checklistType) => checklistType.checklists)
   @JoinColumn({ name: 'id_checklist_type' })
   checklistType: ChecklistType;
-
-  @OneToOne(() => Calendar, (calendar) => calendar.checklist, {
-    cascade: true,
-    onDelete: 'SET NULL',
-  })
-  @JoinColumn({ name: 'id_calendar' })
-  calendar: Calendar;
 }
