@@ -30,4 +30,14 @@ export class SearchController {
     this.rmqService.ack(context);
     return await this.elasticsearchService.getLogsCountByTimeRange(data);
   }
+
+  @EventPattern('elasticsearchClient/getServiceLogsTypeByTimeRange')
+  async getServiceLogsTypeByTimeRange(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    console.log(data);
+    return await this.elasticsearchService.getServiceLogsTypeByTimeRange(data);
+  }
 }

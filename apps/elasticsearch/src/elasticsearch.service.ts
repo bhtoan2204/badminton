@@ -3,10 +3,42 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { RpcException } from '@nestjs/microservices';
 import * as moment from 'moment';
 
+interface ServiceTypeBuckets {
+  key: string;
+  doc_count: number;
+}
+
+interface ServiceTypeAggregations {
+  service_types: {
+    buckets: ServiceTypeBuckets[];
+  };
+}
+
 @Injectable()
 export class SearchService {
   private readonly index = 'famfund-app-production';
   constructor(private readonly elasticsearchService: ElasticsearchService) {}
+
+  private serviceType = [
+    'auth',
+    'user',
+    'payment',
+    'family',
+    'invitation',
+    'chat',
+    'notification',
+    'crawler',
+    'calendar',
+    'checklist',
+    'guideline',
+    'education',
+    'subject',
+    'household',
+    'room',
+    'finance',
+    'utilities',
+    'shopping',
+  ];
 
   async getLogsCount() {
     try {
@@ -144,7 +176,7 @@ export class SearchService {
       const counts = await Promise.all(
         intervals.map(async ({ startTime, endTime }) => {
           const result = await this.elasticsearchService.count({
-            index: 'famfund-app-production', // Thay thế bằng tên index của bạn
+            index: 'famfund-app-production',
             body: {
               query: {
                 range: {
@@ -157,12 +189,96 @@ export class SearchService {
             },
           });
           return {
-            time: moment(startTime).format('YYYY-MM-DD HH:mm'), // Định dạng thời gian theo ý muốn
+            time: moment(startTime).format('YYYY-MM-DD HH:mm'),
             count: result.count,
           };
         }),
       );
       return counts;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+
+  async getServiceLogsTypeByTimeRange(dto: any) {
+    try {
+      const { timeStart, timeEnd } = dto;
+      const timeDifference = moment(timeEnd).diff(moment(timeStart), 'minutes');
+      const intervalMinutes = Math.round(timeDifference / 30);
+
+      const numberOfIntervals = Math.min(
+        Math.ceil(timeDifference / intervalMinutes),
+        30,
+      );
+
+      const intervals = Array.from(Array(numberOfIntervals).keys()).map(
+        (index) => {
+          const startTime = moment(timeStart)
+            .add(index * intervalMinutes, 'minutes')
+            .toISOString();
+          const endTime = moment(startTime)
+            .add(intervalMinutes, 'minutes')
+            .toISOString();
+
+          return { startTime, endTime };
+        },
+      );
+
+      const results = await Promise.all(
+        intervals.map(async ({ startTime, endTime }) => {
+          try {
+            const result = await this.elasticsearchService.search({
+              index: 'famfund-app-production',
+              body: {
+                query: {
+                  bool: {
+                    filter: [
+                      {
+                        range: {
+                          '@timestamp': {
+                            gte: startTime,
+                            lt: endTime,
+                          },
+                        },
+                      },
+                    ],
+                  },
+                },
+                aggs: {
+                  service_types: {
+                    terms: {
+                      field: 'service.type',
+                      size: 20,
+                    },
+                  },
+                },
+              },
+            });
+
+            const aggregations =
+              result.aggregations as unknown as ServiceTypeAggregations;
+
+            return {
+              time: moment(startTime).format('YYYY-MM-DD HH:mm'),
+              counts: aggregations.service_types.buckets.map((bucket) => ({
+                type: bucket.key,
+                count: bucket.doc_count,
+              })),
+            };
+          } catch (searchError) {
+            console.error('Error fetching aggregation data:', searchError);
+            throw new RpcException({
+              message: searchError.message,
+              statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+            });
+          }
+        }),
+      );
+
+      return results.flat();
     } catch (error) {
       throw new RpcException({
         message: error.message,

@@ -6,7 +6,7 @@ import {
 } from '@app/common';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { Between, Repository } from 'typeorm';
+import { Between, MoreThan, Repository } from 'typeorm';
 import { validate, version, NIL } from 'uuid';
 import { StorageService } from '../storage/storage.service';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -299,6 +299,7 @@ export class ExpenseditureService {
       const option = {
         where: {
           id_family: dto.id_family,
+          amount: MoreThan(1),
         },
         skip: (dto.page - 1) * dto.itemsPerPage,
         take: dto.itemsPerPage,

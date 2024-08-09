@@ -264,13 +264,24 @@ export class CalendarService {
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
+      if (category) {
+        const categoryEvent = await this.categoryEventRepository.findOne({
+          where: { id_category_event: category, id_family },
+        });
+        if (!categoryEvent) {
+          throw new RpcException({
+            message: 'Category event not found',
+            statusCode: HttpStatus.NOT_FOUND,
+          });
+        }
+        calendar.category = category;
+      }
       if (title) calendar.title = title;
       if (description) calendar.description = description;
       if (time_start) calendar.time_start = time_start;
       if (time_end) calendar.time_end = time_end;
       if (color) calendar.color = color;
       if (is_all_day !== undefined) calendar.is_all_day = is_all_day;
-      if (category) calendar.category = category;
       if (location) calendar.location = location;
       if (recurrence_exception)
         calendar.recurrence_exception = recurrence_exception;

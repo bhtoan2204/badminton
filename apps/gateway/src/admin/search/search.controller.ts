@@ -14,6 +14,7 @@ import { SearchService } from './search.service';
 import { GetLogsFilterDto } from './dto/getLogFilter.dto';
 import { GetCountLogsByTimeRangeDto } from './dto/getCountLogsByTimeRange.dto';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { GetServiceCountLogsByTimeRangeDto } from './dto/getServiceCountLogsByTimeRangeDto.dto';
 
 @ApiTags('Admin Logs')
 @Controller('logs')
@@ -44,5 +45,14 @@ export class SearchController {
   @Post('getLogsCountByTimeRange')
   async getLogsCountByTimeRange(@Body() dto: GetCountLogsByTimeRangeDto) {
     return this.searchService.getLogsCountByTimeRange(dto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get service logs type by time range' })
+  @Post('getServiceLogsTypeByTimeRange')
+  async getServiceLogsTypeByTimeRange(
+    @Body() dto: GetServiceCountLogsByTimeRangeDto,
+  ) {
+    return this.searchService.getServiceLogsTypeByTimeRange(dto);
   }
 }

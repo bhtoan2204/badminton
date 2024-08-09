@@ -19,6 +19,7 @@ export class ExpenseditureController {
       data.date,
     );
   }
+
   @EventPattern('financeClient/getExpenseByMonth')
   async getExpenseByMonth(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
@@ -29,6 +30,7 @@ export class ExpenseditureController {
       data.year,
     );
   }
+
   @EventPattern('financeClient/getExpenseByYear')
   async getExpenseByYear(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);

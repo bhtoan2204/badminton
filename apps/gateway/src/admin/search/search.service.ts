@@ -54,4 +54,19 @@ export class SearchService {
       );
     }
   }
+
+  async getServiceLogsTypeByTimeRange(dto: any) {
+    try {
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'elasticsearchClient/getServiceLogsTypeByTimeRange',
+        dto,
+      );
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
+    }
+  }
 }
