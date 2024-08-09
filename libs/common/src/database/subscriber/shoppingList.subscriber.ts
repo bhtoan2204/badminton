@@ -33,56 +33,41 @@ export class ShoppingListSubscriber
     return ShoppingLists;
   }
 
-  // private async calculateTotalAmount(id_list: number): Promise<number> {
-  //   const items = await this.shoppingItemRepository.find({
-  //     where: { id_list },
-  //   });
-  //   return items.reduce((total, item) => total + item.price * item.quantity, 0);
-  // }
+  private async calculateTotalAmount(id_list: number): Promise<number> {
+    const shoppingItemRepository = this.dataSource.getRepository(ShoppingItems);
+    const items = await shoppingItemRepository.find({ where: { id_list } });
+    console.log(items);
+    return items.reduce((total, item) => total + item.price * item.quantity, 0);
+  }
 
-  // async afterUpdate(event: UpdateEvent<ShoppingLists>): Promise<any> {
-  //   const { entity, databaseEntity } = event;
-  //   if (entity && databaseEntity) {
-  //     const expenditure = await this.expenditureRepository.findOne({
-  //       where: { id_expenditure: entity.id_expenditure },
-  //     });
-  //     if (expenditure && entity.id_expenditure) {
-  //       if (entity.status === ShoppingListsStatus.COMPLETED) {
-  //         expenditure.amount = await this.calculateTotalAmount(entity.id_list);
-  //         expenditure.description = entity.description;
-  //         expenditure.expenditure_date = entity.updated_at;
-  //         await this.expenditureRepository.save(expenditure);
-  //       } else if (entity.status === ShoppingListsStatus.IN_PROGRESS) {
-  //         entity.id_expenditure = null;
-  //         await event.manager.save(entity);
-  //         await this.expenditureRepository.delete(expenditure.id_expenditure);
-  //       }
-  //     } else {
-  //       if (entity.status === ShoppingListsStatus.COMPLETED) {
-  //         const amount = await this.calculateTotalAmount(entity.id_list);
-  //         const newExpenditure = this.expenditureRepository.create({
-  //           id_family: entity.id_family,
-  //           amount: amount,
-  //           description: entity.description,
-  //           expenditure_date: entity.created_at,
-  //         });
-  //         await this.expenditureRepository.save(newExpenditure);
-  //         entity.id_expenditure = newExpenditure.id_expenditure;
-  //         await event.manager.save(entity);
-  //       }
-  //     }
-  //   }
-  // }
+  async afterUpdate(event: UpdateEvent<ShoppingLists>): Promise<any> {
+    const { entity, databaseEntity } = event;
+    if (entity && databaseEntity) {
+      const expenditure = await this.expenditureRepository.findOne({
+        where: { id_shopping_list: entity.id_list },
+      });
+      if (entity.status === ShoppingListsStatus.COMPLETED) {
+        expenditure.amount = await this.calculateTotalAmount(entity.id_list);
+        expenditure.description = entity.description;
+        expenditure.expenditure_date = entity.updated_at;
+      } else if (entity.status === ShoppingListsStatus.IN_PROGRESS) {
+        expenditure.amount = 0;
+        expenditure.description = entity.description;
+        expenditure.expenditure_date = entity.updated_at;
+      }
+      await this.expenditureRepository.save(expenditure);
+    }
+  }
 
-  // async afterRemove(event: RemoveEvent<ShoppingLists>): Promise<any> {
-  //   const { entity } = event;
-  //   if (entity) {
-  //     const expenditure = await this.expenditureRepository.findOne({
-  //       where: { id_expenditure: entity.id_expenditure },
-  //     });
-  //     if (expenditure) {
-  //       await this.expenditureRepository.remove(expenditure);
-  //     }
-  //   }
-  // }
+  async afterRemove(event: RemoveEvent<ShoppingLists>): Promise<any> {
+    const { entity } = event;
+    if (entity) {
+      const expenditure = await this.expenditureRepository.findOne({
+        where: { id_shopping_list: entity.id_list },
+      });
+      if (expenditure) {
+        await this.expenditureRepository.remove(expenditure);
+      }
+    }
+  }
 }

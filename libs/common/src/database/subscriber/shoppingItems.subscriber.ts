@@ -48,15 +48,12 @@ export class ShoppingItemSubscriber
       const expenditure = await expenditureRepository.findOne({
         where: { id_shopping_list: id_list },
       });
-      console.log('expenditure', expenditure);
-      if (shoppingList.status === ShoppingListsStatus.COMPLETED) {
-        if (expenditure) {
+      if (expenditure) {
+        if (shoppingList.status === ShoppingListsStatus.COMPLETED) {
           expenditure.amount = await this.calculateTotalAmount(id_list);
           expenditure.expenditure_date = new Date();
           await expenditureRepository.save(expenditure);
-        }
-      } else if (shoppingList.status === ShoppingListsStatus.IN_PROGRESS) {
-        if (expenditure) {
+        } else if (shoppingList.status === ShoppingListsStatus.IN_PROGRESS) {
           expenditure.amount = 0;
           expenditure.expenditure_date = new Date();
           await expenditureRepository.save(expenditure);
