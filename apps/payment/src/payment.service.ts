@@ -101,10 +101,7 @@ export class PaymentService {
       });
 
       if (!familyExtra.length) {
-        throw new RpcException({
-          message: 'Family not found or not buy any extra package yet',
-          statusCode: HttpStatus.NOT_FOUND,
-        });
+        return [];
       }
 
       const extraPackages = familyExtra.map((item) => {
@@ -145,14 +142,12 @@ export class PaymentService {
   }
 
   async checkOrder(id_user: string, dto: any) {
-    const { id_order, bankCode, id_family } = dto;
+    const { id_order, bankCode } = dto;
 
     try {
       const order = await this.orderRepository.findOne({
         where: {
           id_order,
-          id_user,
-          id_family,
           status: OrderStatus.PENDING,
           bank_code: bankCode,
         },
@@ -240,9 +235,27 @@ export class PaymentService {
         id_family: newFamily.id_family,
       });
       order.id_family = newFamily.id_family;
-      await this.orderRepository.save(order);
 
-      await this.addDefaultExpenseIncomeType(newFamily.id_family);
+      await Promise.all([
+        this.orderRepository.save(order),
+        this.addDefaultExpenseIncomeType(newFamily.id_family),
+        this.addDefaultSvc(newFamily.id_family),
+      ]);
+    }
+  }
+
+  private async addDefaultSvc(id_family: number) {
+    try {
+      const familyExtraPackages = await this.familyExtraRepository.create({
+        id_family: id_family,
+        id_extra_package: 4,
+      });
+      await this.familyExtraRepository.save(familyExtraPackages);
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
     }
   }
 

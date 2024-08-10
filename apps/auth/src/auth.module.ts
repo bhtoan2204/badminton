@@ -7,7 +7,7 @@ import {
   Users,
 } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
-import { MainDatabaseModule } from '@app/common/database/database.module';
+import { MainDatabaseModule } from '@app/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';

@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { Brackets, EntityManager, Like, Repository } from 'typeorm';
+import { Brackets, Like, Repository } from 'typeorm';
 import { RpcException } from '@nestjs/microservices';
 import { StorageService } from './storage/storage.service';
 import {
@@ -7,7 +7,6 @@ import {
   FamilyExtraPackages,
   FamilyRoles,
   MemberFamily,
-  PackageExtra,
   UploadFileRequest,
   Users,
 } from '@app/common';
@@ -16,11 +15,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class FamilyService {
   constructor(
-    private readonly entityManager: EntityManager,
     private readonly storageService: StorageService,
     @InjectRepository(Family) private familyRepository: Repository<Family>,
-    @InjectRepository(PackageExtra)
-    private packageExtraRepository: Repository<PackageExtra>,
     @InjectRepository(FamilyExtraPackages)
     private familyExtraPackagesRepository: Repository<FamilyExtraPackages>,
     @InjectRepository(MemberFamily)
@@ -195,6 +191,15 @@ export class FamilyService {
       if (memberFamily) {
         throw new RpcException({
           message: 'Member already in family',
+          statusCode: HttpStatus.CONFLICT,
+        });
+      }
+      const memberCount = await this.memberFamilyRepository.count({
+        where: { id_family },
+      });
+      if (memberCount >= 20) {
+        throw new RpcException({
+          message: 'Family is full',
           statusCode: HttpStatus.CONFLICT,
         });
       }

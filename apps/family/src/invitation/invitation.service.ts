@@ -76,6 +76,15 @@ export class InvitationService {
           statusCode: HttpStatus.BAD_REQUEST,
         });
       }
+      const memberCount = await this.memberFamilyRepository.count({
+        where: { id_family },
+      });
+      if (memberCount >= 20) {
+        throw new RpcException({
+          message: 'Family is full',
+          statusCode: HttpStatus.CONFLICT,
+        });
+      }
       const invitation = await this.familyInvitationRepository.find({
         where: { id_family, code },
       });

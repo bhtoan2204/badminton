@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AuthModule } from './auth.module';
-import { RmqService } from '@app/common/rmq/rmq.service';
+import { RmqService } from '@app/common';
 import { GrpcService, initTracing } from '@app/common';
 
 async function bootstrap() {

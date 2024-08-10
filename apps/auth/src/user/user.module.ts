@@ -8,7 +8,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { StorageModule } from '../storage/storage.module';
-import { FamilyInvitation } from '@app/common/database/entity/family_invitation.entity';
+import { FamilyInvitation } from '@app/common';
 import { TwilioModule } from 'nestjs-twilio';
 
 @Module({
