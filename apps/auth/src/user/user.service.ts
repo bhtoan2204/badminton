@@ -310,7 +310,7 @@ export class UserService {
       }
       if (email) {
         const user = await this.userRepository.findOne({
-          where: { email, login_type: LoginType.LOCAL, isemailverified: false },
+          where: { email, login_type: LoginType.LOCAL, isemailverified: true },
         });
         if (!user) {
           throw new RpcException({
@@ -598,25 +598,30 @@ export class UserService {
           statusCode: HttpStatus.BAD_REQUEST,
         });
       }
-      const user = await this.userRepository.findOne({
-        where: [
-          { email, login_type: LoginType.LOCAL },
-          { phone, login_type: LoginType.LOCAL },
-        ],
-        select: ['id_user', 'password', 'salt'],
-      });
+      let user;
+      if (email) {
+        user = await this.userRepository.findOne({
+          where: { email, login_type: LoginType.LOCAL },
+          select: ['id_user', 'password', 'salt'],
+        });
+      } else if (phone) {
+        user = await this.userRepository.findOne({
+          where: { phone, login_type: LoginType.LOCAL },
+          select: ['id_user', 'password', 'salt'],
+        });
+      }
       if (!user) {
         throw new RpcException({
           message: 'User not found',
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
+
       const hashedPassword = await hashPassword(password, user.salt);
       user.password = hashedPassword;
-      await Promise.all([
-        this.userRepository.save(user),
-        this.otpRepository.remove(otp),
-      ]);
+
+      await this.userRepository.save(user);
+      await this.otpRepository.remove(otp);
       return {
         message: 'Password has been reset',
         data: true,
