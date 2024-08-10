@@ -24,7 +24,6 @@ import { GetPaymentHistoryDto } from './dto/getPaymentHistory.dto';
 
 @ApiTags('Payment')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('payment')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
@@ -50,6 +49,7 @@ export class PaymentController {
     return this.paymentService.getComboPackage();
   }
 
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get place order (main, combo, extra)' })
   @Post('placeOrder')
@@ -62,6 +62,7 @@ export class PaymentController {
     return this.paymentService.placeOrder(id_user, dto, ip);
   }
 
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Check order' })
   @Post('checkOrder')
@@ -70,6 +71,7 @@ export class PaymentController {
     return this.paymentService.checkOrderReturn(id_user, dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get successful orders for current user' })
   @ApiQuery({ name: 'page', required: true, type: Number })
@@ -84,6 +86,7 @@ export class PaymentController {
     return this.paymentService.getOrder(id_user, page, itemsPerPage);
   }
 
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get available function' })
   @Get('getAvailableFunction/:id_family')
@@ -95,6 +98,7 @@ export class PaymentController {
     return this.paymentService.getAvailableFunction(id_user, id_family);
   }
 
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Payment History' })
   @ApiQuery({ name: 'page', required: true, type: Number })

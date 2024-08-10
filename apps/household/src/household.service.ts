@@ -58,6 +58,7 @@ export class HouseholdService {
         where: { id_family: dto.id_family },
         skip: (dto.page - 1) * dto.itemsPerPage,
         take: dto.itemsPerPage,
+        relations: ['category', 'room', 'durableItem', 'consumableItem'],
       };
       if (dto.sortBy && dto.sortDirection) {
         option['order'] = {
@@ -296,7 +297,7 @@ export class HouseholdService {
     try {
       const item = await this.householdItemsRepository.findOne({
         where: { id_family, id_household_item: id_item },
-        relations: ['durableItem', 'consumableItem'],
+        relations: ['category', 'room', 'durableItem', 'consumableItem'],
       });
 
       if (!item) {

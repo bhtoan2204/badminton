@@ -176,33 +176,35 @@ export class PaymentService {
   }
 
   private async handleOrderStatus(order: Order) {
-    if (order.status === OrderStatus.SUCCESS) {
+    try {
+      if (order.status === OrderStatus.SUCCESS) {
+        throw new RpcException({
+          message: 'Order already paid',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+
+      if (order.id_package_main) {
+        await this.handleMainPackage(order);
+      } else if (order.id_package_extra) {
+        await this.handleExtraPackage(order);
+      } else if (order.id_package_combo) {
+        await this.handleComboPackage(order);
+      } else {
+        throw new RpcException({
+          message: 'Invalid order package',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+
+      order.status = OrderStatus.SUCCESS;
+      return await this.orderRepository.save(order);
+    } catch (error) {
       throw new RpcException({
-        message: 'Order already paid',
-        statusCode: HttpStatus.BAD_REQUEST,
+        message: error.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
-
-    if (order.id_package_main) {
-      await this.handleMainPackage(order);
-    } else if (order.id_package_extra) {
-      await this.handleExtraPackage(order);
-    } else if (order.id_package_combo) {
-      await this.handleComboPackage(order);
-    } else {
-      throw new RpcException({
-        message: 'Invalid order package',
-        statusCode: HttpStatus.BAD_REQUEST,
-      });
-    }
-
-    order.status = OrderStatus.SUCCESS;
-    await this.orderRepository.save(order);
-    const familyExtraPackages = await this.familyExtraRepository.create({
-      id_family: order.id_family,
-      id_extra_package: 4,
-    });
-    await this.familyExtraRepository.save(familyExtraPackages);
   }
 
   private async handleMainPackage(order: Order) {
