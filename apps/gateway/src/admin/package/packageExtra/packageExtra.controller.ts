@@ -28,4 +28,9 @@ export class PackageExtraController {
   async updatePackageExtra(@Body() dto: UpdatePackageExtraDto): Promise<any> {
     return this.packageExtraService.updatePackageExtra(dto);
   }
+
+  @Get('statistics')
+  async getPackageExtraStatistics(): Promise<any> {
+    return this.packageExtraService.getPackageExtraStatistics();
+  }
 }

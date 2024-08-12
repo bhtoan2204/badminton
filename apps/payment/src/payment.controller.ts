@@ -32,7 +32,7 @@ export class PaymentController {
   @EventPattern('paymentClient/verifyOrder')
   async updateStatus(@Payload() data: any, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-    return this.paymentService.checkOrder(data.id_user, data.dto);
+    return this.paymentService.checkOrder(data.dto);
   }
 
   @EventPattern('paymentClient/getMainPackage')

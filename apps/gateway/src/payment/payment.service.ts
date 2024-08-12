@@ -143,12 +143,12 @@ export class PaymentService {
     }
   }
 
-  async checkOrderReturn(id_user: string, dto: VerifyOrderDTO) {
+  async checkOrderReturn(dto: VerifyOrderDTO) {
     try {
       return await this.rmqService.send(
         this.paymentClient,
         'paymentClient/verifyOrder',
-        { id_user, dto },
+        { dto },
       );
     } catch (error) {
       throw new HttpException(

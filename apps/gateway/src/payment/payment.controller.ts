@@ -62,13 +62,11 @@ export class PaymentController {
     return this.paymentService.placeOrder(id_user, dto, ip);
   }
 
-  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Check order' })
   @Post('checkOrder')
-  async checkOrderReturn(@CurrentUser() user, @Body() dto: VerifyOrderDTO) {
-    const id_user = user.id_user;
-    return this.paymentService.checkOrderReturn(id_user, dto);
+  async checkOrderReturn(@Body() dto: VerifyOrderDTO) {
+    return this.paymentService.checkOrderReturn(dto);
   }
 
   @UseGuards(JwtAuthGuard)

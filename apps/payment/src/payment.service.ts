@@ -141,7 +141,7 @@ export class PaymentService {
     }
   }
 
-  async checkOrder(id_user: string, dto: any) {
+  async checkOrder(dto: any) {
     const { id_order, bankCode } = dto;
 
     try {

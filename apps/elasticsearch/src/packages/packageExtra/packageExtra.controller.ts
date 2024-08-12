@@ -31,4 +31,10 @@ export class PackageExtraController {
     this.rmqService.ack(context);
     return this.packageExtraService.updatePackageExtra(data);
   }
+
+  @EventPattern('elasticsearchClient/getPackageExtraStatistics')
+  async getPackageExtraStatistics(@Ctx() context: RmqContext): Promise<any> {
+    this.rmqService.ack(context);
+    return this.packageExtraService.getPackageExtraStatistics();
+  }
 }

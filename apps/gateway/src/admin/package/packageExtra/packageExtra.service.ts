@@ -10,6 +10,22 @@ export class PackageExtraService {
     private readonly elasticsearchClient: ClientProxy,
     private readonly rmqService: RmqService,
   ) {}
+
+  async getPackageExtraStatistics(): Promise<any> {
+    try {
+      return await this.rmqService.send(
+        this.elasticsearchClient,
+        'elasticsearchClient/getPackageExtraStatistics',
+        {},
+      );
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.statusCode || error.status || 500,
+      );
+    }
+  }
+
   async getPackagesExtra(
     search: string,
     sortBy: string,
