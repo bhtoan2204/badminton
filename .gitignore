@@ -42,4 +42,5 @@ package-lock.json
 
 deploy.sh
 
-**/.env*
+**/.env
+**/.env.production
